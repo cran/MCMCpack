@@ -93,8 +93,9 @@ extern "C"{
 				       gamma_p[i-1]);
 	  }
 	  else {
-	    gamma_p[i] = rtnorm(gamma[i], ::pow(tune[0], 2.0), gamma_p[i-1], 
-				gamma[i+1]);
+	    gamma_p[i] = rtnorm_combo(gamma[i], ::pow(tune[0], 2.0), 
+				      gamma_p[i-1], 
+				      gamma[i+1]);
 	  }
 	}
 	double loglikerat = 0.0;
@@ -105,21 +106,21 @@ extern "C"{
 	  if (MY[i] == ncat){
 	    loglikerat = loglikerat 
 	      + log(1.0  - 
-		    pnorm1(gamma_p[MY[i]-1] - Xbeta[i]) ) 
+		    pnorm(gamma_p[MY[i]-1] - Xbeta[i]) ) 
 	      - log(1.0 - 
-		    pnorm1(gamma[MY[i]-1] - Xbeta[i]) );
+		    pnorm(gamma[MY[i]-1] - Xbeta[i]) );
 	  }
 	  else if (MY[i] == 1){
 	    loglikerat = loglikerat 
-	      + log(pnorm1(gamma_p[MY[i]] - Xbeta[i])  ) 
-	      - log(pnorm1(gamma[MY[i]] - Xbeta[i]) );
+	      + log(pnorm(gamma_p[MY[i]] - Xbeta[i])  ) 
+	      - log(pnorm(gamma[MY[i]] - Xbeta[i]) );
 	  }
 	  else{
 	    loglikerat = loglikerat 
-	      + log(pnorm1(gamma_p[MY[i]] - Xbeta[i]) - 
-		    pnorm1(gamma_p[MY[i]-1] - Xbeta[i]) ) 
-	      - log(pnorm1(gamma[MY[i]] - Xbeta[i]) - 
-		    pnorm1(gamma[MY[i]-1] - Xbeta[i]) );
+	      + log(pnorm(gamma_p[MY[i]] - Xbeta[i]) - 
+		    pnorm(gamma_p[MY[i]-1] - Xbeta[i]) ) 
+	      - log(pnorm(gamma[MY[i]] - Xbeta[i]) - 
+		    pnorm(gamma[MY[i]-1] - Xbeta[i]) );
 	  }
 	}
 	for (int j=2; j<(ncat-1); ++j){	   
@@ -139,7 +140,7 @@ extern "C"{
 	// [Z| gamma, beta, y] 
 	Matrix<double> Z_mean = MX * beta;
 	for (int i=0; i<N; ++i){
-	  Z[i] = rtnorm(Z_mean[i], 1.0, gamma[MY[i]-1], gamma[MY[i]]);
+	  Z[i] = rtnorm_combo(Z_mean[i], 1.0, gamma[MY[i]-1], gamma[MY[i]]);
 	}
 	
       

@@ -1,8 +1,8 @@
 //
-// MCMCpack, Version 0.4-1
+// MCMCpack, Version 0.4-2
 //
 
-Release Date: June 9, 2003
+Release Date: July 23, 2003
 
 This package contains functions for posterior simulation for a number of
 statistical models. All simulation is done in compiled C++ written in
@@ -16,18 +16,19 @@ generators for statistical distributions.
 // Authors
 //
 
-Andrew D. Martin <admartin@artsci.wustl.edu>
+Andrew D. Martin <admartin@wustl.edu>
 Kevin M. Quinn <kquinn@latte.harvard.edu>
 
 //
 // Changes and Bug Fixes
 //
 
-0.3-10 to 0.3-11
-   * Fixed a bug in MCMCpoisson() re: non-negative counts
-   * Included a data file of Supreme Court votes for the
-     MCMCirt1d() model [thanks to Simon Jackman for the suggestion]
-   * Fixed memory leak caused by Scythe_Matrix.cc [thanks to Dan Pemstein]
+0.4-1 to 0.4-2
+   * Optimized some of the Scythe 0.4 code, which provides faster
+     computation for most models.
+   * Corrected a permissions problem on cleanup [thanks to Kurt Hornik] 
+   * Added explicit licensing information and a text echo when loading
+     MCMCpack.
 
 0.3-11 to 0.4-1
    * Ported to Scythe Version 0.4 (which will soon be publicly available)
@@ -53,6 +54,12 @@ Kevin M. Quinn <kquinn@latte.harvard.edu>
    * Range checking is turned off in the compiled C++ code, yielding
      significant speed gains for most models.
 
+0.3-10 to 0.3-11
+   * Fixed a bug in MCMCpoisson() re: non-negative counts
+   * Included a data file of Supreme Court votes for the
+     MCMCirt1d() model [thanks to Simon Jackman for the suggestion]
+   * Fixed memory leak caused by Scythe_Matrix.cc [thanks to Dan Pemstein]
+
 //
 // Compilation
 //
@@ -70,7 +77,7 @@ noted above. Many thanks to Dan Pemstein for helping with the
 cross-compilation, and to Kurt Hornik and Fritz Leisch for their
 help with debugging and service to the R community.
 
-Please contact Andrew D. Martin <admartin@artsci.wustl.edu> if
+Please contact Andrew D. Martin <admartin@wustl.edu> if
 you have any problems or questions.
 
 --
@@ -85,5 +92,5 @@ St. Louis, MO 63130
 (314) 935-5856 (Fax)
 
 Office: Eliot Hall 326
-Email: admartin@artsci.wustl.edu
+Email: admartin@wustl.edu
 WWW:   http://adm.wustl.edu

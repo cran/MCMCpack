@@ -53,9 +53,6 @@
 extern "C" int isinf(double);
 extern "C" int isnan(double);
 #endif
-#ifdef sgi
-#include <nan.h> // <cnan>?
-#endif
 #ifdef __MINGW32__
 #define M_PI 3.141592653589793238462643383280
 #endif
@@ -2039,11 +2036,10 @@ namespace SCYTHE {
 			temp = (xnum + c[7]) / (xden + d[7]);
 			do_del(y);
 			swap_tail;
-		} else if (log_p
-							|| (lower && -37.5193 < x && x < 8.2924)
-							|| (upper && -8.2929 < x && x < 37.5193)
-				) {
-			/* Evaluate pnorm for x in (-37.5, -5.657) union (5.657, 37.5) */
+		} else if((-37.5193 < x) && (x < 8.2924)) {
+			/* originally had y < 50 */
+			/* Evaluate pnorm for x in (-37.5, -5.657) 
+			 * union (5.657, 8.29) */
 			xsq = 1.0 / (x * x);
 			xnum = p[5] * xsq;
 			xden = xsq;
@@ -2055,19 +2051,27 @@ namespace SCYTHE {
 			temp = (M_1_SQRT_2PI - temp) / y;
 			do_del(x);
 			swap_tail;
-		} else {
-			if (x > 0) {
-				*cum = 1.;
-				*ccum = 0.;
+		} else { /* x < -37.5193  OR	8.2924 < x */
+			if(log_p) {/* be better than to just return log(0) or log(1) */
+				xsq = x*x;
+				if(xsq * DBL_EPSILON < 1.)
+					del = (1. - (1. - 5./(xsq+6.)) / (xsq+4.)) / (xsq+2.);
+				else
+					del = 0.;
+				*cum = -.5*xsq - M_LN_SQRT_2PI - log(y) + log1p(del);
+				*ccum = -0.;/*log(1)*/
+				swap_tail;
 			} else {
-				*cum = 0.;
-				*ccum = 1.;
+				if(x > 0) {
+					*cum = 1.; *ccum = 0.;
+				} else {
+					*cum = 0.; *ccum = 1.;
+				}
 			}
-			if (THROW_ON_NONCONV)
+			if (THROW_ON_NONCONV) 
 				throw scythe_convergence_error (__FILE__, __PRETTY_FUNCTION__,
 						__LINE__, std::string("x (") & x & "did not converge");
 		}
-
 		return;
 	}
 #undef SIXTEN
@@ -2077,19 +2081,14 @@ namespace SCYTHE {
 	double
 	pnorm2 (const double &x, const bool &lower_tail, const bool &log_p)
 	{
-		// XXX An sgi fix is probably required here
-		// note: commented out for MINGW crosscompilation -- should be fixed
+		// XXX A mingw fix is probably required here
 		//if (isnan(x))
 		//	throw scythe_nan_error (__FILE__, __PRETTY_FUNCTION__,
 		//			__LINE__, "Quantile x is not a number (NaN)");
 #ifdef __MINGW32__
 		if (! finite(x))
 #else
-#ifdef sgi
-		if (IsINF(x))
-#else
 		if (isinf(x))
-#endif
 #endif
 			throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
 					__LINE__, "Quantile x is inifinte (+/-Inf)");
@@ -2785,18 +2784,18 @@ namespace SCYTHE {
     return(A);
   }
 
-	/* Multivariate t */
-	Matrix<double>
-	rmvt (const Matrix<double> &sigma, const double &nu) {
-		Matrix<double> result;
+  /* Multivariate t */
+  Matrix<double>
+  rmvt (const Matrix<double> &sigma, const double &nu) {
+    Matrix<double> result;
     if (nu <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
 				__LINE__, "D.O.F parameter nu <= 0");
-		}
-		result = rmvnorm(Matrix<double>(sigma.rows(), 1, true, 0), sigma);
-		return result / std::sqrt(rchisq(nu) / nu);
-	}
-
+    }
+    result = rmvnorm(Matrix<double>(sigma.rows(), 1, true, 0), sigma);
+    return result / std::sqrt(rchisq(nu) / nu);
+  }
+  
   /* Bernoulli */
   int
   rbern (const double &p)
@@ -2892,26 +2891,28 @@ namespace SCYTHE {
     double FA = 0.0;
     double FB = 0.0;
     double sd = ::sqrt(v);
-    if ((::fabs((above-m)/sd) < 6.36) && (::fabs((below-m)/sd) < 6.36)){
+    if ((::fabs((above-m)/sd) < 8.2) && (::fabs((below-m)/sd) < 8.2)){
       FA = pnorm2((above-m)/sd, true, false);
       FB = pnorm2((below-m)/sd, true, false);
     }
-    if ((((above-m)/sd) < 6.36)  && (((below-m)/sd) <= -6.36) ){ 
+    if ((((above-m)/sd) < 8.2)  && (((below-m)/sd) <= -8.2) ){ 
       FA = pnorm2((above-m)/sd, true, false);
       FB = 0.0;
     }
-    if ( (((above-m)/sd) >= 6.36)  && (((below-m)/sd) > -6.36) ){ 
+    if ( (((above-m)/sd) >= 8.2)  && (((below-m)/sd) > -8.2) ){ 
       FA = 1.0;
       FB = FB = pnorm2((below-m)/sd, true, false);
     } 
-    if ( (((above-m)/sd) >= 6.36) && (((below-m)/sd) <=-6.36)){
+    if ( (((above-m)/sd) >= 8.2) && (((below-m)/sd) <= -8.2)){
       FA = 1.0;
       FB = 0.0;
     }
+    /*
     if ( (((above-m)/sd) <= -6.36) || (((below-m)/sd) > 6.36)){
       throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__, __LINE__,
 			       "Truncation bounds too far from 0");
     }
+    */
     /*
     if ((::fabs((above-m)/sd) > 6.36) && (::fabs((below-m)/sd) > 6.36)){
     throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__, __LINE__,
@@ -2919,10 +2920,10 @@ namespace SCYTHE {
     }
     */
     double term = runif()*(FA-FB)+FB;
-    if (term < 1e-10)
-      term = 1e-10;
-    if (term > (1 - 1e-10))
-      term = 1 - 1e-10;
+    if (term < 5.6e-17)
+      term = 5.6e-17;
+    if (term > (1 - 5.6e-17))
+      term = 1 - 5.6e-17;
     double draw = m + sd * qnorm1(term);
     if (draw > above)
       draw = above;
@@ -2931,6 +2932,59 @@ namespace SCYTHE {
  		 
     return draw;
   }
+
+  /* Sample from a truncated Normal distribution */
+  double
+  rtnorm_combo(const double& m, const double& v, const double& below,
+	       const double& above)
+  {
+    if (below > above) {
+      throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
+				__LINE__, "Truncation bound not logically consistent");
+    }
+    double s = ::sqrt(v);
+    if (( ((above-m)/s > 0.5) && ((m-below)/s > 0.5)) ||
+	( ((above-m)/s > 2.0) && ((below-m)/s < 0.25)) ||
+	( ((m-below)/s > 2.0) && ((above-m)/s > -0.25)) ){ 
+      double x = rnorm(m, s);
+      while ((x > above) || (x < below))
+	x = rnorm(m,s);
+      return x;
+    } else {
+      // use the inverse cdf method
+      double FA = 0.0;
+      double FB = 0.0;
+      if ((::fabs((above-m)/s) < 8.2) && (::fabs((below-m)/s) < 8.2)){
+	FA = pnorm2((above-m)/s, true, false);
+	FB = pnorm2((below-m)/s, true, false);
+      }
+      if ((((above-m)/s) < 8.2)  && (((below-m)/s) <= -8.2) ){ 
+	FA = pnorm2((above-m)/s, true, false);
+	FB = 0.0;
+      }
+      if ( (((above-m)/s) >= 8.2)  && (((below-m)/s) > -8.2) ){ 
+	FA = 1.0;
+	FB = FB = pnorm2((below-m)/s, true, false);
+      } 
+      if ( (((above-m)/s) >= 8.2) && (((below-m)/s) <= -8.2)){
+	FA = 1.0;
+	FB = 0.0;
+      }
+      double term = runif()*(FA-FB)+FB;
+      if (term < 5.6e-17)
+	term = 5.6e-17;
+      if (term > (1 - 5.6e-17))
+	term = 1 - 5.6e-17;
+      double x = m + s * qnorm1(term);
+      if (x > above)
+	x = above;
+      if (x < below)
+	x = below;
+      return x;
+    }    
+  }
+
+
 
   /* Sample from a truncated Normal distribution */
   double
@@ -2956,11 +3010,7 @@ namespace SCYTHE {
 #ifdef __MINGW32__
 		if (! finite(x)) {
 #else
-#ifdef sgi
-		if (IsINF(x)) {
-#else
-    if (isinf(x)) {
-#endif
+    if (isinf(x)){
 #endif
       std::cerr << "WARNING in "
 		<< __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
@@ -2997,11 +3047,7 @@ namespace SCYTHE {
 #ifdef __MINGW32__
 		if (! finite(x)) {
 #else
-#ifdef sgi
-		if (IsINF(x)) {
-#else
     if (isinf(x)){
-#endif
 #endif
       std::cerr << "WARNING in "
 		<< __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
@@ -3023,11 +3069,18 @@ namespace SCYTHE {
 				__LINE__, "Variance non-positive");
     }
 		
+    double s = ::sqrt(v);
     // do rejection sampling and return value
-    if (m >= below){
-      double x = rnorm(m, v);
+    //if (m >= below){
+    if ((m/s + below/s ) < 1.2){
+      double x = rnorm(m, s);
       while (x < below)
-	x = rnorm(m,v);
+	x = rnorm(m,s);
+      return x; 
+    } else if ((m/s + below/s ) < 4.0 ){
+      // use the inverse cdf method
+      double above = (m+30.0)*s;
+      double x = rtnorm(m, v, below, above);
       return x;
     } else {
       // do slice sampling and return value
@@ -3040,11 +3093,7 @@ namespace SCYTHE {
 #ifdef __MINGW32__
 			if (! finite(x)) {
 #else
-#ifdef sgi
-			if (IsINF(x)) {
-#else
       if (isinf(x)){
-#endif
 #endif
 	std::cerr << "WARNING in "
 		  << __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
@@ -3065,12 +3114,21 @@ namespace SCYTHE {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
 				__LINE__, "Variance non-positive");
     }
-
+    double s = ::sqrt(v);
     // do rejection sampling and return value
-    if (m <= above) {
-      double x = rnorm(m, v);
+    //if ((m/::sqrt(v) - above/::sqrt(v) ) < 1.4){ 8.88
+    //if ((m/::sqrt(v) - above/::sqrt(v) ) < 1.2){ 8.25
+    //if ((m/::sqrt(v) - above/::sqrt(v) ) < 1.0){ 8.52
+    if ((m/s - above/s ) < 1.2){ 
+
+      double x = rnorm(m, s);
       while (x > above)
-	x = rnorm(m,v);
+	x = rnorm(m,s);
+      return x;
+    } else if ((m/s - above/s ) < 4.0 ){
+      // use the inverse cdf method
+      double below = (m-30.0)*s;
+      double x = rtnorm(m, v, below, above);
       return x;
     } else {
       // do slice sampling and return value
@@ -3086,11 +3144,7 @@ namespace SCYTHE {
 #ifdef __MINGW32__
 			if (finite(x)) {
 #else
-#ifdef sgi
-			if (IsINF(x)) {
-#else
       if (isinf(x)){
-#endif
 #endif
 	std::cerr << "WARNING in "
 		  << __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
