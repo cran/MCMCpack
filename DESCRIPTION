@@ -1,11 +1,11 @@
 Package: MCMCpack
-Version: 0.4-2
-Date: 2003-7-23
+Version: 0.4-3
+Date: 2003-9-3
 Title: Markov chain Monte Carlo (MCMC) Package
 Author: Andrew D. Martin <admartin@wustl.edu>, and
   Kevin M. Quinn <kquinn@latte.harvard.edu>
 Maintainer: Andrew D. Martin <admartin@wustl.edu>
-Depends: R (>= 1.7.0), coda, MASS
+Depends: R (>= 1.6.0), coda, MASS
 Description: This package contains functions for posterior
   simulation for a number of statistical models. All simulation
   is done in compiled C++ written in the Scythe Statistical

@@ -144,14 +144,6 @@ MCMCpanel(obs, Y, X, W, burnin = 1000, mcmc = 10000, thin = 5,
    \url{http://www-fis.iarc.fr/coda/}.
 }
 
-\examples{
-   \dontrun{
-   posterior <- MCMCpanel(obs, Y, X, W, eta0 = 4, R0 = 1)
-   plot(posterior)
-   summary(posterior)
-   }
-}
-
 \keyword{models}
 
 \seealso{\code{\link[coda]{plot.mcmc}},\code{\link[coda]{summary.mcmc}}}

@@ -24,7 +24,7 @@ using namespace std;
 		  const int* Rmcmc, const int* Rthin, const double* Ralpha0,
 		  const double* Rbeta0, const double* Ralpha1, 
 		  const double* Rbeta1, const int* Rverbose, 
-		  const double* Rtune, const int* Rseed){
+		  const int* Rseed){
 
 
 
@@ -60,8 +60,6 @@ using namespace std;
     int mcmc =   *Rmcmc;
     int thin =   *Rthin;
     int tot_iter = burnin + mcmc;
-    int accepts = 0;
-    double tune = *Rtune;
 
     // prior for p0
     // p0 ~ beta(alpha0, beta0)
@@ -85,10 +83,6 @@ using namespace std;
     Matrix<double> p1 = ones<double>(ntables,1)*0.5;
     Matrix<double> y0(ntables,1);
     Matrix<double> y1(ntables,1);
-
-    // do somewith with tune and accepts to stop -Wall error
-    accepts++;
-    tune++;
 
     for (int iter=0; iter<tot_iter; ++iter){
 

@@ -27,7 +27,8 @@
            data=list(), burnin = 1000, mcmc = 10000,
            thin=5, tune=NA, verbose = FALSE, seed = 0,
            lambda.start = NA, l0=0, L0=0,
-           store.lambda=TRUE, store.scores=FALSE, ... ) {
+           store.lambda=TRUE, store.scores=FALSE,
+           drop.constantvars=TRUE, ... ) {
 
     # check for MCMCirtKd special case, this is used to tell the R
     # and C++ code what to echo (1 if regular, 2 if MCMCirtKd)
@@ -49,6 +50,12 @@
  
     # extract X and variable names from the model formula and frame       
     if (is.matrix(x)){
+      if (drop.constantvars==TRUE){
+        x.col.var <- apply(x, 2, var, na.rm=TRUE)
+        x <- x[,x.col.var!=0]
+        x.row.var <- apply(x, 1, var, na.rm=TRUE)
+        x <- x[x.row.var!=0,]
+      }
       X <- as.data.frame(x)
       xvars <- dimnames(X)[[2]]
       xobs <- dimnames(X)[[1]]
@@ -81,6 +88,12 @@
       Xterm.length <- length(attr(mt, "variables"))
       X <- subset(mf,
                   select=as.character(attr(mt, "variables"))[2:Xterm.length])
+      if (drop.constantvars==TRUE){
+        x.col.var <- apply(X, 2, var, na.rm=TRUE)
+        X <- X[,x.col.var!=0]
+        x.row.var <- apply(X, 1, var, na.rm=TRUE)
+        X <- X[x.row.var!=0,]
+      }
       N <- nrow(X)	        # number of observations      
       K <- ncol(X)              # number of manifest variables
       ncat <- matrix(NA, K, 1)  # vector of number of categ. in each man. var. 
@@ -98,6 +111,7 @@
     if (is.null(xobs)){
       xobs <- 1:N
     }
+
     
     check.parameters(burnin, mcmc, thin, echo.name)
     
@@ -264,12 +278,11 @@
                   probit.beta <- coef(probit.out)
                   Lambda[i,j] <- probit.beta[1]
                 }
-                else{
+                if (ncat[i] > 2){
                   polr.out <- polr(ordered(X[X[,i]!=-999,i])~1)
                   Lambda[i,j] <- -polr.out$zeta[1]*.588
                 }
               }
-              else Lambda[i,j] <- 0
             }
             if(Lambda.ineq.constraints[i,j]>0){
               Lambda[i,j] <- 1.0
@@ -322,12 +335,12 @@
     # starting values for gamma (note: not changeable by user)
     gamma <- matrix(0, max(ncat)+1, K)
     for (i in 1:K){
-      if (ncat[i]==2){
+      if (ncat[i]<=2){
         gamma[1,i] <- -300
         gamma[2,i] <- 0
         gamma[3,i] <- 300
       }
-      else {
+      if(ncat[i] > 2) {
         polr.out <- polr(ordered(X[X[,i]!=-999,i])~1)
         gamma[1,i] <- -300
         gamma[2,i] <- 0
@@ -336,7 +349,7 @@
         gamma[ncat[i]+1,i] <- 300
       }
     }
-    
+
     # define holder for posterior density sample
     if (store.scores == FALSE && store.lambda == FALSE){
       sample <- matrix(data=0, mcmc/thin, length(gamma))
@@ -412,11 +425,11 @@
                             rep(1:(factors+1),K), sep="_")
       }
       if(case.switch==2) {
-        alpha.hold <- paste("alpha", 1:K, sep = "")
-        beta.hold <- paste("beta", 1:K, sep = "")
+        alpha.hold <- paste("alpha", X.names, sep="_")
+        beta.hold <- paste("beta", X.names, sep = "_")
         beta.hold <- rep(beta.hold, factors, each=factors)
         beta.hold <- paste(beta.hold, 1:factors, sep="_")
-  
+                
         Lambda.names <- t(cbind(matrix(alpha.hold, K, 1), 
                                 matrix(beta.hold,K,factors,byrow=TRUE)))  
         dim(Lambda.names) <- NULL
@@ -459,7 +472,7 @@
     attr(output, "n.manifest") <- K
     attr(output, "n.factors") <- factors
     attr(output, "accept.rate") <- posterior$accepts /
-      (posterior$burnin+posterior$mcmc*K)
+      ((posterior$burnin+posterior$mcmc)*K)
     if(case.switch==1) {
       attr(output,"title") <-
         "MCMCpack Ordinal Data Factor Analysis Posterior Density Sample"

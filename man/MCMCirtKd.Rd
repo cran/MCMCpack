@@ -17,7 +17,7 @@
 MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
    burnin = 500, mcmc = 1000, thin=5, verbose = FALSE, seed = 0,
    alphabeta.start = NA, b0 = 0, B0=0, store.item = FALSE,
-   store.ability=TRUE, ... )  }
+   store.ability=TRUE, drop.constantvars=TRUE, ... )  }
 
 \arguments{
     \item{datamatrix}{The matrix of data.  Must be 0, 1, or missing values.  
@@ -27,15 +27,22 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
     
     \item{item.constraints}{List of lists specifying possible equality
     or simple inequality constraints on the item parameters. A typical
-    entry in the list has one of three forms: \code{varname=list(d,c)} which
-    will constrain the dth loading for the item named varname to
-    be equal to c, \code{varname=list(d,"+")} which will constrain the dth
-    loading for the item named varname to be positive, and
-    \code{varname=list(d, "-")} which will constrain the dth loading for the
-    item named varname to be negative. If x is a matrix without
-    column names defaults names of ``V1", ``V2", ... , etc will be
-    used. The first column of case parameters corresponds to
-    item difficulty parameters (\eqn{\alpha}{alpha}) and should
+    entry in the list has one of three forms: \code{rowname=list(d,c)}
+    which will constrain the dth item parameter for the item named
+    rowname to be equal to c, \code{rowname=list(d,"+")} which will
+    constrain the dth item parameter for the item named rowname to be
+    positive, and\code{rowname=list(d, "-")} which will constrain the dth
+    item parameter for the item named varname to be negative. If x is a
+    matrix without row names defaults names of ``V1", ``V2", ... , etc
+    will be used. In a d dimensional model, the first item parameter for
+    item \eqn{i}{i} is the difficulty parameter (\eqn{\alpha_i}{alpha_i}),
+    the second item parameter is the discrimation parameter on dimension
+    1 (\eqn{\beta_{i,1}{beta_{i,1}}}), the third item parameter is the
+    discrimation parameter on dimension 2
+    (\eqn{\beta_{i,2}{beta_{i,2}}}), ...,  and the (d+1)th item parameter
+    is the discrimation parameter on dimension d
+    (\eqn{\beta_{i,1}{beta_{i,1}}}). 
+    The item difficulty parameters (\eqn{\alpha}{alpha}) should
     generally not be constrained. 
     }
 
@@ -89,7 +96,11 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
    \item{store.ability}{A switch that determines whether or not to store
     the subject abilities for posterior analysis.  By default, the
     item parameters are all stored.}
-    
+
+  \item{drop.constantvars}{A switch that determines whether or not
+        items and subjects that have no variation
+	should be deleted before fitting the model. Default = TRUE.}
+  
     \item{...}{further arguments to be passed}       
 }
 
@@ -180,10 +191,27 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
 
 \examples{
    \dontrun{
+   data(SupremeCourt)
+   # note that the rownames (the item names) are "1", "2", etc
+   posterior1 <- MCMCirtKd(SupremeCourt, dimensions=1,
+                   burnin=5000, mcmc=50000, thin=10,
+                   B0=.25, store.item=TRUE,
+                   item.constraints=list("1"=list(2,"-")))
+   plot(posterior1)
+   summary(posterior1)
+
+
    data(Senate)
-   posterior <- MCMCirtKd(Senate, dimensions=2, verbose=TRUE)
-   plot(posterior)
-   summary(posterior)
+   rownames(Senate) <- Senate$member
+   # note that we need to transpose the data to get
+   # the bills on the rows
+   posterior2 <- MCMCirtKd(t(Senate[,6:677]), dimensions=2,
+                   burnin=5000, mcmc=50000, thin=10,
+                   item.constraints=list(rc2=list(2,"-"), rc2=c(3,0),
+                                         rc3=list(3,"-")),
+                   B0=.25)
+   plot(posterior2)
+   summary(posterior2)
    }
 }
 

@@ -119,7 +119,6 @@
                      alpha1 = as.double(alpha1),
                      beta1 = as.double(beta1),
                      verbose = as.integer(verbose),
-                     tune = as.double(tune),
                      seed = as.integer(seed),
                      PACKAGE="MCMCpack"
                      )

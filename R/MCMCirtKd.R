@@ -18,7 +18,8 @@
            burnin = 1000, mcmc = 10000,
            thin=5, verbose = FALSE, seed = 0,
            alphabeta.start = NA, b0=0, B0=0,
-           store.item=FALSE, store.ability=TRUE, ... ) {
+           store.item=FALSE, store.ability=TRUE,
+           drop.constantvars=TRUE, ... ) {
 
     datamatrix <- t(as.matrix(datamatrix))   
     
@@ -29,6 +30,7 @@
                             lambda.start=alphabeta.start,
                             l0=b0, L0=B0, store.lambda=store.item,
                             store.scores=store.ability,
+                            drop.constantvars=drop.constantvars,
                             special.case="special.case")
     return(post)
   }

@@ -158,12 +158,12 @@ MCMCfactanal(x, factors, lambda.constraints=list(),
    ### An example using the formula interface
    data(swiss)
    posterior <- MCMCfactanal(~Agriculture+Examination+Education+Catholic
-                             +Infant.Mortality, factors=2,
-                             lambda.constraints=list(Examination=list(1,"+"),
-                             Examination=list(2,"-"), Education=c(2,0),
-                             Infant.Mortality=c(1,0)),
-                             verbose=FALSE, store.scores=FALSE, a0=1, b0=0.15,
-                             data=swiss, burnin=5000, mcmc=50000, thin=20)
+                    +Infant.Mortality, factors=2,
+                    lambda.constraints=list(Examination=list(1,"+"),
+                       Examination=list(2,"-"), Education=c(2,0),
+                       Infant.Mortality=c(1,0)),
+                    verbose=FALSE, store.scores=FALSE, a0=1, b0=0.15,
+                    data=swiss, burnin=5000, mcmc=50000, thin=20)
    plot(posterior)
    summary(posterior)
 
@@ -174,10 +174,10 @@ MCMCfactanal(x, factors, lambda.constraints=list(),
    Y <- t(t(chol(Sigma)) \%*\% matrix(rnorm(500*15), 15, 500))
 
    posterior <- MCMCfactanal(Y, factors=3,
-                             lambda.constraints=list(V1=c(2,0),
-                             V1=c(3,0), V2=c(3,0), V3=list(1,"+"),
-                             V3=list(2,"+"), V3=list(3,"+")),
-                             verbose=FALSE)
+                    lambda.constraints=list(V1=c(2,0),
+                       V1=c(3,0), V2=c(3,0), V3=list(1,"+"),
+                       V3=list(2,"+"), V3=list(3,"+")),
+                    verbose=FALSE)
    plot(posterior)
    summary(posterior)        
    }

@@ -151,7 +151,7 @@ MCMCdynamicEI(r0, r1, c0, c1, burnin=5000, mcmc=200000, thin=200,
    r1 <- rpois(10, 200)
    c0 <- 100 + 1:10*7 + rpois(10, 30)
    c1 <- (r0+r1) - c0
-   posterior <- MCMCdynamicEI(r0, r1, c0, c1, verbose=TRUE,
+   posterior <- MCMCdynamicEI(r0, r1, c0, c1,
       burnin=10000, mcmc=5000000, thin=1000)
    plot(posterior)
    summary(posterior) 
