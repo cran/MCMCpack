@@ -7,7 +7,7 @@
 }
 
 \usage{
-dnoncenhypergeom(x, n1, n2, m1, psi)
+dnoncenhypergeom(x=NA, n1, n2, m1, psi)
 }
 
 \arguments{

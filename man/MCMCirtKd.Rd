@@ -15,7 +15,7 @@
   
 \usage{
 MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
-   burnin = 500, mcmc = 1000, thin=5, verbose = FALSE, seed = 0,
+   burnin = 1000, mcmc = 10000, thin=5, verbose = FALSE, seed = 0,
    alphabeta.start = NA, b0 = 0, B0=0, store.item = FALSE,
    store.ability=TRUE, drop.constantvars=TRUE, ... )  }
 
