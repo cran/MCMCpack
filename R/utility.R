@@ -20,13 +20,15 @@
 # this will recycle the elements of x as needed to fill the matrix
 #
 # ADM 4/18/2003
+# ADM 11/13/2003 [bug fix]
 
 "xpnd" <-
   function (x, nrow) {
     dim(x) <- NULL
     output <- matrix(0, nrow, nrow)
     output[lower.tri(output, diag = TRUE)] <- x
-    output[upper.tri(output)] <- output[lower.tri(output)]
-    dim(output) <- c(nrow, nrow)
+    hold <- output
+    hold[upper.tri(hold, diag=TRUE)] <- 0
+    output <- output + t(hold)    
     return(output)
   }
