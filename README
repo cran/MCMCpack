@@ -1,8 +1,8 @@
 //
-// MCMCpack, Version 0.4-5
+// MCMCpack, Version 0.4-6
 //
 
-Release Date: November 17, 2003
+Release Date: November 21, 2003
 
 This package contains functions for posterior simulation for a number of
 statistical models. All simulation is done in compiled C++ written in
@@ -24,7 +24,13 @@ Kevin M. Quinn <kquinn@latte.harvard.edu>
 //
 
 NOTE: We are still working on implementing a NAMESPACE for this package. We
-plant to do so once R 1.8.* is released.
+plant to do so in our next major release.
+
+0.4-5 to 0.4-6
+   * Fixed a bug in rnoncenhypergeom() [thanks to Tom LaFramboise]
+   * Patched Scythe0.3 to fix an error in inv() [thanks to Donour Sizemore].  
+     Note that this function is not called in MCMCpack, so was causing no
+     explicit errors.
 
 0.4-3 to 0.4-5
    * Fixed a bug in xpnd() [thanks to Michael Man]

@@ -418,7 +418,8 @@
                          
       mode <- trunc(c/q) 
       if(uu>=mode && mode>=ll) return(mode)
-      else return( trunc(q/a) )      
+      else return( trunc(q/a) )
+      
     }  
   
     sample.low.to.high <- function(lower.end, ran, pi, shift) { 
@@ -438,27 +439,24 @@
     single.draw <- function(n1, n2, m1, psi, ll, uu, mode, pi) {
       ran <- runif(1)
       shift <- 1-ll  
-           
       if(mode==ll) return(sample.low.to.high(ll, ran, pi, shift))            
       if(mode==uu) return(sample.high.to.low(uu, ran, pi, shift))                                         
-          
       if(ran < pi[mode+shift]) return(mode)             
       ran <- ran - pi[mode+shift]
-          
       lower <- mode - 1                                                                            
       upper <- mode + 1
-                     
-      repeat {                                     
+          
+      repeat {           
         if(pi[upper + shift] >= pi[lower + shift]) {              
           if(ran < pi[upper+shift]) return(upper)
           ran <- ran - pi[upper+shift]
-          if(upper == uu) return( sample.high.to.low(lower, ran) )
+          if(upper == uu) return( sample.high.to.low(lower, ran, pi, shift) )
           upper <- upper + 1                            
         }
         else {
           if(ran < pi[lower+shift]) return(lower)
           ran <- ran - pi[lower+shift]
-          if(lower == ll) return( sample.low.to.high(upper, ran) )
+          if(lower == ll) return( sample.low.to.high(upper, ran, pi, shift) )
           lower <- lower - 1                   
         }     
       }
