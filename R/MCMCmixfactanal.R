@@ -27,7 +27,7 @@
 
 "MCMCmixfactanal" <-
   function(x, factors, lambda.constraints=list(),
-           data=parent.environment(), burnin = 1000, mcmc = 20000,
+           data=parent.frame(), burnin = 1000, mcmc = 20000,
            thin=1, tune=NA, verbose = FALSE, seed = NA,
            lambda.start = NA, psi.start=NA,
            l0=0, L0=0, a0=0.001, b0=0.001,
@@ -46,6 +46,7 @@
     mf$store.lambda <- mf$store.scores <- mf$std.var <- mf$... <- NULL
     mf$drop.unused.levels <- TRUE
     mf[[1]] <- as.name("model.frame")
+    mf$na.action <- 'na.pass'
     mf <- eval(mf, sys.frame(sys.parent()))
     attributes(mt)$intercept <- 0
     Xterm.length <- length(attr(mt, "variables"))
@@ -60,11 +61,7 @@
         ncat[i] <- -999
         X[is.na(X[,i]), i] <- -999
       }
-      else if (is.ordered(X[,i])){
-        ncat[i] <- nlevels(X[,i])      
-        X[,i] <- as.integer(X[,i])
-        X[is.na(X[,i]), i] <- -999
-      }
+   else if (is.ordered(X[, i])) {      ncat[i] <- nlevels(X[, i])      temp <- as.integer(X[,i])      temp <- ifelse(is.na(X[,i]) | (X[,i] == "<NA>"), -999, temp)      X[, i] <- temp}
       else {
         stop("Manifest variable ", dimnames(X)[[2]][i],
              " neither ordered factor nor numeric variable.\n")
@@ -226,6 +223,7 @@
         gamma[2,i] <- 0
         gamma[3:ncat[i],i] <- (polr.out$zeta[2:(ncat[i]-1)] -
                                polr.out$zeta[1])*.588
+
         gamma[ncat[i]+1,i] <- 300
       }
     }
@@ -252,7 +250,9 @@
       sample <- matrix(data=0, mcmc/thin, K*(factors+1)+(factors+1)*N +
                        length(gamma)+K)
     }
-    
+
+    accepts <- matrix(0, K, 1)
+
     # Call the C++ code to do the real work
     posterior <- .C("mixfactanalpost",
                     samdata = as.double(sample),
@@ -301,14 +301,20 @@
                     b0col = as.integer(ncol(b0)),
                     storelambda = as.integer(store.lambda),
                     storescores = as.integer(store.scores),
-                    accepts = as.integer(0),
+                    accepts = as.integer(accepts),
+                    acceptsrow = as.integer(nrow(accepts)),
+                    acceptscol = as.integer(ncol(accepts)),
                     PACKAGE="MCMCpack"
                     )
 
-    cat(" overall acceptance rate = ",
-        posterior$accepts / ((posterior$burnin+posterior$mcmc)*n.ord.ge3), "\n")
-
-    
+    accepts <- matrix(posterior$accepts, posterior$acceptsrow,
+                      posterior$acceptscol, byrow=TRUE)
+    rownames(accepts) <- X.names
+    colnames(accepts) <- ""
+    cat("\n\nAcceptance rates:\n")
+    print(t(accepts) / (posterior$burnin+posterior$mcmc), digits=2,
+          width=6)      
+        
     # put together matrix and build MCMC object to return
     sample <- matrix(posterior$samdata, posterior$samrow, posterior$samcol,
                      byrow=TRUE)

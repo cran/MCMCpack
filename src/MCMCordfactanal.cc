@@ -20,6 +20,10 @@
 // revised version of older MCMCordfactanal 
 // 7/16/2004 KQ
 // updated to new version of Scythe ADM 7/24/2004
+// fixed a bug pointed out by Alexander Raach 1/16/2005 KQ
+//
+
+#include <iostream>
 
 #include "matrix.h"
 #include "distributions.h"
@@ -60,7 +64,8 @@ ordfactanalpost (double* sampledata, const int* samplerow,
 		 const double* Lampprecdata, const int* Lampprecrow,
 		 const int* Lamppreccol, const int* storelambda,
 		 const int* storescores,
-		 int* accepts, const int* outswitch
+		 int* acceptsdata, const int* acceptsrow, 
+		 const int* acceptscol, const int* outswitch
 		 ) {
 
   // put together matrices
@@ -77,6 +82,7 @@ ordfactanalpost (double* sampledata, const int* samplerow,
   const Matrix<double> Lambda_prior_prec = r2scythe(*Lampprecrow, 
 						    *Lamppreccol, 
 						    Lampprecdata);  
+  Matrix<int> accepts = r2scythe(*acceptsrow, *acceptscol, acceptsdata);
 
   
   // initialize rng stream
@@ -99,9 +105,9 @@ ordfactanalpost (double* sampledata, const int* samplerow,
 
   // starting values for phi, Xstar, and gamma_p
   Matrix<double> phi = Matrix<double>(N, D-1);
+  //Matrix<double> phi = stream->rnorm(N, D-1);
   phi = cbind(ones<double>(N,1), phi);
   Matrix<double> Xstar = Matrix<double>(N, K);
-  Matrix<double> gamma_p = gamma(_,0);
 
   // storage matrices (row major order)
   Matrix<double> Lambda_store;
@@ -158,6 +164,7 @@ ordfactanalpost (double* sampledata, const int* samplerow,
 
     // sample gamma
     for (int j=0; j<K; ++j){ // do the sampling for each manifest var
+      Matrix<double> gamma_p = gamma(_,j);
       Matrix<double> X_mean = phi * t(Lambda(j,_));
       for (int i=2; i<(ncateg[j]); ++i){
 	if (i==(ncateg[j]-1)){
@@ -198,12 +205,12 @@ ordfactanalpost (double* sampledata, const int* samplerow,
 	  }
 	}
       }
-      for (int k=2; k<(ncateg[j]-1); ++k){
+      for (int k=2; k<ncateg[j]; ++k){
 	loggendenrat = loggendenrat 
-	  + log(pnorm(gamma(k+1,j), gamma(k,j), tune[j]) - 
-		pnorm(gamma(k-1,j), gamma(k,j), tune[j]) )  
-	  - log(pnorm(gamma_p[k+1], gamma_p[k], tune[j]) - 
-		pnorm(gamma_p[k-1], gamma_p[k], tune[j]) );
+	    + log(pnorm(gamma(k+1,j), gamma(k,j), tune[j]) - 
+		  pnorm(gamma_p[k-1], gamma(k,j), tune[j]) )  
+	    - log(pnorm(gamma_p[k+1], gamma_p[k], tune[j]) - 
+		  pnorm(gamma(k-1,j), gamma_p[k], tune[j]) );
       }
       double logacceptrat = loglikerat + loggendenrat;
       if (stream->runif() <= exp(logacceptrat)){
@@ -211,7 +218,7 @@ ordfactanalpost (double* sampledata, const int* samplerow,
 	  if (gamma(i,j) == 300) break;
 	  gamma(i,j) = gamma_p[i];
 	}
-	++accepts[0];
+	++accepts[j];
       }
     }
   
@@ -226,8 +233,12 @@ ordfactanalpost (double* sampledata, const int* samplerow,
 	}
 	Rprintf("\n");
       }
-      Rprintf("\nMetropolis-Hastings acceptance rate = %10.5f\n", 
-	      static_cast<double>(*accepts)/(static_cast<double>((iter+1)*K)));
+      Rprintf("\nMetropolis-Hastings acceptance rates = \n");
+	for (int j = 0; j<K; ++j){
+	  Rprintf("%6.2f", 
+		  static_cast<double>(accepts[j]) / 
+		  static_cast<double>((iter+1)));
+	} 
     }
     if (verbose[0] == 1 && iter % 500 == 0 && *outswitch == 2){
       Rprintf("\n\nMCMCirtKd iteration %i of %i \n", (iter+1), tot_iter);
@@ -278,6 +289,9 @@ ordfactanalpost (double* sampledata, const int* samplerow,
   int size = *samplerow * *samplecol;
   for (int i=0; i<size; ++i)
     sampledata[i] = output[i];
+
+  for (int j=0; j<K; ++j)
+    acceptsdata[j] = accepts[j];
   
 }
 

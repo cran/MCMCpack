@@ -144,13 +144,13 @@ static double shrinkage(double (*logfun)(double[], const double&,
 
   double Lbar = L;
   double Rbar = R;
-  int ind0;
-  if (index==0){
-    ind0 = 1;
-  }
-  else {
-    ind0 = 0;
-  }
+  //  int ind0;
+  //if (index==0){
+  //  ind0 = 1;
+  // }
+  //else {
+  //  ind0 = 0;
+  // }
   double theta_x1[2];
   theta_x1[0] = theta[0];
   theta_x1[1] = theta[1];
@@ -266,7 +266,7 @@ extern "C"{
     const int p_init = 50;
     const Matrix<double> widthmat(warmup_iter - warmup_burnin, 2);
 
-    // warm up sampling to chose slice sampling parameters adaptively
+    // warm up sampling to choose slice sampling parameters adaptively
     for (int iter=0; iter<warmup_iter; ++iter){
 
       // loop over tables

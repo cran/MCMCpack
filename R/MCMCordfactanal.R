@@ -25,7 +25,7 @@
 
 "MCMCordfactanal" <-
   function(x, factors, lambda.constraints=list(),
-           data=parent.environment(), burnin = 1000, mcmc = 20000,
+           data=parent.frame(), burnin = 1000, mcmc = 20000,
            thin=1, tune=NA, verbose = FALSE, seed = NA,
            lambda.start = NA, l0=0, L0=0,
            store.lambda=TRUE, store.scores=FALSE,
@@ -87,6 +87,7 @@
       mf$... <- NULL
       mf$drop.unused.levels <- TRUE
       mf[[1]] <- as.name("model.frame")
+      mf$na.action <- 'na.pass'
       mf <- eval(mf, sys.frame(sys.parent()))
       attributes(mt)$intercept <- 0
       Xterm.length <- length(attr(mt, "variables"))
@@ -236,6 +237,8 @@
                        length(gamma))
     }
 
+
+    accepts <- matrix(0, K, 1)
     
     ## Call the C++ code to do the real work
     posterior <- .C("ordfactanalpost",
@@ -276,13 +279,20 @@
                     Lamppreccol = as.integer(ncol(Lambda.prior.prec)),
                     storelambda = as.integer(store.lambda),
                     storescores = as.integer(store.scores),
-                    accepts = as.integer(0),
+                    accepts = as.integer(accepts),
+                    acceptsrow = as.integer(nrow(accepts)),
+                    acceptscol = as.integer(ncol(accepts)),
                     outswitch = as.integer(case.switch),
                     PACKAGE="MCMCpack"
                     )
     if(case.switch==1) {
-      cat(" overall acceptance rate = ",
-          posterior$accepts / ((posterior$burnin+posterior$mcmc)*K), "\n")
+      accepts <- matrix(posterior$accepts, posterior$acceptsrow,
+                        posterior$acceptscol, byrow=TRUE)
+      rownames(accepts) <- X.names
+      colnames(accepts) <- ""
+      cat("\n\nAcceptance rates:\n")
+      print(t(accepts) / (posterior$burnin+posterior$mcmc), digits=2,
+            width=6)      
     }
     
     # put together matrix and build MCMC object to return

@@ -1,39 +1,46 @@
 Dirichlet               The Dirichlet Distribution
 InvGamma                The Inverse Gamma Distribution
 InvWishart              The Inverse Wishart Distribution
-MCMCdynamicEI           Markov chain Monte Carlo for Quinn's Dynamic
+MCMCdynamicEI           Markov Chain Monte Carlo for Quinn's Dynamic
                         Ecological Inference Model
-MCMCfactanal            Markov chain Monte Carlo for Normal Theory
+MCMCfactanal            Markov Chain Monte Carlo for Normal Theory
                         Factor Analysis Model
-MCMChierEI              Markov chain Monte Carlo for Wakefield's
+MCMChierEI              Markov Chain Monte Carlo for Wakefield's
                         Hierarchial Ecological Inference Model
-MCMCirt1d               Markov chain Monte Carlo for One Dimensional
+MCMCirt1d               Markov Chain Monte Carlo for One Dimensional
                         Item Response Theory Model
-MCMCirtKd               Markov chain Monte Carlo for K-Dimensional
+MCMCirtKd               Markov Chain Monte Carlo for K-Dimensional
                         Item Response Theory Model
-MCMClogit               Markov chain Monte Carlo for Logistic
+MCMClogit               Markov Chain Monte Carlo for Logistic
                         Regression
 MCMCmetrop1R            Metropolis Sampling from User-Written R
                         function
-MCMCmixfactanal         Markov chain Monte Carlo for Mixed Data Factor
+MCMCmixfactanal         Markov Chain Monte Carlo for Mixed Data Factor
                         Analysis Model
-MCMCoprobit             Markov chain Monte Carlo for Ordered Probit
+MCMCmnl                 Markov Chain Monte Carlo for Multinomial
+                        Logistic Regression
+MCMCoprobit             Markov Chain Monte Carlo for Ordered Probit
                         Regression
-MCMCordfactanal         Markov chain Monte Carlo for Ordinal Data
+MCMCordfactanal         Markov Chain Monte Carlo for Ordinal Data
                         Factor Analysis Model
-MCMCpanel               Markov chain Monte Carlo for the General
+MCMCpanel               Markov Chain Monte Carlo for the General
                         Linear Panel Model
-MCMCpoisson             Markov chain Monte Carlo for Poisson
+MCMCpoisson             Markov Chain Monte Carlo for Poisson
                         Regression
-MCMCprobit              Markov chain Monte Carlo for Probit Regression
+MCMCprobit              Markov Chain Monte Carlo for Probit Regression
 MCMCregress             Markov Chain Monte Carlo for Gaussian Linear
                         Regression
+MCMCtobit               Markov Chain Monte Carlo for Gaussian Linear
+                        Regression with a Censored Dependent Variable
+Nethvote                Dutch Voting Behavior in 1989
 NoncenHypergeom         The Noncentral Hypergeometric Distribution
 PErisk                  Political Economic Risk Data from 62 Countries
                         in 1987
 Senate                  106th U.S. Senate Roll Call Vote Matrix
 SupremeCourt            U.S. Supreme Court Vote Matrix
 Wishart                 The Wishart Distribution
+choicevar               Handle Choice-Specific Covariates in
+                        Multinomial Choice Models
 dtomogplot              Dynamic Tomography Plot
 read.Scythe             Read a Matrix from a File written by Scythe
 tomogplot               Tomography Plot

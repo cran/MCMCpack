@@ -1,6 +1,6 @@
 \name{MCMCfactanal}
 \alias{MCMCfactanal}
-\title{Markov chain Monte Carlo for Normal Theory Factor Analysis Model}
+\title{Markov Chain Monte Carlo for Normal Theory Factor Analysis Model}
 \description{
   This function generates a posterior density sample from Normal theory
   factor analysis model. Normal priors are assumed on the factor
@@ -13,7 +13,7 @@
   
 \usage{
 MCMCfactanal(x, factors, lambda.constraints=list(),
-             data=parent.environment(), burnin = 1000, mcmc = 20000,
+             data=parent.frame(), burnin = 1000, mcmc = 20000,
              thin=1, verbose = FALSE, seed = NA,
              lambda.start = NA, psi.start = NA,
              l0=0, L0=0, a0=0.001, b0=0.001,
@@ -148,7 +148,9 @@ MCMCfactanal(x, factors, lambda.constraints=list(),
   compiled C++ code to maximize efficiency.  Please consult the
   coda documentation for a comprehensive list of functions that
   can be used to analyze the posterior density sample.     
-  }
+ 
+     As is the case with all measurement models, make sure that you have plenty
+  of free memory, especially when storing the scores.
 }
 
 \references{

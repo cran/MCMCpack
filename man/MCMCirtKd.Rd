@@ -1,6 +1,6 @@
 \name{MCMCirtKd}
 \alias{MCMCirtKd}
-\title{Markov chain Monte Carlo for K-Dimensional Item Response Theory
+\title{Markov Chain Monte Carlo for K-Dimensional Item Response Theory
    Model}
 \description{
   This function generates a posterior density sample from a
@@ -21,7 +21,7 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
 
 \arguments{
     \item{datamatrix}{The matrix of data.  Must be 0, 1, or missing values.  
-    It is of dimensionality items by subjects.}
+    It is of dimensionality subjects by items.}
 
     \item{dimensions}{The number of dimensions in the latent space.}
     
@@ -165,10 +165,14 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
   The model is identified by the constraints on the item parameters
   (see Jackman 2001).  The user cannot place constraints on the subect
   abilities.  This identification scheme differs from that in
-  \code{MCMCirt1d}, which uses a single directional constraint on
-  one subject ability.  However, in our experience, using subject 
+  \code{MCMCirt1d}, which uses constraints on
+  the subject abilities to identify the model.
+  In our experience, using subject 
   ability constraints for models in greater than one dimension does not work 
   particularly well.
+  
+    As is the case with all measurement models, make sure that you have plenty
+  of free memory, especially when storing the item parameters.
   }
   
 \references{
@@ -192,6 +196,9 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
    \url{http://www-fis.iarc.fr/coda/}.
+   
+      Douglas Rivers.  2004.  ``Identification of Multidimensional Item-Response
+   Models."  Stanford University, typescript.
 }
 
 
@@ -199,7 +206,7 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
    \dontrun{
    data(SupremeCourt)
    # note that the rownames (the item names) are "1", "2", etc
-   posterior1 <- MCMCirtKd(SupremeCourt, dimensions=1,
+   posterior1 <- MCMCirtKd(t(SupremeCourt), dimensions=1,
                    burnin=5000, mcmc=50000, thin=10,
                    B0=.25, store.item=TRUE,
                    item.constraints=list("1"=list(2,"-")))
@@ -211,7 +218,7 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
    rownames(Senate) <- Senate$member
    # note that we need to transpose the data to get
    # the bills on the rows
-   posterior2 <- MCMCirtKd(t(Senate[,6:677]), dimensions=2,
+   posterior2 <- MCMCirtKd(Senate[,6:677], dimensions=2,
                    burnin=5000, mcmc=50000, thin=10,
                    item.constraints=list(rc2=list(2,"-"), rc2=c(3,0),
                                          rc3=list(3,"-")),

@@ -1,6 +1,6 @@
 \name{MCMCdynamicEI}
 \alias{MCMCdynamicEI}
-\title{Markov chain Monte Carlo for Quinn's Dynamic Ecological
+\title{Markov Chain Monte Carlo for Quinn's Dynamic Ecological
   Inference Model}
 \description{
   MCMCdynamicEI is used to fit Quinn's dynamic ecological inference

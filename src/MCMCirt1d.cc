@@ -59,6 +59,8 @@ extern "C"{
 	    const int* thetaineqcol,
 	    const int* store
 	    ) {
+
+    using namespace SCYTHE; //Added by Matthew S. Fasman on 11/04/2004
     
     // put together matrices
     const Matrix<int> X = r2scythe(*Xrow, *Xcol, Xdata);

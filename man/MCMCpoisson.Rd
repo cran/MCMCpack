@@ -1,6 +1,6 @@
 \name{MCMCpoisson}
 \alias{MCMCpoisson}
-\title{Markov chain Monte Carlo for Poisson Regression}
+\title{Markov Chain Monte Carlo for Poisson Regression}
 \description{
   This function generates a posterior density sample
   from a Poisson regression model using a random walk Metropolis

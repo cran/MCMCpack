@@ -2,6 +2,32 @@
 // Changes and Bug Fixes
 //
 
+0.5-2 to 0.6-1
+   * added a tobit model for a linear model with censoring in MCMCtobit()
+   * added multinomial logit model in MCMCmnl()
+   * added vote data from the Netherlands to illustrate MCMCmnl()
+   * added choicevar() function to specify choice-specific variables in 
+     multinomial choice models
+   * fixed some data-handling issues in MCMCmixfactanal() and
+     MCMCordfactanal() [thanks to Ben Goodrich for isolating these and
+     providing patches]
+   * fixed the Metropolis-Hastings step for the Cowles algorithm for
+     cutpoints in MCMCoprobit(), MCMCordfactanal(), and MCMCmixfactanal()
+     [thanks to Alexander Raach for isolating the problem and providing
+     a patch]
+   * removed gcc specific compilation flags from Makevars.in (per the 
+     request of Brian Ripley and Kurt Hornik)
+   * added informative message for templates created in auto.Scythe.call()
+   * modified vector.tune() hidden function
+   * fixed Neal's shrinkage procedure in MCMChierEI.cc  
+   * a number of editorial fixes, updating for new calendar year, etc.
+   * removed functions acosh, asinh, atanh, and expm1 from smath.h and 
+     smath.cc so cross-compilation will work
+
+//
+// Old Changes and Bug Fixes
+//
+
 MCMCpack 0.5-1 was a major revision of MCMCpack.  The entire package was
 been essentially re-written using the new development environment (documented
 in the MCMCpack specification) and the new Scythe Statistical Library 1.0.
@@ -42,10 +68,6 @@ exhaustive.
    * all documentation updated to reflect changes
    * MCMCirt1d() has a new interface with new types of constraints--
      sampling for this model is also now much faster. 
-
-//
-// Old Changes and Bug Fixes
-//
 
 0.4-8 to 0.4-9
    * Fixed a minor Scythe issue to fix error found by gcc 3.4.   

@@ -1,8 +1,8 @@
 //
-// MCMCpack, Version 0.5-2
+// MCMCpack, Version 0.6-1
 //
 
-Release Date: August 17, 2004
+Release Date: February 18, 2005
 
 This package contains functions for posterior simulation for a number of
 statistical models. All simulation is done in compiled C++ written in
@@ -18,7 +18,7 @@ sampling algorithm, and tools for visualization.
 //
 
 Andrew D. Martin <admartin@wustl.edu>
-Kevin M. Quinn <kquinn@latte.harvard.edu>
+Kevin M. Quinn <kevin_quinn@harvard.edu>
 
 //
 // Compilation

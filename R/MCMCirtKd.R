@@ -21,7 +21,7 @@
            store.item=FALSE, store.ability=TRUE,
            drop.constantvars=TRUE, ... ) {
 
-    datamatrix <- t(as.matrix(datamatrix))   
+    datamatrix <- as.matrix(datamatrix)   
     
     post <- MCMCordfactanal(x=datamatrix, factors=dimensions,
                             lambda.constraints=item.constraints,

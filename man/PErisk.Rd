@@ -5,7 +5,7 @@
 \description{
 Political Economic Risk Data from 62 Countries in 1987.
 }
-\usage{data(CountryRisk)}
+\usage{data(PErisk)}
 \format{
   A data frame with 62 observations on the following 9 variables. All
   data points are from 1987. See Quinn (2004) for more details. 
@@ -36,8 +36,8 @@ Political Economic Risk Data from 62 Countries in 1987.
   \url{http://www.ssc.upenn.edu/~cheibub/data/}.
 
   Witold J. Henisz. 2002. ``The Political Constraint Index (POLCON)
-  Dataset.''
-  \url{http://www-management.wharton.upenn.edu/henisz/POLCON/ContactInfo.html}.
+  Dataset.'' \\
+ \url{http://www-management.wharton.upenn.edu/henisz/POLCON/ContactInfo.html}.
 
   Monty G. Marshall, Ted Robert Gurr, and Barbara Harff. 2002. ``State
   Failure Task Force Problem Set.''
