@@ -13,8 +13,8 @@
   
 \usage{
 MCMCfactanal(x, factors, lambda.constraints=list(),
-             data=list(), burnin = 1000, mcmc = 10000,
-             thin=5, verbose = FALSE, seed = 0,
+             data=parent.environment(), burnin = 1000, mcmc = 20000,
+             thin=1, verbose = FALSE, seed = NA,
              lambda.start = NA, psi.start = NA,
              l0=0, L0=0, a0=0.001, b0=0.001,
              store.scores = FALSE, std.var=TRUE, ... )
@@ -29,11 +29,11 @@ MCMCfactanal(x, factors, lambda.constraints=list(),
   \item{lambda.constraints}{List of lists specifying possible simple equality
     or inequality constraints on the factor loadings. A typical
     entry in the list has one of three forms: \code{varname=list(d,c)} which
-    will constrain the dth loading for the variable named varname to
+    will constrain the dth loading for the variable named \code{varname} to
     be equal to c, \code{varname=list(d,"+")} which will constrain the dth
-    loading for the variable named varname to be positive, and
+    loading for the variable named \code{varname} to be positive, and
     \code{varname=list(d, "-")} which will constrain the dth loading for the
-    variable named varname to be negative. If x is a matrix without
+    variable named \code{varname} to be negative. If x is a matrix without
     column names defaults names of ``V1",``V2", ... , etc will be
     used.}
   
@@ -50,10 +50,16 @@ MCMCfactanal(x, factors, lambda.constraints=list(),
     the sampler is printed to the screen.  If TRUE, the iteration number and
     the factor loadings and uniquenesses are printed to the screen.}
   
-  \item{seed}{The seed for the random number generator.  The code uses the
-    Mersenne Twister, which requires an integer as an input.  If nothing
-    is provided, the Scythe default seed is used.}
-  
+    \item{seed}{The seed for the random number generator.  If NA, the Mersenne
+    Twister generator is used with default seed 12345; if an integer is 
+    passed it is used to seed the Mersenne twister.  The user can also
+    pass a list of length two to use the L'Ecuyer random number generator,
+    which is suitable for parallel computation.  The first element of the
+    list is the L'Ecuyer seed, which is a vector of length six or NA (if NA 
+    a default seed of \code{rep(12345,6)} is used).  The second element of 
+    list is a positive substream number. See the MCMCpack 
+    specification for more details.}
+
   \item{lambda.start}{Starting values for the factor loading matrix
     Lambda. If \code{lambda.start} is set to a scalar the starting value for
     all unconstrained loadings will be set to that scalar. If
@@ -146,8 +152,8 @@ MCMCfactanal(x, factors, lambda.constraints=list(),
 }
 
 \references{
-   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2003.  
-   \emph{Scythe Statistical Library 0.4.} \url{http://scythe.wustl.edu}.
+   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.  
+   \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
@@ -170,18 +176,17 @@ MCMCfactanal(x, factors, lambda.constraints=list(),
    summary(posterior)
 
    ### An example using the matrix interface
-   Lambda <- matrix(runif(45,-.5,.5), 15, 3)
-   Psi <- diag(1 - apply(Lambda ^2, 1, sum))
-   Sigma <- Lambda \%*\% t(Lambda) + Psi 
-   Y <- t(t(chol(Sigma)) \%*\% matrix(rnorm(500*15), 15, 500))
-
-   posterior <- MCMCfactanal(Y, factors=3,
-                    lambda.constraints=list(V1=c(2,0),
-                       V1=c(3,0), V2=c(3,0), V3=list(1,"+"),
-                       V3=list(2,"+"), V3=list(3,"+")),
-                    verbose=FALSE)
-   plot(posterior)
-   summary(posterior)        
+   Y <- cbind(swiss$Agriculture, swiss$Examination,
+              swiss$Education, swiss$Catholic,
+              swiss$Infant.Mortality)
+   colnames(Y) <- c("Agriculture", "Examination", "Education", "Catholic",
+                    "Infant.Mortality")
+   post <- MCMCfactanal(Y, factors=2,
+                        lambda.constraints=list(Examination=list(1,"+"),
+                          Examination=list(2,"-"), Education=c(2,0),
+                          Infant.Mortality=c(1,0)),
+                        verbose=FALSE, store.scores=FALSE, a0=1, b0=0.15,
+                        burnin=5000, mcmc=50000, thin=20)
    }
 }
 

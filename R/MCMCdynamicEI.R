@@ -5,9 +5,9 @@
 
 "MCMCdynamicEI" <-
   function(r0, r1, c0, c1, burnin=5000, mcmc=200000,
-           thin=200, tune=2.65316, verbose=FALSE, seed=0,
-           W=0, nu0=1, delta0=0.03, nu1=1,
-           delta1=0.03, ...){
+           thin=200, tune=2.65316, verbose=FALSE, seed=NA,
+           W=0, a0=1, b0=0.03, a1=1,
+           b1=0.03, ...){
     
     # Error checking
     if (length(r0) != length(r1)){
@@ -45,25 +45,32 @@
       stop("Please check data and try MCMCdynamicEI() again.\n")
     }
 
-    check.parameters(burnin, mcmc, thin, "MCMCdynamicEI", tune)
-    
-    if (nu0 <= 0 ){
-      cat("Parameter nu0 <= 0.\n")
+    check.mcmc.parameters(burnin, mcmc, thin)
+    tune <- scalar.tune(tune)
+
+    # seeds
+    seeds <- form.seeds(seed) 
+    lecuyer <- seeds[[1]]
+    seed.array <- seeds[[2]]
+    lecuyer.stream <- seeds[[3]]
+
+    if (a0 <= 0 ){
+      cat("Parameter a0 <= 0.\n")
       stop("Please respecify and try MCMCdynamicEI() again.\n")
     }
     
-    if (delta0 <= 0 ){
-      cat("Parameter delta0 <= 0.\n")
+    if (b0 <= 0 ){
+      cat("Parameter b0 <= 0.\n")
       stop("Please respecify and try MCMCdynamicEI() again.\n")
     }
     
-    if (nu1 <= 0 ){
-      cat("Parameter nu1 <= 0.\n")
+    if (a1 <= 0 ){
+      cat("Parameter a1 <= 0.\n")
       stop("Please respecify and try MCMCdynamicEI() again.\n")
     }
     
-    if (delta1 <= 0 ){
-      cat("Parameter delta1 <= 0.\n")
+    if (b1 <= 0 ){
+      cat("Parameter b1 <= 0.\n")
       stop("Please respecify and try MCMCdynamicEI() again.\n")
     }
     
@@ -95,13 +102,15 @@
                    mcmc = as.integer(mcmc),
                    thin = as.integer(thin),
                    W = as.double(W),
-                   nu0 = as.double(nu0),
-                   delta0 = as.double(delta0),
-                   nu1 = as.double(nu1),
-                   delta1 = as.double(delta1),
+                   a0 = as.double(a0),
+                   b0 = as.double(b0),
+                   a1 = as.double(a1),
+                   b1 = as.double(b1),
                    verbose = as.integer(verbose),
                    tune = as.double(tune),
-                   seed = as.integer(seed),
+                   lecuyer = as.integer(lecuyer),
+                   seedarray = as.integer(seed.array),
+                   lecuyerstream = as.integer(lecuyer.stream),
                    accepts = as.integer(0),
                    PACKAGE="MCMCpack"
                    )
@@ -111,7 +120,7 @@
     
     sample <- matrix(C.sample$samdata, C.sample$samrow, C.sample$samcol,
                      byrow=TRUE)
-    output <- mcmc2(data=sample, start=1, end=mcmc, thin=thin)
+    output <- mcmc(data=sample, start=1, end=mcmc, thin=thin)
     p0names <- paste("p0table", 1:ntables, sep="")
     p1names <- paste("p1table", 1:ntables, sep="")
     varnames(output) <- c(p0names, p1names, "sigma^2_0", "sigma^2_1")

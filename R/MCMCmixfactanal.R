@@ -1,33 +1,34 @@
 ##########################################################################
-# sample from the posterior distribution of a factor analysis model
-# model in R using linked C++ code in Scythe.
-#
-# The model is:
-#
-# x*_i = \Lambda \phi_i + \epsilon_i,   \epsilon_i \sim N(0, \Psi)
-#
-# \lambda_{ij} \sim N(l0_{ij}, L0^{-1}_{ij})
-# \phi_i \sim N(0,I)
-#
-# and x*_i is the latent variable formed from the observed ordinal
-# variable in the usual (Albert and Chib, 1993) way and is equal to
-# x_i when x_i is continuous. When x_j is ordinal \Psi_jj is assumed
-# to be 1.
-#
-# Andrew D. Martin
-# Washington University
-#
-# Kevin M. Quinn
-# Harvard University
-#
-# 12/2/2003
-#
+## sample from the posterior distribution of a factor analysis model
+## model in R using linked C++ code in Scythe.
+##
+## The model is:
+##
+## x*_i = \Lambda \phi_i + \epsilon_i,   \epsilon_i \sim N(0, \Psi)
+##
+## \lambda_{ij} \sim N(l0_{ij}, L0^{-1}_{ij})
+## \phi_i \sim N(0,I)
+##
+## and x*_i is the latent variable formed from the observed ordinal
+## variable in the usual (Albert and Chib, 1993) way and is equal to
+## x_i when x_i is continuous. When x_j is ordinal \Psi_jj is assumed
+## to be 1.
+##
+## Andrew D. Martin
+## Washington University
+##
+## Kevin M. Quinn
+## Harvard University
+##
+## 12/2/2003
+## Revised to accommodate new spec 7/20/2004
+##
 ##########################################################################
 
 "MCMCmixfactanal" <-
   function(x, factors, lambda.constraints=list(),
-           data=list(), burnin = 1000, mcmc = 10000,
-           thin=5, tune=NA, verbose = FALSE, seed = 0,
+           data=parent.environment(), burnin = 1000, mcmc = 20000,
+           thin=1, tune=NA, verbose = FALSE, seed = NA,
            lambda.start = NA, psi.start=NA,
            l0=0, L0=0, a0=0.001, b0=0.001,
            store.lambda=TRUE, store.scores=FALSE,
@@ -93,144 +94,51 @@
         }
       }
     }
-     
-
-
+    
     n.ord.ge3 <- 0
     for (i in 1:K)
       if (ncat[i] >= 3) n.ord.ge3 <- n.ord.ge3 + 1
+   
+    check.mcmc.parameters(burnin, mcmc, thin)
     
-    check.parameters(burnin, mcmc, thin, "MCMCmixfactanal()")
-
-
+    ## setup constraints on Lambda
+    holder <- build.factor.constraints(lambda.constraints, X, K, factors+1)
+    Lambda.eq.constraints <- holder[[1]]
+    Lambda.ineq.constraints <- holder[[2]]
+    X.names <- holder[[3]]
     
-    # give names to the rows of Lambda related matrices
-    Lambda.eq.constraints <- matrix(NA, K, factors+1)
-    Lambda.ineq.constraints <- matrix(0, K, factors+1)
-    Lambda.prior.mean <- matrix(0, K, factors+1)
-    Lambda.prior.prec <- matrix(0, K, factors+1)
-    
-    if (is.null(colnames(X))){
-      rownames(Lambda.eq.constraints) <- paste("V", 1:ncol(X), sep="") 
-      rownames(Lambda.ineq.constraints) <- paste("V", 1:ncol(X), sep="")
-      rownames(Lambda.prior.mean) <- paste("V", 1:ncol(X), sep="")
-      rownames(Lambda.prior.prec) <- paste("V", 1:ncol(X), sep="")
-      X.names <- paste("V", 1:ncol(X), sep="")
-    }
-    if (!is.null(colnames(X))){
-      rownames(Lambda.eq.constraints) <- colnames(X)
-      rownames(Lambda.ineq.constraints) <- colnames(X)
-      rownames(Lambda.prior.mean) <- colnames(X)
-      rownames(Lambda.prior.prec) <- colnames(X)
-      X.names <- colnames(X)
-    }
-  
-    # setup the equality and inequality contraints on Lambda
-    if (length(lambda.constraints) != 0){
-      constraint.names <- names(lambda.constraints)  
-      for (i in 1:length(constraint.names)){
-        name.i <- constraint.names[i]
-        lambda.constraints.i <- lambda.constraints[[i]]
-        col.index <- lambda.constraints.i[[1]]
-        replace.element <- lambda.constraints.i[[2]]
-        if (is.numeric(replace.element)){
-          Lambda.eq.constraints[rownames(Lambda.eq.constraints)==name.i,
-                                col.index] <- replace.element
-        }
-        if (replace.element=="+"){
-          Lambda.ineq.constraints[rownames(Lambda.ineq.constraints)==name.i,
-                                  col.index] <- 1
-        }
-        if (replace.element=="-"){
-          Lambda.ineq.constraints[rownames(Lambda.ineq.constraints)==name.i,
-                                  col.index] <- -1
-        }
-      }
-    }
-
-    # if subtracting out the mean of continuous X then constrain
-    # the mean parameter to 0
+    ## if subtracting out the mean of continuous X then constrain
+    ## the mean parameter to 0
     for (i in 1:K){
       if (ncat[i] < 2 && std.mean==TRUE){
-        Lambda.eq.constraints[i,1] <- 0.0
+        if ((Lambda.eq.constraints[i,1] == -999 ||
+             Lambda.eq.constraints[i,1] == 0.0) &&
+            Lambda.ineq.constraints[i,1] == 0.0){
+          Lambda.eq.constraints[i,1] <- 0.0
+        }
+        else {
+          cat("Constraints on Lambda are logically\ninconsistent with std.mean==TRUE.\n")
+          stop("Please respecify and call MCMCmixfactanal() again\n")          
+        }
       }
-    }
-    
-    
-    testmat <- Lambda.ineq.constraints * Lambda.eq.constraints
-    
-    if (min(is.na(testmat))==0){
-      if ( min(testmat[!is.na(testmat)]) < 0){
-          cat("Constraints on Lambda are logically inconsistent.\n")
-        stop("Please respecify and call MCMCmixfactanal() again\n")
-      }
-    }
-    Lambda.eq.constraints[is.na(Lambda.eq.constraints)] <- -999
-    
-    # setup prior means and precisions for Lambda
-    # prior means
-    if (is.matrix(l0)){ # matrix input for l0
-      if (nrow(l0)==K && ncol(l0)==(factors+1))
-        Lambda.prior.mean <- l0
-      else {
-        cat("l0 not of correct size for model specification.\n")
-        stop("Please respecify and call MCMCmixfactanal() again\n")
-      }
-    }
-    else if (is.list(l0)){ # list input for l0
-      l0.names <- names(l0)
-      for (i in 1:length(l0.names)){
-        name.i <- l0.names[i]
-        l0.i <- l0[[i]]
-        col.index <- l0.i[[1]]
-        replace.element <- l0.i[[2]]
-        if (is.numeric(replace.element)){
-          Lambda.prior.mean[rownames(Lambda.prior.mean)==name.i,
-                            col.index] <- replace.element
-        }   
-      }
-    }
-    else if (length(l0)==1 && is.numeric(l0)){ # scalar input for l0
-      Lambda.prior.mean <- matrix(l0, K, factors+1)
-    }
-    else {
-      cat("l0 neither matrix, list, nor scalar.\n")
-      stop("Please respecify and call MCMCmixfactanal() again\n")
-    }
-    
-    # prior precisions
-    if (is.matrix(L0)){ # matrix input for L0
-      if (nrow(L0)==K && ncol(L0)==(factors+1))
-        Lambda.prior.prec <- L0
-      else {
-        cat("L0 not of correct size for model specification.\n")
-        stop("Please respecify and call MCMCmixfactanal() again\n")
-      }
-    }
-    else if (is.list(L0)){ # list input for L0
-      L0.names <- names(L0)
-      for (i in 1:length(L0.names)){
-        name.i <- L0.names[i]
-        L0.i <- L0[[i]]
-        col.index <- L0.i[[1]]
-        replace.element <- L0.i[[2]]
-        if (is.numeric(replace.element)){
-          Lambda.prior.prec[rownames(Lambda.prior.prec)==name.i,
-                            col.index] <- replace.element
-        }   
-      }
-    }
-    else if (length(L0)==1 && is.numeric(L0)){ # scalar input for L0
-      Lambda.prior.prec <- matrix(L0, K, factors+1)
-    }
-    else {
-      cat("L0 neither matrix, list, nor scalar.\n")
-      stop("Please respecify and call MCMCmixfactanal() again\n")
-    }
-    if (min(L0) < 0){
-      cat("L0 contains negative elements.\n")
-      stop("Please respecify and call MCMCmixfactanal() again\n")
-    }
+    }    
+
+
+    ## setup and check prior on Psi
+    holder <- form.ig.diagmat.prior(a0, b0, K)
+    a0 <- holder[[1]]
+    b0 <- holder[[2]]
+
+    ## setup prior on Lambda
+    holder <- form.factload.norm.prior(l0, L0, K, factors+1, X.names)
+    Lambda.prior.mean <- holder[[1]]
+    Lambda.prior.prec <- holder[[2]]
+
+    # seeds
+    seeds <- form.seeds(seed) 
+    lecuyer <- seeds[[1]]
+    seed.array <- seeds[[2]]
+    lecuyer.stream <- seeds[[3]]
     
     # Starting values for Lambda
     Lambda <- matrix(0, K, factors+1)
@@ -296,11 +204,7 @@
       }
     }
     else if (is.double(tune)){
-      tune <- matrix(tune, K, 1)
-    }
-    if(min(tune) < 0) {
-      cat("Tuning parameter is negative.\n")
-      stop("Please respecify and call MCMCmixfactanal() again\n")
+      tune <- matrix(abs(tune/ncat), K, 1)
     }
   
     # starting values for gamma (note: not changeable by user)
@@ -326,65 +230,14 @@
       }
     }
 
-    # starting value for Psi
-    Psi <- matrix(0, K, K)
-    if (is.na(psi.start)){
-      for (i in 1:K){
-        if (ncat[i] < 2) {
-          Psi[i,i] <- 0.5 *var(X[,i])
-        }
-        else {
-          Psi[i,i] <- 1.0
-        }
+    ## starting values for Psi
+    Psi <- factuniqueness.start(psi.start, X)
+    for (i in 1:K){
+      if (ncat[i] >= 2){
+        Psi[i,i] <- 1.0
       }
     }
-    else if (is.double(psi.start)){
-      for (i in 1:K){
-        Psi <- diag(K) * psi.start
-        if (ncat[i] >= 2) {
-          Psi[i] <- 1.0
-        }
-      }
-    }
-    else {
-      cat("psi.start neither NA, nor double.\n")
-      stop("Please respecify and call MCMCmixfactanal() again.\n")
-    }
-    if (nrow(Psi) != K || ncol(Psi) != K){
-      cat("Psi starting value not K by K matrix.\n")
-      stop("Please respecify and call MCMCmixfactanal() again.\n")    
-    }
-
-
-    # setup prior for diag(Psi)
-    if (length(a0)==1 && is.double(a0))
-      a0 <- matrix(a0, K, 1)
-    else if (length(a0) == K && is.double(a0))
-      a0 <- matrix(a0, K, 1)
-    else {
-      cat("a0 not properly specified.\n")
-      stop("Please respecify and call MCMCmixfactanal() again.\n")
-    }
-    if (length(b0)==1 && is.double(b0))
-      b0 <- matrix(b0, K, 1)
-    else if (length(b0) == K && is.double(b0))
-      b0 <- matrix(b0, K, 1)
-    else {
-      cat("b0 not properly specified.\n")
-      stop("Please respecify and call MCMCmixfactanal() again.\n")
-    }
-    
-    # prior for Psi error checking
-    if(min(a0) <= 0) {
-      cat("IG(a0/2,b0/2) prior parameter a0 less than or equal to zero.\n")
-      stop("Please respecify and call MCMCmixfactanal() again.\n")
-    }
-    if(min(b0) <= 0) {
-      cat("IG(a0/2,b0/2) prior parameter b0 less than or equal to zero.\n")
-      stop("Please respecify and call MCMCmixfactanal() again.\n")      
-    }  
-   
-    
+          
     # define holder for posterior density sample
     if (store.scores == FALSE && store.lambda == FALSE){
       sample <- matrix(data=0, mcmc/thin, length(gamma)+K)
@@ -412,7 +265,9 @@
                     mcmc = as.integer(mcmc),
                     thin = as.integer(thin),
                     tune = as.double(tune),
-                    seed = as.integer(seed),
+                    lecuyer = as.integer(lecuyer),
+                    seedarray = as.integer(seed.array),
+                    lecuyerstream = as.integer(lecuyer.stream),
                     verbose = as.integer(verbose),
                     Lambda = as.double(Lambda),
                     Lambdarow = as.integer(nrow(Lambda)),
@@ -457,7 +312,7 @@
     # put together matrix and build MCMC object to return
     sample <- matrix(posterior$samdata, posterior$samrow, posterior$samcol,
                      byrow=TRUE)
-    output <- mcmc2(data=sample,start=1, end=mcmc, thin=thin)
+    output <- mcmc(data=sample,start=1, end=mcmc, thin=thin)
     
     par.names <- NULL
     if (store.lambda==TRUE){
@@ -487,10 +342,10 @@
     varnames(output) <- par.names
 
     # get rid of columns for constrained parameters
-    output.df <- mcmc2dataframe(output)
+    output.df <- as.data.frame(as.matrix(output))
     output.var <- diag(var(output.df))
     output.df <- output.df[,output.var != 0]
-    output <- mcmc2(as.matrix(output.df), start=1, end=mcmc, thin=thin)
+    output <- mcmc(as.matrix(output.df), start=1, end=mcmc, thin=thin)
     
     # add constraint info so this isn't lost
     attr(output, "constraints") <- lambda.constraints

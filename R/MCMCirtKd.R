@@ -1,22 +1,22 @@
 ##########################################################################
-# sample from a K-dimensional two-parameter item response model with
-# probit link. This is just a wrapper function that calls
-# MCMCordfactanal.
-#
-# Andrew D. Martin
-# Washington University
-#
-# Kevin M. Quinn
-# Harvard University
-#
-# June 8, 2003
-#
+## sample from a K-dimensional two-parameter item response model with
+## probit link. This is just a wrapper function that calls
+## MCMCordfactanal.
+##
+## Andrew D. Martin
+## Washington University
+##
+## Kevin M. Quinn
+## Harvard University
+##
+## June 8, 2003
+##
 ##########################################################################
 
 "MCMCirtKd" <-
   function(datamatrix, dimensions, item.constraints=list(),
            burnin = 1000, mcmc = 10000,
-           thin=5, verbose = FALSE, seed = 0,
+           thin=1, verbose = FALSE, seed = NA,
            alphabeta.start = NA, b0=0, B0=0,
            store.item=FALSE, store.ability=TRUE,
            drop.constantvars=TRUE, ... ) {
@@ -31,8 +31,7 @@
                             l0=b0, L0=B0, store.lambda=store.item,
                             store.scores=store.ability,
                             drop.constantvars=drop.constantvars,
-                            drop.constantcases=drop.constantcases,
-                            special.case="special.case")
+                            model="MCMCirtKd")
     return(post)
   }
 

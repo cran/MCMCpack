@@ -11,9 +11,9 @@
   }
   
 \usage{
-MCMCoprobit(formula, data = list(), burnin = 1000, mcmc = 10000,
-   thin=5, tune = NA, verbose = FALSE, seed = 0, beta.start = NA,
-   b0 = 0, B0 = 0.001, ...) }
+MCMCoprobit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
+   thin=1, tune = NA, verbose = FALSE, seed = NA, beta.start = NA,
+   b0 = 0, B0 = 0, ...) }
 
 \arguments{
     \item{formula}{Model formula.}
@@ -32,12 +32,19 @@ MCMCoprobit(formula, data = list(), burnin = 1000, mcmc = 10000,
       number of categories in the response variable.}
 
     \item{verbose}{A switch which determines whether or not the progress of
-    the sampler is printed to the screen.  If TRUE, the iteration number and
-    the betas are printed to the screen every 500 iterations.}
-
-    \item{seed}{The seed for the random number generator.  The code uses the
-    Mersenne Twister, which requires an integer as an input.  If nothing
-    is provided, the Scythe default seed is used.}
+    the sampler is printed to the screen.  If TRUE, the iteration
+    number, the beta vector, and the Metropolis-Hastings acceptance rate
+    are printed to the screen every 500 iterations.}
+  
+    \item{seed}{The seed for the random number generator.  If NA, the Mersenne
+      Twister generator is used with default seed 12345; if an integer is 
+      passed it is used to seed the Mersenne twister.  The user can also
+      pass a list of length two to use the L'Ecuyer random number generator,
+      which is suitable for parallel computation.  The first element of the
+      list is the L'Ecuyer seed, which is a vector of length six or NA (if NA 
+      a default seed of \code{rep(12345,6)} is used).  The second element of 
+      list is a positive substream number. See the MCMCpack 
+      specification for more details.}
   
     \item{beta.start}{The starting value for the \eqn{\beta}{beta} vector.   
     This can either be a scalar or a column vector with dimension equal
@@ -54,7 +61,9 @@ MCMCoprobit(formula, data = list(), burnin = 1000, mcmc = 10000,
     \item{B0}{The prior precision of \eqn{\beta}{beta}.  This can either be a 
     scalar or a square matrix with dimensions equal to the number of
     betas.  If this takes a scalar value, then that value times an
-    identity matrix serves as the prior precision of \eqn{\beta}{beta}.}
+    identity matrix serves as the prior precision of \eqn{\beta}{beta}.
+    Default value of 0 is equivalent to  an improper uniform prior on
+    \eqn{\beta}{beta}. } 
     
     \item{...}{further arguments to be passed}       
 }
@@ -102,8 +111,8 @@ MCMCoprobit(formula, data = list(), burnin = 1000, mcmc = 10000,
   Valen E. Johnson and James H. Albert. 1999. ``Ordinal Data Modeling." 
   Springer: New York.
       
-  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2003.  
-   \emph{Scythe Statistical Library 0.4.} \url{http://scythe.wustl.edu}.
+  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.  
+   \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    
   Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.

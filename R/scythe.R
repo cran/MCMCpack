@@ -33,6 +33,7 @@
 # by the data.
 #
 # Kevin Rompala 5/1/2003
+# fixed by ADM 7/25/2004
 
 "read.Scythe" <-
   function(infile = NA) {
@@ -48,7 +49,7 @@
     dimensions <- scan(file=infile,n=2)
     inputdata <- scan(file=infile)
     close(infile)
-    matrix(data=inputdata,
+    hold <- matrix(data=inputdata,
            nrow=dimensions[1], ncol=dimensions[2], byrow=TRUE)
-    return(0) 
+    return(hold) 
   }

@@ -1,133 +1,153 @@
-// sample from the posterior distribution of a logistic regression
-// logistice regression model in R using linked C++ code in Scythe
+// MCMClogit.cc is C++ code to estimate a logistic regression model with
+//   a multivariate normal prior
 //
-// KQ 1/23/03
+// Andrew D. Martin
+// Dept. of Political Science
+// Washington University in St. Louis
+// admartin@wustl.edu
+//
+// Kevin M. Quinn
+// Dept. of Government
+// Harvard University
+// kevin_quinn@harvard.edu
+// 
+// This software is distributed under the terms of the GNU GENERAL
+// PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
+// file for more information.
+//
+// Copyright (C) 2004 Andrew D. Martin and Kevin M. Quinn
+// 
+// updated to the new version of Scythe 7/25/2004 KQ
 
 #include <iostream>
-#include "Scythe_Matrix.h"
-#include "Scythe_Simulate.h"
-#include "Scythe_Stat.h"
-#include "Scythe_LA.h"
-#include "Scythe_IDE.h"
-#include "Scythe_Math.h"
+#include "matrix.h"
+#include "distributions.h"
+#include "stat.h"
+#include "la.h"
+#include "ide.h"
+#include "smath.h"
+#include "MCMCrng.h"
+#include "MCMCfcds.h"
+
+#include <R.h>           // needed to use Rprintf()
+#include <R_ext/Utils.h> // needed to allow user interrupts
 
 using namespace SCYTHE;
 using namespace std;
 
-double logit_logpost(Matrix<double>& Y, const Matrix<double>& X, 
-		     const Matrix<double>& beta,
-		     const Matrix<double>& beta_prior_mean, 
-		     const Matrix<double>& beta_prior_var){
+static double logit_logpost(const Matrix<double>& Y, const Matrix<double>& X, 
+			    const Matrix<double>& beta,
+			    const Matrix<double>& beta_prior_mean, 
+			    const Matrix<double>& beta_prior_prec){
 
-  Matrix<double> eta = X * beta;
-  Matrix<double> p = exp(eta)/(1+exp(eta));
-  double loglike = 0;
+  // likelihood
+  const Matrix<double> eta = X * beta;
+  const Matrix<double> p = 1.0/(1.0 + exp(-eta));
+  double loglike = 0.0;
   for (int i=0; i<Y.rows(); ++i)
     loglike += Y[i]*::log(p[i]) + (1-Y[i])*::log(1-p[i]);
-  double logprior = lndmvn(beta, beta_prior_mean, beta_prior_var);
-  double logpost = loglike + logprior;
-  return logpost;
+  
+  // prior
+  double logprior = 0.0;
+  if (beta_prior_prec(0,0) != 0){
+    logprior = lndmvn(beta, beta_prior_mean, invpd(beta_prior_prec));
+  }
+
+  return (loglike + logprior);
 }
 
 extern "C"{
-
-  using namespace SCYTHE;
-
-  // simulate from posterior density and return a Gibbs by parameters matrix 
-  // of the posterior density sample
-  void
-  logitpost (double* samdata, const int* samrow, const int* samcol, 
-	     const double* Xdata, const int* Xrow, const int* Xcol,
-	     const double* Ydata, const int* Yrow, const int* Ycol,
-	     const int* burnin, const int* mcmc, const int* thin,
-	     const int* seed, const int* verbose,
-	     const int* bstartdata, const int* bstartrow, const int* bstartcol, 
-	     const double* b0data, const int* b0row, const int* b0col,
-	     const double* B0data, const int* B0row, const int* B0col,
-	     const double* mdata, const int* mrow, const int* mcol,
-	     const double* Vdata, const int* Vrow, const int* Vcol,
-	     const double* tune, int* accepts){
-
-    // initialize seed (mersenne twister / use default seed unless specified)
-    if(seed==0) set_mersenne_seed(5489UL);
-    else set_mersenne_seed(seed[0]);
-
-    // form matrices
-    Matrix<double> X(Xcol[0], Xrow[0], Xdata);
-    X = t(X);
-    Matrix<double> Y(Ycol[0], Yrow[0], Ydata);
-    Y = t(Y);
-    Matrix<double> b0(b0col[0], b0row[0], b0data);
-    b0 = t(b0);
-    Matrix<double> B0(B0col[0], B0row[0], B0data);
-    B0 = t(B0);
-    Matrix<double> m(mcol[0], mrow[0], mdata);
-    m = t(m);
-    Matrix<double> V(Vcol[0], Vrow[0], Vdata);
-    V = t(V);
-    Matrix<double> C = cholesky(V) * tune[0];
-
-    Matrix<double> beta_prior_var = invpd(B0);
-
-    // proposal parameters
-    Matrix<double> propV = invpd(B0 + invpd(V));
-    Matrix<double> propm = propV*(B0*b0 + invpd(V)*m);
-    Matrix<double> propC = cholesky(propV) * tune[0];
-
-    // define constants
-    int k = X.cols();
-    int tot_iter = burnin[0] + mcmc[0];
-
-    // holding matrix
-    Matrix<double> betam(k, mcmc[0]);
-
-    // starting values
-    Matrix<double> beta(bstartcol[0], bstartrow[0], bstartdata[0]);
-    beta = t(beta);
   
+  void MCMClogit(double *sampledata, const int *samplerow, 
+		 const int *samplecol, const double *Ydata, 
+		 const int *Yrow, const int *Ycol, const double *Xdata, 
+		 const int *Xrow, const int *Xcol, const int *burnin, 
+		 const int *mcmc, const int *thin, const double *tunedata, 
+		 const int *tunerow, const int *tunecol, const int *lecuyer, 
+		 const int *seedarray, const int *lecuyerstream, 
+		 const int *verbose, const double *betastartdata, 
+		 const int *betastartrow, const int *betastartcol, 
+		 const double *b0data, const int *b0row, const int *b0col, 
+		 const double *B0data, const int *B0row, const int *B0col, 
+		 const double *Vdata, const int *Vrow, const int *Vcol) {  
+    
+    // pull together Matrix objects
+    const Matrix <double> Y = r2scythe(*Yrow, *Ycol, Ydata);
+    const Matrix <double> X = r2scythe(*Xrow, *Xcol, Xdata);
+    const Matrix <double> tune = r2scythe(*tunerow, *tunecol, tunedata);
+    Matrix <double> beta = r2scythe(*betastartrow, *betastartcol, 
+				    betastartdata);
+    const Matrix <double> b0 = r2scythe(*b0row, *b0col, b0data);
+    const Matrix <double> B0 = r2scythe(*B0row, *B0col, B0data);
+    const Matrix <double> V = r2scythe(*Vrow, *Vcol, Vdata);
+    
+    // define constants
+    const int tot_iter = *burnin + *mcmc;  // total number of mcmc iterations
+    const int nstore = *mcmc / *thin;      // number of draws to store
+    const int k = X.cols();
+    
+    // storage matrix or matrices
+    Matrix<double> storemat(nstore, k);
+    
+    // initialize rng stream
+    rng *stream = MCMCpack_get_rng(*lecuyer, seedarray, *lecuyerstream);
+    
+    // proposal parameters
+    const Matrix<double> propV = tune * invpd(B0 + invpd(V)) * tune;
+    const Matrix<double> propC = cholesky(propV) ;
 
-    double logpost_cur = logit_logpost(Y,X,beta,b0,beta_prior_var);
-
+    double logpost_cur = logit_logpost(Y, X, beta, b0, B0);
+    
     // MCMC loop
     int count = 0;
+    int accepts = 0;
     for (int iter = 0; iter < tot_iter; ++iter){
 
       // sample beta
-      Matrix<double> beta_can = beta + propC * rnorm(k,1);
-
-      double logpost_can = logit_logpost(Y,X,beta_can, b0, beta_prior_var);
-      double ratio = ::exp(logpost_can - logpost_cur); 
-
-      if (runif() < ratio){
+      const Matrix<double> beta_can = gaxpy(propC, stream->rnorm(k,1), beta);
+      
+      const double logpost_can = logit_logpost(Y,X,beta_can, b0, B0);
+      const double ratio = ::exp(logpost_can - logpost_cur); 
+      
+      if (stream->runif() < ratio){
 	beta = beta_can;
 	logpost_cur = logpost_can;
-	++accepts[0];
+	++accepts;
       }
-
-
+            
       // store values in matrices
-      if (iter >= burnin[0] && ((iter%thin[0])==0)){ 
+      if (iter >= *burnin && ((iter % *thin)==0)){ 
 	for (int j = 0; j < k; j++)
-	  betam (j, count) = beta[j];
+	  storemat(count, j) = beta[j];
 	++count;
       }
-
-
-      if (verbose[0] == 1 && iter % 500 == 0) {
-	cout << "MCMClogit iteration = " << iter + 1 << endl;
-	cout << " beta = " << endl << beta.toString();
-	cout << " acceptance rate = " << static_cast<double>(accepts[0])/
-	    static_cast<double>(iter+1) << endl << endl;
+      
+      // print output to stdout
+      if(*verbose == 1 && iter % 500 == 0){
+	Rprintf("\n\nMCMClogit iteration %i of %i \n", (iter+1), tot_iter);
+	Rprintf("beta = \n");
+	for (int j=0; j<k; ++j)
+	  Rprintf("%10.5f\n", beta[j]);
+	Rprintf("Metropolis acceptance rate for beta = %3.5f\n\n", 
+		static_cast<double>(accepts) / 
+		static_cast<double>(iter+1));	
       }
-    
-
+      
+      void R_CheckUserInterrupt(void); // allow user interrupts    
     }// end MCMC loop
+
+     delete stream; // clean up random number stream
   
     // return output
-    Matrix<double> holder = t(betam);
-    int number = samrow[0] * samcol[0];
-    for (int i=0; i<number; ++i)
-      samdata[i] = holder[i];
+    const int size = *samplerow * *samplecol;
+    for (int i=0; i<size; ++i)
+      sampledata[i] = storemat[i];
+    
+    Rprintf("\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+    Rprintf("The Metropolis acceptance rate for beta was %3.5f", 
+	    static_cast<double>(accepts) / static_cast<double>(tot_iter));
+    Rprintf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+    
   }
   
 }

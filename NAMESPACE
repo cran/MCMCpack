@@ -1,0 +1,38 @@
+useDynLib(MCMCpack)
+import(coda)
+import(MASS)
+
+export(    
+       ddirichlet,
+       dinvgamma,
+       diwish,
+       dnoncenhypergeom,
+       dtomogplot,
+       dwish,
+       MCMCbaselineEI,
+       MCMCdynamicEI,
+       MCMCfactanal,
+       MCMChierEI,
+       MCMCirt1d,
+       MCMCirtKd,
+       MCMClogit,
+       MCMCmetrop1R,
+       MCMCmixfactanal,
+       MCMCoprobit,
+       MCMCordfactanal,
+       MCMCpanel,
+       MCMCpoisson,
+       MCMCprobit,
+       MCMCregress,
+       rdirichlet,
+       read.Scythe,
+       rinvgamma,
+       riwish,
+       rnoncenhypergeom,
+       rwish,
+       tomogplot,
+       vech,
+       write.Scythe,
+       xpnd
+       )
+

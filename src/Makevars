@@ -1,6 +1,2 @@
-PKG_CXXFLAGS = -funroll-loops -Wall -pedantic -DSCYTHE_NO_RANGE
-
-
-
-
+PKG_CXXFLAGS = -Wall -pedantic -DSCYTHE_COMPILE_DIRECT -DSCYTHE_NO_RANGE -O3 -fno-gcse -funroll-loops  -DHAVE_TRUNC
 

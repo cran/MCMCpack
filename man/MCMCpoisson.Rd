@@ -11,9 +11,9 @@
   }
   
 \usage{
-MCMCpoisson(formula, data = list(), burnin = 1000, mcmc = 10000,
-   thin = 5, tune = 1.1, verbose = FALSE, seed = 0,  beta.start = NA,
-   b0 = 0, B0 = 0.001, ...) }
+MCMCpoisson(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
+   thin = 1, tune = 1.1, verbose = FALSE, seed = NA,  beta.start = NA,
+   b0 = 0, B0 = 0, ...) }
 
 \arguments{
     \item{formula}{Model formula.}
@@ -27,18 +27,28 @@ MCMCpoisson(formula, data = list(), burnin = 1000, mcmc = 10000,
     \item{thin}{The thinning interval used in the simulation.  The number of
     mcmc iterations must be divisible by this value.}
 
-    \item{tune}{Metropolis tuning parameter.  Make sure that the
-    acceptance rate is satisfactory before using the posterior density sample
-    for inference.}
+    \item{tune}{Metropolis tuning parameter. Can be either a positive
+      scalar or a \eqn{k}{k}-vector, where \eqn{k}{k} is the length of
+      \eqn{\beta}{beta}.Make sure that the
+      acceptance rate is satisfactory (typically between 0.20 and 0.5)
+      before using the posterior density sample for inference.}
+
     
     \item{verbose}{A switch which determines whether or not the progress of
-    the sampler is printed to the screen.  If TRUE, the iteration number and
-    the \eqn{\beta}{beta} is printed to the screen every 500 iterations.}
+    the sampler is printed to the screen.  If TRUE, the iteration number,
+    the current beta vector, and the Metropolis acceptance rate  are
+    printed to the screen every 500 iterations.} 
 
-    \item{seed}{The seed for the random number generator.  The code uses the
-    Mersenne Twister, which requires an integer as an input.  If nothing
-    is provided, the Scythe default seed is used.}
-
+    \item{seed}{The seed for the random number generator.  If NA, the Mersenne
+    Twister generator is used with default seed 12345; if an integer is 
+    passed it is used to seed the Mersenne twister.  The user can also
+    pass a list of length two to use the L'Ecuyer random number generator,
+    which is suitable for parallel computation.  The first element of the
+    list is the L'Ecuyer seed, which is a vector of length six or NA (if NA 
+    a default seed of \code{rep(12345,6)} is used).  The second element of 
+    list is a positive substream number. See the MCMCpack 
+    specification for more details.}
+    
     \item{beta.start}{The starting value for the \eqn{\beta}{beta} vector.
     This can either 
     be a scalar or a column vector with dimension equal to the number of 
@@ -52,15 +62,17 @@ MCMCpoisson(formula, data = list(), burnin = 1000, mcmc = 10000,
     vector with dimension equal to the number of betas. If this takes a scalar
     value, then that value will serve as the prior mean for all of the
     betas.}
-    
-    \item{B0}{The prior precision of \eqn{\beta}{beta}.  This can either be a
+
+  \item{B0}{The prior precision of \eqn{\beta}{beta}.  This can either be a
     scalar
     or a square matrix with dimensions equal to the number of betas.  If this
     takes a scalar value, then that value times an identity matrix serves
-    as the prior precision of \eqn{\beta}{beta}.}
-    
-    \item{...}{further arguments to be passed}       
-}}
+    as the prior precision of \eqn{\beta}{beta}. Default value of 0 is
+    equivalent to an improper uniform prior for beta.}
+     
+    \item{\ldots}{further arguments to be passed}       
+
+}
 
 \value{
    An mcmc object that contains the posterior density sample.  This 
@@ -79,17 +91,20 @@ MCMCpoisson(formula, data = list(), burnin = 1000, mcmc = 10000,
   \deqn{\mu_i = \exp(x_i'\beta)}{mu_i = exp(x_i'beta)}
   We assume a multivariate Normal prior on \eqn{\beta}{beta}:
     \deqn{\beta \sim \mathcal{N}(b_0,B_0^{-1})}{beta ~ N(b0,B0^(-1))}
-  The candidate generating density is a multivariate Normal density centered
-  at the current value of \eqn{\beta}{beta} with variance-covariance matrix
-  that is an approximation of the posterior based on the maximum likelihood 
-  estimates and the prior precision multiplied by the tuning parameter  
-   squared.
-  }}
+
+  The Metropois proposal distribution is centered at the current value of
+  \eqn{\theta}{theta} and has variance-covariance \eqn{V = T
+    (B_0 + C^{-1})^{-1} T }{V = T (B0 + C^{-1})^{-1} T}, where
+  \eqn{T}{T} is a the diagonal positive definite matrix formed from the
+  \code{tune}, \eqn{B_0}{B0} is the prior precision, and \eqn{C}{C} is
+  the large sample variance-covariance matrix of the MLEs. This last
+  calculation is done via an initial call to \code{glm}.
+ }
   
 \references{
       
-  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2003.  
-   \emph{Scythe Statistical Library 0.4.} \url{http://scythe.wustl.edu}.
+  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.  
+   \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
