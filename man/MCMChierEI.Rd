@@ -8,10 +8,10 @@
   }
   
 \usage{
-MCMChierEI(r0, r1, c0, c1, burnin=1000, mcmc=50000, thin=1,
-           verbose=FALSE, tune=2.65316, seed=NA,
-           m0=0, M0=10, m1=0, M1=10, a0=1, b0=0.5, a1=1,
-           b1=0.5, ...)
+MCMChierEI(r0, r1, c0, c1, burnin=5000, mcmc=50000, thin=1,
+           verbose=FALSE, seed=NA,
+           m0=0, M0=2.287656, m1=0, M1=2.287656, a0=0.825, b0=0.0105,
+           a1=0.825, b1=0.0105, ...)
    }
 
 \arguments{
@@ -34,18 +34,6 @@ MCMChierEI(r0, r1, c0, c1, burnin=1000, mcmc=50000, thin=1,
   \item{thin}{The thinning interval used in the simulation.  The number of
     mcmc iterations must be divisible by this value.}
 
-  \item{tune}{Tuning parameter for the Metropolis-Hasting sampling. The
-    default value has been chosen to work well across most datasets. The
-  user should only change the tuning parameter if s/he has carefully
-  inspected the C++ code where the sampling takes place and understands
-  what s/he is doing. Note that the acceptance rate will typically be
-  much lower (say around 0.01) than would ordinarily be advisable. The
-  reason for this low acceptance rate is because the proposal
-  distribution is evenly spread around the entire tomography line while
-  the posterior is concentrated in one area of the line. While many
-  candidate draws are rejected, this algorithm mixes better than
-  algorithms that use more local proposal distributions.}
-
   \item{verbose}{A switch which determines whether or not the progress of
     the sampler is printed to the screen.  Information is printed
     if TRUE.}
@@ -59,7 +47,7 @@ MCMChierEI(r0, r1, c0, c1, burnin=1000, mcmc=50000, thin=1,
     a default seed of \code{rep(12345,6)} is used).  The second element of 
     list is a positive substream number. See the MCMCpack 
     specification for more details.}
-    
+
   \item{m0}{Prior mean of the \eqn{\mu_0}{mu0} parameter.}
 
   \item{M0}{Prior variance of the \eqn{\mu_0}{mu0} parameter.}
@@ -132,18 +120,30 @@ MCMChierEI(r0, r1, c0, c1, burnin=1000, mcmc=50000, thin=1,
   \eqn{\sigma^2_1 \sim \mathcal{IG}(a_1/2, b_1/2)}{\sigma^2_1 ~
     InvGamma(a1/2, b1/2)}.
 
+   The default priors have been chosen to make the implied prior
+   distribution for \eqn{p_{0}}{p0} and \eqn{p_{1}}{p1}
+   \emph{approximately} uniform on (0,1). 
+  
    Inference centers on \eqn{p_0}{p0}, \eqn{p_1}{p1}, \eqn{\mu_0}{mu0},
    \eqn{\mu_1}{mu1}, \eqn{\sigma^2_0}{sigma^2_0}, and
    \eqn{\sigma^2_1}{sigma^2_1}.
-   The Metropolis-Hastings algorithm is used to sample from the posterior
-   density. 
+   Univariate slice sampling (Neal, 2003) along with Gibbs sampling is
+   used to sample from the posterior density.
+
+   See Section 5.4 of Wakefield (2003) for discussion of the priors used
+   here. \code{MCMChierEI} departs from the Wakefield model in that the
+   \code{mu0} and \code{mu1} are here assumed to be drawn from
+   independent normal distributions whereas Wakefield assumes they are
+   drawn from logistic distributions. 
 }
   
 \references{
-  Jonathan Wakefield. 2001. ``Ecological Inference for 2 x 2 Tables."
-   Center for Statistics and the Social Sciences Working Paper
-   no. 12. University of Washington. 
+Jonathan C. Wakefield.  2003. ``Ecological inference for 2x2 tables."  Read 
+before the Royal Statistical Society, on November 12th, 2003.
 
+   Radford Neal. 2003. ``Slice Sampling" (with discussion). \emph{Annals of
+   Statistics}, 31: 705-767. 
+   
    Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004. 
     \emph{Scythe Statistical 
    Library 1.0.} \url{http://scythe.wustl.edu}.
@@ -155,18 +155,35 @@ MCMChierEI(r0, r1, c0, c1, burnin=1000, mcmc=50000, thin=1,
 
 \examples{
    \dontrun{
-   c0 <- rpois(5, 500)
-   c1 <- c(200, 140, 250, 190, 75)
-   r0 <- rpois(5, 400)
-   r1 <- (c0 + c1) - r0
-   posterior <- MCMChierEI(r0,r1,c0,c1, mcmc=200000, thin=50)
-   plot(posterior)
-   summary(posterior) 
+## simulated data example 
+set.seed(3920)
+n <- 100
+r0 <- round(runif(n, 400, 1500))
+r1 <- round(runif(n, 100, 4000))
+p0.true <- pnorm(rnorm(n, m=0.5, s=0.25))
+p1.true <- pnorm(rnorm(n, m=0.0, s=0.10))
+y0 <- rbinom(n, r0, p0.true)
+y1 <- rbinom(n, r1, p1.true)
+c0 <- y0 + y1
+c1 <- (r0+r1) - c0
+
+## plot data
+tomogplot(r0, r1, c0, c1)
+
+## fit exchangeable hierarchical model
+post <- MCMChierEI(r0,r1,c0,c1, mcmc=40000, thin=5, verbose=TRUE,
+                    seed=list(NA, 1))
+
+p0meanHier <- colMeans(post)[1:n]
+p1meanHier <- colMeans(post)[(n+1):(2*n)]
+
+## plot truth and posterior means
+pairs(cbind(p0.true, p0meanHier, p1.true, p1meanHier))
    }
 }
 
 \keyword{models}
 
-\seealso{\code{\link{MCMCbaselineEI}}, \code{\link{MCMCdynamicEI}},
+\seealso{\code{\link{MCMCdynamicEI}},
   \code{\link[coda]{plot.mcmc}},\code{\link[coda]{summary.mcmc}}}
 

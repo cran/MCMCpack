@@ -8,7 +8,7 @@
 }
   
 \usage{
-dtomogplot(r0, r1, c0, c1, time.vec=NA,
+dtomogplot(r0, r1, c0, c1, time.vec=NA, delay=0,
            xlab="fraction of r0 in c0 (p0)",
            ylab="fraction of r1 in c0 (p1)",
            color.palette=heat.colors, bgcol="black", ...)
@@ -26,6 +26,10 @@ dtomogplot(r0, r1, c0, c1, time.vec=NA,
   \item{time.vec}{Vector of time periods that correspond to the elements
     of \eqn{r_0}{r0}, \eqn{r_1}{r1}, \eqn{c_0}{c0}, and \eqn{c_1}{c1}.}
 
+  \item{delay}{Time delay in seconds between the plotting of the
+    tomography lines. Setting a positive delay is useful for visualizing
+    temporal dependence.}
+  
   \item{xlab}{The x axis label for the plot.}
 
   \item{ylab}{The y axis label for the plot.}
@@ -80,13 +84,39 @@ dtomogplot(r0, r1, c0, c1, time.vec=NA,
 }
 
 \examples{
-r0 <- rpois(20, 300)
-r1 <- rpois(20, 200)
-c0 <- 100 + 1:20*7 + rpois(20, 30)
+\dontrun{
+## simulated data example 1
+set.seed(3920)
+n <- 100
+r0 <- rpois(n, 2000)
+r1 <- round(runif(n, 100, 4000))
+p0.true <- pnorm(-1.5 + 1:n/(n/2))
+p1.true <- pnorm(1.0 - 1:n/(n/4))
+y0 <- rbinom(n, r0, p0.true)
+y1 <- rbinom(n, r1, p1.true)
+c0 <- y0 + y1
 c1 <- (r0+r1) - c0
-dtomogplot(r0, r1, c0, c1, time.vec=1901:1920) 
+
+## plot data
+dtomogplot(r0, r1, c0, c1, delay=0.1)
+
+## simulated data example 2
+set.seed(8722)
+n <- 100
+r0 <- rpois(n, 2000)
+r1 <- round(runif(n, 100, 4000))
+p0.true <- pnorm(-1.0 + sin(1:n/(n/4)))
+p1.true <- pnorm(0.0 - 2*cos(1:n/(n/9)))
+y0 <- rbinom(n, r0, p0.true)
+y1 <- rbinom(n, r1, p1.true)
+c0 <- y0 + y1
+c1 <- (r0+r1) - c0
+
+## plot data
+dtomogplot(r0, r1, c0, c1, delay=0.1)
+}
 }
 
-\seealso{\code{\link{MCMCbaselineEI}}, \code{\link{MCMChierEI}},
+\seealso{\code{\link{MCMChierEI}},
   \code{\link{MCMCdynamicEI}},\code{\link{tomogplot}}
 }

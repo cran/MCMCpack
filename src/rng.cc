@@ -903,9 +903,10 @@ namespace SCYTHE {
 				__LINE__, "Truncation bound not logically consistent");
     }
     double s = ::sqrt(v);
+
     if (( ((above-m)/s > 0.5) && ((m-below)/s > 0.5)) ||
-	( ((above-m)/s > 2.0) && ((below-m)/s < 0.25)) ||
-	( ((m-below)/s > 2.0) && ((above-m)/s > -0.25)) ){ 
+    	( ((above-m)/s > 2.0) && ((below-m)/s < 0.25)) ||
+    	( ((m-below)/s > 2.0) && ((above-m)/s > -0.25)) ){ 
       double x = rnorm(m, s);
       while ((x > above) || (x < below))
 	x = rnorm(m,s);
@@ -1019,12 +1020,12 @@ namespace SCYTHE {
     double s = ::sqrt(v);
     // do rejection sampling and return value
     //if (m >= below){
-    if ((m/s - below/s ) > 1.2){
+    if ((m/s - below/s ) > -0.5){
       double x = rnorm(m, s);
       while (x < below)
 	x = rnorm(m,s);
       return x; 
-    } else if ((m/s - below/s ) > 4.0 ){
+    } else if ((m/s - below/s ) > -5.0 ){
       // use the inverse cdf method
       double above = (m+30.0)*s;
       double x = rtnorm(m, v, below, above);
@@ -1058,12 +1059,12 @@ namespace SCYTHE {
     }
     double s = ::sqrt(v);
     // do rejection sampling and return value
-    if ((m/s - above/s ) < 1.2){ 
+    if ((m/s - above/s ) < 0.5){ 
       double x = rnorm(m, s);
       while (x > above)
 	x = rnorm(m,s);
       return x;
-    } else if ((m/s - above/s ) < 4.0 ){
+    } else if ((m/s - above/s ) < 5.0 ){
       // use the inverse cdf method
       double below = (m-30.0)*s;
       double x = rtnorm(m, v, below, above);

@@ -1,8 +1,6 @@
 Dirichlet               The Dirichlet Distribution
 InvGamma                The Inverse Gamma Distribution
 InvWishart              The Inverse Wishart Distribution
-MCMCbaselineEI          Markov chain Monte Carlo for Wakefield's
-                        Baseline Ecological Inference Model
 MCMCdynamicEI           Markov chain Monte Carlo for Quinn's Dynamic
                         Ecological Inference Model
 MCMCfactanal            Markov chain Monte Carlo for Normal Theory

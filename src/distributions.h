@@ -187,6 +187,7 @@ namespace SCYTHE {
                         const double &, const double &location = 0.0,
                         const double &scale = 1.0);
 
+
   /**** The Log Normal Distribution ****/
 
   /* CDFs */

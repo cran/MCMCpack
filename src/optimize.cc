@@ -489,9 +489,10 @@ namespace SCYTHE {
   template <class T>
   Matrix<T>
   BFGS (T (*fun)(const Matrix<T> &, const Matrix<T> &,
-				const Matrix<T> &), rng *myrng, const Matrix<T> &theta, 
-			  const Matrix<T> &y, const Matrix<T> &X,
-				const int &maxit, const T &tolerance)
+		 const Matrix<T> &), rng *myrng, 
+	const Matrix<T> &theta, 
+	const Matrix<T> &y, const Matrix<T> &X,
+	const int &maxit, const T &tolerance)
   {
     if (! theta.isColVector())
       throw scythe_dimension_error (__FILE__, __PRETTY_FUNCTION__,

@@ -37,6 +37,7 @@
     rect(-0.05, 1, 1.05, 1.05, col="white", lty=0)
     rect(1, -0.05, 1.05, 1.05, col="white", lty=0)
     box()
+    par(pty="m")
     return(0)
   }
 
@@ -47,7 +48,7 @@
 # KQ 11/9/2002
 
 "dtomogplot" <-
-  function(r0, r1, c0, c1, time.vec=NA, 
+  function(r0, r1, c0, c1, time.vec=NA, delay=0, 
            xlab="fraction of r0 in c0 (p0)",
            ylab="fraction of r1 in c0 (p1)",
            color.palette=heat.colors,
@@ -96,6 +97,11 @@
     rect(0, 0, 1, 1, col=bgcol, lty=0)
   
     for (year in 1:N) {
+      time.last <- proc.time()[3]
+      time.next <- proc.time()[3]
+      while ( (time.next - time.last) < delay ){
+        time.next <- proc.time()[3]        
+      }
       abline(intercept[year], slope[year], col=col.vec[year])
     }
 
@@ -104,5 +110,6 @@
     rect(-0.05, 1, 1.05, 1.05, col="white", lty=0)
     rect(1, -0.05, 1.05, 1.05, col="white", lty=0)
     box()  
+    par(pty="m")
     return(0)
   }

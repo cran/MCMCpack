@@ -16,16 +16,30 @@
  * Provides the class definition for the L'Ecuyer random number
  * generator, a rng capable of generating many independent substreams.
  * This class extends the abstract rng class by implementing runif().
- * Based on RngStream.cpp, originally released under the following
+ * Based on RngStream.cpp, which was released under the following
  * license:
  *
- * Copyright:      Pierre L'Ecuyer, University of Montreal
- * Notice:         This code can be used freely for personnal,
- *                 academic, or non-commercial purposes. For commercial
- *                 purposes, please contact P. L'Ecuyer at:
- *                 lecuyer@iro.umontreal.ca
- * Date:           14 August 2001
+ * This software is Copyright (C) 2004 Pierre L'Ecuyer.
  *
+ * License: this code can be used freely for personal, academic, or
+ * non-commercial purposes.  For commercial licensing, please contact
+ * P. L'Ecuyer at lecuyer@iro.umontreal.ca.
+ *
+ * This code may also be redistributed and modified under the terms of
+ * the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or (at your option) any
+ * later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
+ * USA.
+ * 
  */
 
 #ifndef SCYTHE_LECUYER_H
