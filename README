@@ -1,10 +1,12 @@
 //
-// MCMCpack, Version 0.3-11
+// MCMCpack, Version 0.4-1
 //
+
+Release Date: June 9, 2003
 
 This package contains functions for posterior simulation for a number of
 statistical models. All simulation is done in compiled C++ written in
-the Scythe Statistical Library Version 0.3. All models return coda mcmc
+the Scythe Statistical Library Version 0.4. All models return coda mcmc
 objects that can then be summarized using coda functions or the coda
 menu interface.  The package also contains some useful utility
 functions, including some additional PDFs and pseudo-random number
@@ -15,7 +17,7 @@ generators for statistical distributions.
 //
 
 Andrew D. Martin <admartin@artsci.wustl.edu>
-Kevin M. Quinn <quinn@stat.washington.edu>
+Kevin M. Quinn <kquinn@latte.harvard.edu>
 
 //
 // Changes and Bug Fixes
@@ -26,7 +28,30 @@ Kevin M. Quinn <quinn@stat.washington.edu>
    * Included a data file of Supreme Court votes for the
      MCMCirt1d() model [thanks to Simon Jackman for the suggestion]
    * Fixed memory leak caused by Scythe_Matrix.cc [thanks to Dan Pemstein]
-   *
+
+0.3-11 to 0.4-1
+   * Ported to Scythe Version 0.4 (which will soon be publicly available)
+   * Cleaned up the codebase and documentation (changes will 
+     soon be part of the specification)
+   * Added vech() and xpnd() utility functions
+   * Included data file of 106th Senate roll call votes for the
+     MCMCirt1d() and MCMCirtKd() models
+   * Added Dirichlet, Noncentral Hypergeometric, and Inverse Gamma
+     generators and densities [with contributions from Kevin Rompala]
+   * Added read.Scythe() function to read matrices written by Scythe
+     [contributed by Kevin Rompala]
+   * Added helper functions to make coding easier [contributed by
+     Kevin Rompala]
+   * Added three models: a K-dimensional item response theory
+     model (MCMCirtKd), a linear factor model (MCMCfactanal), and
+     an ordinal item response theory model (MCMCordfactanal)
+   * Added a pre-processor command to handle ininf() compilation
+     issues on SGI [thanks to Dave Henderson]
+   * All MCMC* functions now only allow starting values for the
+     first simulated block of parameters and use check.parameters()
+     function.
+   * Range checking is turned off in the compiled C++ code, yielding
+     significant speed gains for most models.
 
 //
 // Compilation

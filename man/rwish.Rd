@@ -23,3 +23,4 @@ A <- rwish(3, matrix(c(1,.3,.3,1),2,2))
 
 \keyword{distribution}
 
+\seealso{\code{\link{dwish}}}

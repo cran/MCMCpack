@@ -4,18 +4,11 @@
 // to the binomial convolution likelihood and the Metropolis-Hastings 
 // algorithm to sample from the posterior
 //
-//  evolution variances are estimated 
+// evolution variances are estimated 
 //
-// Kevin Quinn
-// Dept. of Political Science and CSSS
-// Univ. Washington
-// quinn@stat.washington.edu
+// KQ 3/9/2002
+// KQ 10/25/2002 [ported to Scythe0.3 and written for an R interface]
 //
-// 3/9/2002
-// 10/25/2002 -- ported to Scythe0.3 and written for an R interface
-//
-
-
 
 #include <iostream> 
 #include "Scythe_Matrix.h"
@@ -24,8 +17,6 @@
 #include "Scythe_Math.h"
 #include "Scythe_LA.h"
 #include "Scythe_IDE.h"
-
-
 
 extern "C"{
  

@@ -55,242 +55,260 @@
 
 namespace SCYTHE {
 
-  /**** This file-local variable holds the output of the last
-   * scythe_exception constructed.
-   ****/
+	/**** This file-local variable holds the output of the last
+	 * scythe_exception constructed.
+	 ****/
 #ifdef __MINGW32__
-  static std::string serr;
+	static std::string serr;
 #else
-  namespace {
-    static std::string serr;
-  }
+	namespace {
+		std::string serr;
+	}
 #endif
 
-  /**** A replacement for the default terminate handler.  This outputs
-   * the string held in serr before calling abort, thereby notifying
-   * the user of why the program crashed.
-   ****/
-  inline void scythe_terminate();
+	/**** A replacement for the default terminate handler.  This outputs
+	 * the string held in serr before calling abort, thereby notifying
+	 * the user of why the program crashed.
+	 ****/
+	inline void scythe_terminate();
 
-  /**** The scythe exception abstract base class ****/
-  class scythe_exception : public std::exception
-    {
-    public:
-      scythe_exception (const std::string &head,
-			const std::string &file,
-			const std::string &function,
-			const unsigned int &line,
-			const std::string &message = "", 
-			const bool &halt = false) throw ()
-	:	exception(),
-	head_ (head),
-	file_ (file),
-	function_ (function),
-	line_ (line),
-	message_ (message)
+	/**** The scythe exception abstract base class ****/
+	class scythe_exception : public std::exception
 	{
-	  std::ostringstream os;	
-	  os << head_ << " in " << file_ << ", " << function_ << ", "
-	     << line_ << ": " << message_ << "!";
-	  serr = os.str();
-	  std::set_terminate(scythe_terminate);
-	  if (halt)
-	    std::terminate();
-	}
+		public:
+			scythe_exception (const std::string &head,
+												const std::string &file,
+												const std::string &function,
+												const unsigned int &line,
+												const std::string &message = "", 
+												const bool &halt = false) throw ()
+				:	exception(),
+					head_ (head),
+					file_ (file),
+					function_ (function),
+					line_ (line),
+					message_ (message)
+			{
+				std::ostringstream os;	
+				os << head_ << " in " << file_ << ", " << function_ << ", "
+					<< line_ << ": " << message_ << "!";
+				serr = os.str();
+				std::set_terminate(scythe_terminate);
+				if (halt)
+					std::terminate();
+			}
 
-      scythe_exception (const scythe_exception &e) throw()
-	:	exception(),
-	head_ (e.head_),
-	file_ (e.file_),
-	function_ (e.function_),
-	line_ (e.line_),
-	message_ (e.message_)
-	{
-	}
+			scythe_exception (const scythe_exception &e) throw()
+				:	exception(),
+					head_ (e.head_),
+					file_ (e.file_),
+					function_ (e.function_),
+					line_ (e.line_),
+					message_ (e.message_)
+			{
+			}
 
-      scythe_exception &operator= (const scythe_exception &e) throw()
-	{
-	  head_ = e.head_;
-	  file_ = e.file_;
-	  function_ = e.function_;
-	  line_  = e.line_;
-	  message_ = e.message_;
+			scythe_exception &operator= (const scythe_exception &e) throw()
+			{
+				head_ = e.head_;
+				file_ = e.file_;
+				function_ = e.function_;
+				line_  = e.line_;
+				message_ = e.message_;
 
-	  return *this;
-	}
+				return *this;
+			}
 
-      virtual ~scythe_exception() throw()
-	{
-	}
+			virtual ~scythe_exception() throw()
+			{
+			}
 
-      virtual const char * what() const throw()
-	{
-	  std::ostringstream os;
-	  os << head_ << " in " << file_ << ", " << function_ << ", "
-	     << line_ << ": " << message_ << "!";
-	  return os.str().c_str();
-	}
+			virtual const char * what() const throw()
+			{
+				std::ostringstream os;
+				os << head_ << " in " << file_ << ", " << function_ << ", "
+					<< line_ << ": " << message_ << "!";
+				return os.str().c_str();
+			}
+
+			virtual std::string message() const throw()
+			{
+				return message_;
+			}
 			
-    private:
-      std::string head_;
-      std::string file_;
-      std::string function_;
-      unsigned int line_;
-      std::string message_;
-    };
+		private:
+			std::string head_;
+			std::string file_;
+			std::string function_;
+			unsigned int line_;
+			std::string message_;
+	};
 	
 
-  /**** Exception class types, added as needed ****/
-  class scythe_alloc_error : public scythe_exception
-    {
-    public:
-      scythe_alloc_error (const std::string &file,
-			  const std::string &function,
-			  const unsigned int &line,
-			  const std::string &message = "",
-			  const bool &halt = false) throw()
-	:	scythe_exception("SCYTHE_ALLOCATION_ERROR", file, function,
-				 line, message, halt)
-	{}
-    };
+	/**** Exception class types, added as needed ****/
+	class scythe_alloc_error : public scythe_exception
+	{
+		public:
+			scythe_alloc_error (const std::string &file,
+													const std::string &function,
+													const unsigned int &line,
+													const std::string &message = "",
+													const bool &halt = false) throw()
+				:	scythe_exception("SCYTHE_ALLOCATION_ERROR", file, function,
+														line, message, halt)
+			{}
+	};
 	
-  class scythe_invalid_arg : public scythe_exception
-    {
-    public:
-      scythe_invalid_arg (	const std::string &file,
-				const std::string &function,
-				const unsigned int &line,
-				const std::string &message = "",
-				const bool &halt = false) throw()
-	:	scythe_exception("SCYTHE_INVALID ARGUMENT", file, function,
-				 line, message, halt)
-	{}
-    };
+	class scythe_invalid_arg : public scythe_exception
+	{
+		public:
+			scythe_invalid_arg (	const std::string &file,
+														const std::string &function,
+														const unsigned int &line,
+														const std::string &message = "",
+														const bool &halt = false) throw()
+				:	scythe_exception("SCYTHE_INVALID ARGUMENT", file, function,
+														line, message, halt)
+			{}
+	};
 	
-  class scythe_file_error : public scythe_exception
-    {
-    public:
-      scythe_file_error (	const std::string &file,
-				const std::string &function,
-				const unsigned int &line,
-				const std::string &message = "",
-				const bool &halt = false) throw()
-	:	scythe_exception("SCYTHE FILE ERROR", file, function,
-				 line, message, halt)
-	{}
-    };
+	class scythe_file_error : public scythe_exception
+	{
+		public:
+			scythe_file_error (	const std::string &file,
+													const std::string &function,
+													const unsigned int &line,
+													const std::string &message = "",
+													const bool &halt = false) throw()
+				:	scythe_exception("SCYTHE FILE ERROR", file, function,
+														line, message, halt)
+			{}
+	};
 	
-  class scythe_conformation_error : public scythe_exception
-    {
-    public:
-      scythe_conformation_error (	const std::string &file,
-					const std::string &function,
-					const unsigned int &line,
-					const std::string &message = "",
-					const bool &halt = false) throw()
-	:	scythe_exception("SCYTHE CONFORMATION ERROR", file, function,
-				 line, message, halt)
-	{}
-    };
+	class scythe_conformation_error : public scythe_exception
+	{
+		public:
+			scythe_conformation_error (	const std::string &file,
+																	const std::string &function,
+																	const unsigned int &line,
+																	const std::string &message = "",
+																	const bool &halt = false) throw()
+				:	scythe_exception("SCYTHE CONFORMATION ERROR", file, function,
+														line, message, halt)
+			{}
+	};
 	
-  class scythe_dimension_error : public scythe_exception
-    {
-    public:
-      scythe_dimension_error (const std::string &file,
-			      const std::string &function,
-			      const unsigned int &line,
-			      const std::string &message = "",
-			      const bool &halt = false) throw()
-	:	scythe_exception("SCYTHE DIMENSION ERROR", file, function,
-				 line, message, halt)
-	{}
-    };
+	class scythe_dimension_error : public scythe_exception
+	{
+		public:
+			scythe_dimension_error (const std::string &file,
+															const std::string &function,
+															const unsigned int &line,
+															const std::string &message = "",
+															const bool &halt = false) throw()
+				:	scythe_exception("SCYTHE DIMENSION ERROR", file, function,
+														line, message, halt)
+			{}
+	};
 	
-  class scythe_null_error : public scythe_exception
-    {
-    public:
-      scythe_null_error (	const std::string &file,
-				const std::string &function,
-				const unsigned int &line,
-				const std::string &message = "",
-				const bool &halt = false) throw()
-	:	scythe_exception("SCYTHE NULL ERROR", file, function,
-				 line, message, halt)
-	{}
-    };
+	class scythe_null_error : public scythe_exception
+	{
+		public:
+			scythe_null_error (	const std::string &file,
+													const std::string &function,
+													const unsigned int &line,
+													const std::string &message = "",
+													const bool &halt = false) throw()
+				:	scythe_exception("SCYTHE NULL ERROR", file, function,
+														line, message, halt)
+			{}
+	};
 	
-  class scythe_type_error : public scythe_exception
-    {
-    public:
-      scythe_type_error (	const std::string &file,
-				const std::string &function,
-				const unsigned int &line,
-				const std::string &message = "",
-				const bool &halt = false) throw()
-	:	scythe_exception("SCYTHE TYPE ERROR", file, function,
-				 line, message, halt)
-	{}
-    };
+	class scythe_type_error : public scythe_exception
+	{
+		public:
+			scythe_type_error (	const std::string &file,
+													const std::string &function,
+													const unsigned int &line,
+													const std::string &message = "",
+													const bool &halt = false) throw()
+				:	scythe_exception("SCYTHE TYPE ERROR", file, function,
+														line, message, halt)
+			{}
+	};
 	
-  class scythe_out_of_range_error : public scythe_exception
-    {
-    public:
-      scythe_out_of_range_error (	const std::string &file,
-					const std::string &function,
-					const unsigned int &line,
-					const std::string &message = "",
-					const bool &halt = false) throw()
-	:	scythe_exception("SCYTHE OUT OF RANGE ERROR", file, function,
-				 line, message, halt)
-	{}
-    };
+	class scythe_out_of_range_error : public scythe_exception
+	{
+		public:
+			scythe_out_of_range_error (	const std::string &file,
+																	const std::string &function,
+																	const unsigned int &line,
+																	const std::string &message = "",
+																	const bool &halt = false) throw()
+				:	scythe_exception("SCYTHE OUT OF RANGE ERROR", file, function,
+														line, message, halt)
+			{}
+	};
 	
-  class scythe_convergence_error : public scythe_exception
-    {
-    public:
-      scythe_convergence_error (	const std::string &file,
-					const std::string &function,
-					const unsigned int &line,
-					const std::string &message = "",
-					const bool &halt = false) throw()
-	:	scythe_exception("SCYTHE CONVERGENCE ERROR", file, function,
-				 line, message, halt)
-	{}
-    };
+	class scythe_convergence_error : public scythe_exception
+	{
+		public:
+			scythe_convergence_error (	const std::string &file,
+																	const std::string &function,
+																	const unsigned int &line,
+																	const std::string &message = "",
+																	const bool &halt = false) throw()
+				:	scythe_exception("SCYTHE CONVERGENCE ERROR", file, function,
+														line, message, halt)
+				{}
+	};
 	
-  class scythe_range_error: public scythe_exception
-    {
-    public:
-      scythe_range_error(	const std::string &file,
-				const std::string &function,
-				const unsigned int &line,
-				const std::string &message = "",
-				const bool &halt = false) throw()
-	:	scythe_exception("SCYTHE RANGE ERROR", file, function,
-				 line, message, halt)
-	{}
-    };
+	class scythe_range_error: public scythe_exception
+	{
+		public:
+			scythe_range_error(	const std::string &file,
+													const std::string &function,
+													const unsigned int &line,
+													const std::string &message = "",
+													const bool &halt = false) throw()
+				:	scythe_exception("SCYTHE RANGE ERROR", file, function,
+														line, message, halt)
+			{}
+	};
 
-  class scythe_precision_error: public scythe_exception
-    {
-    public:
-      scythe_precision_error(	const std::string &file,
-				const std::string &function,
-				const unsigned int &line,
-				const std::string &message = "",
-				const bool &halt = false) throw()
-	:	scythe_exception("SCYTHE PRECISION ERROR", file, function,
-				 line, message, halt)
-	{}
-    };
+	class scythe_precision_error: public scythe_exception
+	{
+		public:
+			scythe_precision_error(	const std::string &file,
+															const std::string &function,
+															const unsigned int &line,
+															const std::string &message = "",
+															const bool &halt = false) throw()
+				:	scythe_exception("SCYTHE PRECISION ERROR", file, function,
+														line, message, halt)
+			{}
+	};
+	
+	class scythe_nan_error: public scythe_exception
+	{
+		public:
+			scythe_nan_error(	const std::string &file,
+												const std::string &function,
+												const unsigned int &line,
+												const std::string &message = "",
+												const bool &halt = false) throw()
+				:	scythe_exception("SCYTHE NAN ERROR", file, function,
+														line, message, halt)
+			{}
+	};
 
-  // The definition of our terminate handler described above
-  inline void scythe_terminate ()
-    {
-      std::cerr << serr << std::endl;
-      std::cerr << std::endl;
-      abort();
-    }
+	// The definition of our terminate handler described above
+	inline void scythe_terminate ()
+	{
+		std::cerr << serr << std::endl;
+		std::cerr << std::endl;
+		abort();
+	}
 
 } // end namspace SCYTHE
 

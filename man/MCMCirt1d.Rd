@@ -8,9 +8,15 @@
   priors on the subject abilities (ideal points), and
   multivariate Normal priors on the item parameters.  The user
   supplies data and priors, and a sample from the posterior
-  density is returned as an \code{mcmc} object, which can be
+  density is returned as an mcmc object, which can be
   subsequently analyzed with functions provided in the coda
   package.
+
+  \emph{NOTE:} This implementation of this model
+  may be deprecated in future releases.  We have implemented
+  a general K-dimensional item response theory model that
+  allows the user to place arbitrary constraints on item and
+  subject parameters.  
   }
   
 \usage{
@@ -124,7 +130,7 @@ MCMCirt1d(datamatrix, theta.fixed = 1, burnin = 500, mcmc = 1000,
 }
 
 \value{
-   An \code{mcmc} object that contains the posterior density sample.  This 
+   An mcmc object that contains the posterior density sample.  This 
    object can be summarized by functions provided by the coda package.
 }
 
@@ -177,7 +183,9 @@ MCMCirt1d(datamatrix, theta.fixed = 1, burnin = 500, mcmc = 1000,
   abilities (ideal points) and item parameters.  The
   \code{theta.fixed} solves the rotational invariance problem by
   constraining the sampler to one of the two identical posterior
-  modes. 
+  modes.  This function differs from the \code{MCMCirtKd} function
+  in the manner in which the model is identified and in the assumed
+  priors.
   }
   
 \references{
@@ -192,8 +200,8 @@ MCMCirt1d(datamatrix, theta.fixed = 1, burnin = 500, mcmc = 1000,
    Valen E. Johnson and James H. Albert. 1999. ``Ordinal Data Modeling." 
    Springer: New York.
 
-   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2002.  
-   \emph{Scythe Statistical Library 0.3.} \url{http://scythe.wustl.edu}.
+   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2003.  
+   \emph{Scythe Statistical Library 0.4.} \url{http://scythe.wustl.edu}.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
@@ -204,11 +212,21 @@ MCMCirt1d(datamatrix, theta.fixed = 1, burnin = 500, mcmc = 1000,
 \examples{
    \dontrun{
    data(SupremeCourt)
-   posterior <- MCMCirt1d(SupremeCourt, verbose=TRUE, burnin=10000, mcmc=50000)
+   posterior1 <- MCMCirt1d(SupremeCourt, verbose=TRUE,
+      burnin=10000, mcmc=50000)
+   plot(posterior1)
+   summary(posterior1)
+   
+   data(Senate)
+   posterior2 <- MCMCirt1d(t(Senate[,6:677]), theta.fixed = 9, verbose=TRUE,
+      burnin=1000, mcmc=5000)
+   plot(posterior2)
+   summary(posterior2)
    }
 }
 
 \keyword{models}
 
-\seealso{\code{\link[coda]{plot.mcmc}},\code{\link[coda]{summary.mcmc}}}
+\seealso{\code{\link[coda]{plot.mcmc}},\code{\link[coda]{summary.mcmc}},
+\code{\link[MCMCpack]{MCMCirtKd}}}
 

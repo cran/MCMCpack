@@ -1,17 +1,9 @@
 // MCMCprobit.cc is a program that simulates draws from the posterior
-// density of a probit regression model.  It is written
+// density of an ordered probit regression model.  It is written
 // modularly, with the goal of creating an R object that will reference
 // this code.
 // 
-// Kevin Quinn
-// Dept. of Political Science and CSSS
-// University of Washington
-// quinn@stat.washington.edu
-// 
-// Andrew D. Martin
-// Dept. of Political Science
-// 
-// 1/24/2003 
+// KQ 1/24/2003 
 // 
 
 #include <iostream>

@@ -2,30 +2,56 @@ MCMCbaselineEI          Markov chain Monte Carlo for Wakefield's
                         Baseline Ecological Inference Model
 MCMCdynamicEI           Markov chain Monte Carlo for Quinn's Dynamic
                         Ecological Inference Model
+MCMCfactanal            Markov chain Monte Carlo for Normal Theory
+                        Factor Analysis Model
 MCMChierEI              Markov chain Monte Carlo for Wakefield's
                         Hierarchial Ecological Inference Model
 MCMCirt1d               Markov chain Monte Carlo for One Dimensional
+                        Item Response Theory Model
+MCMCirtKd               Markov chain Monte Carlo for K-Dimensional
                         Item Response Theory Model
 MCMClogit               Markov chain Monte Carlo for Logistic
                         Regression
 MCMCoprobit             Markov chain Monte Carlo for Ordered Probit
                         Regression
-MCMCpanel               Markov chain Monte Carlo for the General Linear
-                        Panel Model
-MCMCpoisson             Markov chain Monte Carlo for Poisson Regression
+MCMCordfactanal         Markov chain Monte Carlo for Ordinal Data
+                        Factor Analysis Model
+MCMCpanel               Markov chain Monte Carlo for the General
+                        Linear Panel Model
+MCMCpoisson             Markov chain Monte Carlo for Poisson
+                        Regression
 MCMCprobit              Markov chain Monte Carlo for Probit Regression
 MCMCregress             Markov chain Monte Carlo for Gaussian Linear
                         Regression
-SupremeCourt            U.S. Supreme Court Vote Matrix 
-diwish                  Evaluate the PDF of the inverse Wishart
+Senate                  106th U.S. Senate Roll Call Vote Matrix
+SupremeCourt            U.S. Supreme Court Vote Matrix
+check.parameters        MCMCpack Helper Function: Check Simulation
+                        Parameters
+ddirichlet              Evaluate Density of Dirichlet Distribution
+dinvgamma               Evaluate the Density of the Inverse Gamma
+                        Distribution
+diwish                  Evaluate the Density of the Inverse Wishart
+                        Distribution
+dnoncenhypergeom        Evaluate Density of Noncentral Hypergeometric
                         Distribution
 dtomogplot              Dynamic Tomography Plot
-dwish                   Evaluate the PDF of the Wishart Distribution
-mcmc2                   Markov Chain Monte Carlo Objects
+dwish                   Evaluate the Density of the Wishart
+                        Distribution
+mcmc2                   CreateMarkov Chain Monte Carlo Objects
 mcmc2dataframe          Convert Markov Chain Monte Carlo Objects to
                         Dataframes
-riwish                  Generate Random Draw from inverse Wishart
+rdirichlet              Generate Random Draws from the Dirichlet
                         Distribution
+read.Scythe             Read a Matrix from a File written by Scythe
+rinvgamma               Generate Random Draw from Inverse Gamma
+                        Distribution
+riwish                  Generate Random Draw from Inverse Wishart
+                        Distribution
+rnoncenhypergeom        Generate Random Draw from Noncentral
+                        Hypergeometric Distribution
 rwish                   Generate Random Draw from Wishart Distribution
-write.Scythe            Write a Matrix to a File to be Read by Scythe
 tomogplot               Tomography Plot
+vech                    Extract Lower Triangular Elements from a
+                        Symmetric Matrix
+write.Scythe            Write a Matrix to a File to be Read by Scythe
+xpnd                    Expand a Vector into a Symmetric Matrix

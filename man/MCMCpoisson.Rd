@@ -5,7 +5,7 @@
   This function generates a posterior density sample
   from a Poisson regression model using a random walk Metropolis
   algorithm. The user supplies data and priors,
-  and a sample from the posterior density is returned as an \code{mcmc}
+  and a sample from the posterior density is returned as an mcmc
   object, which can be subsequently analyzed with functions 
   provided in the coda package.
   }
@@ -63,7 +63,7 @@ MCMCpoisson(formula, data = list(), burnin = 1000, mcmc = 10000,
 }}
 
 \value{
-   An \code{mcmc} object that contains the posterior density sample.  This 
+   An mcmc object that contains the posterior density sample.  This 
    object can be summarized by functions provided by the coda package.
 }
 
@@ -88,8 +88,8 @@ MCMCpoisson(formula, data = list(), burnin = 1000, mcmc = 10000,
   
 \references{
       
-  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2002.  
-   \emph{Scythe Statistical Library 0.3.} \url{http://scythe.wustl.edu}.
+  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2003.  
+   \emph{Scythe Statistical Library 0.4.} \url{http://scythe.wustl.edu}.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
@@ -97,11 +97,16 @@ MCMCpoisson(formula, data = list(), burnin = 1000, mcmc = 10000,
 }
 
 
-\examples{\dontrun{
-counts <- c(18,17,15,20,10,20,25,13,12)
-outcome <- gl(3,1,9)
-treatment <- gl(3,3)
-posterior <- MCMCpoisson(counts ~ outcome + treatment)}}
+\examples{
+   \dontrun{
+   counts <- c(18,17,15,20,10,20,25,13,12)
+   outcome <- gl(3,1,9)
+   treatment <- gl(3,3)
+   posterior <- MCMCpoisson(counts ~ outcome + treatment)
+   plot(posterior)
+   summary(posterior)
+   }
+}
 
 \keyword{models}
 

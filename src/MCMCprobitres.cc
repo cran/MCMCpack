@@ -3,15 +3,7 @@
 // It is written modularly, with the goal of creating an R object that 
 // will reference this code.
 // 
-// Kevin Quinn
-// Dept. of Political Science and CSSS
-// University of Washington
-// quinn@stat.washington.edu
-// 
-// Andrew D. Martin
-// Dept. of Political Science
-// 
-// 11/18/2002
+// ADM and KQ 11/18/2002
 // 
 
 #include <iostream>

@@ -1,24 +1,14 @@
-##########################################################################
 # sample from the posterior distribution of an ordered probit model
 # via the data augmentation approach of Cowles (1996)
 #
-# Andrew D. Martin
-# Washington University
-#
-# Kevin M. Quinn
-# University of Washington
-#
-# January 25, 2003
-#
-##########################################################################
+# KQ 1/25/2003
 
-MCMCoprobit <- function(formula, data = list(), burnin = 1000, mcmc = 10000,
-   thin = 5, tune = NA, verbose = FALSE, seed = 0, beta.start = NA,
-   b0 = 0, B0 = 0.001, ...) {
+"MCMCoprobit" <-
+  function(formula, data = list(), burnin = 1000, mcmc = 10000,
+           thin = 5, tune = NA, verbose = FALSE, seed = 0, beta.start = NA,
+           b0 = 0, B0 = 0.001, ...) {
    
-   #
-   # extract X, Y, and variable names from the model formula and frame       
-   #
+   # extract X, Y, and variable names from the model formula and frame
    call <- match.call()
    mt <- terms(formula, data=data)
    if(missing(data)) data <- sys.frame(sys.parent())
@@ -46,37 +36,18 @@ MCMCoprobit <- function(formula, data = list(), burnin = 1000, mcmc = 10000,
    X <- as.matrix(X)
    
    # burnin / mcmc / thin error checking
-   if(mcmc %% thin != 0) {
-      cat("Gibbs interval not evenly divisible by thinning interval.")
-      stop("\nPlease respecify and call MCMCoprobit() again.\n") 
-      } 
-   if(mcmc < 0) {
-      cat("Gibbs interval negative.")
-      stop("\nPlease respecify and call MCMCoprobit() again.\n")
-           } 
-   if(burnin < 0) {
-      cat("Burnin interval negative.")
-      stop("\nPlease respecify and call MCMCoprobit() again.\n") 
-      }       
-   if(thin < 0) {
-      cat("Thinning interval negative.")
-      stop("\n Please respecify and call MCMCoprobit() again.\n") 
-      }          
-   
+   check.parameters(burnin, mcmc, thin, "MCMCoprobit", tune)
+    
    # check tuning parameter
    if (is.na(tune)){
      tune <- 0.05/ncat
    }
-   if(tune < 0) {
-      cat("Tuning parameter is negative.")
-      stop("\n Please respecify and call MCMCoprobit() again.\n")
-   }
-
+ 
    xint <- match("(Intercept)", colnames(X), nomatch=0)
    if (xint > 0){
      new.X <- X[, -xint, drop=FALSE]
    }
-   else warning("an intercept is needed annd assumed")
+   else warning("An intercept is needed and assumed in MCMCoprobit()\n.")
    if (ncol(new.X) == 0){
      polr.out <- polr(ordered(Y)~1)
    }
@@ -93,28 +64,28 @@ MCMCoprobit <- function(formula, data = list(), burnin = 1000, mcmc = 10000,
      }
    }
    else if(is.null(dim(beta.start))) {
-      beta.start <- beta.start * matrix(1,K,1)  
-      }
+     beta.start <- beta.start * matrix(1,K,1)  
+   }
    else if((dim(beta.start)[1] != K) || (dim(beta.start)[2] != 1)) {
-      cat("Starting value for beta not conformable.\n")
-      stop("\n Please respecify and call MCMCoprobit() again.\n")
-      }
+     cat("Starting value for beta not conformable.\n")
+     stop("Please respecify and call MCMCoprobit() again.\n")
+   }
    
    # prior for beta error checking
    if(is.null(dim(b0))) {
-      b0 <- b0 * matrix(1,K,1)  
-      }
+     b0 <- b0 * matrix(1,K,1)  
+   }
    if((dim(b0)[1] != K) || (dim(b0)[2] != 1)) {
-      cat("N(b0,B0) prior b0 not conformable.")
-      stop("\n Please respecify and call MCMCoprobit() again.\n") 
-      }   
+     cat("N(b0,B0) prior b0 not conformable.\n")
+     stop("Please respecify and call MCMCoprobit() again.\n") 
+   }   
    if(is.null(dim(B0))) {
-      B0 <- B0 * diag(K)    
-      }
+     B0 <- B0 * diag(K)    
+   }
    if((dim(B0)[1] != K) || (dim(B0)[2] != K)) {
-      cat("N(b0,B0) prior B0 not conformable.")
-      stop("\n Please respecify and call MCMCoprobit() again.\n")
-      }
+     cat("N(b0,B0) prior B0 not conformable.\n")
+     stop("Please respecify and call MCMCoprobit() again.\n")
+   }
 
    # form gamma starting values (note: not changeable)
    gamma <- matrix(NA,ncat+1,1)
@@ -126,8 +97,6 @@ MCMCoprobit <- function(formula, data = list(), burnin = 1000, mcmc = 10000,
    # posterior density sample
    sample <- matrix(data=0, mcmc/thin, K + ncat + 1)
    
-   
-   ##### C++ CALL GOES HERE ######
    posterior <- .C("oprobitpost",
                    samdata = as.double(sample),
                    samrow = as.integer(nrow(sample)),
@@ -160,19 +129,19 @@ MCMCoprobit <- function(formula, data = list(), burnin = 1000, mcmc = 10000,
                    PACKAGE="MCMCpack"
                    )
 
-   cat(" overall acceptance rate = ",
-      posterior$accepts / (posterior$burnin+posterior$mcmc), "\n")
+   cat(" Overall acceptance rate = ",
+       posterior$accepts / (posterior$burnin+posterior$mcmc), "\n")
    
    
-     # put together matrix and build MCMC object to return
-     sample <- matrix(posterior$samdata, posterior$samrow,
-                      posterior$samcol, byrow=TRUE)
-     sample <- sample[,c(1:K, (K+3):(K+ncat))]
+   # put together matrix and build MCMC object to return
+   sample <- matrix(posterior$samdata, posterior$samrow,
+                    posterior$samcol, byrow=TRUE)
+   sample <- sample[,c(1:K, (K+3):(K+ncat))]
 
-     output <- mcmc2(data=sample, start=1, end=mcmc, thin=thin)
-     names <- c(X.names, paste("gamma", 2:(ncat-1), sep=""))     
-     varnames(output) <- names
-     attr(output,"title") <-
-        "MCMCpack Ordered Probit Posterior Density Sample"   
-     output
-}
+   output <- mcmc2(data=sample, start=1, end=mcmc, thin=thin)
+   names <- c(X.names, paste("gamma", 2:(ncat-1), sep=""))     
+   varnames(output) <- names
+   attr(output,"title") <-
+     "MCMCpack Ordered Probit Posterior Density Sample"   
+   return(output)
+ }

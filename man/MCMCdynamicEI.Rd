@@ -69,7 +69,7 @@ MCMCdynamicEI(r0, r1, c0, c1, burnin=5000, mcmc=200000, thin=200,
 }
 
 \value{
-  An \code{mcmc} object that contains the posterior density sample.
+  An mcmc object that contains the posterior density sample.
   This object can  be summarized by functions provided by the coda package.
 }
 
@@ -136,8 +136,9 @@ MCMCdynamicEI(r0, r1, c0, c1, burnin=5000, mcmc=200000, thin=200,
   Temporal Dependence." Paper prepared for Ecological Inference
   Conference, Harvard University, June 17-18, 2002.
 
-  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2002.  \emph{Scythe Statistical 
-    Library 0.3.} \url{http://scythe.wustl.edu}.
+  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2003. 
+  \emph{Scythe Statistical 
+    Library 0.4.} \url{http://scythe.wustl.edu}.
   
   Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
   \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
@@ -145,15 +146,18 @@ MCMCdynamicEI(r0, r1, c0, c1, burnin=5000, mcmc=200000, thin=200,
 }
 
 \examples{
-\dontrun{
-r0 <- rpois(10, 300)
-r1 <- rpois(10, 200)
-c0 <- 100 + 1:10*7 + rpois(10, 30)
-c1 <- (r0+r1) - c0
-posterior <- MCMCdynamicEI(r0, r1, c0, c1, verbose=TRUE,
-   burnin=10000, mcmc=5000000, thin=1000)
+   \dontrun{
+   r0 <- rpois(10, 300)
+   r1 <- rpois(10, 200)
+   c0 <- 100 + 1:10*7 + rpois(10, 30)
+   c1 <- (r0+r1) - c0
+   posterior <- MCMCdynamicEI(r0, r1, c0, c1, verbose=TRUE,
+      burnin=10000, mcmc=5000000, thin=1000)
+   plot(posterior)
+   summary(posterior) 
+   }
 }
-}
+
 \keyword{models}
 
 \seealso{\code{\link{MCMCbaselineEI}}, \code{\link{MCMChierEI}},

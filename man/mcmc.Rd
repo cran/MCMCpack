@@ -1,16 +1,19 @@
 \name{mcmc2}
 \alias{mcmc2}
-\title{Markov Chain Monte Carlo Objects}
+\title{Create Markov Chain Monte Carlo Objects}
 
 \usage{
 mcmc2(data= NA, start = 1, end = numeric(0), thin = 1)
 }
 
 \arguments{
-  \item{data}{a vector or  matrix of MCMC output}
-  \item{start}{the iteration number of the first observation}
-  \item{end}{the iteration number of the last observation}
-  \item{thin}{the thinning interval between consecutive observations}
+  \item{data}{A vector or  matrix of MCMC output.}
+
+  \item{start}{The iteration number of the first observation.}
+
+  \item{end}{The iteration number of the last observation.}
+
+  \item{thin}{The thinning interval between consecutive observations.}
 }
 
 \description{
@@ -25,7 +28,7 @@ mcmc2(data= NA, start = 1, end = numeric(0), thin = 1)
 
    MCMC objects resemble time series (\code{ts}) objects and have
    methods for the generic functions \code{time}, \code{start},
-   \code{end}, \code{frequency} and \code{window}.
+   \code{end}, \code{frequency}, and \code{window}.
 }
 
 \author{Martyn Plummer (slightly modified by Kevin Quinn)}
