@@ -1,0 +1,30 @@
+\name{SupremeCourt}
+\alias{SupremeCourt}
+\title{
+U.S. Supreme Court Vote Matrix
+}
+\description{
+This dataframe contains a matrix votes cast by U.S. Supreme
+Court justices in all cases in the 2000 term.
+}
+\usage{
+data(SupremeCourt)
+}
+\format{
+The dataframe has contains data for justices Rehnquist, Stevens,
+O'Connor, Scalia, Kennedy, Souter, Thomas, Ginsburg, and Breyer
+for the 2000 term of the U.S. Supreme Court.  It contains data
+from 43 cases. The votes are coded liberal (1) and conservative
+(0) using the protocal of Spaeth (2003).   The unit of analysis
+is the case citation (ANALU=0).  We are concerned with formally
+decided cases issued with written opinions, after full oral
+argument and cases decided by an equally divided vote
+(DECTYPE=1,5,6,7).
+}
+
+\source{
+Harold J. Spaeth. 2003. \emph{Original United States Supreme Court Database: 
+1953-2001 Terms.}  \url{http://polisci.msu.edu/pljp/}.
+}
+
+\keyword{datasets}

@@ -319,17 +319,14 @@ namespace SCYTHE {
       return Matrix((c - a + 1), (d - b + 1));
     }
     int cnt = 0;
-    double *temp = new double[(c - a + 1) * (d - b + 1)];
+		Matrix<T> temp = Matrix<T>((c - a + 1), (d - b + 1), false);
     for (int i = a; i <= c; ++i) {
       for (int j = b; j <= d; ++j) {
-	temp[cnt++] = data_[ijIndex(i, j)];
+				temp[cnt++] = data_[ijIndex(i, j)];
       }
     }
-    return Matrix ((c - a + 1), (d - b + 1), temp);
-    delete [] temp;
+    return temp;
   }
-
-
 
   /* all rows extraction with _ struct */
   template <class T>
@@ -344,12 +341,12 @@ namespace SCYTHE {
     int newcolsize = 1;
     int newrowsize = rows_;
 
-    double temp[newrowsize];
+		Matrix<T> temp = Matrix<T>(newrowsize, newcolsize, false);
     for (int i=0; i<newrowsize; ++i){
       temp[i] = data_[ijIndex(i,j)];
     }
     
-    return Matrix(newrowsize, newcolsize, temp);
+    return temp;
   }
   
 
@@ -367,13 +364,12 @@ namespace SCYTHE {
     int newcolsize = cols_;
     int newrowsize = 1;
 
-    double *temp = new double[newcolsize];
+		Matrix<T> temp = Matrix<T>(newrowsize, newcolsize, false);
     for (int j=0; j<newcolsize; ++j){
       temp[j] = data_[ijIndex(i,j)];
     }
     
-    return Matrix(newrowsize, newcolsize, temp);
-    delete [] temp;
+    return temp;
   }
 
 	
@@ -459,26 +455,27 @@ namespace SCYTHE {
   Matrix<T>
   &Matrix<T>::operator*= (const Matrix<T> &m)
   {
-    if (rows_ == 1 && cols_ == 1) {
-      // Case 1: 1X1 *= nXm
-      T temp = data_[0];
-      resize2Match(m);
-      for (int i = 0; i  < size(); ++i)
-	data_[i] = temp * m.data_[i];
-    } else if (m.rows_ == 1 && m.cols_ == 1) {
-      // Case 2: nXm *= 1X1
-      for (int i = 0; i < size(); ++i)
-	data_[i] *= m.data_[0];
-    } else if (cols_ == m.rows_) {
-      // Case 4: nXm *= mXk
-      alloc_ = getAllocSize(rows_ * m.cols_);
-      T* temp = new (std::nothrow) T[alloc_];
-      if (temp == 0) {
-	throw scythe_alloc_error(__FILE__,__PRETTY_FUNCTION__, __LINE__,
-				 "Failure allocating space for multiplication");
-	return *this;
-      }
-      /*
+		if (rows_ == 1 && cols_ == 1) {
+			// Case 1: 1X1 *= nXm
+			T temp = data_[0];
+			resize2Match(m);
+			for (int i = 0; i  < size(); ++i)
+				data_[i] = temp * m.data_[i];
+		} else if (m.rows_ == 1 && m.cols_ == 1) {
+			// Case 2: nXm *= 1X1
+			for (int i = 0; i < size(); ++i)
+				data_[i] *= m.data_[0];
+		} else if (cols_ == m.rows_) {
+			// Case 4: nXm *= mXk
+			alloc_ = getAllocSize(rows_ * m.cols_);
+			T* temp = new (std::nothrow) T[alloc_];
+			if (temp == 0) {
+				throw scythe_alloc_error(__FILE__,__PRETTY_FUNCTION__,
+				__LINE__, "Failure allocating space for multiplication");
+				return *this;
+			}
+      
+			/*
 	for (int i = 0; i < rows_; ++i) {
 	for (int j = 0; j < m.cols_; ++j) {
 	temp[i * m.cols_ + j] = (T) 0;
@@ -489,23 +486,25 @@ namespace SCYTHE {
 	}
 	}
       */
-      const_col_major_iterator cmi = m.beginc();
-      for (int i = 0; i < rows_; ++i) {
-	for (int j = 0; j < m.cols_; ++j) {
-	  temp[i * m.cols_ + j] = inner_product(&data_[i * cols_], 
-						&data_[i * cols_ + m.rows_], cmi + (m.rows_ * j), (T) 0);
-	}
-      }
+      
+			const_col_major_iterator cmi = m.beginc();
+			for (int i = 0; i < rows_; ++i) {
+				for (int j = 0; j < m.cols_; ++j) {
+					temp[i * m.cols_ + j] = inner_product(&data_[i * cols_], 
+					&data_[i * cols_ + m.rows_], cmi + (m.rows_ * j), (T) 0);
+				}
+			}
 			
-      cols_ = m.cols_;
-      delete[] data_;
-      data_ = temp;
-    } else { // error
-      throw scythe_conformation_error(__FILE__, __PRETTY_FUNCTION__,
-				      __LINE__, "Matrices are not multiplication conformable");
-    }
-    return *this;
-  }
+			cols_ = m.cols_;
+			delete[] data_;
+			data_ = temp;
+		} else { // error
+			throw scythe_conformation_error(__FILE__, __PRETTY_FUNCTION__,
+				__LINE__, "Matrices are not multiplication conformable");
+		}
+		
+		return *this;
+	}
 	
   /* Kronecker Multiplication/assignment operator */
   template <class T>

@@ -143,7 +143,7 @@ c0 <- rpois(5, 500)
 c1 <- c(200, 140, 250, 190, 75)
 r0 <- rpois(5, 400)
 r1 <- (c0 + c1) - r0
-posterior <- MCMChierEI(r0,r1,c0,c1)}
+posterior <- MCMChierEI(r0,r1,c0,c1, mcmc=200000, thin=50)}
 }
 
 \keyword{models}

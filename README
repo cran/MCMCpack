@@ -1,5 +1,5 @@
 //
-// MCMCpack
+// MCMCpack, Version 0.3-11
 //
 
 This package contains functions for posterior simulation for a number of
@@ -16,6 +16,17 @@ generators for statistical distributions.
 
 Andrew D. Martin <admartin@artsci.wustl.edu>
 Kevin M. Quinn <quinn@stat.washington.edu>
+
+//
+// Changes and Bug Fixes
+//
+
+0.3-10 to 0.3-11
+   * Fixed a bug in MCMCpoisson() re: non-negative counts
+   * Included a data file of Supreme Court votes for the
+     MCMCirt1d() model [thanks to Simon Jackman for the suggestion]
+   * Fixed memory leak caused by Scythe_Matrix.cc [thanks to Dan Pemstein]
+   *
 
 //
 // Compilation

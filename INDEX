@@ -16,6 +16,7 @@ MCMCpoisson             Markov chain Monte Carlo for Poisson Regression
 MCMCprobit              Markov chain Monte Carlo for Probit Regression
 MCMCregress             Markov chain Monte Carlo for Gaussian Linear
                         Regression
+SupremeCourt            U.S. Supreme Court Vote Matrix 
 diwish                  Evaluate the PDF of the inverse Wishart
                         Distribution
 dtomogplot              Dynamic Tomography Plot

@@ -202,7 +202,10 @@ MCMCirt1d(datamatrix, theta.fixed = 1, burnin = 500, mcmc = 1000,
 
 
 \examples{
-   \dontrun{posterior <- MCMCirt1d(supreme.court.votematrix)}
+   \dontrun{
+   data(SupremeCourt)
+   posterior <- MCMCirt1d(SupremeCourt, verbose=TRUE, burnin=10000, mcmc=50000)
+   }
 }
 
 \keyword{models}
