@@ -146,11 +146,12 @@ MCMCdynamicEI(r0, r1, c0, c1, burnin=5000, mcmc=200000, thin=200,
 
 \examples{
 \dontrun{
-r0 <- rpois(20, 300)
-r1 <- rpois(20, 200)
-c0 <- 100 + 1:20*7 + rpois(20, 30)
+r0 <- rpois(10, 300)
+r1 <- rpois(10, 200)
+c0 <- 100 + 1:10*7 + rpois(10, 30)
 c1 <- (r0+r1) - c0
-posterior <- MCMCdynamicEI(r0, r1, c0, c1)
+posterior <- MCMCdynamicEI(r0, r1, c0, c1, verbose=TRUE,
+   burnin=10000, mcmc=5000000, thin=1000)
 }
 }
 \keyword{models}

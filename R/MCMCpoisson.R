@@ -11,6 +11,8 @@
 #
 # January 24, 2003
 #
+# Bug fixed by KQ on 3/17/2003
+#
 ##########################################################################
 
 MCMCpoisson <- function(formula, data = list(), burnin = 1000, mcmc = 10000,
@@ -39,9 +41,9 @@ MCMCpoisson <- function(formula, data = list(), burnin = 1000, mcmc = 10000,
    N <- nrow(X)	             # number of observations      
    K <- ncol(X)              # number of covariates
      
-   # test y positive
-   if (sum(Y <= 0) > 0) {
-      cat("\n Elements of Y equal to something other than positive integer.")
+   # test y non-negative
+   if (sum(Y < 0) > 0) {
+      cat("\n Elements of Y negative. ")
       stop("\n Check data and call MCMCpoisson() again. \n") 
      }
    
