@@ -14,12 +14,18 @@
 
 \arguments{
     \item{W}{Positive definite matrix W \eqn{(p \times p)}{(p x p)}.}
-    \item{v}{Inverse Wishart degrees of freedom (scalar).}
-    \item{S}{Inverse Wishart scale matrix \eqn{(p \times p)}{(p x p)}.}}
+    \item{v}{Degrees of freedom (scalar).}
+    \item{S}{Scale matrix \eqn{(p \times p)}{(p x p)}.}}
 
 \value{
   \code{diwish} evaluates the density at positive definite matrix W.
   \code{riwish} generates one random draw from the distribution.
+}
+
+\details{
+  The mean of an inverse Wishart random variable with \code{v} degrees
+  of freedom and scale matrix \code{S} is \eqn{(v-p-1)^{-1}S}{1/(v-p-1)
+    S}. 
 }
 
 \examples{

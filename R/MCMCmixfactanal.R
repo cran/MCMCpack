@@ -357,8 +357,7 @@
     attr(output, "constraints") <- lambda.constraints
     attr(output, "n.manifest") <- K
     attr(output, "n.factors") <- factors
-    attr(output, "accept.rate") <- posterior$accepts /
-      ((posterior$burnin+posterior$mcmc)*n.ord.ge3)
+    attr(output, "accept.rates") <- t(accepts) / (posterior$burnin+posterior$mcmc)
       attr(output,"title") <-
         "MCMCpack Mixed Data Factor Analysis Posterior Density Sample"
     
