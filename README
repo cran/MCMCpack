@@ -1,0 +1,53 @@
+//
+// MCMCpack
+//
+
+This package contains functions for posterior simulation for a number of
+statistical models. All simulation is done in compiled C++ written in
+the Scythe Statistical Library Version 0.3. All models return coda mcmc
+objects that can then be summarized using coda functions or the coda
+menu interface.  The package also contains some useful utility
+functions, including some additional PDFs and pseudo-random number
+generators for statistical distributions.
+
+//
+// Authors
+//
+
+Andrew D. Martin <admartin@artsci.wustl.edu>
+Kevin M. Quinn <quinn@stat.washington.edu>
+
+//
+// Compilation
+//
+
+This package (along with Scythe) uses C++ and the Standard Template
+Library (STL).  It requires use of the GCC compiler 3.0 or greater.  It
+has been tested on GCC 3.1, and 3.2 on Linux and MacOS X.
+
+We have also successfully compiled this package for Windows using
+a MinGW cross-compiler using binutils 2.13, gcc 3.2, mingw
+runtime 2.2, and w32api 2.0.  This is essentially the same setup
+described by Yan and Rossini (2002), except for more recent
+versions of the compiler to successfully handle the C++ issues
+noted above. Many thanks to Dan Pemstein for helping with the
+cross-compilation, and to Kurt Hornik and Fritz Leisch for their
+help with debugging and service to the R community.
+
+Please contact Andrew D. Martin <admartin@artsci.wustl.edu> if
+you have any problems or questions.
+
+--
+Andrew D. Martin, Ph.D.
+Department of Political Science
+Washington University
+Campus Box 1063
+One Brookings Drive
+St. Louis, MO 63130
+(314) 935-5863 (Office)
+(314) 495-8272 (Cell)
+(314) 935-5856 (Fax)
+
+Office: Eliot Hall 326
+Email: admartin@artsci.wustl.edu
+WWW:   http://adm.wustl.edu

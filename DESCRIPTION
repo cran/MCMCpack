@@ -1,0 +1,19 @@
+Package: MCMCpack
+Version: 0.3-10
+Date: 2003-2-16
+Title: Markov chain Monte Carlo (MCMC) Package
+Author: Andrew D. Martin <admartin@artsci.wustl.edu>, and
+  Kevin M. Quinn <quinn@stat.washington.edu>
+Maintainer: Andrew D. Martin <admartin@artsci.wustl.edu>
+Depends: R (>= 1.6.0), coda, ts, MASS
+Description: This package contains functions for posterior
+  simulation for a number of statistical models. All simulation
+  is done in compiled C++ written in the Scythe Statistical
+  Library Version 0.3. All models return coda mcmc objects that
+  can then be summarized using coda functions or the coda menu
+  interface.  The package also contains some useful utility
+  functions, including some additional PDFs and pseudo-random
+  number generators for statistical distributions.
+License: GPL version 2 or newer
+URL: http://www.r-project.org, http://scythe.wustl.edu, 
+   http://scythe.wustl.edu/mcmcpack.html
