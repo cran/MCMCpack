@@ -932,6 +932,37 @@ namespace SCYTHE {
     return temp;
   }
 
+  double
+  lndlogis( const double& x, const double& location,
+    const double& scale)
+  {
+    if (scale <= 0) {
+      throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
+        __LINE__, "scale <= 0");
+    }
+    
+    double X = (x - location) / scale;
+    double e = std::exp(-X);
+    double f = 1.0 + e;
+    return std::log(e) - std::log(scale) - 2.0*std::log(f);
+  }
+
+  Matrix<double>
+  lndlogis( const int& rows, const int& cols, const double& x,
+    const double& location, const double& scale)
+  {
+    int size = rows * cols;
+    if (size <= 0) {
+      throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
+        __LINE__, "Tried to create matrix of size <= 0");
+    }
+    Matrix<double> temp(rows, cols, false);
+    for (int i = 0; i < size; i++)
+      temp[i] = lndlogis(x,location,scale);
+    
+    return temp;
+  }
+
   /**** The Log Normal Distribution ****/
 
   /* CDFs */
@@ -1352,9 +1383,18 @@ namespace SCYTHE {
   double
   lndnorm (const double& x, const double& mu, const double& sigma)
   {
-    if (sigma <= 0){
+    if (sigma < 0){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
         __LINE__, "negative standard deviation");
+    }
+    
+    if (sigma == 0.0){
+      if (x != mu){
+	return -std::numeric_limits<double>::infinity();
+      }
+      else {
+	return std::numeric_limits<double>::infinity();
+      }
     }
     
     double X = (x - mu) / sigma;

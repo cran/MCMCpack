@@ -1,6 +1,6 @@
 Package: MCMCpack
-Version: 0.5-1
-Date: 2004-7-28
+Version: 0.5-2
+Date: 2004-8-17
 Title: Markov chain Monte Carlo (MCMC) Package
 Author: Andrew D. Martin <admartin@wustl.edu>, and
   Kevin M. Quinn <kevin_quinn@harvard.edu>
@@ -15,10 +15,6 @@ Description: This package contains functions for posterior
   additional density functions and pseudo-random number generators
   for statistical distributions, a general purpose Metropolis
   sampling algorithm, and tools for visualization.
-Note: The software RngStream included in this package is subject to
-  the copyright of Pierre L'Ecuyer, University of Montreal, and
-  can be freely used only for personnal, academic, or
-  non-commercial purposes.
 License: GPL version 2 or newer
 URL: http://mcmcpack.wustl.edu
-Packaged: Wed Aug  4 17:40:07 2004; adm
+Packaged: Mon Dec 27 13:47:19 2004; hornik

@@ -4,12 +4,12 @@
 # KQ 10/22/2002
 
 "MCMChierEI" <-
-  function(r0, r1, c0, c1, burnin=1000, mcmc=50000, thin=1,
-           verbose=FALSE, tune=2.65316, seed=NA,
-           m0=0, M0=10,
-           m1=0, M1=10,
-           a0=1.0, b0=0.5,
-           a1=1.0, b1=0.5, ...){
+  function(r0, r1, c0, c1, burnin=5000, mcmc=50000, thin=1,
+           verbose=FALSE, seed=NA,
+           m0=0, M0=2.287656,
+           m1=0, M1=2.287656,
+           a0=0.825, b0=0.0105,
+           a1=0.825, b1=0.0105, ...){
     
     # Error checking
     if (length(r0) != length(r1)){
@@ -48,9 +48,7 @@
     }
 
     check.mcmc.parameters(burnin, mcmc, thin)
-    tune <- scalar.tune(tune)
-    
-     
+
     # seeds
     seeds <- form.seeds(seed) 
     lecuyer <- seeds[[1]]
@@ -114,17 +112,12 @@
                    a1 = as.double(a1),
                    b1 = as.double(b1),
                    verbose = as.integer(verbose),
-                   tune = as.double(tune),
                    lecuyer = as.integer(lecuyer),
                    seedarray = as.integer(seed.array),
                    lecuyerstream = as.integer(lecuyer.stream),
-                   accepts = as.integer(0),
                    PACKAGE="MCMCpack"
                    )
 
-    cat(" Overall acceptance rate = ",
-        C.sample$accepts / (C.sample$burnin+C.sample$mcmc) / ntables, "\n")
-    
     sample <- matrix(C.sample$samdata, C.sample$samrow, C.sample$samcol,
                      byrow=TRUE)
     

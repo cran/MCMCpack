@@ -74,7 +74,7 @@ c1 <- (r0 + r1) - c0
 tomogplot(r0, r1, c0, c1) 
 }
 
-\seealso{\code{\link{MCMCbaselineEI}}, \code{\link{MCMChierEI}},
+\seealso{\code{\link{MCMChierEI}},
   \code{\link{MCMCdynamicEI}}, \code{\link{dtomogplot}}
 }
 

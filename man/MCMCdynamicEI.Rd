@@ -8,9 +8,9 @@
   }
   
 \usage{
-MCMCdynamicEI(r0, r1, c0, c1, burnin=5000, mcmc=200000, thin=200,
-              tune=2.65316, verbose=FALSE, seed=NA, W=0, a0=1,
-              b0=0.03, a1=1, b1=0.03, ...)
+MCMCdynamicEI(r0, r1, c0, c1, burnin=5000, mcmc=50000, thin=1,
+              verbose=FALSE, seed=NA, W=0, a0=0.825,
+              b0=0.0105, a1=0.825, b1=0.0105, ...)
    }
 
 \arguments{
@@ -32,19 +32,6 @@ MCMCdynamicEI(r0, r1, c0, c1, burnin=5000, mcmc=200000, thin=200,
 
   \item{thin}{The thinning interval used in the simulation.  The number of
     mcmc iterations must be divisible by this value.}
-
-  \item{tune}{Tuning parameter for the Metropolis-Hasting sampling.  The
-    default value has been chosen to work well across most datasets. The
-  user should only change the tuning parameter if s/he has carefully
-  inspected the C++ code where the sampling takes place and understands
-  what s/he is doing. Note that the acceptance rate will typically be
-  much lower (say around 0.01) than would ordinarily be advisable. The
-  reason for this low acceptance rate is because the proposal
-  distribution is evenly spread around the entire tomography line while
-  the posterior is concentrated in one area of the line. While many
-  candidate draws are rejected, this algorithm mixes better than
-  algorithms that use more local proposal distributions.}
-
 
   \item{verbose}{A switch which determines whether or not the progress of
     the sampler is printed to the screen.  Information is printed
@@ -140,19 +127,22 @@ MCMCdynamicEI(r0, r1, c0, c1, burnin=5000, mcmc=200000, thin=200,
 
   Inference centers on \eqn{p_0}{p0}, \eqn{p_1}{p1},
   \eqn{\sigma^2_0}{sigma^2_0}, and \eqn{\sigma^2_1}{sigma^2_1}.
- The Metropolis-Hastings algorithm is used to sample from the posterior
-  density. 
+   Univariate slice sampling (Neal, 2003) together with Gibbs sampling
+   is used to sample from the posterior density. 
   }
   
 \references{
 
 Kevin Quinn. 2004. ``Ecological Inference in the Presence of Temporal 
-Dependence." In \emph{Ecological Inference: New Methodological Strategies}. Gary 
-King, Ori Rosen, and Martin A. Tanner (eds.). New York: Cambridge University 
-Press.
+Dependence." In \emph{Ecological Inference: New Methodological
+Strategies}. Gary King, Ori Rosen, and Martin A. Tanner (eds.). New
+York: Cambridge University Press. 
 
 Jonathan C. Wakefield.  2003. ``Ecological inference for 2x2 tables."  Read 
 before the Royal Statistical Society, on November 12th, 2003.
+
+   Radford Neal. 2003. ``Slice Sampling" (with discussion). \emph{Annals of
+   Statistics}, 31: 705-767. 
 
   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004. 
   \emph{Scythe Statistical 
@@ -165,18 +155,72 @@ before the Royal Statistical Society, on November 12th, 2003.
 
 \examples{
    \dontrun{
-   r0 <- rpois(10, 300)
-   r1 <- rpois(10, 200)
-   c0 <- 100 + 1:10*7 + rpois(10, 30)
-   c1 <- (r0+r1) - c0
-   posterior <- MCMCdynamicEI(r0, r1, c0, c1,
-      burnin=10000, mcmc=5000000, thin=1000)
-   plot(posterior)
-   summary(posterior) 
+## simulated data example 1
+set.seed(3920)
+n <- 100
+r0 <- rpois(n, 2000)
+r1 <- round(runif(n, 100, 4000))
+p0.true <- pnorm(-1.5 + 1:n/(n/2))
+p1.true <- pnorm(1.0 - 1:n/(n/4))
+y0 <- rbinom(n, r0, p0.true)
+y1 <- rbinom(n, r1, p1.true)
+c0 <- y0 + y1
+c1 <- (r0+r1) - c0
+
+## plot data
+dtomogplot(r0, r1, c0, c1, delay=0.1)
+
+## fit dynamic model
+post1 <- MCMCdynamicEI(r0,r1,c0,c1, mcmc=40000, thin=5, verbose=TRUE,
+                    seed=list(NA, 1))
+
+## fit exchangeable hierarchical model 
+post2 <- MCMChierEI(r0,r1,c0,c1, mcmc=40000, thin=5, verbose=TRUE,
+                    seed=list(NA, 2))
+
+p0meanDyn <- colMeans(post1)[1:n]
+p1meanDyn <- colMeans(post1)[(n+1):(2*n)]
+p0meanHier <- colMeans(post2)[1:n]
+p1meanHier <- colMeans(post2)[(n+1):(2*n)]
+
+## plot truth and posterior means
+pairs(cbind(p0.true, p0meanDyn, p0meanHier, p1.true, p1meanDyn, p1meanHier))
+
+
+## simulated data example 2
+set.seed(8722)
+n <- 100
+r0 <- rpois(n, 2000)
+r1 <- round(runif(n, 100, 4000))
+p0.true <- pnorm(-1.0 + sin(1:n/(n/4)))
+p1.true <- pnorm(0.0 - 2*cos(1:n/(n/9)))
+y0 <- rbinom(n, r0, p0.true)
+y1 <- rbinom(n, r1, p1.true)
+c0 <- y0 + y1
+c1 <- (r0+r1) - c0
+
+## plot data
+dtomogplot(r0, r1, c0, c1, delay=0.1)
+
+## fit dynamic model
+post1 <- MCMCdynamicEI(r0,r1,c0,c1, mcmc=40000, thin=5, verbose=TRUE,
+                    seed=list(NA, 1))
+
+## fit exchangeable hierarchical model 
+post2 <- MCMChierEI(r0,r1,c0,c1, mcmc=40000, thin=5, verbose=TRUE,
+                    seed=list(NA, 2))
+
+p0meanDyn <- colMeans(post1)[1:n]
+p1meanDyn <- colMeans(post1)[(n+1):(2*n)]
+p0meanHier <- colMeans(post2)[1:n]
+p1meanHier <- colMeans(post2)[(n+1):(2*n)]
+
+## plot truth and posterior means
+pairs(cbind(p0.true, p0meanDyn, p0meanHier, p1.true, p1meanDyn, p1meanHier))
    }
 }
 
 \keyword{models}
 
-\seealso{\code{\link{MCMCbaselineEI}}, \code{\link{MCMChierEI}},
+\seealso{\code{\link{MCMChierEI}},
   \code{\link[coda]{plot.mcmc}},\code{\link[coda]{summary.mcmc}}}

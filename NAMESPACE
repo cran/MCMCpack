@@ -9,7 +9,6 @@ export(
        dnoncenhypergeom,
        dtomogplot,
        dwish,
-       MCMCbaselineEI,
        MCMCdynamicEI,
        MCMCfactanal,
        MCMChierEI,

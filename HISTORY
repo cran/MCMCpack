@@ -2,11 +2,25 @@
 // Changes and Bug Fixes
 //
 
-MCMCpack 0.5-1 is a major revision of MCMCpack.  The entire package was
+MCMCpack 0.5-1 was a major revision of MCMCpack.  The entire package was
 been essentially re-written using the new development environment (documented
 in the MCMCpack specification) and the new Scythe Statistical Library 1.0.
 This following list summarizes major changes, but is by no means 
 exhaustive.
+
+0.5-1 to 0.5-2
+   * C++ code for truncated normal draws optimized for speed
+   * with the permission of Pierre L'Ecuyer licensing of RngStream code
+     changed to a dual license setup that is GPL compatible. Thanks to Chris 
+     Lawrence for bringing the licensing issues to our attention and 
+     drafting a new licensing statement and to Pierre L'Ecuyer for
+     agreeing to use the new licensing statement for his RngStream
+     code.
+   * Fixed serious bugs in MCMChierEI() and MCMCdynamicEI() 
+   * Implemented a new sampling scheme based on slice sampling for
+     MCMChierEI() and MCMCdynamicEI().
+   * Removed MCMCbaselineEI()
+   * Added delay argument to dtomogplog() 
 
 0.4-8 to 0.5-1
    * NAMESPACE implemented
@@ -26,6 +40,8 @@ exhaustive.
    * documentation for density functions and RNGs have been made "R-like"
    * fixed some spelling errors and misnomers in the documentation
    * all documentation updated to reflect changes
+   * MCMCirt1d() has a new interface with new types of constraints--
+     sampling for this model is also now much faster. 
 
 //
 // Old Changes and Bug Fixes
