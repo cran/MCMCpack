@@ -10,7 +10,7 @@
 \usage{
 MCMCdynamicEI(r0, r1, c0, c1, burnin=5000, mcmc=200000, thin=200,
               tune=2.65316, verbose=FALSE, seed=0, W=0, nu0=1,
-              delta0=0.5, nu1=1, delta1=0.5, ...)
+              delta0=0.03, nu1=1, delta1=0.03, ...)
    }
 
 \arguments{

@@ -1,6 +1,6 @@
 Package: MCMCpack
-Version: 0.4-4
-Date: 2003-11-13
+Version: 0.4-5
+Date: 2003-11-17
 Title: Markov chain Monte Carlo (MCMC) Package
 Author: Andrew D. Martin <admartin@wustl.edu>, and
   Kevin M. Quinn <kquinn@latte.harvard.edu>

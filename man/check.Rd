@@ -7,7 +7,7 @@
 }
 
 \usage{
-  check.parameters(burnin, mcmc, thin, fcn, tune)
+  check.parameters(burnin, mcmc, thin, fcn, tune=NA)
 }
 
 \arguments{
