@@ -3072,12 +3072,12 @@ namespace SCYTHE {
     double s = ::sqrt(v);
     // do rejection sampling and return value
     //if (m >= below){
-    if ((m/s + below/s ) < 1.2){
+    if ((m/s - below/s ) > 1.2){
       double x = rnorm(m, s);
       while (x < below)
 	x = rnorm(m,s);
       return x; 
-    } else if ((m/s + below/s ) < 4.0 ){
+    } else if ((m/s - below/s ) > 4.0 ){
       // use the inverse cdf method
       double above = (m+30.0)*s;
       double x = rtnorm(m, v, below, above);
@@ -3116,11 +3116,7 @@ namespace SCYTHE {
     }
     double s = ::sqrt(v);
     // do rejection sampling and return value
-    //if ((m/::sqrt(v) - above/::sqrt(v) ) < 1.4){ 8.88
-    //if ((m/::sqrt(v) - above/::sqrt(v) ) < 1.2){ 8.25
-    //if ((m/::sqrt(v) - above/::sqrt(v) ) < 1.0){ 8.52
     if ((m/s - above/s ) < 1.2){ 
-
       double x = rnorm(m, s);
       while (x > above)
 	x = rnorm(m,s);

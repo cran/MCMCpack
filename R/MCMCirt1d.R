@@ -9,6 +9,8 @@
            alpha.start = NA, beta.start = NA, t0 = 0, T0 = 1,
            b0.alpha = 0, b0.beta = 0, B0.alpha = 1, B0.beta = 1,
            B0.corr = 0, store.item = FALSE, ... ) {
+
+    set.seed(83829)
     
     # burnin / mcmc / thin error checking
     check.parameters(burnin, mcmc, thin, "MCMCirt1d")

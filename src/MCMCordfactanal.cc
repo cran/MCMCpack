@@ -99,25 +99,7 @@ ordfactanalpost (double* sam, const int* samrow, const int* samcol,
   
   for (int iter=0; iter < tot_iter; ++iter){
 
-
-    
-    // sample Xstar (OLD)
-    /*
-    for (int j=0; j<K; ++j){
-        Matrix<double> X_mean = phi * t(Lambda(j,_));
-      for (int i=0; i<N; ++i){
-	if (X(i,j) == -999){ // if missing
-	  Xstar(i,j) = rnorm(X_mean[i], 1.0);
-	}
-	else { // if not missing
-	  Xstar(i,j) = rtnorm_combo(X_mean[i], 1.0, 
-			      gamma(X(i,j)-1, j), gamma(X(i,j), j));
-	}
-      }
-    }
-    */
-
-    // sample Xstar (NEW)
+    // sample Xstar
     for (int i=0; i<N; ++i){
       Matrix<double> X_mean = Lambda * t(phi(i,_));
       for (int j=0; j<K; ++j){

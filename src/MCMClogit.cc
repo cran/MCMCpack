@@ -48,6 +48,10 @@ extern "C"{
 	     const double* Vdata, const int* Vrow, const int* Vcol,
 	     const double* tune, int* accepts){
 
+    // initialize seed (mersenne twister / use default seed unless specified)
+    if(seed==0) set_mersenne_seed(5489UL);
+    else set_mersenne_seed(seed[0]);
+
     // form matrices
     Matrix<double> X(Xcol[0], Xrow[0], Xdata);
     X = t(X);

@@ -212,13 +212,12 @@ MCMCirt1d(datamatrix, theta.fixed = 1, burnin = 500, mcmc = 1000,
 \examples{
    \dontrun{
    data(SupremeCourt)
-   posterior1 <- MCMCirt1d(SupremeCourt, verbose=TRUE,
-      burnin=10000, mcmc=50000)
+   posterior1 <- MCMCirt1d(SupremeCourt, burnin=10000, mcmc=50000)
    plot(posterior1)
    summary(posterior1)
    
    data(Senate)
-   posterior2 <- MCMCirt1d(t(Senate[,6:677]), theta.fixed = 9, verbose=TRUE,
+   posterior2 <- MCMCirt1d(t(Senate[,6:677]), theta.fixed = 9,
       burnin=1000, mcmc=5000)
    plot(posterior2)
    summary(posterior2)

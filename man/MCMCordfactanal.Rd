@@ -16,7 +16,8 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
                 data=list(), burnin = 1000, mcmc = 10000,
                 thin=5, tune=NA, verbose = FALSE, seed = 0,
                 lambda.start = NA, l0=0, L0=0,
-                store.lambda=TRUE, store.scores=FALSE, ... )
+                store.lambda=TRUE, store.scores=FALSE,
+                drop.constantvars=TRUE, ... )
  }
 
 \arguments{
@@ -92,6 +93,9 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
       applications with a small number of observations}.  By default, the
     factor scores are not stored.}
 
+  \item{drop.constantvars}{A switch that determines whether or not
+        observations and manifest variables that have no variation
+	should be deleted before fitting the model. Default = TRUE.}
   
   \item{...}{further arguments to be passed}       
 }

@@ -1,8 +1,8 @@
 //
-// MCMCpack, Version 0.4-2
+// MCMCpack, Version 0.4-3
 //
 
-Release Date: July 23, 2003
+Release Date: September 3, 2003
 
 This package contains functions for posterior simulation for a number of
 statistical models. All simulation is done in compiled C++ written in
@@ -22,6 +22,19 @@ Kevin M. Quinn <kquinn@latte.harvard.edu>
 //
 // Changes and Bug Fixes
 //
+
+NOTE: We are still working on implementing a NAMESPACE for this package. We
+plant to do so once R 1.8.* is released.
+
+0.4-2 to 0.4-3
+   * Fixed bug in Scythe truncated Normal generators (which had been
+     fixed before but sneaked into the last release) -- this fixes 
+     a problem with MCMCirt1d
+   * Cleaned up MCMCbaselineDA.cc (eliminated unused arguments)
+   * Cleaned up MCMCbaseline.R (tuning argument)
+   * Set seed in MCMClogit.cc fixed
+   * Set seed in MCMCpoisson.cc fixed   
+   * Fixed all examples such that they work out of the box
 
 0.4-1 to 0.4-2
    * Optimized some of the Scythe 0.4 code, which provides faster
@@ -88,7 +101,7 @@ Campus Box 1063
 One Brookings Drive
 St. Louis, MO 63130
 (314) 935-5863 (Office)
-(314) 495-8272 (Cell)
+(314) 753-8377 (Cell)
 (314) 935-5856 (Fax)
 
 Office: Eliot Hall 326
