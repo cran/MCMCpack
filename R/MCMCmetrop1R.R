@@ -53,7 +53,7 @@
   sample <- .Call("MCMCmetrop1R_cc", fun, as.double(theta.init),
                   my.env, as.integer(burnin), as.integer(mcmc),
                   as.integer(thin),
-                  as.logical(verbose),
+                  as.integer(verbose),
                   lecuyer=as.integer(lecuyer), 
                   seedarray=as.integer(seed.array),
                   lecuyerstream=as.integer(lecuyer.stream),

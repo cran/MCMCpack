@@ -16,8 +16,11 @@
  * Provides the class definition for the L'Ecuyer random number
  * generator, a rng capable of generating many independent substreams.
  * This class extends the abstract rng class by implementing runif().
- * Based on RngStream.cpp, which was released under the following
- * license:
+ * Based on RngStream.cpp.
+ * 
+ * Pierre L'Ecuyer agreed to the following dual-licensing terms in an
+ * email received 7 August 2004.  This dual-license was prompted by
+ * the Debian maintainers of R and MCMCpack. 
  *
  * This software is Copyright (C) 2004 Pierre L'Ecuyer.
  *
