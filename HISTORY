@@ -2,6 +2,12 @@
 // Changes and Bug Fixes
 //
 
+0.6-3 to 0.6-4
+  * fixed bug with verbose in MCMCmetrop1R pointed out by a referee for 
+    Rnews
+  * added a little clarification to the lecuyer.h file about the dual-
+    licensing scheme Pierre L'Ecuyer agreed to on 7 August 2004.
+
 0.6-2 to 0.6-3
   * cleaned up the docs for MCMCirtKd
   * MCMCirtKd now fits a model with a difficulty parameter rather than
