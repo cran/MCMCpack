@@ -80,6 +80,18 @@ namespace SCYTHE {
   {
   public:
     typedef T ttype;
+
+		friend class matrix_iterator<ttype>;
+    friend class const_matrix_iterator<ttype>;
+    friend class row_major_iterator<ttype>;
+    friend class const_row_major_iterator<ttype>;
+    friend class col_major_iterator<ttype>;
+    friend class const_col_major_iterator<ttype>;
+    friend class reverse_row_major_iterator<ttype>;
+    friend class const_reverse_row_major_iterator<ttype>;
+    friend class reverse_col_major_iterator<ttype>;
+    friend class const_reverse_col_major_iterator<ttype>;
+
     typedef matrix_iterator<ttype> iterator;
     typedef const_matrix_iterator<ttype> const_iterator;
     typedef row_major_iterator<ttype> row_major_iterator;
@@ -94,17 +106,6 @@ namespace SCYTHE {
       reverse_col_major_iterator;
     typedef const_reverse_col_major_iterator<ttype>
       const_reverse_col_major_iterator;
-
-    friend class iterator;
-    friend class const_iterator;
-    friend class row_major_iterator;
-    friend class col_major_iterator;
-    friend class const_row_major_iterator;
-    friend class const_col_major_iterator;
-    friend class reverse_row_major_iterator;
-    friend class const_reverse_row_major_iterator;
-    friend class reverse_col_major_iterator;
-    friend class const_reverse_col_major_iterator;
     
     /**** Constructors ****/
 

@@ -1,8 +1,8 @@
 //
-// MCMCpack, Version 0.4-8
+// MCMCpack, Version 0.4-9
 //
 
-Release Date: February 15, 2004
+Release Date: July 2, 2004
 
 This package contains functions for posterior simulation for a number of
 statistical models. All simulation is done in compiled C++ written in
@@ -26,6 +26,9 @@ Kevin M. Quinn <kquinn@latte.harvard.edu>
 NOTE: We are still working on implementing a NAMESPACE for this package. We
 plant to do so in our next major release.
 
+
+0.4-8 to 0.4-9
+   * Fixed Scythe issues to work with gcc 3.4.0 (as requested by Brain Ripley).
 
 0.4-7 to 0.4-8
    * Repaired Scythe_Simulate.*, for which an outdated version was included

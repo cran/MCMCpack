@@ -73,11 +73,11 @@ namespace SCYTHE {
   namespace {
     template <class T>
     T
-    donothing(const Matrix<T> &x) {return 0.0;};
+    donothing(const Matrix<T> &x) {return 0.0;}
 
     template <class T>
     T
-    donothing(const T &x)  { return 0.0; };
+    donothing(const T &x)  { return 0.0; }
   }
 
 
@@ -610,7 +610,7 @@ namespace SCYTHE {
       throw scythe_dimension_error (__FILE__, __PRETTY_FUNCTION__,
             __LINE__, "Theta not column vector");
     if (! psi.isColVector())
-      throw scythe_dimension_error (__FILE__, __PRETTY_FUNCTION,
+      throw scythe_dimension_error (__FILE__, __PRETTY_FUNCTION__,
             __LINE__, "Psi not column vector");
 
     Matrix<T> thetastar = theta;
