@@ -1,13 +1,7 @@
 // sample from the posterior distribution of a Poisson regression
 // in R using linked C++ code in Scythe
 //
-// Kevin Quinn
-// University of Washington
-// 
-// Andrew D. Martin
-// Washington University
-// 
-// 1/24/03 (ADM)
+// ADM 1/24/03
 // 
 
 #include <iostream>

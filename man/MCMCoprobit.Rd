@@ -5,7 +5,7 @@
   This function generates a posterior density sample
   from an ordered probit regression model using the data augmentation 
   approach of Cowles (1996). The user supplies data and priors,
-  and a sample from the posterior density is returned as an \code{mcmc}
+  and a sample from the posterior density is returned as an mcmc
   object, which can be subsequently analyzed with functions 
   provided in the coda package.
   }
@@ -60,7 +60,7 @@ MCMCoprobit(formula, data = list(), burnin = 1000, mcmc = 10000,
 }
 
 \value{
-   An \code{mcmc} object that contains the posterior density sample.  This 
+   An mcmc object that contains the posterior density sample.  This 
    object can be summarized by functions provided by the coda package.
 }
 
@@ -90,8 +90,8 @@ MCMCoprobit(formula, data = list(), burnin = 1000, mcmc = 10000,
    
    The algorithm employed is discussed in depth by Cowles (1996).  Note that 
    the model does include a constant in the data matrix.  Thus, the first
-   element  \eqn{\gamma_1}{gamma_1} is normalized to zero, and thus not 
-   returned in the \code{mcmc} object.
+   element  \eqn{\gamma_1}{gamma_1} is normalized to zero, and is not 
+   returned in the mcmc object.
 }
   
 \references{
@@ -102,8 +102,8 @@ MCMCoprobit(formula, data = list(), burnin = 1000, mcmc = 10000,
   Valen E. Johnson and James H. Albert. 1999. ``Ordinal Data Modeling." 
   Springer: New York.
       
-  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2002.  
-   \emph{Scythe Statistical Library 0.3.} \url{http://scythe.wustl.edu}.
+  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2003.  
+   \emph{Scythe Statistical Library 0.4.} \url{http://scythe.wustl.edu}.
    
   Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
@@ -111,13 +111,17 @@ MCMCoprobit(formula, data = list(), burnin = 1000, mcmc = 10000,
 }
 
 
-\examples{\dontrun{
-x1 <- rnorm(100); x2 <- rnorm(100);
-z <- 1.0 + x1*0.1 - x2*0.5 + rnorm(100);
-y <- z; y[z < 0] <- 0; y[z >= 0 & z < 1] <- 1;
-y[z >= 1 & z < 1.5] <- 2; y[z >= 1.5] <- 3;
-posterior <- MCMCoprobit(y ~ x1 + x2, tune=0.3, mcmc=20000)
-}}
+\examples{
+   \dontrun{
+   x1 <- rnorm(100); x2 <- rnorm(100);
+   z <- 1.0 + x1*0.1 - x2*0.5 + rnorm(100);
+   y <- z; y[z < 0] <- 0; y[z >= 0 & z < 1] <- 1;
+   y[z >= 1 & z < 1.5] <- 2; y[z >= 1.5] <- 3;
+   posterior <- MCMCoprobit(y ~ x1 + x2, tune=0.3, mcmc=20000)
+   plot(posterior)
+   summary(posterior)
+   }
+}
 
 \keyword{models}
 

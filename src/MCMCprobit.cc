@@ -2,16 +2,8 @@
 // density of a probit regression model.  It is written
 // modularly, with the goal of creating an R object that will reference
 // this code.
-// 
-// Kevin Quinn
-// Dept. of Political Science and CSSS
-// University of Washington
-// quinn@stat.washington.edu
-// 
-// Andrew D. Martin
-// Dept. of Political Science
-// 
-// 11/12/2002 -- ported to Scythe0.3
+//
+// ADM and KQ 11/12/2002
 // 
 
 #include <iostream>

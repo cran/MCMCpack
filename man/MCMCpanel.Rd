@@ -8,14 +8,14 @@
   effects parameters, a Wishart prior on the random effects
   precision matrix, and a Gamma prior on the conditional error
   precision. The user supplies data and priors, and a sample from
-  the posterior density is returned as an \code{mcmc} object,
+  the posterior density is returned as an mcmc object,
   which can be subsequently analyzed with functions provided in
   the coda package.
   }
   
 \usage{
 MCMCpanel(obs, Y, X, W, burnin = 1000, mcmc = 10000, thin = 5, 
-    verbose = FALSE, seed = 0, beta.start = NA, sigma2.start = NA,
+    verbose = FALSE, seed = 0, sigma2.start = NA,
     D.start = NA, b0 = 0, B0 = 1, eta0, R0, nu0 = 0.001,
     delta0 = 0.001, ...)
    }
@@ -47,13 +47,6 @@ MCMCpanel(obs, Y, X, W, burnin = 1000, mcmc = 10000, thin = 5,
     \item{verbose}{A switch which determines whether or not the progress of
     the sampler is printed to the screen.  If TRUE, the iteration number
     and parameters are printed to the screen.}
-
-    \item{beta.start}{The starting value for the \eqn{\beta}{beta} vector.
-    This can either 
-    be a scalar or a column vector with dimension equal to the number of 
-    betas. If this takes a scalar value, then that value will serve as the 
-    start value for all of the betas. Default value of NA uses the least
-    squares estimates.}
 
     \item{sigma2.start}{The starting value for the conditional error
     variance. Default value of NA uses the least squares estimates.}
@@ -94,7 +87,7 @@ MCMCpanel(obs, Y, X, W, burnin = 1000, mcmc = 10000, thin = 5,
 }
 
 \value{
-   An \code{mcmc} object that contains the posterior density sample.  This 
+   An mcmc object that contains the posterior density sample.  This 
    object can be summarized by functions provided by the coda package.
 }
 
@@ -129,8 +122,9 @@ MCMCpanel(obs, Y, X, W, burnin = 1000, mcmc = 10000, thin = 5,
    When fitting one of these models, it is of utmost importance to choose a 
    prior that reflects your prior beliefs about the random effects.  Using the
    \code{dwish} and \code{rwish} functions might be useful in choosing these
-   values.
-   
+   values.  Also, the user is not allowed to specify a starting value
+   for the \eqn{\beta}{beta} parameters, as they are simulated in the
+   first block of the sampler.
    }
  
 \references{
@@ -138,8 +132,8 @@ MCMCpanel(obs, Y, X, W, burnin = 1000, mcmc = 10000, thin = 5,
    Hierarchical Longitudinal Models." \emph{Statistics and Computing.} 9: 
    17-26.
 
-   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2002.  \emph{Scythe 
-   Statistical Library 0.3.} \url{http://scythe.wustl.edu}.
+   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2003.  \emph{Scythe 
+   Statistical Library 0.4.} \url{http://scythe.wustl.edu}.
    
    Andrew D. Martin and Kyle L. Saunders. 2002. ``Bayesian Inference for 
    Political Science Panel Data.'' Paper presented at the 2002 Annual Meeting 
@@ -151,7 +145,11 @@ MCMCpanel(obs, Y, X, W, burnin = 1000, mcmc = 10000, thin = 5,
 }
 
 \examples{
-   \dontrun{posterior <- MCMCpanel(obs, Y, X, W, eta0 = 4, R0 = 1)}
+   \dontrun{
+   posterior <- MCMCpanel(obs, Y, X, W, eta0 = 4, R0 = 1)
+   plot(posterior)
+   summary(posterior)
+   }
 }
 
 \keyword{models}

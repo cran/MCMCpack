@@ -11,7 +11,7 @@
 // Andrew D. Martin
 // Dept. of Political Science
 // 
-// 10/10/2002 -- ported to Scythe0.3
+// ADM and KQ 10/10/2002 [ported to Scythe0.3]
 // 
 
 #include <iostream>

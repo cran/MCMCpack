@@ -1,13 +1,8 @@
 // fits Wakefield's baseline model for ecological inference via 
 // data augmentation
 //
-// Kevin Quinn
-// Dept. of Political Science and CSSS
-// Univ. Washington
-// quinn@stat.washington.edu
-//
-// 2/24/2002
-// 10/23/2002 -- ported to Scythe0.3 and written for an R interface
+// KQ 2/24/2002
+// KQ 10/23/2002 [ported to Scythe0.3 and written for an R interface]
 //
 
 #include <iostream> 

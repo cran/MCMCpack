@@ -61,7 +61,7 @@ MCMCbaselineEI(r0, r1, c0, c1, burnin=1000, mcmc=50000, thin=10,
 }
 
 \value{
-  An \code{mcmc} object that contains the posterior density sample.
+  An mcmc object that contains the posterior density sample.
   This object can  be summarized by functions provided by the coda package.
 }
 
@@ -99,9 +99,9 @@ MCMCbaselineEI(r0, r1, c0, c1, burnin=1000, mcmc=50000, thin=10,
    Center for Statistics and the Social Sciences Working Paper
    no. 12. University of Washington. 
 
-   Andrew D. Martin, Kevin M. Quinn, and Daniel B. Pemstein.  2002.   
+   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2003.   
    \emph{Scythe Statistical 
-   Library 0.3.} \url{http://scythe.wustl.edu}.
+   Library 0.4.} \url{http://scythe.wustl.edu}.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
@@ -109,7 +109,11 @@ MCMCbaselineEI(r0, r1, c0, c1, burnin=1000, mcmc=50000, thin=10,
 }
 
 \examples{
-   \dontrun{posterior <- MCMCbaselineEI(300, 200, 100, 400)}
+   \dontrun{
+   posterior <- MCMCbaselineEI(300, 200, 100, 400)
+   plot(posterior)
+   summary(posterior)
+   }
 }
 
 \keyword{models}

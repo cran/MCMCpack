@@ -1,4 +1,6 @@
-PKG_CXXFLAGS = -funroll-loops -Wall -pedantic
+PKG_CXXFLAGS = -funroll-loops -Wall -pedantic -DSCYTHE_NO_RANGE
+
+
 
 
 

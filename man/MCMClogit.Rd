@@ -5,7 +5,7 @@
   This function generates a posterior density sample
   from a logistic regression model using a random walk Metropolis
   algorithm. The user supplies data and priors,
-  and a sample from the posterior density is returned as an \code{mcmc}
+  and a sample from the posterior density is returned as an mcmc
   object, which can be subsequently analyzed with functions 
   provided in the coda package.
   }
@@ -63,7 +63,7 @@ MCMClogit(formula, data = list(), burnin = 1000, mcmc = 10000,
 }
 
 \value{
-   An \code{mcmc} object that contains the posterior density sample.  This 
+   An mcmc object that contains the posterior density sample.  This 
    object can be summarized by functions provided by the coda package.
 }
 
@@ -89,8 +89,8 @@ MCMClogit(formula, data = list(), burnin = 1000, mcmc = 10000,
   
 \references{
       
-  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2002.  
-   \emph{Scythe Statistical Library 0.3.} \url{http://scythe.wustl.edu}.
+  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2003.  
+   \emph{Scythe Statistical Library 0.4.} \url{http://scythe.wustl.edu}.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
@@ -98,8 +98,14 @@ MCMClogit(formula, data = list(), burnin = 1000, mcmc = 10000,
 }
 
 
-\examples{\dontrun{data(birthwt)
-posterior <- MCMClogit(low~age+as.factor(race)+smoke, data=birthwt)}}
+\examples{
+   \dontrun{
+   data(birthwt)
+   posterior <- MCMClogit(low~age+as.factor(race)+smoke, data=birthwt)
+   plot(posterior)
+   summary(posterior)
+   }
+}
 
 \keyword{models}
 

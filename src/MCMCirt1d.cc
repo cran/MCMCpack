@@ -1,5 +1,7 @@
 // MCMCirt1d.cc is C++ code to estimate a one-dimensional item response
 // theory model. 
+//
+// ADM and KQ 1/15/2003
 
 #include <iostream>
 #include "Scythe_Matrix.h"
@@ -14,7 +16,7 @@ using namespace std;
 
 // update latent data for standard item response models
 Matrix<double>
-irt_Z_update (Matrix<double> &Y, Matrix<double> &theta,
+irt_Z_update1 (Matrix<double> &Y, Matrix<double> &theta,
                             Matrix<double> &eta) {
    // define constants
    int J = theta.rows();
@@ -46,7 +48,7 @@ irt_Z_update (Matrix<double> &Y, Matrix<double> &theta,
 // a K x 1 vector of prior covariances (Mabcov).
 // note: works only for one-dimensional case
 Matrix<double>
-   irt_eta_update (Matrix<double> & Z, Matrix<double> & theta,
+   irt_eta_update1 (Matrix<double> & Z, Matrix<double> & theta,
    const Matrix<double> & Mamean, const Matrix<double> & Mbmean,
    const Matrix<double> & Mavar, const Matrix<double> & Mbvar,
    const Matrix<double> & Mabcov ) {
@@ -87,7 +89,7 @@ Matrix<double>
 // and a J x 1 vector of prior variances (T0)
 // note: works only for one-dimensional case
 Matrix<double>
-irt_theta_update (Matrix<double> & Z, Matrix<double> & eta, const 
+irt_theta_update1 (Matrix<double> & Z, Matrix<double> & eta, const 
    Matrix<double> & t0, const Matrix<double> & T0) {
    
    int J = Z.rows();
@@ -183,13 +185,13 @@ irt1dpost (double* sample, const int* samrow, const int* samcol,
   for (int iter=0; iter < tot_iter; ++iter){
     
     // sample latent utilities (Z)
-    Z = irt_Z_update(Y, theta, eta);
+    Z = irt_Z_update1(Y, theta, eta);
         
     // sample bill parameters (eta)
-    eta = irt_eta_update(Z, theta, Mamean, Mbmean, Mavar, Mbvar, Mabcov);
+    eta = irt_eta_update1(Z, theta, Mamean, Mbmean, Mavar, Mbvar, Mabcov);
     
     // sample ideal points (theta)
-    theta = irt_theta_update(Z, eta, Mt0, MT0);
+    theta = irt_theta_update1(Z, eta, Mt0, MT0);
       
     // fix rotational invariance by forcing a member to
     // have a negative ideal point

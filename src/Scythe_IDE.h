@@ -52,79 +52,79 @@
 
 namespace SCYTHE {
 
-  /* Cholesky decomposition of a sym pos-def matrix */
-  template <class T>
-    Matrix<T>
-    cholesky (const Matrix<T> &);
+	/* Cholesky decomposition of a sym pos-def matrix */
+	template <class T>
+  Matrix<T>
+	cholesky (const Matrix<T> &);
 
-  /* Solves Ax=b for x via backsubstitution using Cholesky
-   * Decomposition  (NOTE: function is overloaded) A must be symmetric
-   * and positive definite
-   */
+	/* Solves Ax=b for x via backsubstitution using Cholesky
+	 * Decomposition  (NOTE: function is overloaded) A must be symmetric
+	 * and positive definite
+	 */
   template <class T>
-    Matrix<T>
-    chol_solve (const Matrix<T> &, const Matrix<T> &);
+	Matrix<T>
+	chol_solve (const Matrix<T> &, const Matrix<T> &);
 
-  /* Solves Ax=b for x via backsubstitution using Cholesky
-   * Decomposition. This function takes in the lower triangular L as
-   * input and does not depend upon cholesky() A must be symmetric and
-   * positive definite
-   */
-  template <class T>
-    Matrix<T> chol_solve (const Matrix<T> &, const Matrix<T> &,
-			  const Matrix<T> &);
+	/* Solves Ax=b for x via backsubstitution using Cholesky
+	 * Decomposition. This function takes in the lower triangular L as
+	 * input and does not depend upon cholesky() A must be symmetric and
+	 * positive definite
+	 */
+	template <class T>
+  Matrix<T> chol_solve (const Matrix<T> &, const Matrix<T> &,
+												const Matrix<T> &);
 
-  /* Calculates the inverse of a Sym. Pos. Def. Matrix (NOTE: function
-   * is overloaded)
-   */
-  template <class T>
-    Matrix<T> invpd (const Matrix<T> &);
+	/* Calculates the inverse of a Sym. Pos. Def. Matrix (NOTE: function
+	 * is overloaded)
+	 */
+	template <class T>
+	Matrix<T> invpd (const Matrix<T> &);
 
-  /* Calculates the inverse of a Sym. Pos. Def. Matrix (NOTE: function
-   * is overloaded)
-   */
-  template <class T>
-    Matrix<T> invpd (const Matrix<T> &, const Matrix<T> &);
+	/* Calculates the inverse of a Sym. Pos. Def. Matrix (NOTE: function
+	 * is overloaded)
+	 */
+	template <class T>
+	Matrix<T> invpd (const Matrix<T> &, const Matrix<T> &);
 
-  /* Calculates the LU Decomposition of a square Matrix */
-  template <class T>
-    void lu_decomp (Matrix<T>, Matrix<T> &, Matrix<T> &,
-		    Matrix<int> &);  
+	/* Calculates the LU Decomposition of a square Matrix */
+	template <class T>
+	void lu_decomp (Matrix<T>, Matrix<T> &, Matrix<T> &,
+									Matrix<int> &);  
 
-  /* Solve Ax=b for x via forward and backsubstitution using the LU
-   * Decomp of Matrix A (NOTE: This function is overloaded)
-   */
+	/* Solve Ax=b for x via forward and backsubstitution using the LU
+	 * Decomp of Matrix A (NOTE: This function is overloaded)
+	 */
   template <class T> 
-    Matrix<T> lu_solve(Matrix<T>, const Matrix<T> &);
+	Matrix<T> lu_solve(Matrix<T>, const Matrix<T> &);
 
-  /* Solve Ax=b for x via forward and backsubstitution using the LU
-   * Decomp of Matrix A (NOTE: This function is overloaded)
-   */
-  template <class T>
-    Matrix<T> lu_solve (Matrix<T>, const Matrix<T> &, const Matrix<T> &,
-			const Matrix<T> &, const Matrix<int> &);
+	/* Solve Ax=b for x via forward and backsubstitution using the LU
+	 * Decomp of Matrix A (NOTE: This function is overloaded)
+	 */
+	template <class T>
+	Matrix<T> lu_solve (Matrix<T>, const Matrix<T> &, const Matrix<T> &,
+											const Matrix<T> &, const Matrix<int> &);
 
-  /* Interchanges the rows of A with those in vector p and returns the
-   * modified Matrix.
-   */
-  template <class T>
-    Matrix<T> row_interchange(Matrix<T>, const Matrix<int> &);
+	/* Interchanges the rows of A with those in vector p and returns the
+	 * modified Matrix.
+	 */
+	template <class T>
+	Matrix<T> row_interchange(Matrix<T>, const Matrix<int> &);
 
-  /* Calculate the Inverse of a square Matrix A via LU decomposition 
-   *
-   * DEPRECATED:  see operator^= in Scythe_Matrix
-   */
-  template <class T>
-    Matrix<T> inv(Matrix<T>);
+	/* Calculate the Inverse of a square Matrix A via LU decomposition 
+	 *
+	 * DEPRECATED:  see operator^= in Scythe_Matrix
+	 */
+	template <class T>
+	Matrix<T> inv(Matrix<T>);
 
-  /* Calculates the determinant of Matrix A via LU Decomposition */
-  template <class T>
-    T det(const Matrix<T> &);
+	/* Calculates the determinant of Matrix A via LU Decomposition */
+	template <class T>
+	T det(const Matrix<T> &);
 
 }	// end namespace SCYTHE
 #if defined (__GNUG__) || defined (__MWERKS__) || defined (_MSC_VER) || \
     defined (EXPLICIT_TEMPLATE_INSTANTIATION)
-// Necessary for template instantiation with some compilers.
+  // Necessary for template instantiation with some compilers.
 # include "Scythe_IDE.cc"
 #endif  /* EXPLICIT_TEMPLATE_INSTANTIATION */
 

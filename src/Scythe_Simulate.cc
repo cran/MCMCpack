@@ -48,16 +48,19 @@
 
 #ifndef SCYTHE_SIMULATE_CC
 #define SCYTHE_SIMULATE_CC
+
 #ifdef __APPLE__
 extern "C" int isinf(double);
+extern "C" int isnan(double);
+#endif
+#ifdef sgi
+#include <nan.h> // <cnan>?
 #endif
 #ifdef __MINGW32__
-// I'd rather do something like this than all the embedded ifdefs
-// below.  Any help appreciated.
-//extern "C" int isinf(double);
-//#define isinf(a) (! finite(a))
 #define M_PI 3.141592653589793238462643383280
 #endif
+
+#include <iostream>
 #include <cmath>
 #include <cfloat>
 #include <climits>
@@ -67,12 +70,14 @@ extern "C" int isinf(double);
 #include "Scythe_Util.h"
 #include "Scythe_IDE.h"
 #include "Scythe_Stat.h"
+#include "Scythe_LA.h"
 
 /* Fill in some defs from R that aren't in math.h */
 #define M_LN_SQRT_2PI 0.918938533204672741780329736406
 #define M_LN_SQRT_PId2  0.225791352644727432363097614947
 #define M_1_SQRT_2PI  0.39894228040143267793994605993
 #define M_2PI   6.28318530717958647692528676655
+#define M_SQRT_32 5.656854249492380195206754896838
 
 namespace SCYTHE {
 	
@@ -85,25 +90,25 @@ namespace SCYTHE {
   /* "Static" variables for the Marsaglia generator */
 #ifdef __MINGW32__
 	/* Initial values of random seeds for ranmars(); */
-  static unsigned long Z = 362436069;
-  static unsigned long W = 521288629;
-  static unsigned long JSR = 123456789;
-  static unsigned long JCONG = 380116160;
+	static unsigned long Z = 362436069;
+	static unsigned long W = 521288629;
+	static unsigned long JSR = 123456789;
+	static unsigned long JCONG = 380116160;
 
-  /* Some more globals for ranmars() */
-  static unsigned long X = 0, Y = 0, T[UCHAR_MAX + 1];
-  static unsigned char C = 0;
+	/* Some more globals for ranmars() */
+	static unsigned long X = 0, Y = 0, T[UCHAR_MAX + 1];
+	static unsigned char C = 0;
 #else
   namespace {
     /* Initial values of random seeds for ranmars(); */
-    static unsigned long Z = 362436069;
-    static unsigned long W = 521288629;
-    static unsigned long JSR = 123456789;
-    static unsigned long JCONG = 380116160;
+    unsigned long Z = 362436069;
+    unsigned long W = 521288629;
+    unsigned long JSR = 123456789;
+    unsigned long JCONG = 380116160;
 
     /* Some more globals for ranmars() */
-    static unsigned long X = 0, Y = 0, T[UCHAR_MAX + 1];
-    static unsigned char C = 0;
+    unsigned long X = 0, Y = 0, T[UCHAR_MAX + 1];
+    unsigned char C = 0;
   }
 #endif
 
@@ -170,44 +175,44 @@ namespace SCYTHE {
 
   /* "Static" variables for the Mersenne Twister */
 #ifdef __MINGW32__
-  /* Period parameters */  
-  static const int N = 624;
-  static const int M = 398;
-		
-  /* constant vector a */
-  static const unsigned long MATRIX_A = 0x9908b0dfUL;
-		
-  /* most significant w-r bits */
-  static const unsigned long UPPER_MASK = 0x80000000UL;
-		
-  /* least significant r bits */
-  static const unsigned long LOWER_MASK = 0x7fffffffUL;
+	/* Period parameters */  
+	static const int N = 624;
+	static const int M = 398;
 
-  /* the array for the state vector  */
-  static unsigned long mt[N];
+	/* constant vector a */
+	static const unsigned long MATRIX_A = 0x9908b0dfUL;
 
-  /* mti==N+1 means mt[N] is not initialized */
-  static int mti=N+1;
+	/* most significant w-r bits */
+	static const unsigned long UPPER_MASK = 0x80000000UL;
+
+	/* least significant r bits */
+	static const unsigned long LOWER_MASK = 0x7fffffffUL;
+    
+	/* the array for the state vector  */
+	static unsigned long mt[N];
+    
+	/* mti==N+1 means mt[N] is not initialized */
+	static int mti=N+1;
 #else
   namespace {
     /* Period parameters */  
-    static const int N = 624;
-    static const int M = 398;
+    const int N = 624;
+    const int M = 398;
 		
     /* constant vector a */
-    static const unsigned long MATRIX_A = 0x9908b0dfUL;
+    const unsigned long MATRIX_A = 0x9908b0dfUL;
 		
     /* most significant w-r bits */
-    static const unsigned long UPPER_MASK = 0x80000000UL;
+    const unsigned long UPPER_MASK = 0x80000000UL;
 		
     /* least significant r bits */
-    static const unsigned long LOWER_MASK = 0x7fffffffUL;
+    const unsigned long LOWER_MASK = 0x7fffffffUL;
 
     /* the array for the state vector  */
-    static unsigned long mt[N];
+    unsigned long mt[N];
 
     /* mti==N+1 means mt[N] is not initialized */
-    static int mti=N+1;
+    int mti=N+1;
   }
 #endif
 	
@@ -264,6 +269,18 @@ namespace SCYTHE {
     return y;
   }
 
+	/* Non-convergence flag setup */
+#ifdef __MINGW32__
+	static bool THROW_ON_NONCONV = false;
+#else
+	namespace {
+		bool THROW_ON_NONCONV = false;
+	}
+#endif
+
+	void throw_on_nonconv (bool t) {
+		THROW_ON_NONCONV = t;
+	}
 
   /*************
    * Functions *
@@ -389,35 +406,9 @@ namespace SCYTHE {
     }
   }
 
-
-
-  /**********************************************************************/
-  /*!
-   * \brief returns pseudo random deviate from  noncentral hypergeometric 
-   *  distribution
-   *  Consider the following contingency table:
-   *
-   *   --------------
-   *   | y1  |   | n1
-   *   --------------
-   *   | y2  |   | n2
-   *   --------------
-   *   | m1  |   | 
-   *
-   * with Yi ~ Binom(ni, pi_i)
-   *
-   * rnchypgeom() samples  Y1|Y1+Y2 = m1
-   *
-   * \param m1 a constant reference to \a m1 the column sum in column 1
-   * \param n1 a constant reference to \a n1 the row sum in row 1
-   * \param n2 a constant reference to \a n2 the row sum in row 2
-   * \param psi a constant reference to \a psi the odds ratio for the table
-   * \param delta a constant reference to \a delta a parameter that 
-   * determines the accuracy of the approximation if any (delta <= 0 
-   * implies the exact mass function is calculated
-   * \return a double pseudo random deviate from a noncnentral hypergeometric
-   * distribution
-   */
+	/* Return a pseudo-random deviate from a non-cental hypergeometric
+	 * distribution
+	 */
   double rnchypgeom(const double& m1, const double& n1, 
 		    const double& n2, const double& psi, 
 		    const double& delta){
@@ -556,8 +547,6 @@ namespace SCYTHE {
     delete [] fvec;
     exit(500000);
   }
-
-
 
   /* The natural log of the absolute value of the gamma function */
   double
@@ -1797,12 +1786,13 @@ namespace SCYTHE {
   /* CDFs */
   double
   pnorm (const double &x, const double &mu, const double &sigma)
+	
   {
     if (sigma <= 0)
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__, __LINE__,
 				"negative standard deviation");
 
-    return pnorm1((x - mu) / sigma);
+    return pnorm2((x - mu) / sigma, true, false);
   }
 	
   Matrix<double>
@@ -1877,6 +1867,8 @@ namespace SCYTHE {
 	
   /* Returns the univariate standard normal cumulative distribution
    * function (CDF)
+	 *
+	 * DEPRECATED
    */
   double
   pnorm1 (double x, const double& eps, const double& maxit,
@@ -1884,12 +1876,6 @@ namespace SCYTHE {
   {
     int i;
  	 
-    if (x > 8.0)
-      return 1.0;
-    
-    if (x <-8.0)
-      return 0.0;
-    
     if (x == 0)
       return 0.5;
   
@@ -1927,6 +1913,192 @@ namespace SCYTHE {
 	return (0.5 - f);
     }
   }
+
+	/* A newer version of pnorm for 0.4.  The pnorm wrapper has been
+	 * updated to use this function, as have library calls that
+	 * previously used pnorm1.
+	 *
+	 * Ported from the R Statistical Library 1.6.2
+	 * (Copyright (C) 2000 The R Development Core Team (GPL))
+	 */
+
+#define SIXTEN 16
+#define do_del(X)							\
+	xsq = trunc(X * SIXTEN) / SIXTEN;				\
+	del = (X - xsq) * (X + xsq);					\
+	if(log_p) {							\
+	    *cum = (-xsq * xsq * 0.5) + (-del * 0.5) + log(temp);	\
+	    if((lower && x > 0.) || (upper && x <= 0.))			\
+		  *ccum = log1p(-exp(-xsq * xsq * 0.5) * 		\
+				exp(-del * 0.5) * temp);		\
+	}								\
+	else {								\
+	    *cum = exp(-xsq * xsq * 0.5) * exp(-del * 0.5) * temp;	\
+	    *ccum = 1.0 - *cum;						\
+	}
+
+#define swap_tail						\
+	if (x > 0.) {/* swap  ccum <--> cum */			\
+	    temp = *cum; if(lower) *cum = *ccum; *ccum = temp;	\
+	}
+
+	void
+	pnorm_both(	double x, double *cum, double *ccum, int i_tail,
+							bool log_p)
+	{
+		const double a[5] = {
+			2.2352520354606839287,
+			161.02823106855587881,
+			1067.6894854603709582,
+			18154.981253343561249,
+			0.065682337918207449113
+		};
+		const double b[4] = {
+			47.20258190468824187,
+			976.09855173777669322,
+			10260.932208618978205,
+			45507.789335026729956
+		};
+		const double c[9] = {
+			0.39894151208813466764,
+			8.8831497943883759412,
+			93.506656132177855979,
+			597.27027639480026226,
+			2494.5375852903726711,
+			6848.1904505362823326,
+			11602.651437647350124,
+			9842.7148383839780218,
+			1.0765576773720192317e-8
+		};
+		const double d[8] = {
+			22.266688044328115691,
+			235.38790178262499861,
+			1519.377599407554805,
+			6485.558298266760755,
+			18615.571640885098091,
+			34900.952721145977266,
+			38912.003286093271411,
+			19685.429676859990727
+		};
+		const double p[6] = {
+			0.21589853405795699,
+			0.1274011611602473639,
+			0.022235277870649807,
+			0.001421619193227893466,
+			2.9112874951168792e-5,
+			0.02307344176494017303
+		};
+		const double q[5] = {
+			1.28426009614491121,
+			0.468238212480865118,
+			0.0659881378689285515,
+			0.00378239633202758244,
+			7.29751555083966205e-5
+		};
+		
+		double xden, xnum, temp, del, eps, xsq, y;
+		int i, lower, upper;
+
+		/* Consider changing these : */
+		eps = DBL_EPSILON * 0.5;
+
+		/* i_tail in {0,1,2} =^= {lower, upper, both} */
+		lower = i_tail != 1;
+		upper = i_tail != 0;
+
+		y = std::fabs(x);
+		if (y <= 0.67448975) {
+			/* qnorm(3/4) = .6744.... -- earlier had 0.66291 */
+			if (y > eps) {
+				xsq = x * x;
+				xnum = a[4] * xsq;
+				xden = xsq;
+				for (i = 0; i < 3; ++i) {
+					xnum = (xnum + a[i]) * xsq;
+					xden = (xden + b[i]) * xsq;
+				}
+			} else xnum = xden = 0.0;
+			
+			temp = x * (xnum + a[3]) / (xden + b[3]);
+			if(lower)  *cum = 0.5 + temp;
+			if(upper) *ccum = 0.5 - temp;
+			if(log_p) {
+				if(lower)  *cum = log(*cum);
+				if(upper) *ccum = log(*ccum);
+			}
+		} else if (y <= M_SQRT_32) {
+			/* Evaluate pnorm for 0.674.. = qnorm(3/4) < |x| <= sqrt(32) 
+			 * ~= 5.657 */
+
+			xnum = c[8] * y;
+			xden = y;
+			for (i = 0; i < 7; ++i) {
+				xnum = (xnum + c[i]) * y;
+				xden = (xden + d[i]) * y;
+			}
+			temp = (xnum + c[7]) / (xden + d[7]);
+			do_del(y);
+			swap_tail;
+		} else if (log_p
+							|| (lower && -37.5193 < x && x < 8.2924)
+							|| (upper && -8.2929 < x && x < 37.5193)
+				) {
+			/* Evaluate pnorm for x in (-37.5, -5.657) union (5.657, 37.5) */
+			xsq = 1.0 / (x * x);
+			xnum = p[5] * xsq;
+			xden = xsq;
+			for (i = 0; i < 4; ++i) {
+				xnum = (xnum + p[i]) * xsq;
+				xden = (xden + q[i]) * xsq;
+			}
+			temp = xsq * (xnum + p[4]) / (xden + q[4]);
+			temp = (M_1_SQRT_2PI - temp) / y;
+			do_del(x);
+			swap_tail;
+		} else {
+			if (x > 0) {
+				*cum = 1.;
+				*ccum = 0.;
+			} else {
+				*cum = 0.;
+				*ccum = 1.;
+			}
+			if (THROW_ON_NONCONV)
+				throw scythe_convergence_error (__FILE__, __PRETTY_FUNCTION__,
+						__LINE__, std::string("x (") & x & "did not converge");
+		}
+
+		return;
+	}
+#undef SIXTEN
+#undef do_del
+#undef swap_tail
+
+	double
+	pnorm2 (const double &x, const bool &lower_tail, const bool &log_p)
+	{
+		// XXX An sgi fix is probably required here
+		// note: commented out for MINGW crosscompilation -- should be fixed
+		//if (isnan(x))
+		//	throw scythe_nan_error (__FILE__, __PRETTY_FUNCTION__,
+		//			__LINE__, "Quantile x is not a number (NaN)");
+#ifdef __MINGW32__
+		if (! finite(x))
+#else
+#ifdef sgi
+		if (IsINF(x))
+#else
+		if (isinf(x))
+#endif
+#endif
+			throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
+					__LINE__, "Quantile x is inifinte (+/-Inf)");
+
+		double p, cp;
+		pnorm_both(x, &p, &cp, (lower_tail ? 0 : 1), log_p);
+
+		return (lower_tail ? p : cp);
+	}
 	
   /* Returns the quantile of the standard normal distribution 
    * associated with a given probability p
@@ -2183,7 +2355,8 @@ namespace SCYTHE {
 		
     if (n > 4e5) {
       val = 1/(4*n);
-      return pnorm1(x * (1 - val) / ::sqrt(1 + x * x * 2. * val));
+      return pnorm2(x * (1 - val) / ::sqrt(1 + x * x * 2. * val), 
+					true, false);
     }
 		
     val = pbeta(n / (n + x * x), n / 2.0, 0.5);
@@ -2612,6 +2785,18 @@ namespace SCYTHE {
     return(A);
   }
 
+	/* Multivariate t */
+	Matrix<double>
+	rmvt (const Matrix<double> &sigma, const double &nu) {
+		Matrix<double> result;
+    if (nu <= 0) {
+      throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
+				__LINE__, "D.O.F parameter nu <= 0");
+		}
+		result = rmvnorm(Matrix<double>(sigma.rows(), 1, true, 0), sigma);
+		return result / std::sqrt(rchisq(nu) / nu);
+	}
+
   /* Bernoulli */
   int
   rbern (const double &p)
@@ -2708,16 +2893,16 @@ namespace SCYTHE {
     double FB = 0.0;
     double sd = ::sqrt(v);
     if ((::fabs((above-m)/sd) < 6.36) && (::fabs((below-m)/sd) < 6.36)){
-      FA = pnorm1((above-m)/sd);
-      FB = pnorm1((below-m)/sd);    
+      FA = pnorm2((above-m)/sd, true, false);
+      FB = pnorm2((below-m)/sd, true, false);
     }
     if ((((above-m)/sd) < 6.36)  && (((below-m)/sd) <= -6.36) ){ 
-      FA = pnorm1((above-m)/sd);
+      FA = pnorm2((above-m)/sd, true, false);
       FB = 0.0;
     }
     if ( (((above-m)/sd) >= 6.36)  && (((below-m)/sd) > -6.36) ){ 
       FA = 1.0;
-      FB = FB = pnorm1((below-m)/sd);    
+      FB = FB = pnorm2((below-m)/sd, true, false);
     } 
     if ( (((above-m)/sd) >= 6.36) && (((below-m)/sd) <=-6.36)){
       FA = 1.0;
@@ -2746,7 +2931,7 @@ namespace SCYTHE {
  		 
     return draw;
   }
-	
+
   /* Sample from a truncated Normal distribution */
   double
   rtbnorm_slice(const double& m, const double& v, const double& below,
@@ -2771,7 +2956,11 @@ namespace SCYTHE {
 #ifdef __MINGW32__
 		if (! finite(x)) {
 #else
-    if (isinf(x)){
+#ifdef sgi
+		if (IsINF(x)) {
+#else
+    if (isinf(x)) {
+#endif
 #endif
       std::cerr << "WARNING in "
 		<< __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
@@ -2808,7 +2997,11 @@ namespace SCYTHE {
 #ifdef __MINGW32__
 		if (! finite(x)) {
 #else
+#ifdef sgi
+		if (IsINF(x)) {
+#else
     if (isinf(x)){
+#endif
 #endif
       std::cerr << "WARNING in "
 		<< __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
@@ -2845,9 +3038,13 @@ namespace SCYTHE {
 	x = runif()*( (m + ::sqrt(-2*v*::log(z))) - below) + below;
       }
 #ifdef __MINGW32__
-		if (! finite(x)) {
+			if (! finite(x)) {
 #else
-    if (isinf(x)){
+#ifdef sgi
+			if (IsINF(x)) {
+#else
+      if (isinf(x)){
+#endif
 #endif
 	std::cerr << "WARNING in "
 		  << __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
@@ -2887,9 +3084,13 @@ namespace SCYTHE {
 	x = runif()*( (newmu + ::sqrt(-2*v*::log(z))) - below) + below;
       }
 #ifdef __MINGW32__
-		if (! finite(x)) {
+			if (finite(x)) {
 #else
-    if (isinf(x)){
+#ifdef sgi
+			if (IsINF(x)) {
+#else
+      if (isinf(x)){
+#endif
 #endif
 	std::cerr << "WARNING in "
 		  << __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "

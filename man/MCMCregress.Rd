@@ -7,14 +7,14 @@
   Gibbs sampling (with a multivariate Gaussian prior on the
   beta vector, and an inverse-Gamma prior on the conditional
   error variance).  The user supplies data and priors, and 
-  a sample from the posterior density is returned as an \code{mcmc}
+  a sample from the posterior density is returned as an mcmc
   object, which can be subsequently analyzed with functions 
   provided in the coda package.
   }
   
 \usage{
 MCMCregress(formula, data = list(), burnin = 1000, mcmc = 10000,
-   thin = 5, verbose = FALSE, seed = 0, beta.start = NA, sigma2.start = NA,
+   thin = 5, verbose = FALSE, seed = 0, sigma2.start = NA,
    b0 = 0, B0 = 0, nu = 0.001, delta = 0.001, ...) }
 
 \arguments{
@@ -39,23 +39,15 @@ MCMCregress(formula, data = list(), burnin = 1000, mcmc = 10000,
     Mersenne Twister, which requires an integer as an input.  If nothing
     is provided, the Scythe default seed is used.}
 
-    \item{beta.start}{The starting value for the \eqn{\beta}{beta} vector.  
-    This can either 
-    be a scalar or a column vector with dimension equal to the number of 
-    betas. If this takes a scalar value, then that value will serve as the 
-    starting value for all of the betas. The default value of NA will
-    use the maximum likelihood estimate of \eqn{\beta}{beta} as the starting 
-    value.}
-
     \item{sigma2.start}{The starting value for the conditional error
-      variance. The default value of of NA will use the maximum
-      likelihood estimate of \eqn{\sigma^2}{sigma2} as the starting value.}
+    variance. The default value of of NA will use the maximum
+    likelihood estimate of \eqn{\sigma^2}{sigma2} as the starting value.}
 
     \item{b0}{The prior mean of \eqn{\beta}{beta}.  This can either be a 
-     scalar or a
-      column vector with dimension equal to the number of betas. If this
-      takes a scalar  value, then that value will serve as the prior
-      mean for all of the betas.} 
+    scalar or a
+    column vector with dimension equal to the number of betas. If this
+    takes a scalar  value, then that value will serve as the prior
+    mean for all of the betas.} 
     
     \item{B0}{The prior precision of \eqn{\beta}{beta}.  This can either be a 
     scalar or a square matrix with dimensions equal to the number of betas.  
@@ -74,7 +66,7 @@ MCMCregress(formula, data = list(), burnin = 1000, mcmc = 10000,
 }
 
 \value{
-   An \code{mcmc} object that contains the posterior density sample.  This 
+   An mcmc object that contains the posterior density sample.  This 
    object can be summarized by functions provided by the coda package.
 }
 
@@ -97,12 +89,14 @@ MCMCregress(formula, data = list(), burnin = 1000, mcmc = 10000,
   \deqn{\sigma^{-2} \sim \mathcal{G}amma(\nu/2, \delta/2)}{sigma^(-2) ~
     Gamma(nu/2, delta/2)}
   Where \eqn{\beta}{beta} and \eqn{\sigma^{-2}}{sigma^(-2)} are assumed 
-  \emph{a priori} independent.
+  \emph{a priori} independent.  Note that only starting values for
+  the conditional error variance are allowed because
+  \eqn{\beta}{beta} is the first block in the sampler.
   }
   
 \references{
-   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2002.  
-   \emph{Scythe Statistical Library 0.3.} \url{http://scythe.wustl.edu}.
+   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2003.  
+   \emph{Scythe Statistical Library 0.4.} \url{http://scythe.wustl.edu}.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
@@ -111,9 +105,13 @@ MCMCregress(formula, data = list(), burnin = 1000, mcmc = 10000,
 
 
 \examples{
-line   <- list(X = c(1,2,3,4,5), Y = c(1,3,3,3,5))
-line$X <- line$X - mean(line$X)
-post2  <- MCMCregress(Y~X, data=line)
+   \dontrun{
+   line   <- list(X = c(1,2,3,4,5), Y = c(1,3,3,3,5))
+   line$X <- line$X - mean(line$X)
+   posterior  <- MCMCregress(Y~X, data=line)
+   plot(posterior)
+   summary(posterior)
+   }
 }
 
 \keyword{models}

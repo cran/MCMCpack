@@ -7,13 +7,13 @@ mcmc2dataframe(obj)
 }
 
 \arguments{
-  \item{obj}{an mcmc object}
+  \item{obj}{An mcmc object.}
 }
 
 \description{
   The function `mcmc2dataframe' is used to convert an mcmc object to a
   dataframe.
-  }
+}
  
 \value{
   A dataframe built from obj.

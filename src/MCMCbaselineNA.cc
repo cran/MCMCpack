@@ -2,13 +2,8 @@
 // Wakefield's normal approximation to the binomial convolution likelihood
 // and Metropolis-Hastings to sample from the posterior
 //
-// Kevin Quinn
-// Dept. of Political Science and CSSS
-// Univ. Washington
-// quinn@stat.washington.edu
-//
-// 3/2/2002
-// 10/22/2002 -- ported to Scythe0.3 and written for an R interface
+// KQ 3/2/2002
+// KQ 10/22/2002 [ported to Scythe0.3 and written for an R interface]
 //
 
 #include <iostream> 

@@ -12,27 +12,27 @@ dtomogplot(r0, r1, c0, c1, time.vec=NA,
            xlab="fraction of r0 in c0 (p0)",
            ylab="fraction of r1 in c0 (p1)",
            color.palette=heat.colors, bgcol="black", ...)
-   }
+}
 
 \arguments{
-  \item{r0}{(ntables * 1) vector of row sums from row 0}
+  \item{r0}{An \eqn{(ntables \times 1)}{(ntables * 1)} vector of row sums from row 0.}
 
-  \item{r1}{(ntables * 1) vector of row sums from row 1}
+  \item{r1}{An \eqn{(ntables \times 1)}{(ntables * 1)} vector of row sums from row 1.}
 
-  \item{c0}{(ntables * 1) vector of column sums from column 0}
+  \item{c0}{An \eqn{(ntables \times 1)}{(ntables * 1)} vector of column sums from column 0.}
 
-  \item{c1}{(ntables * 1) vector of column sums from column 1}
+  \item{c1}{An \eqn{(ntables \times 1)}{(ntables * 1)} vector of column sums from column 1.}
 
-  \item{time.vec}{vector of time periods that correspond to the elements
-    of r0, r1, c0, and c1}
+  \item{time.vec}{Vector of time periods that correspond to the elements
+    of \eqn{r_0}{r0}, \eqn{r_1}{r1}, \eqn{c_0}{c0}, and \eqn{c_1}{c1}.}
 
-  \item{xlab}{the x axis label for the plot}
+  \item{xlab}{The x axis label for the plot.}
 
-  \item{ylab}{the y axis label for the plot}
+  \item{ylab}{The y axis label for the plot.}
 
-  \item{color.palette}{Color palette to be used to encode temporal patterns}
+  \item{color.palette}{Color palette to be used to encode temporal patterns.}
   
-  \item{bgcol}{the background color for the plot}
+  \item{bgcol}{The background color for the plot.}
   
   \item{...}{further arguments to be passed}     
 }
@@ -59,23 +59,24 @@ dtomogplot(r0, r1, c0, c1, time.vec=NA,
   \eqn{Y_1|r_1 \sim \mathcal{B}inomial(r_1, p_1)}{Y1|r1 ~
     Binomial(r1,p1)}.
 
-  dtomogplot plots the bounds on the MLEs for (p0, p1) and color codes
-  them by the elements of time.vec. 
-  }
+  This function plots the bounds on the maximum likelihood
+  estimates for (p0, p1) and color codes them by the elements of
+  time.vec. 
+}
 
-  \keyword{hplot}
+\keyword{hplot}
   
-  \references{
-    Gary King, 1997. A Solution to the Ecological Inference Problem.
-    Princeton: Princeton University Press.
-    
-    Jonathan Wakefield. 2001. ``Ecological Inference for 2 x 2 Tables,''
-    Center for Statistics and the Social Sciences Working Paper 
-    no. 12. University of Washington.
+\references{
+  Gary King, 1997. \emph{A Solution to the Ecological Inference Problem}.
+  Princeton: Princeton University Press.
+  
+  Jonathan Wakefield. 2001. ``Ecological Inference for 2 x 2 Tables,''
+  Center for Statistics and the Social Sciences Working Paper 
+  no. 12. University of Washington.
 
-    Kevin M. Quinn. 2002. ``Ecological Inference in the Presence of
-    Temporal Dependence.'' Paper prepared for Ecological Inference
-    Conference, Harvard University, June 17-18, 2002.
+  Kevin M. Quinn. 2002. ``Ecological Inference in the Presence of
+  Temporal Dependence.'' Paper prepared for Ecological Inference
+  Conference, Harvard University, June 17-18, 2002.
 }
 
 \examples{
@@ -87,5 +88,5 @@ dtomogplot(r0, r1, c0, c1, time.vec=1901:1920)
 }
 
 \seealso{\code{\link{MCMCbaselineEI}}, \code{\link{MCMChierEI}},
-  \code{\link{MCMCdynamicEI}}, 
-  \code{\link[coda]{plot.mcmc}},\code{\link[coda]{summary.mcmc}}}
+  \code{\link{MCMCdynamicEI}},\code{\link{tomogplot}}
+}

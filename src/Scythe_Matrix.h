@@ -49,25 +49,18 @@
 #define SCYTHE_MATRIX_H
 
 #include <string>
+#include <climits>
+#include <cmath>
 #include "Scythe_Error.h"
 #include "Scythe_Util.h"
 #include "Scythe_Matrix_Iterator.h"
 
+#define SCYTHE_10log2 .30102999
+
 namespace SCYTHE {
   
-  inline  double sgn(const double& x){
-    if (x>0)
-      return 1.0;
-    else if (x<0)
-      return -1.0;
-    else
-      return 0.0;
-  } 
-  
-
   struct all_elements{
   }  const _ = {};
-  
  
   
   enum IN_TYPE {	NORMAL, REPEAT, DIAG, UTRIANG, LTRIANG,
@@ -84,6 +77,14 @@ namespace SCYTHE {
       typedef const_row_major_iterator<ttype> const_row_major_iterator;
       typedef col_major_iterator<ttype> col_major_iterator;
       typedef const_col_major_iterator<ttype> const_col_major_iterator;
+			typedef reverse_row_major_iterator<ttype>
+				reverse_row_major_iterator;
+			typedef const_reverse_row_major_iterator<ttype>
+				const_reverse_row_major_iterator;
+			typedef reverse_col_major_iterator<ttype>
+				reverse_col_major_iterator;
+			typedef const_reverse_col_major_iterator<ttype>
+				const_reverse_col_major_iterator;
 
       friend class iterator;
       friend class const_iterator;
@@ -91,6 +92,10 @@ namespace SCYTHE {
       friend class col_major_iterator;
       friend class const_row_major_iterator;
       friend class const_col_major_iterator;
+      friend class reverse_row_major_iterator;
+      friend class const_reverse_row_major_iterator;
+      friend class reverse_col_major_iterator;
+      friend class const_reverse_col_major_iterator;
 			
       /**** Constructors ****/
 
@@ -112,9 +117,9 @@ namespace SCYTHE {
        * it fills the Matrix with zeroes but you can turn this off or
        * change the fill value
        */
-      explicit
-	Matrix (const int &n, const int &m, const bool &fill = true,
-		const T &fill_value = 0); 
+			explicit
+			Matrix (const int &n, const int &m, const bool &fill = true,
+			const T &fill_value = 0); 
 
       /* Array Constructor:  Creates an n x m Matrix from an array of
        * type T.  You may enter an IN_TYPE as enumerated above.  If
@@ -158,58 +163,75 @@ namespace SCYTHE {
       Matrix (const std::string &path);
 
       /* Copy Constructor: Create a copy of an existing Matrix */
-      Matrix (const Matrix<T> &);
+      Matrix (const Matrix<T> &, const bool &fill=true);
 
       template <class S>
-	Matrix (const Matrix<S> &);
+			Matrix (const Matrix<S> &);
 
       /**** Destructor ****/
       ~Matrix ();
+
+			/**** STL container modifiers ****/
+			/* Swap operator (sort of a dual copy constructor) */
+			void swap (Matrix<T> &);
+
+			inline void clear ()
+			{
+				resize(0, 0);
+			}
 
       /**** Indexing Operators ****/
 
       /* Retrieve the ith element in row major order */
       inline T &operator[] (const int &i)
-	{
-	  if ( !inRange(i)) {
-	    throw scythe_out_of_range_error (__FILE__,__PRETTY_FUNCTION__,
+			{
+#ifndef SCYTHE_NO_RANGE
+				if ( !inRange(i)) {
+					throw scythe_out_of_range_error (__FILE__,__PRETTY_FUNCTION__,
 					     __LINE__, std::string("Index ") & i & 
 					     " out of range");
-	  }
-	  return data_[i];
-	}
+				}
+#endif
+				return data_[i];
+			}
 
       /* Retrieve the (i,j)th element */
       inline T &operator() (const int &i, const int &j)
-	{
-	  if (! inRange(i, j)) {
-	    throw scythe_out_of_range_error(__FILE__,__PRETTY_FUNCTION__,
+			{
+#ifndef SCYTHE_NO_RANGE
+				if (! inRange(i, j)) {
+					throw scythe_out_of_range_error(__FILE__,__PRETTY_FUNCTION__,
 					    __LINE__, std::string("Index (") & i & "," &  j & 
 					    ") out of range");
-	  }
-	  return data_[i * cols_ + j];
-	}
+				}
+#endif
+				return data_[i * cols_ + j];
+			}
 
       /* Versions of the above two for const Matrix objects */
       inline T &operator[] (const int &i) const
-	{
-	  if (! inRange(i)) {
-	    throw scythe_out_of_range_error (__FILE__,__PRETTY_FUNCTION__,
+			{
+#ifndef SCYTHE_NO_RANGE
+				if (! inRange(i)) {
+					throw scythe_out_of_range_error (__FILE__,__PRETTY_FUNCTION__,
 					     __LINE__, std::string("Index ") & i &
 					     " out of range");
-	  }
-	  return data_[i];
-	}
+				}
+#endif
+				return data_[i];
+			}
 			
       inline T &operator() (const int &i, const int &j) const
-	{
-	  if (! inRange(i, j)) {
-	    throw scythe_out_of_range_error(__FILE__,__PRETTY_FUNCTION__,
+			{
+#ifndef SCYTHE_NO_RANGE
+				if (! inRange(i, j)) {
+					throw scythe_out_of_range_error(__FILE__,__PRETTY_FUNCTION__,
 					    __LINE__, std::string("Index (") & i & "," &  j & 
 					    ") out of range");
-	  }
-	  return data_[i * cols_ + j];
-	}
+				}
+#endif
+				return data_[i * cols_ + j];
+			}
 
       /* SubMatrix operator: returns a new Matrix with a,b,c,d
        * defining the bounds of the block s.t 0 <= a <= c < rows_;
@@ -222,8 +244,8 @@ namespace SCYTHE {
       /* functions for extracting all rows and all columns with the 
        * _ struct
        */
-      Matrix<T> operator() (const all_elements& a, const int& j);
-      Matrix<T> operator() (const int& i, const all_elements& a);
+      Matrix<T> operator() (const all_elements& a, const int& j) const;
+      Matrix<T> operator() (const int& i, const all_elements& a) const;
 
       /**** Self-modifying arithmetic operators ****/
 
@@ -231,7 +253,7 @@ namespace SCYTHE {
       Matrix<T> &operator= (const Matrix<T> &);
 
       template <class S>
-	Matrix<T> &operator= (const Matrix<S> &);
+			Matrix<T> &operator= (const Matrix<S> &);
 
       /* Matrix addition/assignment */
       Matrix<T> &operator+= (const Matrix<T> &);
@@ -261,61 +283,72 @@ namespace SCYTHE {
 
       /* Return total length of the matrix */
       inline int size() const
-	{
-	  return rows_ * cols_;
-	}
+			{
+				return size_;
+			}
 
       /* Return number of rows */
       inline int rows() const
-	{
-	  return rows_;
-	}
+			{
+				return rows_;
+			}
 
       /* Return number of columns */
       inline int cols() const
-	{
-	  return cols_;
-	}
+			{
+				return cols_;
+			}
+
+			inline bool empty() const
+			{
+				// Equivalent to isNull but is the STL-compliant syntax
+				return (rows_ == 0);
+			}
+
+			// Our max size is the biggest int or the limits of your mem
+			inline int max_size () const {
+				return INT_MAX;
+			}
 
       /* Is this Matrxi 0X0 (such a matrix is for array defs only) */
       inline bool isNull() const
-	{
-	  // If rows_ == 0 so will cols_
-	  return (rows_ == 0);
-	}
+			{
+				// If rows_ == 0 so will cols_
+				return (rows_ == 0);
+			}
 
       /* Are all the elements in this Matrix == 0 */
       inline bool isZero() const
-	{
-	  for (int i = 0; i < size(); ++i)
-	    if (data_[i] != 0)
-	      return false;
-	  return true;
-	}
+			{
+				for (int i = 0; i < size_; ++i)
+					if (data_[i] != 0)
+						return false;
+				return true;
+			}
 			
       /* 1X1 Matrix? */
       inline bool isScalar() const
-	{
-	  return (rows_ == 1 && cols_ == 1);
-	}
+			{
+				return (rows_ == 1 && cols_ == 1);
+			}
 
       /* 1Xm Matrix? */
       inline bool isRowVector() const
-	{
-	  return (rows_ == 1);
-	}
+			{
+				return (rows_ == 1);
+			}
 
       /* nX1 Matrix? */
       inline bool isColVector() const
-	{
-	  return (cols_ == 1);
-	}
+			{
+				return (cols_ == 1);
+			}
 			
       /* nXn Matrix? Note that Null/Scalar Matrices are Square... */ 
       inline bool isSquare() const
-	{
-	  return (rows_ == cols_);
-	}
+			{
+				return (rows_ == cols_);
+			}
 			
       /* M[i,j] == 0 when i != j */
       bool isDiagonal() const;
@@ -345,9 +378,9 @@ namespace SCYTHE {
        * under special circumstances.
        */
       inline T *getArray() const
-	{
-	  return data_;
-	}
+			{
+				return data_;
+			}
 
       /* Print matrix to a formatted string (very Java). Switched prec
        * and width from 0.1 cause prec is much more useful than width.
@@ -367,197 +400,236 @@ namespace SCYTHE {
        * file. 
        * NOTE: Load is now a new type of constructor */
       void save(const std::string &path, const char &flag = 'n',
-		const bool &header = 0, const int &prec = 5,
-		const int &width = 0) const;
+								const bool &header = 0, const int &prec = 5,
+								const int &width = 0) const;
 			
-      inline bool inRange(const int &i) const
-	{
-	  return (i >= 0 && i < rows_ * cols_ ? true : false);
-	}
+			inline bool inRange(const int &i) const
+			{
+				return (i > -1 && i < size_ ? true : false);
+			}
 			
       inline bool inRange (const int &i, const int &j) const
-	{
-	  return (i >= 0 && j >= 0 && i < rows_ && j < cols_
-		  ? true : false);
-	}
+			{
+				int index = i * cols_ + j;
+				return (index > -1 && index < size_ ? true : false);
+			}
 
-      /* Resize the matrix.  Note that end elements will be trimmed
-       * off in row major order.  Use with caution.  Version leaves
-       * junk at the end of a matrix that grows.  Version 2 fills it
-       * with a default elements
-       */
-      inline void resize(const int &rows, const int &cols)
-	{
-	  if (rows < 0 || cols < 0)
-	    throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__,
+			/* Resizes the matrix by the ^2 1/2 alg.  */
+      inline void resize( const int &rows, const int &cols,
+													const bool &fill=true)
+			{
+				if (rows < 0 || cols < 0)
+					throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__,
 				     __LINE__, "Rows or cols < 0");
 
-	  resize(rows * cols);
-	  rows_ = rows;
-	  cols_ = cols;
-	}
-
-      inline void resize(const int &rows, const int &cols, const T &def)
-	{
-	  int old_size = rows_ * cols_;
-	  resize(rows, cols);
-	  if (rows_ * cols_ > old_size) {
-	    for (int i = old_size; i < rows_ * cols_; ++i)
-	      data_[i] = def;
-	  }
-	}
-
+				resize(rows * cols, fill);
+				rows_ = rows;
+				cols_ = cols;
+			}
+			
       /**** Iterator Stuff ****/
 			
       inline row_major_iterator begin()
-	{
-	  return row_major_iterator(*this);
-	}
+			{
+				return row_major_iterator(*this);
+			}
 
       inline row_major_iterator end()
-	{
-	  row_major_iterator temp(*this);
-	  return (temp + (rows_ * cols_));
-	}
+			{
+				row_major_iterator temp(*this);
+				return (temp + (size_));
+			}
 			
       inline row_major_iterator vec(const int &n)
-	{
-	  return row_major_iterator(*this).next_vec(n);
-	}
+			{
+				return row_major_iterator(*this).next_vec(n);
+			}
 			
       inline const_row_major_iterator begin() const
-	{
-	  return const_row_major_iterator(*this);
-	}
+			{
+				return const_row_major_iterator(*this);
+			}
 
       inline const_row_major_iterator end() const
-	{
-	  const_row_major_iterator temp(*this);
-	  return (temp + (rows_ * cols_));
-	}
+			{
+				const_row_major_iterator temp(*this);
+				return (temp + (size_));
+			}
 			
       inline const_row_major_iterator vec(const int &n) const
-	{
-	  return const_row_major_iterator(*this).next_vec(n);
-	}
+			{
+				return const_row_major_iterator(*this).next_vec(n);
+			}
 
       inline col_major_iterator beginc()
-	{
-	  return col_major_iterator(*this);
-	}
+			{
+				return col_major_iterator(*this);
+			}
 			
       inline col_major_iterator endc()
-	{
-	  col_major_iterator temp(*this);
-	  return (temp + (rows_ * cols_));
-	}
+			{
+				col_major_iterator temp(*this);
+				return (temp + (size_));
+			}
 			
       inline col_major_iterator vecc(const int &n)
-	{
-	  return col_major_iterator(*this).next_vec(n);
-	}
+			{
+				return col_major_iterator(*this).next_vec(n);
+			}
 			
       inline const_col_major_iterator beginc() const
-	{
-	  return const_col_major_iterator(*this);
-	}
+			{
+				return const_col_major_iterator(*this);
+			}
 			
       inline const_col_major_iterator endc() const
-	{
-	  const_col_major_iterator temp(*this);
-	  return (temp + (rows_ * cols_));
-	}
+			{
+				const_col_major_iterator temp(*this);
+				return (temp + (size_));
+			}
 			
       inline const_col_major_iterator vecc(const int &n) const
-	{
-	  return const_col_major_iterator(*this).next_vec(n);
-	}
+			{
+				return const_col_major_iterator(*this).next_vec(n);
+			}
+
+			inline reverse_row_major_iterator rbegin ()
+			{
+				return reverse_row_major_iterator(*this);
+			}
+      
+			inline reverse_row_major_iterator rend()
+			{
+				reverse_row_major_iterator temp(*this);
+				return (temp + (size_));
+			}
+      
+			inline reverse_row_major_iterator rvec(const int &n)
+			{
+				return reverse_row_major_iterator(*this).next_vec(n);
+			}
+			
+      inline const_reverse_row_major_iterator rbegin() const
+			{
+				return const_reverse_row_major_iterator(*this);
+			}
+
+      inline const_reverse_row_major_iterator rend() const
+			{
+				const_reverse_row_major_iterator temp(*this);
+				return (temp + (size_));
+			}
+			
+      inline const_reverse_row_major_iterator rvec(const int &n) const
+			{
+				return const_reverse_row_major_iterator(*this).next_vec(n);
+			}
+
+      inline reverse_col_major_iterator rbeginc()
+			{
+				return reverse_col_major_iterator(*this);
+			}
+			
+      inline reverse_col_major_iterator rendc()
+			{
+				reverse_col_major_iterator temp(*this);
+				return (temp + (size_));
+			}
+			
+      inline reverse_col_major_iterator rvecc(const int &n)
+			{
+				return reverse_col_major_iterator(*this).next_vec(n);
+			}
+			
+      inline const_reverse_col_major_iterator rbeginc() const
+			{
+				return const_reverse_col_major_iterator(*this);
+			}
+			
+      inline const_reverse_col_major_iterator rendc() const
+			{
+				const_reverse_col_major_iterator temp(*this);
+				return (temp + (size_));
+			}
+			
+      inline const_reverse_col_major_iterator rvecc(const int &n) const
+			{
+				return const_reverse_col_major_iterator(*this).next_vec(n);
+			}
 
     private:
       /**** Helper Functions ****/
       inline int ijIndex(const int &i, const int &j) const
-	{
-	  return (i * cols_ + j);
-	}
+			{
+				return (i * cols_ + j);
+			}
 				
-      inline int getAllocSize(const int &size) const
-	{
-	  if (size < 0) {
-	    throw scythe_alloc_error(__FILE__, __PRETTY_FUNCTION__,
-				     __LINE__, "Can't allocate Matrix of size < 0");
-	  } else if (size == 0) {
-	    return 1;
-	  } else if (size > alloc_) {
-	    int x = 1;
-	    while (size > x) {
-	      x *= 2;
-	    }
-	    return x;
-	  } else if (size < .25 * alloc_)
-	    return (alloc_ / 2);
-				
-	  return alloc_;
-	}
-			
       inline void resize2Match (const Matrix<T> &m)
-	{
-	  resize(m.size());
-	  rows_ = m.rows();
-	  cols_ = m.cols();
-	}
-		
-      inline void resize (const int &s)
-	{
-	  try {
-	    if (s > size())
-	      grow(s - size());
-	    else if (s < size())
-	      shrink(size() - s);
-	  } catch (scythe_alloc_error &sae) {
-	    throw;
-	  }
-	  // Ignore same size resizes
-	}
-		
-      inline void grow (const int &extra)
-	{
-	  alloc_ = getAllocSize(size() + extra);
-	  //data_ = (T *) realloc(data_, sizeof(T) * alloc_);
-	  T *temp = data_;
-	  data_ = new (std::nothrow) T[alloc_];
-				
-	  if (data_ == 0) {
-	    throw scythe_alloc_error(__FILE__, __PRETTY_FUNCTION__,
+			{
+				resize(m.size_, false);
+				rows_ = m.rows_;
+				cols_ = m.cols_;
+			}
+
+			inline void resize (const int &s, const bool &fill=true)
+			{
+				try {
+					if (s > alloc_)
+						grow(s, fill);
+					else if (s < .25 * alloc_)
+						shrink(fill);
+				} catch (scythe_alloc_error &sae) {
+					throw;
+				}
+				size_ = s;
+			}
+
+      inline void grow (const int &s, const bool &fill=true)
+			{
+				alloc_ = alloc_ ? alloc_ : 1;
+				while (alloc_ < s)
+					alloc_ <<= 1;
+
+				T *temp = data_;
+				data_ = new (std::nothrow) T[alloc_];
+			
+				if (data_ == 0) {
+					throw scythe_alloc_error(__FILE__, __PRETTY_FUNCTION__,
 				     __LINE__, "Failed to reallocate internal array");
-	  }
+				}
 				
-	  for (int i =0; i < rows_ * cols_; ++i)
-	    data_[i] = temp[i];
+				if (fill) {
+					for (int i =0; i < size_; ++i)
+						data_[i] = temp[i];
+				}
 				
-	  delete[] temp;
-	}
+				delete[] temp;
+			}
 		
-      inline void shrink (const int &difference)
-	{
-	  alloc_ = getAllocSize(size() - difference);
-	  //data_ = (T *) realloc(data_, sizeof(T) * alloc_);
-	  T *temp = data_;
-	  data_ = new (std::nothrow) T[alloc_];
+      inline void shrink (const bool &fill=true)
+			{
+				alloc_ >>= 1;
+				//data_ = (T *) realloc(data_, sizeof(T) * alloc_);
+				T *temp = data_;
+				data_ = new (std::nothrow) T[alloc_];
 				
-	  if (data_ == 0) {
-	    throw scythe_alloc_error(__FILE__, __PRETTY_FUNCTION__,
+				if (data_ == 0) {
+					throw scythe_alloc_error(__FILE__, __PRETTY_FUNCTION__,
 				     __LINE__, "Failed to reallocate internal array");
-	  }
+				}
 				
-	  for (int i =0; i < alloc_; ++i)
-	    data_[i] = temp[i];
+				if (fill) {
+					for (int i =0; i < alloc_; ++i)
+						data_[i] = temp[i];
+				}
 				
-	  delete[] temp;
-	}
+				delete[] temp;
+			}
 
       /**** Instance Variables ****/
       int rows_;				// # of rows
       int cols_;				// # of cols
+			int size_;				// rows_ * cols_
       int alloc_;				// Total allocated size
       T *data_;						// The actual elements of the Matrix
 
@@ -569,59 +641,59 @@ namespace SCYTHE {
    * deal purely with size)
    */
 	
-  template <class T>
-    bool operator== (const Matrix<T> &, const Matrix<T> &);
+	template <class T>
+	bool operator== (const Matrix<T> &, const Matrix<T> &);
 
   template<class T>
-    bool operator== (const Matrix<T> &, const typename Matrix<T>::ttype &);
+	bool operator== (const Matrix<T> &, const typename Matrix<T>::ttype &);
 
   template <class T>
-    bool operator== (const typename Matrix<T>::ttype &, const Matrix<T> &);
+	bool operator== (const typename Matrix<T>::ttype &, const Matrix<T> &);
 
   template <class T>
-    bool operator!= (const Matrix<T> &, const Matrix<T> &);
+	bool operator!= (const Matrix<T> &, const Matrix<T> &);
 
   template<class T>
-    bool operator!= (const Matrix<T> &, const typename Matrix<T>::ttype &);
+	bool operator!= (const Matrix<T> &, const typename Matrix<T>::ttype &);
 
   template <class T>
-    bool operator!= (const typename Matrix<T>::ttype &, const Matrix<T> &);
+ 	bool operator!= (const typename Matrix<T>::ttype &, const Matrix<T> &);
 			
   template <class T>
-    bool operator< (const Matrix<T> &, const Matrix<T> &);
+ 	bool operator< (const Matrix<T> &, const Matrix<T> &);
 	
   template<class T>
-    bool operator< (const Matrix<T> &, const typename Matrix<T>::ttype &);
+ 	bool operator< (const Matrix<T> &, const typename Matrix<T>::ttype &);
 
   template <class T>
-    bool operator< (const typename Matrix<T>::ttype &, const Matrix<T> &);
+ 	bool operator< (const typename Matrix<T>::ttype &, const Matrix<T> &);
 			
   template <class T>
-    bool operator> (const Matrix<T> &, const Matrix<T> &);
+	bool operator> (const Matrix<T> &, const Matrix<T> &);
 	
   template<class T>
-    bool operator> (const Matrix<T> &, const typename Matrix<T>::ttype &);
+	bool operator> (const Matrix<T> &, const typename Matrix<T>::ttype &);
 
   template <class T>
-    bool operator> (const typename Matrix<T>::ttype &, const Matrix<T> &);
+	bool operator> (const typename Matrix<T>::ttype &, const Matrix<T> &);
 			
   template <class T>
-    bool operator<= (const Matrix<T> &, const Matrix<T> &);
+	bool operator<= (const Matrix<T> &, const Matrix<T> &);
 	
   template<class T>
-    bool operator<= (const Matrix<T> &, const typename Matrix<T>::ttype &);
+	bool operator<= (const Matrix<T> &, const typename Matrix<T>::ttype &);
 
   template <class T>
-    bool operator<= (const typename Matrix<T>::ttype &, const Matrix<T> &);
+	bool operator<= (const typename Matrix<T>::ttype &, const Matrix<T> &);
 			
   template <class T>
-    bool operator>= (const Matrix<T> &, const Matrix<T> &);
+	bool operator>= (const Matrix<T> &, const Matrix<T> &);
 	
   template<class T>
-    bool operator>= (const Matrix<T> &, const typename Matrix<T>::ttype &);
+	bool operator>= (const Matrix<T> &, const typename Matrix<T>::ttype &);
 
   template <class T>
-    bool operator>= (const typename Matrix<T>::ttype &, const Matrix<T> &);
+	bool operator>= (const typename Matrix<T>::ttype &, const Matrix<T> &);
 		
   /* Element-by-element (in)equality operators: return Matrices
    * filled with 0s and 1s.  Ex: If we have A |= B, the matrix
@@ -631,124 +703,141 @@ namespace SCYTHE {
    * A.cols() == B.cols() && B.rows() == 1
    */
   template <class T>
-    Matrix<bool> operator|= (const Matrix<T> &, const Matrix<T> &);
+	Matrix<bool> operator|= (const Matrix<T> &, const Matrix<T> &);
 
   template <class T>
-    Matrix<bool> operator|= (const Matrix<T> &, const typename Matrix<T>::ttype &);
+	Matrix<bool> operator|= (	const Matrix<T> &,
+														const typename Matrix<T>::ttype &);
 	
   template <class T>
-    Matrix<bool> operator|= (const typename Matrix<T>::ttype &, const Matrix<T> &);
+	Matrix<bool> operator|= (	const typename Matrix<T>::ttype &,
+														const Matrix<T> &);
 	
   template <class T>
-    Matrix<bool> operator| (const Matrix<T> &, const Matrix<T> &);
+	Matrix<bool> operator| (const Matrix<T> &, const Matrix<T> &);
 	
   template <class T>
-    Matrix<bool> operator| (const Matrix<T> &, const typename Matrix<T>::ttype &);
+	Matrix<bool> operator| (const Matrix<T> &,
+													const typename Matrix<T>::ttype &);
 	
   template <class T>
-    Matrix<bool> operator| (const typename Matrix<T>::ttype &, const Matrix<T> &);
+	Matrix<bool> operator| (const typename Matrix<T>::ttype &,
+													const Matrix<T> &);
 	
   template <class T>
-    Matrix<bool> operator<< (const Matrix<T> &, const Matrix<T> &);
+	Matrix<bool> operator<< (const Matrix<T> &, const Matrix<T> &);
 	
   template <class T>
-    Matrix<bool> operator<< (const Matrix<T> &, const typename Matrix<T>::ttype &);
+	Matrix<bool> operator<< (const Matrix<T> &,
+													const typename Matrix<T>::ttype &);
 	
   template <class T>
-    Matrix<bool> operator<< (const typename Matrix<T>::ttype &, const Matrix<T> &);
+	Matrix<bool> operator<< (	const typename Matrix<T>::ttype &,
+														const Matrix<T> &);
 	
   template <class T>
-    Matrix<bool> operator>> (const Matrix<T> &, const Matrix<T> &);
+	Matrix<bool> operator>> (const Matrix<T> &, const Matrix<T> &);
 	
   template <class T>
-    Matrix<bool> operator>> (const Matrix<T> &, const typename Matrix<T>::ttype &);
+	Matrix<bool> operator>> (	const Matrix<T> &,
+														const typename Matrix<T>::ttype &);
 	
   template <class T>
-    Matrix<bool> operator>> (const typename Matrix<T>::ttype &, const Matrix<T> &);
+	Matrix<bool> operator>> (	const typename Matrix<T>::ttype &,
+														const Matrix<T> &);
 	
   template <class T>
-    Matrix<bool> operator<<= (const Matrix<T> &, const Matrix<T> &);
+	Matrix<bool> operator<<= (const Matrix<T> &, const Matrix<T> &);
 	
   template <class T>
-    Matrix<bool> operator<<=(const Matrix<T> &, const typename Matrix<T>::ttype &);
+	Matrix<bool> operator<<=(	const Matrix<T> &,
+														const typename Matrix<T>::ttype &);
 	
   template <class T>
-    Matrix<bool> operator<<=(const typename Matrix<T>::ttype &, const Matrix<T> &);
+	Matrix<bool> operator<<=(	const typename Matrix<T>::ttype &,
+														const Matrix<T> &);
 			
   template <class T>
-    Matrix<bool> operator>>= (const Matrix<T> &, const Matrix<T> &);
+	Matrix<bool> operator>>= (const Matrix<T> &, const Matrix<T> &);
 	
   template <class T>
-    Matrix<bool> operator>>=(const Matrix<T> &, const typename Matrix<T>::ttype &);
+	Matrix<bool> operator>>=(	const Matrix<T> &,
+														const typename Matrix<T>::ttype &);
 	
   template <class T>
-    Matrix<bool> operator>>=(const typename Matrix<T>::ttype &, const Matrix<T> &);
+	Matrix<bool> operator>>=(	const typename Matrix<T>::ttype &,
+														const Matrix<T> &);
 
   /**** Matrix arithmetic operators ****/
 
   /* Matrix addition */
   template <class T>
-    Matrix<T> operator+ (const Matrix<T> &, const Matrix<T> &);
+	Matrix<T> operator+ (const Matrix<T> &, const Matrix<T> &);
 	
   template <class T>
-    Matrix<T> operator+ (const Matrix<T> &, const typename Matrix<T>::ttype &);
+	Matrix<T> operator+ (	const Matrix<T> &,
+												const typename Matrix<T>::ttype &);
 	
   template <class T>
-    Matrix<T> operator+ (const typename Matrix<T>::ttype &, const Matrix<T> &);
+	Matrix<T> operator+ (	const typename Matrix<T>::ttype &,
+												const Matrix<T> &);
 
   /* Matrix subtraction */
   template <class T>
-    Matrix<T> operator- (Matrix<T>, const Matrix<T> &);
+	Matrix<T> operator- (Matrix<T>, const Matrix<T> &);
 	
   template <class T>
-    Matrix<T> operator- (Matrix<T>, const typename Matrix<T>::ttype &);
+	Matrix<T> operator- (Matrix<T>, const typename Matrix<T>::ttype &);
 	
   template <class T>
-    Matrix<T> operator- (const typename Matrix<T>::ttype &, const Matrix<T> &);
+	Matrix<T> operator- (	const typename Matrix<T>::ttype &,
+												const Matrix<T> &);
 		
   /* Negate all the elements in the matrix */
   template <class T>
-    Matrix<T> operator- (Matrix<T>);
+	Matrix<T> operator- (Matrix<T>);
 		
   /* Matrix Multiplication */
   template <class T>
-    Matrix<T> operator* (Matrix<T>, const Matrix<T> &);
+	Matrix<T> operator* (Matrix<T>, const Matrix<T> &);
 	
   template <class T>
-    Matrix<T> operator* (Matrix<T>, const typename Matrix<T>::ttype &);
+	Matrix<T> operator* (Matrix<T>, const typename Matrix<T>::ttype &);
 	
   template <class T>
-    Matrix<T> operator* (const typename Matrix<T>::ttype &, const Matrix<T> &);
+	Matrix<T> operator* (	const typename Matrix<T>::ttype &,
+												const Matrix<T> &);
 		
   /* Kronecker Multiplication */
   template <class T>
-    Matrix<T> operator% (Matrix<T>, const Matrix<T> &);
+	Matrix<T> operator% (Matrix<T>, const Matrix<T> &);
 	
   template <class T>
-    Matrix<T> operator% (Matrix<T>, const typename Matrix<T>::ttype &);
+	Matrix<T> operator% (Matrix<T>, const typename Matrix<T>::ttype &);
 	
   template <class T>
-    Matrix<T> operator% (const typename Matrix<T>::ttype &, const Matrix<T> &);
+	Matrix<T> operator% (	const typename Matrix<T>::ttype &,
+												const Matrix<T> &);
 		
   /* Element-by-element division */
   template <class T>
-    Matrix<T> operator/ (Matrix<T>, const Matrix<T> &);
+	Matrix<T> operator/ (Matrix<T>, const Matrix<T> &);
 		
   /* Matrix power: ^0 returns identity matrix of this size, ^-1
    * returns inverse, otherwise must be a positive int
    */
   template <class T>
-    Matrix<T> operator^ (Matrix<T>, const int &);
+	Matrix<T> operator^ (Matrix<T>, const int &);
 		
   /* Return the transpose of this matrix */
   template <class T>
-    Matrix<T> operator! (const Matrix<T> &);
+	Matrix<T> operator! (const Matrix<T> &);
 		
   /* Return the determinant of a SQUARE matrix vi LU decomposition*/
   template <class T>
-    T operator~ (Matrix<T>);
-		
+	T operator~ (Matrix<T>);
 
+		
 }	// end namespace SCYTHE
 #if defined (__GNUG__) || defined (__MWERKS__) || defined (_MSC_VER) || \
     defined (EXPLICIT_TEMPLATE_INSTANTIATION)
@@ -757,3 +846,4 @@ namespace SCYTHE {
 #endif  /* EXPLICIT_TEMPLATE_INSTANTIATION */
 
 #endif /* SCYTHE_MATRIX_H */
+

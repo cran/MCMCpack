@@ -66,11 +66,11 @@ namespace SCYTHE {
   template <class T>
   Matrix<T>::Matrix ()
     :	rows_ (0),
-	cols_ (0),
-	alloc_ (0),
-	data_ (0)
+			cols_ (0),
+			size_ (0),
+			alloc_ (0),
+			data_ (0)
   {
-    //data_ = (T*) malloc(sizeof(T) * alloc_);
     data_ = new (std::nothrow) T[alloc_];
     if (data_ == 0) {
       throw scythe_alloc_error(__FILE__, __PRETTY_FUNCTION__,
@@ -82,12 +82,11 @@ namespace SCYTHE {
   template <class T>
   Matrix<T>::Matrix (const T &e)
     :	rows_ (1),
-	cols_ (1),
-	alloc_ (0),
-	data_ (0)
+			cols_ (1),
+			size_ (1),
+			alloc_ (1),
+			data_ (0)
   {
-    alloc_ = getAllocSize(1);
-    //data_ = (T*) malloc(sizeof(T) * alloc_);
     data_ = new (std::nothrow) T[alloc_];
     if (data_ == 0) {
       throw scythe_alloc_error(__FILE__, __PRETTY_FUNCTION__,
@@ -97,27 +96,28 @@ namespace SCYTHE {
   }
 
   /* Standard Constructor */
-  template <class T>
-  Matrix<T>::Matrix (const int &n, const int &m, const bool &fill,
-		     const T &fill_value)
-    :	rows_ (n),
-	cols_ (m),
-	alloc_ (0),
-	data_ (0)
-  {
-    alloc_ = getAllocSize(n * m);
-    //data_ = (T*) malloc(sizeof(T) * alloc_);
+	template <class T>
+	Matrix<T>::Matrix ( const int &n, const int &m, const bool &fill,
+											const T &fill_value)
+		:	rows_ (n),
+			cols_ (m),
+			size_ (n * m),
+			alloc_ (1),
+			data_ (0)
+	{
+		while (alloc_ < size_)
+			alloc_ <<= 1;
     data_ = new (std::nothrow) T[alloc_];
     if (data_ == 0) {
       throw scythe_alloc_error(__FILE__, __PRETTY_FUNCTION__,
-			       __LINE__,
-			       std::string("Error allocating Matrix of size ")&(n * m));
-    } else if (fill) {
-      for (int i = 0; i < alloc_; ++i) {
-	data_[i] = fill_value;
-      }
-    }
-  }
+			       __LINE__, "Failure allocating Matrix of size 1");
+		}
+
+		if (fill) {
+			for (register int i = 0; i < alloc_; ++i)
+				data_[i] = fill_value;
+		}
+	}
 
   /* Array Constructor */
   template <class T>
@@ -125,11 +125,11 @@ namespace SCYTHE {
 		     IN_TYPE type, const int &a, const int &b,
 		     const int &c, const int &d)
     :	rows_ (n),
-	cols_ (m),
-	alloc_ (0),
-	data_ (0)
+			cols_ (m),
+			size_ (n * m),
+			alloc_ (1),
+			data_ (0)
   {
-    alloc_ = getAllocSize(n * m);
     /* This constructor is an interface weakness.  There is no easy
      * way to ensure that the array is of the length required.
      * Incorrect arrays may cause a seg fault.  Worse yet, if the
@@ -138,76 +138,73 @@ namespace SCYTHE {
      * constructor has far higher utility than any other.  We should
      * consider switching to a safe array type in the future.
      */
-    //data_ = (T*) malloc(sizeof(T) * alloc_);
+		while (alloc_ < size_)
+			alloc_ <<= 1;
     data_ = new (std::nothrow) T[alloc_];
     if (data_ == 0) {
       throw scythe_alloc_error(__FILE__, __PRETTY_FUNCTION__, __LINE__, 
-			       std::string("Failure allocating Matrix of size ") & (n * m));
+			       std::string("Failure allocating Matrix of size ") & 
+						 	(n * m));
     } else if (type == NORMAL) {
-      for (int i = 0; i < rows_; ++i) {
-	for (int j = 0; j < cols_; ++j) {
-	  data_[ijIndex(i, j)] = in[ijIndex(i, j)];
-	}
-      }
+			for (register int i = 0; i < size_; ++i)
+					data_[i] = in[i];
     } else if (type == REPEAT) {
       if (a <= 0 || a > n * m) {
-	throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__,
-				 __LINE__, "REPEAT requires a s.t. 0 < a <= n * m ");
+				throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__,
+						__LINE__, "REPEAT requires a s.t. 0 < a <= n * m ");
       } else {
-	int cnt = 0;
-	for (int i = 0; i < rows_; ++i) {
-	  for (int j = 0; j < cols_; ++j) {
-	    if (cnt == a)
-	      cnt = 0;
-	    data_[ijIndex(i, j)] = in[cnt++];
-	  }
-	}
-      }
+				int cnt = -1;
+				for (register int i = 0; i < size_; ++i) {
+					if (cnt == a - 1)
+						cnt = -1;
+					data_[i] = in[++cnt];
+				}
+			}
     } else if (type == DIAG) {
-      int cnt = 0;
-      for (int i = 0; i < rows_; ++i) {
-	for (int j = 0; j < cols_; ++j) {
-	  if (i == j)
-	    data_[ijIndex(i, j)] = in[cnt++];
-	  else
-	    data_[ijIndex(i, j)] = 0;
-	}
+      int cnt = -1;
+      for (register int i = 0; i < rows_; ++i) {
+				for (register int j = 0; j < cols_; ++j) {
+					if (i == j)
+						data_[i * cols_ + j] = in[++cnt];
+					else
+						data_[i * cols_ + j] = 0;
+				}
       }
     } else if (type == UTRIANG) {
-      int cnt = 0;
-      for (int i = 0; i < rows_; ++i) {
-	for (int j = 0; j < cols_; ++j) {
-	  if (i <= j)
-	    data_[ijIndex(i, j)] = in[cnt++];
-	  else
-	    data_[ijIndex(i, j)] = 0;
-	}
+      int cnt = -1;
+      for (register int i = 0; i < rows_; ++i) {
+				for (register int j = 0; j < cols_; ++j) {
+					if (i <= j)
+						data_[i * cols_ + j] = in[++cnt];
+					else
+						data_[i * cols_ + j] = 0;
+				}
       }
     } else if (type == LTRIANG) {
-      int cnt = 0;
-      for (int i = 0; i < rows_; ++i) {
-	for (int j = 0; j < cols_; ++j) {
-	  if (i >= j) 
-	    data_[ijIndex(i, j)] = in[cnt++];
-	  else
-	    data_[ijIndex(i, j)] = 0;
-	}
+      int cnt = -1;
+      for (register int i = 0; i < rows_; ++i) {
+				for (register int j = 0; j < cols_; ++j) {
+					if (i >= j) 
+						data_[i * cols_ + j] = in[++cnt];
+					else
+						data_[i * cols_ + j] = 0;
+				}
       }
     } else if (type == BLOCK) {
       if (a < 0 || b < 0 || c < a || d < b || c >= n || d >= m) {
-	throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__,
-				 __LINE__,"BLOCK requires (a, b, c, d) s.t. 0 <= a <= c < n; \
-0 <= b <= d < m");
+				throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__,
+				 	__LINE__,"BLOCK requires (a, b, c, d) s.t. 0 <= a <= c < n; \
+					0 <= b <= d < m");
       } else {
-	int cnt = 0;
-	for (int i = 0; i < rows_; ++i) {
-	  for (int j = 0; j < cols_; ++j) {
-	    if (i >= a && i <= c && j >= b && j <= d)
-	      data_[ijIndex(i, j)] = in[cnt++];
-	    else
-	      data_[ijIndex(i, j)] = 0;
-	  }
-	}
+				int cnt = -1;
+				for (int i = 0; i < rows_; ++i) {
+					for (int j = 0; j < cols_; ++j) {
+						if (i >= a && i <= c && j >= b && j <= d)
+							data_[i * cols_ + j] = in[++cnt];
+						else
+							data_[i * cols_ + j] = 0;
+					}
+				}
       }		
     } else { // undefined IN_TYPE 
       throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__,
@@ -219,9 +216,10 @@ namespace SCYTHE {
   template <class T>
   Matrix<T>::Matrix(const std::string &path)
     :	rows_ (0),
-	cols_ (0),
-	alloc_(0),
-	data_ (0)
+			cols_ (0),
+			size_ (0),
+			alloc_(1),
+			data_ (0)
   {
     std::ifstream file(path.c_str());
     if (! file) {
@@ -229,28 +227,29 @@ namespace SCYTHE {
 			      std::string("Could not open ") & path);
     } else {
       file >> rows_ >> cols_;
+			size_ = rows_ * cols_;
       if (file.eof() || rows_ <= 0 || cols_ <= 0) {
-	throw scythe_file_error(__FILE__, __PRETTY_FUNCTION__, __LINE__,
-				"Bad file format");
+				throw scythe_file_error(__FILE__, __PRETTY_FUNCTION__, __LINE__,
+						"Bad file format");
       } else {
-	alloc_ = getAllocSize(rows_ * cols_);
-	//data_ = (T*) malloc(sizeof(T) * alloc_);
-	data_ = new (std::nothrow) T[alloc_];
-	if (data_ == 0) {
-	  throw scythe_alloc_error(__FILE__, __PRETTY_FUNCTION__,
-				   __LINE__,
-				   std::string("Failure allocating Matrix of size ")
-				   & size());
-	} else {
-	  for (int i = 0; i < size(); ++i) {
-	    if (file.eof())
-	      throw scythe_file_error(__FILE__, __PRETTY_FUNCTION__,
-				      __LINE__, std::string("Reached end of file before ")
-				      & size() & " values were read");
+				while (alloc_ < size_)
+					alloc_ <<= 1;
+				data_ = new (std::nothrow) T[alloc_];
+				if (data_ == 0) {
+					throw scythe_alloc_error(__FILE__, __PRETTY_FUNCTION__,
+							__LINE__,
+							std::string("Failure allocating Matrix of size ")
+							& size_);
+				} else {
+					for (int i = 0; i < size_; ++i) {
+						if (file.eof())
+							throw scythe_file_error(__FILE__, __PRETTY_FUNCTION__,
+									__LINE__, std::string("Reached end of file before ")
+									& size_ & " values were read");
 
-	    file >> data_[i];
-	  }
-	}
+							file >> data_[i];
+						}
+				}
       }
       file.close();
     }
@@ -258,20 +257,20 @@ namespace SCYTHE {
 
   /* Copy constructor */
   template <class T>
-  Matrix<T>::Matrix (const Matrix<T> &m)
+  Matrix<T>::Matrix (const Matrix<T> &m, const bool &fill)
     :	rows_ (m.rows_),
-	cols_ (m.cols_),
-	alloc_ (m.alloc_),
-	data_ (0)
+			cols_ (m.cols_),
+			size_ (m.size_),
+			alloc_ (m.alloc_),
+			data_ (0)
   {
-    //data_ = (T *) malloc(sizeof(T) * alloc_);
     data_ = new (std::nothrow) T[alloc_];
     if (data_ == 0) {
       throw scythe_alloc_error(__FILE__, __PRETTY_FUNCTION__, __LINE__,
-			       std::string("Failure allocating Matrix of size ") & size());
-    } else {
-      for (int i = 0; i < size(); ++i) {
-	data_[i] = m.data_[i];
+			      std::string("Failure allocating Matrix of size ") & size_);
+    } else if (fill) {
+      for (int i = 0; i < size_; ++i) {
+				data_[i] = m.data_[i];
       }
     }
   }
@@ -280,20 +279,21 @@ namespace SCYTHE {
   template <class S>
   Matrix<T>::Matrix (const Matrix<S> &m)
     :	rows_ (m.rows()),
-	cols_ (m.cols()),
-	alloc_ (0),
-	data_ (0)
+			cols_ (m.cols()),
+			size_ (m.size()),
+			alloc_ (1),
+			data_ (0)
   {
-    //data_ = (T *) malloc(sizeof(T) * alloc_);
-    alloc_ = getAllocSize(rows_ * cols_);
+		while (alloc_ < size_)
+			alloc_ <<= 1;
     data_ = new (std::nothrow) T[alloc_];
     if (data_ == 0) {
       throw scythe_alloc_error(__FILE__, __PRETTY_FUNCTION__, __LINE__,
-			       std::string("Failure allocating Matrix of size ") & size());
+			    std::string("Failure allocating Matrix of size ") & size_);
     } else {
       S *mdata = m.getArray();
-      for (int i = 0; i < size(); ++i) {
-	data_[i] = (T) mdata[i];
+      for (int i = 0; i < size_; ++i) {
+				data_[i] = (T) mdata[i];
       }
     }
   }
@@ -302,9 +302,32 @@ namespace SCYTHE {
   template <class T>
   Matrix<T>::~Matrix ()
   {
-    //free(data_);
     delete[] data_;
   }
+
+	/* swap two matrices' internals */
+	template <class T>
+	void
+	Matrix<T>::swap (Matrix<T> &M)
+	{
+		int trows = rows_;
+		int tcols = cols_;
+		int tsize = size_;
+		int talloc = alloc_;
+		T *tdata = data_;
+
+		rows_ = M.rows_;
+		cols_ = M.cols_;
+		size_ = M.size_;
+		alloc_ = M.alloc_;
+		data_ = M.data_;
+
+		M.rows_ = trows;
+		M.cols_ = tcols;
+		M.size_ = tsize;
+		M.alloc_ = talloc;
+		M.data_ = tdata;
+	}
 	
   /* Submatrix operator */
   template <class T>
@@ -312,61 +335,65 @@ namespace SCYTHE {
   Matrix<T>::operator() (const int &a, const int &b, const int &c,
 			 const int &d) const
   {
+#ifndef SCYTHE_NO_RANGE
     if (c < a || d < b || !inRange(a,b) || !inRange(c,d)) {
       throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__, __LINE__,
 			       "() requires (a, b, c, d) s.t. 0 <= a <= c < rows_; \
 0 <= b <= d < cols");
       return Matrix((c - a + 1), (d - b + 1));
     }
-    int cnt = 0;
-		Matrix<T> temp = Matrix<T>((c - a + 1), (d - b + 1), false);
-    for (int i = a; i <= c; ++i) {
-      for (int j = b; j <= d; ++j) {
-				temp[cnt++] = data_[ijIndex(i, j)];
-      }
-    }
-    return temp;
+#endif
+
+    int cnt = -1;
+
+		Matrix<T> temp((c - a + 1), (d - b + 1), false);
+		for (int i = a; i <= c; ++i)
+			for (int j = b; j <= d; ++j)
+				temp.data_[++cnt] = data_[i * cols_ + j];
+    
+		return temp;
   }
 
   /* all rows extraction with _ struct */
   template <class T>
   Matrix<T>
-  Matrix<T>::operator() (const all_elements& a, const int& j){
+  Matrix<T>::operator() (const all_elements& a, const int& j) const
+	{
+#ifndef SCYTHE_NO_RANGE
     if (j >= cols_ || j < 0) {
       throw scythe_out_of_range_error (__FILE__,__PRETTY_FUNCTION__,
 				       __LINE__, std::string("Index ") & j &
 				       " out of range");
     }
-    
-    int newcolsize = 1;
-    int newrowsize = rows_;
-
-		Matrix<T> temp = Matrix<T>(newrowsize, newcolsize, false);
-    for (int i=0; i<newrowsize; ++i){
-      temp[i] = data_[ijIndex(i,j)];
+#endif
+		//XXX
+		Matrix<T> temp(rows_, 1, false);
+		int k = j;
+    for (register int i=0; i<rows_; ++i){
+      temp.data_[i] = data_[k];
+			k += cols_;
     }
     
     return temp;
   }
   
-
-
   /* all cols extraction with _ struct */
   template <class T>
   Matrix<T>
-  Matrix<T>::operator() (const int& i, const all_elements& a){
+  Matrix<T>::operator() (const int& i, const all_elements& a) const
+	{
+#ifndef SCYTHE_NO_RANGE
     if (i >= rows_ || i < 0) {
       throw scythe_out_of_range_error (__FILE__,__PRETTY_FUNCTION__,
 				       __LINE__, std::string("Index ") & i &
 				       " out of range");
     }
-    
-    int newcolsize = cols_;
-    int newrowsize = 1;
-
-		Matrix<T> temp = Matrix<T>(newrowsize, newcolsize, false);
-    for (int j=0; j<newcolsize; ++j){
-      temp[j] = data_[ijIndex(i,j)];
+#endif
+    //XXX
+    Matrix<T> temp(1, cols_, false);
+		int k = i * cols_ - 1;
+		for (register int j=0; j<cols_; ++j){
+      temp.data_[j] = data_[++k];
     }
     
     return temp;
@@ -381,7 +408,7 @@ namespace SCYTHE {
   &Matrix<T>::operator= (const Matrix<T> &m)
   {
     resize2Match(m);
-    for (int i = 0; i < size(); ++i)
+    for (register int i = 0; i < size_; ++i)
       data_[i] = m.data_[i];
     return *this;
   }
@@ -391,9 +418,9 @@ namespace SCYTHE {
   Matrix<T>
   &Matrix<T>::operator= (const Matrix<S> &m)
   {
-    resize(m.rows(), m.cols());
+    resize(m.rows(), m.cols(), false);
     S *mdata = m.getArray();
-    for (int i = 0; i < size(); ++i)
+    for (register int i = 0; i < size_; ++i)
       data_[i] = (T) mdata[i];
     return *this;
   }
@@ -403,20 +430,20 @@ namespace SCYTHE {
   Matrix<T>
   &Matrix<T>::operator+= (const Matrix<T> &m)
   {
-    if (isScalar()) {
+    if (size_ == 1) {
       // Case 1: 1X1 += nXm
       T temp = data_[0];
       resize2Match(m);
-      for (int i = 0; i < size(); ++i) 
-	data_[i] = temp + m.data_[i];
-    } else if (m.isScalar()) {
+      for (int i = 0; i < size_; ++i) 
+				data_[i] = temp + m.data_[i];
+    } else if (m.size_ == 1) {
       // Case 2: nXm += 1X1
-      for (int i = 0; i < size(); ++i)
-	data_[i] += m.data_[0];
+      for (int i = 0; i < size_; ++i)
+				data_[i] += m.data_[0];
     } else if (rows_ == m.rows_ && cols_ == m.cols_) {
       // Case 3: nXm += nXm
-      for (int i = 0; i < size(); ++i)
-	data_[i] += m.data_[i];
+      for (int i = 0; i < size_; ++i)
+				data_[i] += m.data_[i];
     } else { // error
       throw scythe_conformation_error(__FILE__, __PRETTY_FUNCTION__,
 				      __LINE__, "Matrices are not addition conformable");
@@ -429,19 +456,19 @@ namespace SCYTHE {
   Matrix<T>
   &Matrix<T>::operator-= (const Matrix<T> &m)
   {
-    if (isScalar()) {
+    if (size_ == 1) {
       // Case 1: 1X1 -= nXm
       T temp = data_[0];
       resize2Match(m);
-      for (int i = 0; i < size(); ++i)
+      for (int i = 0; i < size_; ++i)
 	data_[i] = temp - m.data_[i];
-    } else if (m.isScalar()) {
+    } else if (m.size_ == 1) {
       // Case 2: nXm -= 1X1
-      for (int i = 0; i < size(); ++i)
+      for (int i = 0; i < size_; ++i)
 	data_[i] -= m.data_[0];
     } else if (rows_ == m.rows_ && cols_ == m.cols_) {
       // Case 3: nXm -= nXm
-      for (int i = 0; i < size(); ++i)
+      for (int i = 0; i < size_; ++i)
 	data_[i] -= m.data_[i];
     } else { // error
       throw scythe_conformation_error(__FILE__, __PRETTY_FUNCTION__,
@@ -455,75 +482,77 @@ namespace SCYTHE {
   Matrix<T>
   &Matrix<T>::operator*= (const Matrix<T> &m)
   {
-		if (rows_ == 1 && cols_ == 1) {
+		if (size_ == 1) {
 			// Case 1: 1X1 *= nXm
 			T temp = data_[0];
 			resize2Match(m);
-			for (int i = 0; i  < size(); ++i)
+			for (int i = 0; i  < size_; ++i)
 				data_[i] = temp * m.data_[i];
-		} else if (m.rows_ == 1 && m.cols_ == 1) {
+		} else if (m.size_ == 1) {
 			// Case 2: nXm *= 1X1
-			for (int i = 0; i < size(); ++i)
+			for (int i = 0; i < size_; ++i)
 				data_[i] *= m.data_[0];
 		} else if (cols_ == m.rows_) {
 			// Case 4: nXm *= mXk
-			alloc_ = getAllocSize(rows_ * m.cols_);
+			alloc_ = 1;
+			while (alloc_ < size_)
+				alloc_ <<= 1;
 			T* temp = new (std::nothrow) T[alloc_];
 			if (temp == 0) {
-				throw scythe_alloc_error(__FILE__,__PRETTY_FUNCTION__,
-				__LINE__, "Failure allocating space for multiplication");
+				throw scythe_alloc_error(__FILE__,__PRETTY_FUNCTION__, __LINE__,
+						"Failure allocating space for multiplication");
 				return *this;
 			}
-      
-			/*
-	for (int i = 0; i < rows_; ++i) {
-	for (int j = 0; j < m.cols_; ++j) {
-	temp[i * m.cols_ + j] = (T) 0;
-	for (int k = 0; k < m.rows_; ++k) {
-	temp[i * m.cols_ + j] += data_[i * cols_ + k] *
-	m.data_[k * m.cols_ + j];
-	}
-	}
-	}
-      */
-      
-			const_col_major_iterator cmi = m.beginc();
-			for (int i = 0; i < rows_; ++i) {
-				for (int j = 0; j < m.cols_; ++j) {
-					temp[i * m.cols_ + j] = inner_product(&data_[i * cols_], 
-					&data_[i * cols_ + m.rows_], cmi + (m.rows_ * j), (T) 0);
+			for (register int i = 0; i < rows_; ++i) {
+				for (register int j = 0; j < m.cols_; ++j) {
+					temp[i * m.cols_ + j] = (T) 0;
+					for (register int k = 0; k < m.rows_; ++k) {
+						temp[i * m.cols_ + j] += data_[i * cols_ + k] *
+							m.data_[k * m.cols_ + j];
+					}
 				}
 			}
-			
-			cols_ = m.cols_;
-			delete[] data_;
-			data_ = temp;
-		} else { // error
-			throw scythe_conformation_error(__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Matrices are not multiplication conformable");
-		}
-		
-		return *this;
+      /*
+      const_col_major_iterator cmi = m.beginc();
+      for (int i = 0; i < rows_; ++i) {
+	for (int j = 0; j < m.cols_; ++j) {
+	  temp[i * m.cols_ + j] = inner_product(&data_[i * cols_], 
+						&data_[i * cols_ + m.rows_], cmi + (m.rows_ * j), (T) 0);
 	}
+      }
+			*/
+			
+      cols_ = m.cols_;
+			size_ = rows_;
+			size_ *= cols_;
+      delete[] data_;
+      data_ = temp;
+    } else { // error
+      throw scythe_conformation_error(__FILE__, __PRETTY_FUNCTION__,
+				      __LINE__, "Matrices are not multiplication conformable");
+    }
+    return *this;
+  }
 	
   /* Kronecker Multiplication/assignment operator */
   template <class T>
   Matrix<T>
   &Matrix<T>::operator%= (const Matrix<T> &m)
   {
-    grow(size() * m.size());
-    int cnt = size() * m.size()                                                    - 1;
+    grow(size_ * m.size_);
+    int cnt = size_ * m.size_  - 1;
     for (int i = rows_ - 1; i >= 0; --i) {
       for (int j = m.rows_ - 1; j >= 0; --j) {
-	for (int k = cols_ - 1; k >= 0; --k) {
-	  for (int n = m.cols_ - 1; n >= 0; --n)
-	    data_[cnt--] = data_[i * cols_ + k] *
-	      m.data_[j * m.cols_ + n];
-	}
+				for (int k = cols_ - 1; k >= 0; --k) {
+					for (int n = m.cols_ - 1; n >= 0; --n)
+						data_[cnt--] = data_[i * cols_ + k] *
+						m.data_[j * m.cols_ + n];
+				}
       }
     }
     rows_ *= m.rows_;
     cols_ *= m.cols_;
+		size_ = rows_ * cols_;
     return *this;
   }
 			
@@ -532,16 +561,16 @@ namespace SCYTHE {
   Matrix<T>
   &Matrix<T>::operator/= (const Matrix<T> &m)
   {
-    if (isScalar()) {
+    if (size_ == 1) {
       T temp = data_[0];
       resize2Match(m);
-      for (int i = 0; i < size(); ++i)
+      for (int i = 0; i < size_; ++i)
 	data_[i] = temp / m.data_[i];
-    } else if (m.isScalar()) {
-      for (int i = 0; i < size(); ++i)
+    } else if (m.size_ == 1) {
+      for (int i = 0; i < size_; ++i)
 	data_[i] /= m.data_[0];
     } else if (rows_ == m.rows_ && cols_ == m.cols_) {
-      for (int i = 0; i < size(); ++i)
+      for (int i = 0; i < size_; ++i)
 	data_[i] /= m.data_[i];
     } else { // error
       throw scythe_conformation_error (__FILE__, __PRETTY_FUNCTION__,
@@ -565,16 +594,16 @@ namespace SCYTHE {
       }
       Matrix<T> temp = *this;
       for (int i = 1; i < e; ++i)
-	*(this) *= temp;
+				*(this) *= temp;
     } else if (e == 0) {
       // Case 3: A^0 == identity matrix of this size
       for (int i = 0; i < rows_; ++i) {
-	for (int j = 0; j < cols_; ++j) {
-	  if (i == j)
-	    data_[ijIndex(i, j)] = 1.0;
-	  else
-	    data_[ijIndex(i, j)] = 0.0;
-	}
+				for (int j = 0; j < cols_; ++j) {
+					if (i == j)
+						data_[ijIndex(i, j)] = 1.0;
+					else
+						data_[ijIndex(i, j)] = 0.0;
+				}
       }
     } else if (e == -1) { 
       // Case 3: A^-1 == inverse of this
@@ -588,24 +617,24 @@ namespace SCYTHE {
 				__LINE__);
 	return *this;
       }
-      Matrix<T> b = Matrix<T>(rows_, 1);
+      Matrix<T> b(rows_, 1);
       Matrix<T> A = *(this);
       Matrix<T> L, U, perm_vec;
 
       // step 1: compute the LU factorization
-      if (A.rows() == 1) {
+      if (A.rows_ == 1) {
 	L = Matrix<T>(1);
 	U = *(this);
 	perm_vec = Matrix<T>(1,1);
       } else {
 	int pivot;
-	L = U = Matrix<T>(A.rows(), A.rows());
-	perm_vec = Matrix<T>(A.rows() - 1, 1);
+	L = U = Matrix<T>(A.rows_, A.rows_);
+	perm_vec = Matrix<T>(A.rows_ - 1, 1);
 
-	for (int k = 0; k < A.rows() - 1; ++k) {
+	for (int k = 0; k < A.rows_ - 1; ++k) {
 	  pivot = k;
 	  // find pivot
-	  for (int i = k; i < A.rows(); ++i) {
+	  for (int i = k; i < A.rows_; ++i) {
 	    if (::fabs(A(pivot,k)) < ::fabs(A(i, k)))
 	      pivot = i;
 	  }
@@ -617,7 +646,7 @@ namespace SCYTHE {
 	  }
 	  // permute
 	  if (k != pivot) {
-	    for (int i = 0; i < A.rows(); ++i) {
+	    for (int i = 0; i < A.rows_; ++i) {
 	      T temp = A(pivot, i);
 	      A(pivot,i) = A(k,i);
 	      A(k,i) = temp;
@@ -625,16 +654,16 @@ namespace SCYTHE {
 	  }
 	  perm_vec[k] = pivot;
 
-	  for (int i = k + 1; i < A.rows(); ++i) {
+	  for (int i = k + 1; i < A.rows_; ++i) {
 	    A(i,k) = A(i,k) / A(k,k);
-	    for (int j = k + 1; j < A.rows(); ++j)
+	    for (int j = k + 1; j < A.rows_; ++j)
 	      A(i,j) = A(i,j) - A(i,k) * A(k,j);
 	  }
 	}
 
 	L = A;
-	for (int i = 0; i < A.rows(); ++i) {
-	  for (int j = i; j < A.rows(); ++j) {
+	for (int i = 0; i < A.rows_; ++i) {
+	  for (int j = i; j < A.rows_; ++j) {
 	    U(i,j) = A(i,j);
 	    L(i,j) = 0;
 	    L(i,i) = 1;
@@ -643,23 +672,23 @@ namespace SCYTHE {
       }
 
       // step 2: repeated solving of A*hold = b
-      for (int j = 0; j < A.rows(); ++j) {
+      for (int j = 0; j < A.rows_; ++j) {
 	b[j] = 1;
-	// Matrix hold = lu_solve(A, b, L, U, p);
+				// Matrix hold = lu_solve(A, b, L, U, p);
 				
-	// step 2.1: solve L*y = Pb via forward substitution
-	// Do a row interchange
+				// step 2.1: solve L*y = Pb via forward substitution
+				// Do a row interchange
 	Matrix<T> bb = b;
-	for (int ci = 0; ci < b.rows() - 1; ++ci) {
+	for (int ci = 0; ci < b.rows_ - 1; ++ci) {
 	  int swap_row = static_cast<int>(perm_vec[ci]);
-	  for (int cj = 0; cj < b.cols(); ++cj) {
+	  for (int cj = 0; cj < b.cols_; ++cj) {
 	    T temp = bb(ci,cj);
 	    bb(ci,cj) = b(swap_row,cj);
 	    b(swap_row,cj) = temp;
 	  }
 	}
-	Matrix<T> y = Matrix<T>(A.rows(), 1);
-	for (int i = 0; i < A.rows(); ++i) {
+	Matrix<T> y(A.rows_, 1);
+	for (int i = 0; i < A.rows_; ++i) {
 	  T sum = 0;
 	  for (int j = 0; j < i; ++j) {
 	    sum += L(i,j) * y[j];
@@ -667,19 +696,19 @@ namespace SCYTHE {
 	  y[i] = (bb[i] - sum) / L(i,i);
 	}
 
-	// step 2.2: solve U*x = y via backsubstitution
-	Matrix<T> x = Matrix<T>(A.rows(),1);
-	for (int i = A.rows() - 1; i >= 0; --i) {
+				// step 2.2: solve U*x = y via backsubstitution
+	Matrix<T> x(A.rows_,1);
+	for (int i = A.rows_ - 1; i >= 0; --i) {
 	  T sum = 0;
-	  for (int j = i + 1; j < A.rows(); ++j) {
+	  for (int j = i + 1; j < A.rows_; ++j) {
 	    sum += U(i,j) * x[j];
 	  }
 	  x[i] = (y[i] - sum) / U(i,i);
 	}
 
-	// step 3: reset b and put the solution into this
+				// step 3: reset b and put the solution into this
 	b[j] = 0;
-	for (int k = 0; k < A.rows(); ++k)
+	for (int k = 0; k < A.rows_; ++k)
 	  (*this)(k,j) = x[k];
       }
     } else { // error A^=n not defined where n < -1
@@ -811,12 +840,12 @@ namespace SCYTHE {
 		
     s.str("");
     if (dim) {
-      s << "Size: " << size() << " (" << rows_ << " x " << cols_
-	<< ")" << endl;
+      s << "Size: " << size_ << " (" << rows_ << " x " << cols_
+	<< ")" << std::endl;
     }
     if (internal) {
       s << "Object: " << this << ", Data: " << data_
-	<< ", Allocation: " << alloc_ << endl;
+	<< ", Allocation: " << alloc_ << std::endl;
     }
 
     for (int i = 0; i < rows_; ++i) {
@@ -826,7 +855,7 @@ namespace SCYTHE {
 	if (i < rows_ - 1 || j < cols_ - 1)
 	  s << " ";
       }
-      s << endl;
+      s << std::endl;
     }
     return s.str();
   }
@@ -868,11 +897,11 @@ namespace SCYTHE {
 	out << std::setw(width) << std::setprecision(prec) <<  " "
 	    << data_[i];
       }
-      out << endl;
+      out << std::endl;
     } else {
       out << toString(prec,width);
     }
-    out << endl;
+    out << std::endl;
     out.close();
   }
 
@@ -1027,7 +1056,7 @@ namespace SCYTHE {
   Matrix<bool>
   operator|= (const Matrix<T> &A, const Matrix<T> &B)
   {
-    Matrix<bool> C = Matrix<bool>(A.rows(), A.cols(), false);
+    Matrix<bool> C(A.rows(), A.cols(), false);
     if (A.isNull() || B.isNull()) {
       throw scythe_null_error(__FILE__, __PRETTY_FUNCTION__, __LINE__,
 			      "Invalid use of NULL Matrix");
@@ -1078,7 +1107,7 @@ namespace SCYTHE {
   Matrix<bool>
   operator| (const Matrix<T> &A, const Matrix<T> &B)
   {
-    Matrix<bool> C = Matrix<bool>(A.rows(), A.cols(), false);
+    Matrix<bool> C(A.rows(), A.cols(), false);
     if (A.isNull() || B.isNull()) {
       throw scythe_null_error(__FILE__, __PRETTY_FUNCTION__, __LINE__,
 			      "Invalid use of NULL Matrix");
@@ -1129,7 +1158,7 @@ namespace SCYTHE {
   Matrix<bool>
   operator<< (const Matrix<T> &A, const Matrix<T> &B)
   {
-    Matrix<bool> C = Matrix<bool>(A.rows(), A.cols(), false);
+    Matrix<bool> C(A.rows(), A.cols(), false);
     if (A.isNull() || B.isNull()) {
       throw scythe_null_error(__FILE__, __PRETTY_FUNCTION__, __LINE__,
 			      "Invalid use of NULL Matrix");
@@ -1180,7 +1209,7 @@ namespace SCYTHE {
   Matrix<bool>
   operator>> (const Matrix<T> &A, const Matrix<T> &B)
   {
-    Matrix<bool> C = Matrix<bool>(A.rows(), A.cols(), false);
+    Matrix<bool> C(A.rows(), A.cols(), false);
     if (A.isNull() || B.isNull()) {
       throw scythe_null_error(__FILE__, __PRETTY_FUNCTION__, __LINE__,
 			      "Invalid use of NULL Matrix");
@@ -1231,7 +1260,7 @@ namespace SCYTHE {
   Matrix<bool>
   operator<<= (const Matrix<T> &A, const Matrix<T> &B)
   {
-    Matrix<bool> C = Matrix<bool>(A.rows(), A.cols(), false);
+    Matrix<bool> C(A.rows(), A.cols(), false);
     if (A.isNull() || B.isNull()) {
       throw scythe_null_error(__FILE__, __PRETTY_FUNCTION__, __LINE__,
 			      "Invalid use of NULL Matrix");
@@ -1282,7 +1311,7 @@ namespace SCYTHE {
   Matrix<bool>
   operator>>= (const Matrix<T> &A, const Matrix<T> &B)
   {
-    Matrix<bool> C = Matrix<bool>(A.rows(), A.cols());
+    Matrix<bool> C(A.rows(), A.cols());
     if (A.isNull() || B.isNull()) {
       throw scythe_null_error(__FILE__, __PRETTY_FUNCTION__, __LINE__,
 			      "Invalid use of NULL Matrix");
@@ -1468,10 +1497,13 @@ namespace SCYTHE {
   Matrix<T>
   operator! (const Matrix <T> &m)
   {
-    Matrix<T> ret = Matrix<T>(m.cols(), m.rows());
-    for (int i = 0; i < m.rows(); ++i) {
-      for (int j = 0; j < m.cols(); ++j)
-	ret(j,i) = m(i,j);
+		int rows = m.rows();
+		int cols = m.cols();
+    Matrix<T> ret(cols, rows, false);
+    for (register int i = 0; i < rows; ++i) {
+      for (register int j = 0; j < cols; ++j)
+				//ret(j,i) = m(i,j);
+				ret[j * rows + i] = m[i * cols + j];
     }
     return ret;
   }
@@ -1490,7 +1522,7 @@ namespace SCYTHE {
 			      __LINE__, "Matrix is NULL");
       return 0;
     }
-    Matrix<T> L = Matrix<T>(A.rows(), A.rows());
+    Matrix<T> L(A.rows(), A.rows());
     Matrix<T> U = L;
     T sign = 1;
     int pivot;

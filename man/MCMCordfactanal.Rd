@@ -1,0 +1,216 @@
+\name{MCMCordfactanal}
+\alias{MCMCordfactanal}
+\title{Markov chain Monte Carlo for Ordinal Data Factor Analysis Model}
+\description{
+  This function generates a posterior density sample from an ordinal data
+  factor analysis model. Normal priors are assumed on the factor
+  loadings and factor scores while improper uniform priors are assumed
+  on the cutpoints. The user supplies data and parameters for the prior
+  distributions, and a sample from the posterior density is returned as
+  an mcmc object, which can be subsequently analyzed with
+  functions provided in the coda package.
+}
+  
+\usage{
+MCMCordfactanal(x, factors, lambda.constraints=list(),
+                data=list(), burnin = 1000, mcmc = 10000,
+                thin=5, tune=NA, verbose = FALSE, seed = 0,
+                lambda.start = NA, l0=0, L0=0,
+                store.lambda=TRUE, store.scores=FALSE, ... )
+ }
+
+\arguments{
+  \item{x}{Either a formula or a numeric matrix containing the
+    manifest variables.}
+
+  \item{factors}{The number of factors to be fitted.}
+  
+  \item{lambda.constraints}{List of lists specifying possible equality
+    or simple inequality constraints on the factor loadings. A typical
+    entry in the list has one of three forms: \code{varname=list(d,c)} which
+    will constrain the dth loading for the variable named varname to
+    be equal to c, \code{varname=list(d,"+")} which will constrain the dth
+    loading for the variable named varname to be positive, and
+    \code{varname=list(d, "-")} which will constrain the dth loading for the
+    variable named varname to be negative. If x is a matrix without
+    column names defaults names of ``V1", ``V2", ... , etc will be
+    used. Note that, unlike \code{MCMCfactanal}, the
+    \eqn{\Lambda}{Lambda} matrix used here has \code{factors}+1
+    columns. The first column of \eqn{\Lambda}{Lambda} corresponds to
+    item difficulty parameters and should generally not be constrained. 
+    }
+  
+  \item{data}{A data frame.}
+  
+  \item{burnin}{The number of burn-in iterations for the sampler.}
+  
+  \item{mcmc}{The number of iterations for the sampler.}
+  
+  \item{thin}{The thinning interval used in the simulation.  The number of
+    iterations must be divisible by this value.}
+
+  \item{tune}{The tuning parameter for the Metropolis-Hastings
+    sampling. Can be either a scalar or a \eqn{k}{k}-vector. Must be
+    strictly positive.}
+  
+  \item{verbose}{A switch which determines whether or not the progress of
+    the sampler is printed to the screen.  If TRUE, the iteration number and
+    the Metropolis-Hastings acceptance rate are printed to the screen.}
+  
+  \item{seed}{The seed for the random number generator.  The code uses the
+    Mersenne Twister, which requires an integer as an input.  If nothing
+    is provided, the Scythe default seed is used.}
+  
+  \item{lambda.start}{Starting values for the factor loading matrix
+    Lambda. If \code{lambda.start} is set to a scalar the starting value for
+    all unconstrained loadings will be set to that scalar. If
+    \code{lambda.start} is a matrix of the same dimensions as Lambda then the
+    \code{lambda.start} matrix is used as the starting values (except
+    for equality-constrained elements). If \code{lambda.start} is set to
+    \code{NA} (the default) then starting values for unconstrained
+    elements are set to values generated from a series of proportional
+    odds logistic regression fits, and starting values for inequality
+    constrained elements are set to either 1.0 or -1.0 depending on the
+    nature of the constraints.}
+  
+  \item{l0}{The means of the independent Normal prior on the factor
+    loadings. Can be either a scalar or a matrix with the same
+    dimensions as \code{Lambda}.}
+
+  \item{L0}{The precisions (inverse variances) of the independent Normal
+    prior on the factor loadings. Can be either a scalar or a matrix with
+    the same dimensions as \code{Lambda}.}
+
+  \item{store.lambda}{A switch that determines whether or not to store
+    the factor loadings for posterior analysis. By default, the factor
+    loadings are all stored.}
+  
+  \item{store.scores}{A switch that determines whether or not to
+    store the factor scores for posterior analysis. 
+    \emph{NOTE: This takes an enormous amount of memory, so
+      should only be used if the chain is thinned heavily, or for
+      applications with a small number of observations}.  By default, the
+    factor scores are not stored.}
+
+  
+  \item{...}{further arguments to be passed}       
+}
+
+\value{
+   An mcmc object that contains the posterior density sample.  This 
+   object can be summarized by functions provided by the coda package.
+}
+
+\details{The model takes the following form:
+
+  Let \eqn{i=1,\ldots,N}{1=1,...,n} index observations and
+  \eqn{j=1,\ldots,K}{j=1,...,K} index response variables within an
+  observation. The typical observed
+  variable \eqn{x_{ij}}{x_ij} is ordinal with a total of \eqn{C_j}{C_j}  
+  categories. The distribution of \eqn{X}{X} is governed by a \eqn{N
+    \times K}{N by K} matrix of latent variables \eqn{X^*}{Xstar} and a
+  series of cutpoints \eqn{\gamma}{gamma}. \eqn{X^*}{Xstar} is assumed
+  to be generated according to:
+  
+  \deqn{x^*_i = \Lambda \phi_i + \epsilon_i}{xstar_i = Lambda phi_i +
+    epsilon_i}
+  \deqn{\epsilon_i \sim \mathcal{N}(0,I)}{epsilon_i ~ N(0, I)}
+
+  where \eqn{x^*_i}{xstar_i} is the \eqn{k}{k}-vector of latent variables
+  specific to observation \eqn{i}{i}, \eqn{\Lambda}{Lambda} is the
+  \eqn{k \times d}{k by d} matrix of factor loadings, and
+  \eqn{\phi_i}{phi_i} is
+  the \eqn{d}{d}-vector of latent factor scores. It is assumed that the
+  first element of \eqn{\phi_i}{phi_i} is equal to 1 for all
+  \eqn{i}{i}. 
+
+  The probability that the \eqn{j}{j}th variable in observation
+  \eqn{i}{i} takes the value \eqn{c}{c} is:
+
+   \deqn{
+     \pi_{ijc} = \Phi(\gamma_{jc} - \Lambda'_j\phi_i) -
+     \Phi(\gamma_{j(c-1)} - \Lambda'_j\phi_i)
+   }{
+     pi_ijc = pnorm(gamma_jc - Lambda'_j phi_i) -
+     pnorm(gamma_j(c-1) - Lambda'_j phi_i)
+   }
+  
+  The implementation used here assumes independent conjugate priors for
+  each element of \eqn{\Lambda}{Lambda} and each
+  \eqn{\phi_i}{phi_i}. More specifically we assume:
+
+  \deqn{\Lambda_{ij} \sim \mathcal{N}(l_{0_{ij}}, L_{0_{ij}}^{-1}),
+    i=1,\ldots,k,  j=1,\ldots,d}{Lambda_ij ~ N(l0_ij,  L0_ij^-1),
+    i=1,...,k, j=1,...,d} 
+
+    \deqn{\phi_i \sim \mathcal{N}(0, I),  i=1,\dots,n}{phi_i ~ N(0, I),
+      i=1,...,n} 
+
+
+    The standard two-parameter item response theory model with probit
+    link is a special case of the model sketched above. 
+    
+  \code{MCMCordfactanal} simulates from the posterior density using
+  standard Metropolis-Hastings within Gibbs sampling. The algorithm
+  employed is based on work by Cowles (1996).  Note that
+  the first element of \eqn{\phi_i}{phi_i} is a 1. As a result, the
+  first column of \eqn{\Lambda}{Lambda} can be interpretated as item
+  difficulty parameters.  Further, the first
+  element  \eqn{\gamma_1}{gamma_1} is normalized to zero, and thus not 
+  returned in the mcmc object.
+  The simulation proper is done in compiled C++ code to maximize
+  efficiency.  Please consult the coda documentation for a comprehensive
+  list of functions that can be used to analyze the posterior density
+  sample. 
+  }
+}
+
+\references{
+  Shawn Treier and Simon Jackman. 2003. ``Democracy as a Latent Variable." 
+  Paper presented at the Midwest Political Science Association Annual Meeting.
+
+  M. K. Cowles. 1996. ``Accelerating Monte Carlo Markov Chain Convergence for
+  Cumulative-link Generalized Linear Models." \emph{Statistics and Computing.}
+  6: 101-110.
+     
+  Valen E. Johnson and James H. Albert. 1999. ``Ordinal Data Modeling." 
+  Springer: New York.
+  
+   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2003.  
+   \emph{Scythe Statistical Library 0.4.} \url{http://scythe.wustl.edu}.
+   
+   Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
+   \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
+   \url{http://www-fis.iarc.fr/coda/}.
+}
+
+
+\examples{
+   \dontrun{
+   data(painters)
+   new.painters <- painters[,1:4]
+   cuts <- apply(new.painters, 2, quantile, c(.25, .50, .75))
+   for (i in 1:4){
+      new.painters[new.painters[,i]<cuts[1,i],i] <- 100
+     new.painters[new.painters[,i]<cuts[2,i],i] <- 200
+     new.painters[new.painters[,i]<cuts[3,i],i] <- 300
+     new.painters[new.painters[,i]<100,i] <- 400
+   }
+
+   posterior <- MCMCordfactanal(~Composition+Drawing+Colour+Expression,
+                        data=new.painters, factors=1,
+                        lambda.constraints=list(Drawing=list(2,"+")),
+                        burnin=5000, mcmc=500000, thin=200, verbose=TRUE,
+                        L0=0.5, store.lambda=TRUE,
+                        store.scores=TRUE, tune=.6)
+   plot(posterior)
+   summary(posterior)
+   }
+}
+
+\keyword{models}
+
+\seealso{\code{\link[coda]{plot.mcmc}}, \code{\link[coda]{summary.mcmc}},
+  \code{\link[mva]{factanal}}, \code{\link[MCMCpack]{MCMCfactanal}},
+  \code{\link[MCMCpack]{MCMCirt1d}}, \code{\link[MCMCpack]{MCMCirtKd}}}
+

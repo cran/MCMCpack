@@ -5,7 +5,7 @@
   This function generates a posterior density sample
   from a probit regression model using the data augmentation
   approach of Albert and Chib (1993). The user supplies data and priors,
-  and a sample from the posterior density is returned as an \code{mcmc}
+  and a sample from the posterior density is returned as an mcmc
   object, which can be subsequently analyzed with functions 
   provided in the coda package.
   }
@@ -38,7 +38,7 @@ MCMCprobit(formula, data = list(), burnin = 1000, mcmc = 10000,
     \item{beta.start}{The starting value for the \eqn{\beta}{beta} vector.    
     This can either 
     be a scalar or a column vector with dimension equal to the number of 
-    betas.  If  If this takes a scalar value, then that value will serve as 
+    betas.  If this takes a scalar value, then that value will serve as 
     the 
     starting value for all of the betas. The default value of NA will
     use the maximum likelihood estimate of \eqn{\beta}{beta} as the starting 
@@ -56,7 +56,7 @@ MCMCprobit(formula, data = list(), burnin = 1000, mcmc = 10000,
     takes a scalar value, then that value times an identity matrix serves
     as the prior precision of \eqn{\beta}{beta}. Default value of 0 is 
     equivalent to
-    an improper uniform prior on \eqn{\beta}{beta} .}
+    an improper uniform prior on \eqn{\beta}{beta}.}
 
    \item{bayes.resid}{Should latent Bayesian residuals (Albert and Chib,
     1995) be returned? Default is FALSE meaning no residuals should be
@@ -69,7 +69,7 @@ MCMCprobit(formula, data = list(), burnin = 1000, mcmc = 10000,
 }
 
 \value{
-   An \code{mcmc} object that contains the posterior density sample.  This 
+   An mcmc object that contains the posterior density sample.  This 
    object can be summarized by functions provided by the coda package.
 }
 
@@ -97,8 +97,8 @@ MCMCprobit(formula, data = list(), burnin = 1000, mcmc = 10000,
   Albert, J. H. and S. Chib. 1995. ``Bayesian Residual Analysis for
   Binary Response Regression Models.'' \emph{Biometrika.} 82, 747-759.
       
-  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2002.  
-   \emph{Scythe Statistical Library 0.3.} \url{http://scythe.wustl.edu}.
+  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2003.  
+   \emph{Scythe Statistical Library 0.4.} \url{http://scythe.wustl.edu}.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
@@ -106,8 +106,14 @@ MCMCprobit(formula, data = list(), burnin = 1000, mcmc = 10000,
 }
 
 
-\examples{\dontrun{data(birthwt)
-posterior <- MCMCprobit(low~age+as.factor(race)+smoke, data=birthwt)}}
+\examples{
+   \dontrun{
+   data(birthwt)
+   posterior <- MCMCprobit(low~age+as.factor(race)+smoke, data=birthwt)
+   plot(posterior)
+   summary(posterior)
+   }
+}
 
 \keyword{models}
 

@@ -1,11 +1,7 @@
 // MCMCpanel.cc is C++ code to implement a general linear panel
 // model.  It is called from R.
 // 
-// Andrew D. Martin
-// Dept. of Political Science
-// Washington University
-// 
-// 10/10/2002 -- ported to Scythe0.3
+// ADM 10/10/2002
 // 
 
 #include <iostream>

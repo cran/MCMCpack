@@ -12,19 +12,19 @@ tomogplot(r0, r1, c0, c1, xlab="fraction of r0 in c0 (p0)",
    }
 
 \arguments{
-  \item{r0}{(ntables * 1) vector of row sums from row 0}
+  \item{r0}{An \eqn{(ntables \times 1)}{(ntables * 1)} vector of row sums from row 0.}
+  
+  \item{r1}{An \eqn{(ntables \times 1)}{(ntables * 1)} vector of row sums from row 1.}
 
-  \item{r1}{(ntables * 1) vector of row sums from row 1}
+  \item{c0}{An \eqn{(ntables \times 1)}{(ntables * 1)} vector of column sums from column 0.}
 
-  \item{c0}{(ntables * 1) vector of column sums from column 0}
+  \item{c1}{An \eqn{(ntables \times 1)}{(ntables * 1)} vector of column sums from column 1.}
 
-  \item{c1}{(ntables * 1) vector of column sums from column 1}
+  \item{xlab}{The x axis label for the plot.}
 
-  \item{xlab}{the x axis label for the plot}
+  \item{ylab}{The y axis label for the plot.}
 
-  \item{ylab}{the y axis label for the plot}
-
-  \item{bgcol}{the background color for the plot}
+  \item{bgcol}{The background color for the plot.}
   
   \item{...}{further arguments to be passed}     
 }
@@ -51,13 +51,14 @@ tomogplot(r0, r1, c0, c1, xlab="fraction of r0 in c0 (p0)",
   \eqn{Y_1|r_1 \sim \mathcal{B}inomial(r_1, p_1)}{Y1|r1 ~
     Binomial(r1,p1)}.
 
-  tomogplot plots the bounds on the MLEs for (p0, p1). 
+  This function  plots the bounds on the maximum likelihood
+  estimatess for (p0, p1). 
   }
 
   \keyword{hplot}
   
   \references{
-    Gary King, 1997. A Solution to the Ecological Inference Problem.
+    Gary King, 1997. \emph{A Solution to the Ecological Inference Problem}.
     Princeton: Princeton University Press.
     
     Jonathan Wakefield. 2001. ``Ecological Inference for 2 x 2 Tables,''
@@ -74,6 +75,7 @@ tomogplot(r0, r1, c0, c1)
 }
 
 \seealso{\code{\link{MCMCbaselineEI}}, \code{\link{MCMChierEI}},
-  \code{\link{MCMCdynamicEI}}, 
-  \code{\link[coda]{plot.mcmc}},\code{\link[coda]{summary.mcmc}}}
+  \code{\link{MCMCdynamicEI}}, \code{\link{dtomogplot}}
+}
+
 

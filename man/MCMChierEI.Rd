@@ -69,7 +69,7 @@ MCMChierEI(r0, r1, c0, c1, burnin=1000, mcmc=50000, thin=1,
 }
 
 \value{
-  An \code{mcmc} object that contains the posterior density sample.
+  An mcmc object that contains the posterior density sample.
   This object can  be summarized by functions provided by the coda package.
 }
 
@@ -129,8 +129,9 @@ MCMChierEI(r0, r1, c0, c1, burnin=1000, mcmc=50000, thin=1,
    Center for Statistics and the Social Sciences Working Paper
    no. 12. University of Washington. 
 
-   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2002.  \emph{Scythe Statistical 
-   Library 0.3.} \url{http://scythe.wustl.edu}.
+   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2003. 
+    \emph{Scythe Statistical 
+   Library 0.4.} \url{http://scythe.wustl.edu}.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
@@ -138,12 +139,15 @@ MCMChierEI(r0, r1, c0, c1, burnin=1000, mcmc=50000, thin=1,
 }
 
 \examples{
-\dontrun{
-c0 <- rpois(5, 500)
-c1 <- c(200, 140, 250, 190, 75)
-r0 <- rpois(5, 400)
-r1 <- (c0 + c1) - r0
-posterior <- MCMChierEI(r0,r1,c0,c1, mcmc=200000, thin=50)}
+   \dontrun{
+   c0 <- rpois(5, 500)
+   c1 <- c(200, 140, 250, 190, 75)
+   r0 <- rpois(5, 400)
+   r1 <- (c0 + c1) - r0
+   posterior <- MCMChierEI(r0,r1,c0,c1, mcmc=200000, thin=50)
+   plot(posterior)
+   summary(posterior) 
+   }
 }
 
 \keyword{models}

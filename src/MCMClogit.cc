@@ -1,14 +1,7 @@
 // sample from the posterior distribution of a logistic regression
 // logistice regression model in R using linked C++ code in Scythe
 //
-// Kevin Quinn
-// University of Washington
-// 
-// Andrew D. Martin
-// Washington University
-// 
-// 1/23/03 (KQ)
-// 
+// KQ 1/23/03
 
 #include <iostream>
 #include "Scythe_Matrix.h"
