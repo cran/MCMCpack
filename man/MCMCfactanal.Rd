@@ -83,11 +83,13 @@ MCMCfactanal(x, factors, lambda.constraints=list(),
   the same dimensions as \code{Lambda}.}
 
   \item{a0}{Controls the shape of the inverse Gamma prior on the
-    uniqueness. Can be either a scalar or a \eqn{k}{k}-vector.}
+    uniqueness. The actual shape parameter is set to \code{a0/2}. Can be
+    either a scalar or a \eqn{k}{k}-vector.} 
 
   \item{b0}{Controls the scale of the inverse Gamma prior on the
-    uniquenesses. Can be either a scalar or a \eqn{k}{k}-vector.}
-  
+    uniquenesses. The actual scale parameter is set to \code{b0/2}. Can
+    be either a scalar or a \eqn{k}{k}-vector.} 
+   
   \item{store.scores}{A switch that determines whether or not to
     store the factor scores for posterior analysis. 
     \emph{NOTE: This takes an enormous amount of memory, so

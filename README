@@ -1,8 +1,8 @@
 //
-// MCMCpack, Version 0.4-6
+// MCMCpack, Version 0.4-7
 //
 
-Release Date: November 21, 2003
+Release Date: February 4, 2004
 
 This package contains functions for posterior simulation for a number of
 statistical models. All simulation is done in compiled C++ written in
@@ -26,6 +26,18 @@ Kevin M. Quinn <kquinn@latte.harvard.edu>
 NOTE: We are still working on implementing a NAMESPACE for this package. We
 plant to do so in our next major release.
 
+0.4-5 to 0.4-6
+   * Fixed some Scythe bugs, including a problem with memory allocation for
+     matrix multiplication.  See http://sourceforge.net/projects/scythestat/
+     for the latest version of Scythe, which is now distributed with MCMCpack.
+     The Scythe code differs slightly in the paths ../include and ../src are
+     replace with the current path, and in pnorm2 the isnan() function is
+     commented out to allow for cross-compilation.
+   * Rolled out http://mcmcpack.wustl.edu website.
+   * Mixed response factor code.
+   * Fixed factanal.
+   * Fixed irtKd.
+   
 0.4-5 to 0.4-6
    * Fixed a bug in rnoncenhypergeom() [thanks to Tom LaFramboise]
    * Patched Scythe0.3 to fix an error in inv() [thanks to Donour Sizemore].  

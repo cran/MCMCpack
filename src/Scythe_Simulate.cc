@@ -4,46 +4,56 @@
  * PDFs, CDFs, and some common functions (gamma, beta, etc) for the
  * Scythe Statistical Library.
  * 
- * Scythe C++ Library
- * Copyright (C) Kevin M. Quinn, Andrew D. Martin,
- * and Daniel B. Pemstein
+ * Scythe Statistical Library
+ * Copyright (C) 2003, Andrew D. Martin, Kevin M. Quinn, and Daniel
+ * Pemstein.  All Rights Reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or (at
+ * your option) any later version.  A copy of this license is included
+ * with this library (LICENSE.GPL).
+ *
+ * This library utilizes code from a number of other open source
+ * projects.  Specific copyright information is provided with the
+ * applicable code.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA.
  *
  * This code written by:
  *
- * Kevin Quinn
- * Assistant Professor
- * Dept. of Political Science and
- * Center for Statistics and Social Sciences
- * Box 354322
- * University of Washington
- * Seattle, WA 98195-4322
- * quinn@stat.washington.edu
- *
  * Andrew D. Martin
  * Assistant Professor
- * Dept. of Political Science
+ * Deptartment of Political Science
  * Campus Box 1063
  * Washington University
+ * One Brookings Drive
  * St. Louis, MO 63130
  * admartin@artsci.wustl.edu
- * 
- * Daniel B. Pemstein
- * dbpemste@artsci.wustl.edu
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
- * USA
+ *
+ * Kevin M. Quinn
+ * Assistant Professor
+ * Department of Government and
+ * Center for Basic Research in the Social Sciences
+ * 34 Kirkland Street
+ * Harvard University
+ * Cambridge, MA 02138
+ * kquinn@fas.harvard.edu
+ *
+ * Daniel Pemstein
+ * Deptartment of Poltical Science
+ * 702 South Wright Street
+ * University of Illinois at Urbana-Champaign
+ * Urbana, IL 61801
+ * dbp@uiuc.edu
  */
 
 #ifndef SCYTHE_SIMULATE_CC
@@ -52,6 +62,9 @@
 #ifdef __APPLE__
 extern "C" int isinf(double);
 extern "C" int isnan(double);
+#endif
+#ifdef sgi
+#include <nan.h> // <cnan>?
 #endif
 #ifdef __MINGW32__
 #define M_PI 3.141592653589793238462643383280
@@ -76,8 +89,18 @@ extern "C" int isnan(double);
 #define M_2PI   6.28318530717958647692528676655
 #define M_SQRT_32 5.656854249492380195206754896838
 
+/* Many random number generators, pdfs, cdfs, and functions (gamma,
+ * etc) in this file are based on code from the R Project, version
+ * 1.6.0-1.7.1.  This code is available under the terms of the GNU
+ * GPL.  Original copyright:
+ * 
+ * Copyright (C) 1998      Ross Ihaka
+ * Copyright (C) 2000-2002 The R Development Core Team
+ * Copyright (C) 2003      The R Foundation
+ */
+
 namespace SCYTHE {
-	
+  
   /***************************************
    * Underlying Random Number Generators *
    ***************************************/
@@ -86,15 +109,15 @@ namespace SCYTHE {
 
   /* "Static" variables for the Marsaglia generator */
 #ifdef __MINGW32__
-	/* Initial values of random seeds for ranmars(); */
-	static unsigned long Z = 362436069;
-	static unsigned long W = 521288629;
-	static unsigned long JSR = 123456789;
-	static unsigned long JCONG = 380116160;
+  /* Initial values of random seeds for ranmars(); */
+  static unsigned long Z = 362436069;
+  static unsigned long W = 521288629;
+  static unsigned long JSR = 123456789;
+  static unsigned long JCONG = 380116160;
 
-	/* Some more globals for ranmars() */
-	static unsigned long X = 0, Y = 0, T[UCHAR_MAX + 1];
-	static unsigned char C = 0;
+  /* Some more globals for ranmars() */
+  static unsigned long X = 0, Y = 0, T[UCHAR_MAX + 1];
+  static unsigned char C = 0;
 #else
   namespace {
     /* Initial values of random seeds for ranmars(); */
@@ -112,8 +135,8 @@ namespace SCYTHE {
   /* Set the random seeds */
   void
   set_ranmars_seed (const unsigned long &z, const unsigned long &w,
-		    const unsigned long &jsr,
-		    const unsigned long &jcong)
+        const unsigned long &jsr,
+        const unsigned long &jcong)
   {
     Z = z;
     W = w;
@@ -128,30 +151,30 @@ namespace SCYTHE {
     // Multiply With Carry Generator
     unsigned long mwc = ((Z=36969UL*(Z&65535UL)+(Z>>16))<<16) +
       (W=18000UL*(W&65535UL)+(W>>16));
- 		 
+      
     // Congruential Generator
     unsigned long cong = (JCONG=69069UL*JCONG+1234567UL);
- 		 
+      
     // 3-Shift-Register Generator
     JSR=JSR^(JSR<<17);
     JSR=JSR^(JSR>>13);
     unsigned long shr3 = (JSR=JSR^(JSR<<5));
- 		 
+      
     // Subtract With Borrow Generator
     X = T[ (unsigned char)(C+15)];
     T[(unsigned char)(C+237)] = X - (Y = T[(unsigned char)(C + 1)] +
-				     (X < Y));
+             (X < Y));
     unsigned long swb = T[++C];
- 		 
+      
     // Keep It Simple Stupid Generator
     unsigned long kiss = ((mwc ^ cong) + shr3);
- 		 
+      
     // We return a KISS+SWB (Should pass diehard and have period
     // > 2^7700).  We return a double in (0,1).
- 		 
+      
     return (kiss + swb) * 2.32830643708e-10;
   }
-	
+  
   /* The following is a slightly modified (for C++) version of MT19937
    * (Mersenne Twister) by Makoto Matsumoto an Takuji Nishimura.  The
    * original source was released under the BSD license and came with
@@ -161,7 +184,38 @@ namespace SCYTHE {
    * Coded by Takuji Nishimura and Makoto Matsumoto.
    * 
    * Copyright (C) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura,
-   * All rights reserved. 
+   * All rights reserved.
+   *
+   * Redistribution and use in source and binary forms, with or without
+   * modification, are permitted provided that the following conditions
+   * are met:
+   *
+   * 1. Redistributions of source code must retain the above copyright
+   *    notice, this list of conditions and the following disclaimer.
+   *
+   * 2. Redistributions in binary form must reproduce the above
+   *    copyright
+   *    notice, this list of conditions and the following disclaimer
+   *    in the documentation and/or other materials provided with the
+   *    distribution.
+   *
+   * 3. The names of its contributors may not be used to endorse or
+   *    promote products derived from this software without specific
+   *    prior written permission.
+   *
+   * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+   * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+   * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+   * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+   * DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+   * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT INCIDENTAL,
+   * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+   * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+   * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+   * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+   * POSSIBILITY OF SUCH DAMAGE.
    *
    * For more information see:
    * http://www.math.keio.ac.jp/matumoto/emt.html
@@ -172,36 +226,36 @@ namespace SCYTHE {
 
   /* "Static" variables for the Mersenne Twister */
 #ifdef __MINGW32__
-	/* Period parameters */  
-	static const int N = 624;
-	static const int M = 398;
+  /* Period parameters */  
+  static const int N = 624;
+  static const int M = 398;
 
-	/* constant vector a */
-	static const unsigned long MATRIX_A = 0x9908b0dfUL;
+  /* constant vector a */
+  static const unsigned long MATRIX_A = 0x9908b0dfUL;
 
-	/* most significant w-r bits */
-	static const unsigned long UPPER_MASK = 0x80000000UL;
+  /* most significant w-r bits */
+  static const unsigned long UPPER_MASK = 0x80000000UL;
 
-	/* least significant r bits */
-	static const unsigned long LOWER_MASK = 0x7fffffffUL;
+  /* least significant r bits */
+  static const unsigned long LOWER_MASK = 0x7fffffffUL;
     
-	/* the array for the state vector  */
-	static unsigned long mt[N];
+  /* the array for the state vector  */
+  static unsigned long mt[N];
     
-	/* mti==N+1 means mt[N] is not initialized */
-	static int mti=N+1;
+  /* mti==N+1 means mt[N] is not initialized */
+  static int mti=N+1;
 #else
   namespace {
     /* Period parameters */  
     const int N = 624;
     const int M = 398;
-		
+    
     /* constant vector a */
     const unsigned long MATRIX_A = 0x9908b0dfUL;
-		
+    
     /* most significant w-r bits */
     const unsigned long UPPER_MASK = 0x80000000UL;
-		
+    
     /* least significant r bits */
     const unsigned long LOWER_MASK = 0x7fffffffUL;
 
@@ -212,7 +266,7 @@ namespace SCYTHE {
     int mti=N+1;
   }
 #endif
-	
+  
   /* initializes mt[N] with a seed */
   void set_mersenne_seed(const unsigned long &s)
   {
@@ -239,15 +293,15 @@ namespace SCYTHE {
       int kk;
 
       if (mti == N+1)   /* if init_genrand() has not been called, */
-	set_mersenne_seed(5489UL); /* a default initial seed is used */
+        set_mersenne_seed(5489UL); /* a default initial seed is used */
 
       for (kk=0;kk<N-M;kk++) {
-	y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
-	mt[kk] = mt[kk+M] ^ (y >> 1) ^ mag01[y & 0x1UL];
+        y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
+        mt[kk] = mt[kk+M] ^ (y >> 1) ^ mag01[y & 0x1UL];
       }
       for (;kk<N-1;kk++) {
-	y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
-	mt[kk] = mt[kk+(M-N)] ^ (y >> 1) ^ mag01[y & 0x1UL];
+        y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
+        mt[kk] = mt[kk+(M-N)] ^ (y >> 1) ^ mag01[y & 0x1UL];
       }
       y = (mt[N-1]&UPPER_MASK)|(mt[0]&LOWER_MASK);
       mt[N-1] = mt[M-1] ^ (y >> 1) ^ mag01[y & 0x1UL];
@@ -266,23 +320,25 @@ namespace SCYTHE {
     return y;
   }
 
-	/* Non-convergence flag setup */
+  /* end of Nishimura and Matsumoto based code */
+
+  /* Non-convergence flag setup */
 #ifdef __MINGW32__
-	static bool THROW_ON_NONCONV = false;
+  static bool THROW_ON_NONCONV = false;
 #else
-	namespace {
-		bool THROW_ON_NONCONV = false;
-	}
+  namespace {
+    bool THROW_ON_NONCONV = false;
+  }
 #endif
 
-	void throw_on_nonconv (bool t) {
-		THROW_ON_NONCONV = t;
-	}
+  void throw_on_nonconv (bool t) {
+    THROW_ON_NONCONV = t;
+  }
 
   /*************
    * Functions *
    *************/
-
+  
   /* The gamma function */
   double 
   gammafn (const double &x)
@@ -323,92 +379,92 @@ namespace SCYTHE {
 
       int n = (int) x;
       if (x < 0)
-	--n;
-			
-      y = x - n;/* n = floor(x)  ==>	y in [ 0, 1 ) */
+        --n;
+      
+      y = x - n;/* n = floor(x)  ==>  y in [ 0, 1 ) */
       --n;
       double value = INTERNAL::chebyshev_eval(y * 2 - 1, gamcs, 22)
-	+ .9375;
-			
+        + .9375;
+      
       if (n == 0)
-	return value;/* x = 1.dddd = 1+y */
+        return value;/* x = 1.dddd = 1+y */
 
       if (n < 0) {
-	/* compute gamma(x) for -10 <= x < 1 */
+        /* compute gamma(x) for -10 <= x < 1 */
 
-	/* If the argument is exactly zero or a negative integer */
-	/* then return NaN. */
-	if (x == 0 || (x < 0 && x == n + 2))
-	  throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__,
-				   __LINE__, "x is 0 or a negative integer");
+        /* If the argument is exactly zero or a negative integer */
+        /* then return NaN. */
+        if (x == 0 || (x < 0 && x == n + 2))
+          throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__,
+              __LINE__, "x is 0 or a negative integer");
 
-	/* The answer is less than half precision */
-	/* because x too near a negative integer. */
-	if (x < -0.5 && std::fabs(x - (int)(x - 0.5) / x) < 67108864.0)
-	  throw scythe_precision_error(__FILE__, __PRETTY_FUNCTION__,
-				       __LINE__,
-				       std::string("Answer < 1/2 precision because x is ")
-				       & "too near a negative integer");
+        /* The answer is less than half precision */
+        /* because x too near a negative integer. */
+        if (x < -0.5 && std::fabs(x - (int)(x - 0.5) / x) < 67108864.0)
+          throw scythe_precision_error(__FILE__, __PRETTY_FUNCTION__,
+              __LINE__,
+              std::string("Answer < 1/2 precision because x is ")
+              & "too near a negative integer");
 
-	/* The argument is so close to 0 that the result
-	 * would overflow. */
-	if (y < 2.2474362225598545e-308)
-	  throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__,
-				   __LINE__, "x too close to 0");
+        /* The argument is so close to 0 that the result
+         * * would overflow. */
+        if (y < 2.2474362225598545e-308)
+          throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__,
+              __LINE__, "x too close to 0");
 
-	n = -n;
+        n = -n;
 
-	for (int i = 0; i < n; i++)
-	  value /= (x + i);
-				
-	return value;
+        for (int i = 0; i < n; i++)
+          value /= (x + i);
+        
+        return value;
       } else {
-	/* gamma(x) for 2 <= x <= 10 */
+        /* gamma(x) for 2 <= x <= 10 */
 
-	for (int i = 1; i <= n; i++) {
-	  value *= (y + i);
-	}
-	return value;
+        for (int i = 1; i <= n; i++) {
+          value *= (y + i);
+        }
+        return value;
       }
     } else {
-      /* gamma(x) for	 y = |x| > 10. */
+      /* gamma(x) for   y = |x| > 10. */
 
-      if (x > 171.61447887182298)		/* Overflow */
-	throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__,
-				 __LINE__, "Overflow");
+      if (x > 171.61447887182298)    /* Overflow */
+        throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__,
+            __LINE__, "Overflow");
 
-      if (x < -170.5674972726612) 			/* Underflow */
-	throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__,
-				 __LINE__, "Underflow");
+      if (x < -170.5674972726612)       /* Underflow */
+        throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__,
+            __LINE__, "Underflow");
 
       double value = std::exp((y - 0.5) * std::log(y) - y 
-			      + M_LN_SQRT_2PI + INTERNAL::lngammacor(y));
+          + M_LN_SQRT_2PI + INTERNAL::lngammacor(y));
 
       if (x > 0)
-	return value;
+        return value;
 
       if (std::fabs((x - (int)(x - 0.5))/x) < 67108864.0)
-	throw scythe_precision_error(__FILE__, __PRETTY_FUNCTION__,
-				     __LINE__,
-				     std::string("Answer < 1/2 precision because x is ")
-				     & "too near a negative integer");
+        throw scythe_precision_error(__FILE__, __PRETTY_FUNCTION__,
+            __LINE__,
+            std::string("Answer < 1/2 precision because x is ")
+            & "too near a negative integer");
 
       double sinpiy = std::sin(M_PI * y);
-			
-      if (sinpiy == 0) 		/* Negative integer arg - overflow */
-	throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__,
-				 __LINE__, "Overflow");
+      
+      if (sinpiy == 0)     /* Negative integer arg - overflow */
+        throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__,
+            __LINE__, "Overflow");
 
       return -M_PI / (y * sinpiy * value);
     }
   }
 
-	/* Return a pseudo-random deviate from a non-cental hypergeometric
-	 * distribution
-	 */
+  /* Return a pseudo-random deviate from a non-cental hypergeometric
+   * distribution
+   */
   double rnchypgeom(const double& m1, const double& n1, 
-		    const double& n2, const double& psi, 
-		    const double& delta){
+        const double& n2, const double& psi, 
+        const double& delta){
 
     // ERROR CHECKING
     /*
@@ -462,19 +518,19 @@ namespace SCYTHE {
       double f = 1.0;
       s = 1.0;
       for (double i=(mode+1); i<=u; ++i){
-	double r = ((n1-i+1)*(m1-i+1))/(i*(n2-m1+i)) * psi;
-	f = f*r;
-	s += f;
-	fvec[static_cast<int>(i)] = f;
+        double r = ((n1-i+1)*(m1-i+1))/(i*(n2-m1+i)) * psi;
+        f = f*r;
+        s += f;
+        fvec[static_cast<int>(i)] = f;
       }
      
       // sum from mode to el
       f = 1.0;
       for (double i=(mode-1); i>=el; --i){
-	double r = ((n1-i)*(m1-i))/((i+1)*(n2-m1+i+1)) * psi;
-	f = f/r;
-	s += f;
-	fvec[static_cast<int>(i)] = f;
+        double r = ((n1-i)*(m1-i))/((i+1)*(n2-m1+i+1)) * psi;
+        f = f/r;
+        s += f;
+        fvec[static_cast<int>(i)] = f;
       }
     }
 
@@ -485,26 +541,26 @@ namespace SCYTHE {
       s = 1.0;
       double i = mode+1;
       double r;
-      do{
-	if (i>u) break;
-	r = ((n1-i+1)*(m1-i+1))/(i*(n2-m1+i)) * psi;
-	f = f*r;
-	s += f;
-	fvec[static_cast<int>(i)] = f;
-	++i;
-      }while(f>=epsilon || r>=5.0/6.0);
+      do {
+        if (i>u) break;
+        r = ((n1-i+1)*(m1-i+1))/(i*(n2-m1+i)) * psi;
+        f = f*r;
+        s += f;
+        fvec[static_cast<int>(i)] = f;
+        ++i;
+      } while(f>=epsilon || r>=5.0/6.0);
      
       // sum from mode to elstar
       f = 1.0;
       i = mode-1;
-      do{
-	if (i<el) break;
-	r = ((n1-i)*(m1-i))/((i+1)*(n2-m1+i+1)) * psi;
-	f = f/r;
-	s += f;
-	fvec[static_cast<int>(i)] = f;
-	--i;
-      }while(f>=epsilon || r <=6.0/5.0);         
+      do {
+        if (i<el) break;
+        r = ((n1-i)*(m1-i))/((i+1)*(n2-m1+i+1)) * psi;
+        f = f/r;
+        s += f;
+        fvec[static_cast<int>(i)] = f;
+        --i;
+      } while(f>=epsilon || r <=6.0/5.0);         
     }
 
     double udraw = runif();
@@ -518,28 +574,27 @@ namespace SCYTHE {
       double fl;
       double fu;
       if (lower >= el)
-	fl = fvec[static_cast<int>(lower)];
+        fl = fvec[static_cast<int>(lower)];
       else 
-	fl = 0.0;
+        fl = 0.0;
 
       if (upper <= u)
-	fu = fvec[static_cast<int>(upper)];
+        fu = fvec[static_cast<int>(upper)];
       else
-	fu = 0.0;
+        fu = 0.0;
 
-      if (fl > fu){
-	psum += fl/s;
-	if (udraw<=psum)
-	  return lower;
-	--lower;
+      if (fl > fu) {
+        psum += fl/s;
+        if (udraw<=psum)
+          return lower;
+        --lower;
+      } else {
+        psum += fu/s;
+        if (udraw<=psum)
+          return upper;
+        ++upper;
       }
-      else{
-	psum += fu/s;
-	if (udraw<=psum)
-	  return upper;
-	++upper;
-      }
-    }while(udraw>psum);
+    } while(udraw>psum);
    
     delete [] fvec;
     exit(500000);
@@ -551,7 +606,7 @@ namespace SCYTHE {
   {
     if (x <= 0 && x == (int)x)
       throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__,
-			       __LINE__, "x is 0 or a negative integer");
+             __LINE__, "x is 0 or a negative integer");
 
     double y = fabs(x);
 
@@ -560,28 +615,28 @@ namespace SCYTHE {
 
     if (y > 2.5327372760800758e+305)
       throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__, __LINE__,
-			       "Overflow");
+             "Overflow");
 
     if (x > 0) /* i.e. y = x > 10 */
       return M_LN_SQRT_2PI + (x - 0.5) * log(x) - x
-	+ INTERNAL::lngammacor(x);
+        + INTERNAL::lngammacor(x);
     
     /* else: x < -10; y = -x */
     double sinpiy = fabs(sin(M_PI * y));
 
     if (sinpiy == 0) /* Negative integer argument */
       throw scythe_exception("UNEXPECTED ERROR",
-			     __FILE__, __PRETTY_FUNCTION__, __LINE__,
-			     "ERROR:  Should never happen!");
+           __FILE__, __PRETTY_FUNCTION__, __LINE__,
+           "ERROR:  Should never happen!");
 
     double ans = M_LN_SQRT_PId2 + (x - 0.5) * log(y) - x - log(sinpiy)
       - INTERNAL::lngammacor(y);
 
     if(fabs((x - (int)(x - 0.5)) * ans / x) < 1.490116119384765696e-8)
       throw scythe_precision_error(__FILE__, __PRETTY_FUNCTION__,
-				   __LINE__, std::string("Answer < 1/2 precision because x is ")
-				   & "too near a negative integer");
-		
+           __LINE__, std::string("Answer < 1/2 precision because x is ")
+           & "too near a negative integer");
+    
     return ans;
   }
 
@@ -591,7 +646,7 @@ namespace SCYTHE {
   {
     if (a <= 0 || b <= 0)
       throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__, __LINE__,
-			       "a or b < 0");
+             "a or b < 0");
 
     if (a + b < 171.61447887182298) /* ~= 171.61 for IEEE */
       return gammafn(a) * gammafn(b) / gammafn(a+b);
@@ -599,8 +654,8 @@ namespace SCYTHE {
     double val = lnbetafn(a, b);
     if (val < -708.39641853226412)
       throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__, __LINE__,
-			       "Underflow");
-		
+             "Underflow");
+    
     return std::exp(val);
   }
 
@@ -616,22 +671,22 @@ namespace SCYTHE {
 
     if (p <= 0 || q <= 0)
       throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__, __LINE__,
-			       "a or b <= 0");
+             "a or b <= 0");
 
     if (p >= 10) {
       /* p and q are big. */
       double corr = INTERNAL::lngammacor(p) + INTERNAL::lngammacor(q)
-	- INTERNAL::lngammacor(p + q);
+        - INTERNAL::lngammacor(p + q);
       return std::log(q) * -0.5 + M_LN_SQRT_2PI + corr
-	+ (p - 0.5) * log(p / (p + q)) + q * log(1 + (-p / (p + q)));
+        + (p - 0.5) * log(p / (p + q)) + q * log(1 + (-p / (p + q)));
     } else if (q >= 10) {
       /* p is small, but q is big. */
       double corr = INTERNAL::lngammacor(q)
-	- INTERNAL::lngammacor(p + q);
+        - INTERNAL::lngammacor(p + q);
       return lngammafn(p) + corr + p - p * std::log(p + q)
-	+ (q - 0.5) * log(1 + (-p / (p + q)));
+        + (q - 0.5) * log(1 + (-p / (p + q)));
     }
-		
+    
     /* p and q are small: p <= q > 10. */
     return std::log(gammafn(p) * (gammafn(q) / gammafn(p + q)));
   }
@@ -642,7 +697,7 @@ namespace SCYTHE {
   {
     if (n < 0)
       throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__, __LINE__,
-			       "n < 0");
+             "n < 0");
 
     if (n == 0)
       return 1;
@@ -658,8 +713,8 @@ namespace SCYTHE {
   {
     if (n < 0)
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__, __LINE__,
-				"n < 0");
- 		 
+        "n < 0");
+      
     double x = n+1;
     double cof[6] = {
       76.18009172947146, -86.50532032941677,
@@ -674,11 +729,11 @@ namespace SCYTHE {
     }
     return(std::log(2.5066282746310005 * ser / x) - tmp);
   }
-	
+  
   /*********************************
    * Fully Specified Distributions * 
    *********************************/
-	
+  
   /**** The Beta Distribution ****/
 
   /* Random Numbers */
@@ -687,38 +742,38 @@ namespace SCYTHE {
   {
     static double report;
     double xalpha, xbeta;
- 		 
+      
     // Check for allowable parameters
     if (alpha <= 0) {
       throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__,
-			       __LINE__, "alpha <= 0");
+             __LINE__, "alpha <= 0");
     }
     if (beta <= 0) {
       throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__,
-			       __LINE__, "beta <= 0");
+             __LINE__, "beta <= 0");
     }
-		
+    
     xalpha = rchisq (2 * alpha);
     xbeta = rchisq (2 * beta);
     report = xalpha / (xalpha + xbeta);
-		
+    
     return (report);
   }
 
   Matrix<double>
-  rbeta (	const int& rows, const int& cols, const double& alpha,
-		const double& beta)
+  rbeta (  const int& rows, const int& cols, const double& alpha,
+    const double& beta)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Attempted to create Matrix of size <= 0");
+        __LINE__, "Attempted to create Matrix of size <= 0");
     }
-		
+    
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; ++i)
       temp[i] = rbeta (alpha, beta);
-		
+    
     return temp;
   }
 
@@ -728,48 +783,48 @@ namespace SCYTHE {
   {
     if (pin <= 0 || qin <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__, __LINE__,
-				"pin or qin <= 0");
+        "pin or qin <= 0");
     }
-		
+    
     if (x <= 0)
       return 0.;
     if (x >= 1)
       return 1.;
-		
+    
     return INTERNAL::pbeta_raw(x,pin,qin);
   }
 
   Matrix<double>
   pbeta(const int& rows, const int& cols, const double& x,
-	const double& pin, const double& qin)
+  const double& pin, const double& qin)
   {
     int size = rows*cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
-    Matrix<double> temp(rows, cols, false);	
+    Matrix<double> temp(rows, cols, false);  
     for (int i=0; i<size; i++)
       temp[i] = pbeta(x,pin,qin);
-		
+    
     return temp;
   }
-	
+  
   /* PDFs */
   double
   dbeta(const double& x, const double& a, const double& b)
   {
     if ((x < 0.0) || (x > 1.0)) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "x not in [0,1]");
+        __LINE__, "x not in [0,1]");
     }
     if (a < 0.0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "a < 0");
+        __LINE__, "a < 0");
     }
     if (b < 0.0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "b < 0");
+        __LINE__, "b < 0");
     }
 
     return (std::pow(x, (a-1.0)) * std::pow((1.0-x), (b-1.0)) )
@@ -778,20 +833,20 @@ namespace SCYTHE {
 
   Matrix<double>
   dbeta(const int& rows, const int& cols, const double& x,
-	const double& a, const double& b)
+  const double& a, const double& b)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = dbeta(x,a,b);
-		
+    
     return temp;  
   }
-	
+  
   /* Returns the natural log of the ordinate of the Beta density
    * evaluated at x with Shape1 a, and Shape2 b
    */
@@ -800,17 +855,17 @@ namespace SCYTHE {
   { 
     if ((x < 0.0) || (x > 1.0)) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "x not in [0,1]");
+        __LINE__, "x not in [0,1]");
     }
     if (a < 0.0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "a < 0");
+        __LINE__, "a < 0");
     }
     if (b < 0.0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "b < 0");
+        __LINE__, "b < 0");
     }
-			
+      
     return (a-1.0) * std::log(x) + (b-1) * std::log(1.0-x)
       - lnbetafn(a,b);
   }
@@ -824,41 +879,41 @@ namespace SCYTHE {
     static int report;
     int count = 0;
     double hold;
- 		 
+      
     // Check for allowable parameters
     if (n <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "n <= 0");
+        __LINE__, "n <= 0");
     }
     if (p < 0 || p > 1) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "p not in [0,1]");
+        __LINE__, "p not in [0,1]");
     }
- 		 
+      
     // Loop and count successes
     for (int i = 0; i < n; i++) {
       hold = runif ();
       if (hold < p)
-	count++;
+        count++;
     }
     report = count;
-		
+    
     return (report);
   }
 
   Matrix<double>
   rbinom( const int& rows, const int& cols, const int& n,
-	  const double& p)
+    const double& p)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Attempted to create Matrix of size <= 0");
+        __LINE__, "Attempted to create Matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; ++i)
       temp[i] = rbinom (n, p);
-		
+    
     return temp;
   }
 
@@ -867,86 +922,86 @@ namespace SCYTHE {
   pbinom(const double &x, const double &n,const double &p) 
   {
     double N = std::floor(n + 0.5);
- 		 
+      
     if (N <= 0 || p < 0 || p > 1){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "floor(n + 0.5) <= 0 or p < 0 or p > 1");
+        __LINE__, "floor(n + 0.5) <= 0 or p < 0 or p > 1");
     }
     double X = std::floor(x);
- 		 
+      
     if (X < 0.0)
       return 0;
-		
+    
     if (N <= X)
       return 1;
- 		 
+      
     return pbeta(1 - p, N - X, X + 1);
   }
 
   Matrix<double>
   pbinom (const int& rows, const int& cols, const double& x,
-	  const double& n, const double& p)
+    const double& n, const double& p)
   {
     int size = rows*cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for(int i = 0; i < size; i++)
       temp[i] = pbinom(x,n,p);
- 		 
+      
     return temp;
   }    
-	
+  
   /* PDFs */
   double
   dbinom(const double& x, const double& n, const double& p)
   {
     if (p < 0 || p > 1) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "p not in [0,1]");
+        __LINE__, "p not in [0,1]");
     }
-		
+    
     double N = floor(n + 0.5);
     double X = floor(x + 0.5);
-		
+    
     return INTERNAL::dbinom_raw(X, N, p, 1 - p);
   }
 
   Matrix<double>
   dbinom( const int& rows, const int& cols, const double& x,
-	  const double& n, const double& p)
+    const double& n, const double& p)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = dbinom(x,n,p);
-		
+    
     return temp;  
   }
 
   /**** The Chi Squared Distribution ****/
-	
+  
   /* Random Numbers */
   double
   rchisq (const double &nu)
   {
     static double report;
- 		 
+      
     // Check for allowable paramter
     if (nu <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Degrees of freedom <= 0");
+        __LINE__, "Degrees of freedom <= 0");
     }
-	
+  
     // Return Gamma(nu/2, 1/2) deviate
     report = rgamma (nu / 2, .5);
-		
+    
     return (report);
   }
 
@@ -956,15 +1011,15 @@ namespace SCYTHE {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Attempted to create Matrix of size <= 0");
+        __LINE__, "Attempted to create Matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; ++i)
       temp[i] = rchisq (nu);
-		
+    
     return temp;
   }
-	
+  
   /* CDFs */
   double
   pchisq(const double& x, const double& df)
@@ -975,18 +1030,18 @@ namespace SCYTHE {
 
   Matrix<double>
   pchisq (const int& rows, const int& cols, const double& x,
-	  const double& df)
+    const double& df)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
-		
+    
     for (int i = 0; i < size; i++)
       temp[i] = pchisq(x,df);
-		
+    
     return temp;
   }    
 
@@ -999,17 +1054,17 @@ namespace SCYTHE {
 
   Matrix<double>
   dchisq( const int& rows, const int& cols, const double& x,
-	  const double& df)
+    const double& df)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = dchisq(x,df);
- 		 
+      
     return temp;
   }
 
@@ -1020,15 +1075,15 @@ namespace SCYTHE {
   rexp (const double &beta)
   {
     static double report;
-		
+    
     // Check for allowable parameter
     if (beta <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Inverse scale parameter beta <= 0");
+        __LINE__, "Inverse scale parameter beta <= 0");
     }
-		
+    
     report = -std::log (runif ()) / beta;
-		
+    
     return (report);
   }
 
@@ -1038,74 +1093,74 @@ namespace SCYTHE {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Attempted to create Matrix of size <= 0");
+        __LINE__, "Attempted to create Matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; ++i)
       temp[i] = rexp (beta);
-		
+    
     return temp;
   }
-	
+  
   /* CDFs */
   double
   pexp(const double& x, const double& scale)
   {
     if (scale <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "scale <= 0");
+        __LINE__, "scale <= 0");
     }
-		
+    
     if (x <= 0)
       return 0;
-		
+    
     return (1 - std::exp(-x*scale));
   }
 
   Matrix<double>
   pexp( const int& rows, const int& cols, const double& x,
-	const double& scale)
+  const double& scale)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = pexp(x,scale);
-		
+    
     return temp;
   }
-	
+  
   /* PDFs */
   double
   dexp(const double& x, const double& scale)
   {
     if (scale <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "scale <= 0");
+        __LINE__, "scale <= 0");
     }
-		
+    
     if (x < 0)
       return 0;
- 		 
+      
     return std::exp(-x * scale) * scale;
   }
 
   Matrix<double>
   dexp( const int& rows, const int& cols, const double& x,
-	const double& scale)
+  const double& scale)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = dexp(x,scale);
-		
+    
     return temp;
   }
 
@@ -1117,7 +1172,7 @@ namespace SCYTHE {
   {
     if (n1 <= 0.0 || n2 <= 0.0)
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "n1 or n2 <= 0");
+        __LINE__, "n1 or n2 <= 0");
 
     return ((rchisq(n1) / n1) / (rchisq(n2) / n2));
   }
@@ -1128,17 +1183,17 @@ namespace SCYTHE {
   {
     if (n1 <= 0 || n2 <= 0){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "n1 or n2 <= 0");
+        __LINE__, "n1 or n2 <= 0");
     }
-	
+  
     if (x <= 0)
       return 0;
- 	 
+    
     if (n2 > 4e5)
       return pchisq(x*n1,n1);
     if (n1 > 4e5)
       return 1-pchisq(n2/x,n2);
-		
+    
     return (1-pbeta(n2/(n2+n1*x),n2/2.0,n1/2.0));
   }
 
@@ -1149,33 +1204,33 @@ namespace SCYTHE {
     int size = rows * cols;
     if (size <= 0){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for(int i = 0; i < size; i++)
       temp [i] = pf(x,n1,n2);
-		
+    
     return temp;
   }
-	
+  
   /* PDFs */
   double
   df(const double& x, const double& m, const double& n)
   {
     double dens;
-		
+    
     if (m <= 0 || n <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "m or n <= 0");
+        __LINE__, "m or n <= 0");
     }
-		
+    
     if (x <= 0)
       return 0;
- 		 
+      
     double f = 1 / (n + x * m);
     double q = n * f;
     double p = x * m * f;
-		
+    
     if (m >= 2) {
       f = m * q / 2;
       dens = INTERNAL::dbinom_raw((m - 2) / 2,(m + n - 2) / 2, p, q);
@@ -1183,7 +1238,7 @@ namespace SCYTHE {
       f = (m * m * q) /(2 * p * (m + n));
       dens = INTERNAL::dbinom_raw(m / 2,(m + n)/ 2, p, q);
     }
-		
+    
     return f*dens;
   }
 
@@ -1194,12 +1249,12 @@ namespace SCYTHE {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = df(x, m, n);
-		
+    
     return temp;
   }
 
@@ -1214,11 +1269,11 @@ namespace SCYTHE {
     // Check for allowable parameters
     if (alpha <= 0) {
       throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__,
-			       __LINE__, "alpha <= 0");
+             __LINE__, "alpha <= 0");
     }
     if (beta <= 0) {
       throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__,
-			       __LINE__, "beta <= 0");
+             __LINE__, "beta <= 0");
     }
 
     if (alpha > 1)
@@ -1233,27 +1288,27 @@ namespace SCYTHE {
 
   Matrix<double>
   rgamma (const int& rows, const int& cols, const double& alpha, 
-	  const double& beta)
+    const double& beta)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Attempted to create Matrix of size <= 0");
+        __LINE__, "Attempted to create Matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; ++i)
       temp[i] = rgamma (alpha, beta);
-	
+  
     return temp;
   }
-	
+  
   /* CDFs */
   double
   pgamma (double x, const double &alph, const double &scale)
   {
     const double xbig = 1.0e+8, xlarge = 1.0e+37, 
       alphlimit = 1000.;/* normal approx. for alph > alphlimit */
-			
+      
     int lower_tail = 1;
 
     double pn1, pn2, pn3, pn4, pn5, pn6, arg, a, b, c, an, osum, sum;
@@ -1264,7 +1319,7 @@ namespace SCYTHE {
 
     if(alph <= 0. || scale <= 0.)
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "alph or scale <= 0");
+        __LINE__, "alph or scale <= 0");
 
     x /= scale;
     
@@ -1275,7 +1330,7 @@ namespace SCYTHE {
 
     if (alph > alphlimit) {
       pn1 = std::sqrt(alph) * 3. * (std::pow(x/alph, 1./3.) + 1.
-				    / (9. * alph) - 1.);
+            / (9. * alph) - 1.);
       return pnorm(pn1, 0., 1.);
     }
 
@@ -1291,9 +1346,9 @@ namespace SCYTHE {
       sum = 1.;
       a = alph;
       do {
-	a += 1.;
-	c *= x / a;
-	sum += c;
+        a += 1.;
+        c *= x / a;
+        sum += c;
       } while (c > DBL_EPSILON);
       arg += std::log(sum);
     }
@@ -1308,29 +1363,28 @@ namespace SCYTHE {
       pn4 = x * b;
       sum = pn3 / pn4;
       for (n = 1; ; n++) {
-	a += 1.;/* =   n+1 -alph */
-	b += 2.;/* = 2(n+1)-alph+x */
-	an = a * n;
-	pn5 = b * pn3 - an * pn1;
-	pn6 = b * pn4 - an * pn2;
-	if (std::fabs(pn6) > 0.) {
-	  osum = sum;
-	  sum = pn5 / pn6;
-	  if (std::fabs(osum - sum) <= DBL_EPSILON * min(1., sum))
-	    break;
-	}
-	pn1 = pn3;
-	pn2 = pn4;
-	pn3 = pn5;
-	pn4 = pn6;
-	if (std::fabs(pn5) >= xlarge) {
-
-	  /* re-scale terms in continued fraction if they are large */
-	  pn1 /= xlarge;
-	  pn2 /= xlarge;
-	  pn3 /= xlarge;
-	  pn4 /= xlarge;
-	}
+        a += 1.;/* =   n+1 -alph */
+        b += 2.;/* = 2(n+1)-alph+x */
+        an = a * n;
+        pn5 = b * pn3 - an * pn1;
+        pn6 = b * pn4 - an * pn2;
+        if (std::fabs(pn6) > 0.) {
+          osum = sum;
+          sum = pn5 / pn6;
+          if (std::fabs(osum - sum) <= DBL_EPSILON * min(1., sum))
+            break;
+        }
+        pn1 = pn3;
+        pn2 = pn4;
+        pn3 = pn5;
+        pn4 = pn6;
+        if (std::fabs(pn5) >= xlarge) {
+          /* re-scale terms in continued fraction if they are large */
+          pn1 /= xlarge;
+          pn2 /= xlarge;
+          pn3 /= xlarge;
+          pn4 /= xlarge;
+        }
       }
       arg += std::log(sum);
     }
@@ -1341,23 +1395,23 @@ namespace SCYTHE {
 
     return (lower_tail) ? sum : 1 - sum;
   }
-	
+  
   Matrix<double>
   pgamma( const int& rows, const int& cols, const double& x,
-	  const double& alph, const double& scale)
+    const double& alph, const double& scale)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = pgamma(x, alph, scale);
-		
+    
     return temp;
   }
-	
+  
 
   /* PDFs */
   double
@@ -1365,20 +1419,20 @@ namespace SCYTHE {
   {
     if (shape <= 0 || scale <= 0)
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "shape or scale <= 0");
+        __LINE__, "shape or scale <= 0");
 
 
     if (x < 0)
       return 0.0;
-		
+    
     if (x == 0) {
       if (shape < 1)
-	throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				  __LINE__, "x == 0 and shape < 1");
-			
+        throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
+            __LINE__, "x == 0 and shape < 1");
+      
       if (shape > 1)
-	return 0.0;
-			
+        return 0.0;
+      
       return 1 / scale;
     }
     
@@ -1386,7 +1440,7 @@ namespace SCYTHE {
       double pr = INTERNAL::dpois_raw(shape, x/scale);
       return pr * shape / x;
     }
-		
+    
     /* else  shape >= 1 */
     double pr = INTERNAL::dpois_raw(shape - 1, x / scale);
     return pr / scale;
@@ -1394,20 +1448,20 @@ namespace SCYTHE {
 
   Matrix<double>
   dgamma( const int& rows, const int& cols, const double& x,
-	  const double& shape, const double& scale)
+    const double& shape, const double& scale)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = dgamma(x, shape, scale);
-		
+    
     return temp;
   }
-	
+  
   /* Other */
   double
   rgamma1 (const double &alpha)
@@ -1419,7 +1473,7 @@ namespace SCYTHE {
     // Check for allowable parameters
     if (alpha <= 1) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "alpha < 1");
+        __LINE__, "alpha < 1");
     }
 
     // Implement Best's (1978) simulator
@@ -1435,22 +1489,22 @@ namespace SCYTHE {
       x = b + y;
 
       if (x > 0) {
-	z = 64 * ::pow (v, 2) * ::pow (w, 3);
-	if (z <= (1 - (2 * ::pow (y, 2) / x))) {
-	  test = 1;
-	  accept = x;
-	} else if ((2 * (b * ::log (x / b) - y)) >= ::log (z)) {
-	  test = 1;
-	  accept = x;
-	} else {
-	  test = 0;
-	}
+        z = 64 * ::pow (v, 2) * ::pow (w, 3);
+        if (z <= (1 - (2 * ::pow (y, 2) / x))) {
+          test = 1;
+          accept = x;
+        } else if ((2 * (b * ::log (x / b) - y)) >= ::log (z)) {
+          test = 1;
+          accept = x;
+        } else {
+          test = 0;
+        }
       }
     }
-		
+    
     return (accept);
   }
-	
+  
   /**** The Logistic Distribution ****/
 
   /* Random Numbers */
@@ -1459,98 +1513,98 @@ namespace SCYTHE {
   {
     static double report;
     double unif;
- 		 
+      
     // Check for allowable paramters
     if (beta <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "beta <= 0");
+        __LINE__, "beta <= 0");
     }
-		
+    
     unif = runif ();
     report = alpha + beta * std::log (unif / (1 - unif));
-		
+    
     return (report);
   }
 
   Matrix<double>
   rlogis (const int& rows, const int& cols, const double& alpha, 
-	  const double& beta)
+    const double& beta)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Attempted to create Matrix of size <= 0");
+        __LINE__, "Attempted to create Matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; ++i)
       temp[i] = rlogis (alpha, beta);
-		
+    
     return temp;
   }
-	
+  
   /* CDFs */
   double
   plogis (const double& x, const double& location,
-	  const double& scale)
+    const double& scale)
   {
     if (scale <= 0.0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "scale <= 0");
+        __LINE__, "scale <= 0");
     }
-		
+    
     double X = (x-location) / scale;
- 		 
+      
     X = std::exp(-X);
- 		 
+      
     return 1 / (1+X);
   }
 
   Matrix<double>
   plogis (const int& rows, const int& cols, const double& x,
-	  const double& location, const double& scale)
+    const double& location, const double& scale)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = plogis(x,location,scale);
-		
+    
     return temp;
   }    
-	
+  
   /* PDFs */
   double
   dlogis( const double& x, const double& location,
-	  const double& scale)
+    const double& scale)
   {
     if (scale <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "scale <= 0");
+        __LINE__, "scale <= 0");
     }
-		
+    
     double X = (x - location) / scale;
     double e = std::exp(-X);
     double f = 1.0 + e;
- 		 
+      
     return e / (scale * f * f);
   }
 
   Matrix<double>
   dlogis( const int& rows, const int& cols, const double& x,
-	  const double& location, const double& scale)
+    const double& location, const double& scale)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = dlogis(x,location,scale);
-		
+    
     return temp;
   }
 
@@ -1562,19 +1616,19 @@ namespace SCYTHE {
   {
     if (logsd < 0.0)
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "standard deviation < 0");
+        __LINE__, "standard deviation < 0");
 
     return std::exp(rnorm(logmean, logsd));
   }
-	
+  
   Matrix<double>
-  rlnorm (	const int &rows, const int &cols, const double &logmean,
-		const double &logsd)
+  rlnorm (  const int &rows, const int &cols, const double &logmean,
+    const double &logsd)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Attempted to create Matrix of size <= 0");
+        __LINE__, "Attempted to create Matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; ++i)
@@ -1582,71 +1636,71 @@ namespace SCYTHE {
 
     return temp;
   }
-	
+  
   /* CDFs */
 
   double
   plnorm (const double& x, const double &logmean,
-	  const double & logsd)
+    const double & logsd)
   {
     if (logsd <= 0){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "logsd <= 0");
+        __LINE__, "logsd <= 0");
     }
-		
+    
     if (x > 0)
       return pnorm(std::log(x), logmean, logsd);
-		
+    
     return 0;
   }
 
   Matrix<double>
   plnorm (const int& rows, const int& cols, const double& x,
-	  const double& logmean, const double& logsd)
+    const double& logmean, const double& logsd)
   {
     int size = rows * cols;
     if (size <= 0){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for(int i=0; i<size; i++)
       temp[i] = plnorm(x,logmean,logsd);
-		
+    
     return temp;
   }  
 
   /* PDFs */
   double
   dlnorm( const double& x, const double& logmean,
-	  const double& logsd)
+    const double& logsd)
   {
     if (logsd <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "logsd <= 0");
+        __LINE__, "logsd <= 0");
     }
-		
+    
     if (x == 0)
       return 0;
-		
+    
     double y = (::log(x) - logmean) / logsd;
-		
+    
     return (1 / (::sqrt(2 * M_PI))) * ::exp(-0.5 * y * y) / (x * logsd);
   }
 
   Matrix<double>
   dlnorm( const int& rows, const int& cols, const double& x,
-	  const double& logmean, const double& logsd)
+    const double& logmean, const double& logsd)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = dlnorm(x, logmean, logsd);
-		
+    
     return temp;
   }
 
@@ -1658,24 +1712,24 @@ namespace SCYTHE {
   {
     if (n <= 0 || p <= 0 || p > 1)
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "n <= 0, p <= 0, or p > 1");
+        __LINE__, "n <= 0, p <= 0, or p > 1");
 
     return rpois(rgamma(n, (1 - p) / p));
   }
 
   Matrix<double>
   rnbinom(const int &rows, const int &cols, const int &n,
-	  const int &p)
+    const int &p)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = rnbinom(n, p);
-		
+    
     return temp;
   }
 
@@ -1685,31 +1739,31 @@ namespace SCYTHE {
   {
     if (n <= 0 || p <= 0 || p >= 1){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "n <= 0 or p not in (0,1)");
+        __LINE__, "n <= 0 or p not in (0,1)");
     }
-		
+    
     double X = floor(x + 1e-7);
- 		 
+      
     if (X < 0)
       return 0.0;
-		
+    
     return pbeta(p, n, X + 1);
   }
 
   Matrix<double>
   pnbinom(const int& rows, const int& cols, const double& x,
-	  const double& n, const double& p)
+    const double& n, const double& p)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
-		
+    
     for (int i = 0; i < size; i++)
       temp[i] = pnbinom(x,n,p);
-		
+    
     return temp;
   }    
 
@@ -1719,37 +1773,37 @@ namespace SCYTHE {
   {
     if (p < 0 || p > 1 || n <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "p not in [0,1] or n <= 0");
+        __LINE__, "p not in [0,1] or n <= 0");
     }
-		
+    
     if (x < 0)
       return 0;
-		
+    
     double X = floor(x + 0.5);
-		
+    
     double prob = INTERNAL::dbinom_raw(n, X + n, p, 1 - p);
     double P = (double) n / (n + x);
-		
+    
     return P * prob;
   }
 
   Matrix<double>
   dnbinom(const int& rows, const int& cols, const double& x,
-	  const double& n, const double& p)
+    const double& n, const double& p)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = dnbinom(x,n,p);
-		
+    
     return temp;
   }
 
-	
+  
   /**** The Normal Distribution ****/
 
   /* Random Numbers */
@@ -1758,20 +1812,20 @@ namespace SCYTHE {
   {
     if (sigma <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Negative variance");
+        __LINE__, "Negative variance");
     }
-		
+    
     return (mu + rnorm1 () * sigma);
   }
 
   Matrix<double>
-  rnorm (	const int &rows, const int &cols, const double &mu,
-		const double &sigma)
+  rnorm (  const int &rows, const int &cols, const double &mu,
+    const double &sigma)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Attempted to create Matrix of size <= 0");
+        __LINE__, "Attempted to create Matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; ++i)
@@ -1783,62 +1837,62 @@ namespace SCYTHE {
   /* CDFs */
   double
   pnorm (const double &x, const double &mu, const double &sigma)
-	
+  
   {
     if (sigma <= 0)
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__, __LINE__,
-				"negative standard deviation");
+        "negative standard deviation");
 
     return pnorm2((x - mu) / sigma, true, false);
   }
-	
+  
   Matrix<double>
   pnorm(const int& rows, const int& cols, const double& x,
-	const double& mu, const double& sigma)
+  const double& mu, const double& sigma)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = pnorm(x,mu,sigma);
-		
+    
     return temp;
   }
-	
+  
   /* PDFs */
   double
   dnorm(const double& x, const double& mu,
-	const double& sigma)
+  const double& sigma)
   {
     if (sigma <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "negative standard deviation");
+        __LINE__, "negative standard deviation");
     }
-		
+    
     double X = (x - mu) / sigma;
-		
+    
     return (M_1_SQRT_2PI * std::exp(-0.5 * X * X) / sigma);
   }
 
   Matrix<double>
   dnorm(const int& rows, const int& cols, const double& x,
-	const double& mu, const double& sigma)
+  const double& mu, const double& sigma)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = dnorm(x,mu,sigma);
-		
+    
     return temp;
   }
-	
+  
   /* Others  */
   double
   rnorm1 ()
@@ -1848,9 +1902,9 @@ namespace SCYTHE {
     double nu1, nu2, rsquared, sqrt_term;
     if (rnorm_count == 1){ // odd numbered passses
       do {
-	nu1 = -1 +2*runif();
-	nu2 = -1 +2*runif();
-	rsquared = ::pow(nu1,2) + ::pow(nu2,2);
+        nu1 = -1 +2*runif();
+        nu2 = -1 +2*runif();
+        rsquared = ::pow(nu1,2) + ::pow(nu2,2);
       } while (rsquared >= 1 || rsquared == 0.0);
       sqrt_term = ::sqrt(-2*::log(rsquared)/rsquared);
       x2 = nu2*sqrt_term;
@@ -1861,244 +1915,241 @@ namespace SCYTHE {
       return x2;
     } 
   }
-	
+  
   /* Returns the univariate standard normal cumulative distribution
    * function (CDF)
-	 *
-	 * DEPRECATED
+   *
+   * DEPRECATED
    */
   double
   pnorm1 (double x, const double& eps, const double& maxit,
-	  const double& minit)
+    const double& minit)
   {
     int i;
- 	 
+    
     if (x == 0)
       return 0.5;
   
     //if x nonnegative keep sign of x and return f + 0.5
     if (x > 0) {
-      double a = (1 / (::sqrt (2.0 * M_PI))) * ::exp (-(x * x) / 2.0) * x;
+      double a = (1 / (::sqrt (2.0 * M_PI))) * ::exp (-(x * x) / 2.0)
+        * x;
       double f = a;
       for (i = 1; i < maxit; ++i) {
-	a = a * (x * x) / (2 * i + 1);
-	f += a;
-	if (::fabs(a)/f < eps && i > minit)
-	  break;
+        a = a * (x * x) / (2 * i + 1);
+        f += a;
+        if (::fabs(a)/f < eps && i > minit)
+          break;
       }
       if (i == maxit) {
-	throw scythe_convergence_error (__FILE__, __PRETTY_FUNCTION__,
-					__LINE__, std::string("x (") & x & "did not converge");
+        throw scythe_convergence_error (__FILE__, __PRETTY_FUNCTION__,
+            __LINE__, std::string("x (") & x & "did not converge");
       } else
-	return (f + 0.5);
+        return (f + 0.5);
     } else {
       // if x negative flip the sign and return 0.5 - f
       x = -1*x;
       double a = (1 / (::sqrt (2.0 * M_PI)))
-	* ::exp (-(x * x) / 2.0) * x;
+        * ::exp (-(x * x) / 2.0) * x;
       double f = a;
       for (i = 1; i < maxit; ++i) {
-	a = a * (x * x) / (2 * i + 1);
-	f += a;
-	if (::fabs(a)/f < eps && i > minit)
-	  break;
+        a = a * (x * x) / (2 * i + 1);
+        f += a;
+        if (::fabs(a)/f < eps && i > minit)
+          break;
       }
       if (i == maxit) {
-	throw scythe_convergence_error (__FILE__, __PRETTY_FUNCTION__,
-					__LINE__, std::string("x (") & x & "did not converge");
+        throw scythe_convergence_error (__FILE__, __PRETTY_FUNCTION__,
+            __LINE__, std::string("x (") & x & "did not converge");
       } else
-	return (0.5 - f);
+        return (0.5 - f);
     }
   }
 
-	/* A newer version of pnorm for 0.4.  The pnorm wrapper has been
-	 * updated to use this function, as have library calls that
-	 * previously used pnorm1.
-	 *
-	 * Ported from the R Statistical Library 1.6.2
-	 * (Copyright (C) 2000 The R Development Core Team (GPL))
-	 */
+  /* A newer version of pnorm for 0.4.  The pnorm wrapper has been
+   * updated to use this function, as have library calls that
+   * previously used pnorm1.
+   */
+
+	 // Many original comments left in for reference.
 
 #define SIXTEN 16
-#define do_del(X)							\
-	xsq = trunc(X * SIXTEN) / SIXTEN;				\
-	del = (X - xsq) * (X + xsq);					\
-	if(log_p) {							\
-	    *cum = (-xsq * xsq * 0.5) + (-del * 0.5) + log(temp);	\
-	    if((lower && x > 0.) || (upper && x <= 0.))			\
-		  *ccum = log1p(-exp(-xsq * xsq * 0.5) * 		\
-				exp(-del * 0.5) * temp);		\
-	}								\
-	else {								\
-	    *cum = exp(-xsq * xsq * 0.5) * exp(-del * 0.5) * temp;	\
-	    *ccum = 1.0 - *cum;						\
-	}
+#define do_del(X)              \
+  xsq = trunc(X * SIXTEN) / SIXTEN;        \
+  del = (X - xsq) * (X + xsq);          \
+  if(log_p) {              \
+      *cum = (-xsq * xsq * 0.5) + (-del * 0.5) + log(temp);  \
+      if((lower && x > 0.) || (upper && x <= 0.))      \
+      *ccum = log1p(-exp(-xsq * xsq * 0.5) *     \
+        exp(-del * 0.5) * temp);    \
+  }                \
+  else {                \
+      *cum = exp(-xsq * xsq * 0.5) * exp(-del * 0.5) * temp;  \
+      *ccum = 1.0 - *cum;            \
+  }
 
-#define swap_tail						\
-	if (x > 0.) {/* swap  ccum <--> cum */			\
-	    temp = *cum; if(lower) *cum = *ccum; *ccum = temp;	\
-	}
+#define swap_tail            \
+  if (x > 0.) {/* swap  ccum <--> cum */      \
+      temp = *cum; if(lower) *cum = *ccum; *ccum = temp;  \
+  }
 
-	void
-	pnorm_both(	double x, double *cum, double *ccum, int i_tail,
-							bool log_p)
-	{
-		const double a[5] = {
-			2.2352520354606839287,
-			161.02823106855587881,
-			1067.6894854603709582,
-			18154.981253343561249,
-			0.065682337918207449113
-		};
-		const double b[4] = {
-			47.20258190468824187,
-			976.09855173777669322,
-			10260.932208618978205,
-			45507.789335026729956
-		};
-		const double c[9] = {
-			0.39894151208813466764,
-			8.8831497943883759412,
-			93.506656132177855979,
-			597.27027639480026226,
-			2494.5375852903726711,
-			6848.1904505362823326,
-			11602.651437647350124,
-			9842.7148383839780218,
-			1.0765576773720192317e-8
-		};
-		const double d[8] = {
-			22.266688044328115691,
-			235.38790178262499861,
-			1519.377599407554805,
-			6485.558298266760755,
-			18615.571640885098091,
-			34900.952721145977266,
-			38912.003286093271411,
-			19685.429676859990727
-		};
-		const double p[6] = {
-			0.21589853405795699,
-			0.1274011611602473639,
-			0.022235277870649807,
-			0.001421619193227893466,
-			2.9112874951168792e-5,
-			0.02307344176494017303
-		};
-		const double q[5] = {
-			1.28426009614491121,
-			0.468238212480865118,
-			0.0659881378689285515,
-			0.00378239633202758244,
-			7.29751555083966205e-5
-		};
-		
-		double xden, xnum, temp, del, eps, xsq, y;
-		int i, lower, upper;
+  void
+  pnorm_both(  double x, double *cum, double *ccum, int i_tail,
+              bool log_p)
+  {
+    const double a[5] = {
+      2.2352520354606839287,
+      161.02823106855587881,
+      1067.6894854603709582,
+      18154.981253343561249,
+      0.065682337918207449113
+    };
+    const double b[4] = {
+      47.20258190468824187,
+      976.09855173777669322,
+      10260.932208618978205,
+      45507.789335026729956
+    };
+    const double c[9] = {
+      0.39894151208813466764,
+      8.8831497943883759412,
+      93.506656132177855979,
+      597.27027639480026226,
+      2494.5375852903726711,
+      6848.1904505362823326,
+      11602.651437647350124,
+      9842.7148383839780218,
+      1.0765576773720192317e-8
+    };
+    const double d[8] = {
+      22.266688044328115691,
+      235.38790178262499861,
+      1519.377599407554805,
+      6485.558298266760755,
+      18615.571640885098091,
+      34900.952721145977266,
+      38912.003286093271411,
+      19685.429676859990727
+    };
+    const double p[6] = {
+      0.21589853405795699,
+      0.1274011611602473639,
+      0.022235277870649807,
+      0.001421619193227893466,
+      2.9112874951168792e-5,
+      0.02307344176494017303
+    };
+    const double q[5] = {
+      1.28426009614491121,
+      0.468238212480865118,
+      0.0659881378689285515,
+      0.00378239633202758244,
+      7.29751555083966205e-5
+    };
+    
+    double xden, xnum, temp, del, eps, xsq, y;
+    int i, lower, upper;
 
-		/* Consider changing these : */
-		eps = DBL_EPSILON * 0.5;
+    /* Consider changing these : */
+    eps = DBL_EPSILON * 0.5;
 
-		/* i_tail in {0,1,2} =^= {lower, upper, both} */
-		lower = i_tail != 1;
-		upper = i_tail != 0;
+    /* i_tail in {0,1,2} =^= {lower, upper, both} */
+    lower = i_tail != 1;
+    upper = i_tail != 0;
 
-		y = std::fabs(x);
-		if (y <= 0.67448975) {
-			/* qnorm(3/4) = .6744.... -- earlier had 0.66291 */
-			if (y > eps) {
-				xsq = x * x;
-				xnum = a[4] * xsq;
-				xden = xsq;
-				for (i = 0; i < 3; ++i) {
-					xnum = (xnum + a[i]) * xsq;
-					xden = (xden + b[i]) * xsq;
-				}
-			} else xnum = xden = 0.0;
-			
-			temp = x * (xnum + a[3]) / (xden + b[3]);
-			if(lower)  *cum = 0.5 + temp;
-			if(upper) *ccum = 0.5 - temp;
-			if(log_p) {
-				if(lower)  *cum = log(*cum);
-				if(upper) *ccum = log(*ccum);
-			}
-		} else if (y <= M_SQRT_32) {
-			/* Evaluate pnorm for 0.674.. = qnorm(3/4) < |x| <= sqrt(32) 
-			 * ~= 5.657 */
+    y = std::fabs(x);
+    if (y <= 0.67448975) {
+      /* qnorm(3/4) = .6744.... -- earlier had 0.66291 */
+      if (y > eps) {
+        xsq = x * x;
+        xnum = a[4] * xsq;
+        xden = xsq;
+        for (i = 0; i < 3; ++i) {
+          xnum = (xnum + a[i]) * xsq;
+          xden = (xden + b[i]) * xsq;
+        }
+      } else xnum = xden = 0.0;
+      
+      temp = x * (xnum + a[3]) / (xden + b[3]);
+      if(lower)  *cum = 0.5 + temp;
+      if(upper) *ccum = 0.5 - temp;
+      if(log_p) {
+        if(lower)  *cum = log(*cum);
+        if(upper) *ccum = log(*ccum);
+      }
+    } else if (y <= M_SQRT_32) {
+      /* Evaluate pnorm for 0.674.. = qnorm(3/4) < |x| <= sqrt(32) 
+       * ~= 5.657 */
 
-			xnum = c[8] * y;
-			xden = y;
-			for (i = 0; i < 7; ++i) {
-				xnum = (xnum + c[i]) * y;
-				xden = (xden + d[i]) * y;
-			}
-			temp = (xnum + c[7]) / (xden + d[7]);
-			do_del(y);
-			swap_tail;
-		} else if((-37.5193 < x) && (x < 8.2924)) {
-			/* originally had y < 50 */
-			/* Evaluate pnorm for x in (-37.5, -5.657) 
-			 * union (5.657, 8.29) */
-			xsq = 1.0 / (x * x);
-			xnum = p[5] * xsq;
-			xden = xsq;
-			for (i = 0; i < 4; ++i) {
-				xnum = (xnum + p[i]) * xsq;
-				xden = (xden + q[i]) * xsq;
-			}
-			temp = xsq * (xnum + p[4]) / (xden + q[4]);
-			temp = (M_1_SQRT_2PI - temp) / y;
-			do_del(x);
-			swap_tail;
-		} else { /* x < -37.5193  OR	8.2924 < x */
-			if(log_p) {/* be better than to just return log(0) or log(1) */
-				xsq = x*x;
-				if(xsq * DBL_EPSILON < 1.)
-					del = (1. - (1. - 5./(xsq+6.)) / (xsq+4.)) / (xsq+2.);
-				else
-					del = 0.;
-				*cum = -.5*xsq - M_LN_SQRT_2PI - log(y) + log1p(del);
-				*ccum = -0.;/*log(1)*/
-				swap_tail;
-			} else {
-				if(x > 0) {
-					*cum = 1.; *ccum = 0.;
-				} else {
-					*cum = 0.; *ccum = 1.;
-				}
-			}
-			if (THROW_ON_NONCONV) 
-				throw scythe_convergence_error (__FILE__, __PRETTY_FUNCTION__,
-						__LINE__, std::string("x (") & x & "did not converge");
-		}
-		return;
-	}
+      xnum = c[8] * y;
+      xden = y;
+      for (i = 0; i < 7; ++i) {
+        xnum = (xnum + c[i]) * y;
+        xden = (xden + d[i]) * y;
+      }
+      temp = (xnum + c[7]) / (xden + d[7]);
+      do_del(y);
+      swap_tail;
+    } else if (log_p
+              || (lower && -37.5193 < x && x < 8.2924)
+              || (upper && -8.2929 < x && x < 37.5193)
+        ) {
+      /* Evaluate pnorm for x in (-37.5, -5.657) union (5.657, 37.5) */
+      xsq = 1.0 / (x * x);
+      xnum = p[5] * xsq;
+      xden = xsq;
+      for (i = 0; i < 4; ++i) {
+        xnum = (xnum + p[i]) * xsq;
+        xden = (xden + q[i]) * xsq;
+      }
+      temp = xsq * (xnum + p[4]) / (xden + q[4]);
+      temp = (M_1_SQRT_2PI - temp) / y;
+      do_del(x);
+      swap_tail;
+    } else {
+      if (x > 0) {
+        *cum = 1.;
+        *ccum = 0.;
+      } else {
+        *cum = 0.;
+        *ccum = 1.;
+      }
+      if (THROW_ON_NONCONV)
+        throw scythe_convergence_error (__FILE__, __PRETTY_FUNCTION__,
+            __LINE__, std::string("x (") & x & "did not converge");
+    }
+
+    return;
+  }
 #undef SIXTEN
 #undef do_del
 #undef swap_tail
 
-	double
-	pnorm2 (const double &x, const bool &lower_tail, const bool &log_p)
-	{
-		// XXX A mingw fix is probably required here
-		//if (isnan(x))
-		//	throw scythe_nan_error (__FILE__, __PRETTY_FUNCTION__,
-		//			__LINE__, "Quantile x is not a number (NaN)");
+  double
+  pnorm2 (const double &x, const bool &lower_tail, const bool &log_p)
+  {
+    // XXX An sgi fix is probably required here
+    // if (isnan(x))
+    //  throw scythe_nan_error (__FILE__, __PRETTY_FUNCTION__,
+    //      __LINE__, "Quantile x is not a number (NaN)");
 #ifdef __MINGW32__
-		if (! finite(x))
+    if (! finite(x))
 #else
-		if (isinf(x))
+#ifdef sgi
+    if (IsINF(x))
+#else
+    if (isinf(x))
 #endif
-			throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-					__LINE__, "Quantile x is inifinte (+/-Inf)");
+#endif
+      throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
+          __LINE__, "Quantile x is inifinte (+/-Inf)");
 
-		double p, cp;
-		pnorm_both(x, &p, &cp, (lower_tail ? 0 : 1), log_p);
+    double p, cp;
+    pnorm_both(x, &p, &cp, (lower_tail ? 0 : 1), log_p);
 
-		return (lower_tail ? p : cp);
-	}
-	
+    return (lower_tail ? p : cp);
+  }
+  
   /* Returns the quantile of the standard normal distribution 
    * associated with a given probability p
    */
@@ -2118,25 +2169,25 @@ namespace SCYTHE {
     double q4 = 0.38560700634e-2;
     double xp = 0.0;
     double p = in_p;
- 		 
+      
     if (p > 0.5)
       p = 1 - p;
-   		 
+        
     if (p < lim) {
       throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__,
-			       __LINE__, "p outside accuracy limit");
+             __LINE__, "p outside accuracy limit");
     }
- 		 
+      
     if (p == 0.5)
       return xp;
- 		 
+      
     double y = ::sqrt (::log (1.0 / ::pow (p, 2)));
     xp = y + ((((y * p4 + p3) * y + p2) * y + p1) * y + p0) /
       ((((y * q4 + q3) * y + q2) * y + q1) * y + q0);
- 		 
+      
     if (in_p < 0.5)
       xp = -1 * xp;
-		
+    
     return xp;
   }
 
@@ -2146,14 +2197,14 @@ namespace SCYTHE {
   {
     if (sigma <= 0){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "negative standard deviation");
+        __LINE__, "negative standard deviation");
     }
-		
+    
     double X = (x - mu) / sigma;
-		
+    
     return -(M_LN_SQRT_2PI  +  0.5 * X * X + std::log(sigma));
   }
-	
+  
   /**** The Poison Distribution ****/
 
   /* Random Numbers */
@@ -2162,17 +2213,17 @@ namespace SCYTHE {
   {
     if (lambda <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__, __LINE__,
-				"lambda <= 0");
+        "lambda <= 0");
     }
     int n;
-		
+    
     if (lambda < 33){
       double cutoff = ::exp(-lambda);
       n = -1;
       double t = 1.0;
       do {
-	++n;
-	t *= runif();
+        ++n;
+        t *= runif();
       } while (t > cutoff);    
     } else{
       int accept = 0;
@@ -2180,24 +2231,24 @@ namespace SCYTHE {
       double beta = M_PI/::sqrt(3*lambda);
       double alpha = lambda*beta;
       double k = ::log(c) - lambda - ::log(beta);
-   		 
+        
       while (accept == 0){
-	double u1 = runif();
-	double x = (alpha - ::log((1-u1)/u1))/beta;
-	while (x <= -0.5){
-	  u1 = runif();
-	  x = (alpha - ::log((1-u1)/u1))/beta;
-	} 
-	n = static_cast<int>(x + 0.5);
-	double u2 = runif();
-	double lhs = alpha - beta*x +
-	  ::log(u2/::pow(1+::exp(alpha-beta*x),2));
-	double rhs = k + n*::log(lambda) - lnfactorial(n);
-	if (lhs <= rhs)
-	  accept = 1;
+        double u1 = runif();
+        double x = (alpha - ::log((1-u1)/u1))/beta;
+        while (x <= -0.5){
+          u1 = runif();
+          x = (alpha - ::log((1-u1)/u1))/beta;
+        } 
+        n = static_cast<int>(x + 0.5);
+        double u2 = runif();
+        double lhs = alpha - beta*x +
+          ::log(u2/::pow(1+::exp(alpha-beta*x),2));
+        double rhs = k + n*::log(lambda) - lnfactorial(n);
+        if (lhs <= rhs)
+          accept = 1;
       }
     }
-		
+    
     return n;
   }
 
@@ -2207,12 +2258,12 @@ namespace SCYTHE {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = rpois(lambda);
-		
+    
     return temp;
   }
 
@@ -2222,48 +2273,48 @@ namespace SCYTHE {
   {
     if(lambda<=0.0){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "lambda <= 0");
+        __LINE__, "lambda <= 0");
     }
-		
+    
     double X = floor(x + 1e-7);
-		
+    
     if (X < 0)
       return 0;
     if (lambda == 1)
       return 1;
-		
+    
     return 1 - pgamma(lambda, X + 1, 1.0);
   }
 
   Matrix<double>
   ppois(const int& rows, const int& cols, const double& x,
-	const double& lambda)
+  const double& lambda)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = ppois(x,lambda);
- 		 
+      
     return temp;
   }
-	
+  
   /* PDFs */
   double
   dpois(const int &x, const double &lambda)
   {
     if (x < 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__, __LINE__,
-				"x < 0");
+        "x < 0");
     }
     if (lambda <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__, __LINE__,
-				"lambda <= 0");
+        "lambda <= 0");
     }
-		
+    
     // compute log(x!)
     double xx = x+1;
     double cof[6] = {
@@ -2278,23 +2329,23 @@ namespace SCYTHE {
       ser += (cof[j] / ++y);
     }
     double lnfactx = ::log(2.5066282746310005 * ser / xx) - tmp;
- 		 
+      
     return (::exp( -1*lnfactx + x * ::log(lambda) - lambda));
   }
 
   Matrix<double>
   dpois(const int& rows, const int& cols, const double& x,
-	const double& lambda)
+  const double& lambda)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = dpois((int)x,lambda);
-		
+    
     return temp;
   }
 
@@ -2307,21 +2358,21 @@ namespace SCYTHE {
   {
     static double report;
     double x, z;
- 		 
+      
     // Check for allowable paramters
     if (sigma2 <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Variance parameter sigma2 <= 0");
+        __LINE__, "Variance parameter sigma2 <= 0");
     }
     if (nu <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "D.O.F parameter nu <= 0");
+        __LINE__, "D.O.F parameter nu <= 0");
     }
-		
+    
     z = rnorm1 ();
     x = rchisq (nu);
     report = mu + ::sqrt (sigma2) * z * ::sqrt (nu) / ::sqrt (x);
-		
+    
     return (report);
   }
 
@@ -2332,12 +2383,12 @@ namespace SCYTHE {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Attempted to create Matrix of size <= 0");
+        __LINE__, "Attempted to create Matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; ++i)
       temp[i] = rt (mu, sigma2, nu);
-		
+    
     return temp;
   }
 
@@ -2346,22 +2397,22 @@ namespace SCYTHE {
   pt(const double& x, const double& n)
   {
     double val;
-		
+    
     if (n <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "n <= 0");
+        __LINE__, "n <= 0");
     }
-		
+    
     if (n > 4e5) {
       val = 1/(4*n);
       return pnorm2(x * (1 - val) / ::sqrt(1 + x * x * 2. * val), 
-					true, false);
+          true, false);
     }
-		
+    
     val = pbeta(n / (n + x * x), n / 2.0, 0.5);
-		
+    
     val /= 2;
-		
+    
     if (x <= 0)
       return val;
     else
@@ -2374,15 +2425,15 @@ namespace SCYTHE {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = pt(x,n);
-		
+    
     return temp;
   }
-	
+  
   /* PDFs */
   double
   dt(const double& x, const double& n)
@@ -2390,9 +2441,9 @@ namespace SCYTHE {
     double u;
     if (n <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "n <= 0");
+        __LINE__, "n <= 0");
     }
-		
+    
     double t = -INTERNAL::bd0(n/2., (n + 1) / 2.)
       + INTERNAL::stirlerr((n + 1) / 2.)
       - INTERNAL::stirlerr(n / 2.);
@@ -2400,7 +2451,7 @@ namespace SCYTHE {
       u = std::log(1+x*x/n)*n/2;
     else
       u = -INTERNAL::bd0(n/2., (n+x*x)/2.) + x*x/2;
-		
+    
     return std::exp(t-u)/std::sqrt(2*M_PI*(1+x*x/n));
   }
 
@@ -2410,17 +2461,17 @@ namespace SCYTHE {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = dt(x,n);
-		
+    
     return temp;
   }
-	
+  
   /* Other */
-	
+  
   /* Returns the univariate Student-t density evaluated at x 
    * with mean mu, scale sigma^2, and nu degrees of freedom
    */
@@ -2428,12 +2479,12 @@ namespace SCYTHE {
   dt1(const double& x, const double& mu, const double& sigma2, 
       const double& nu)
   {
-    double logdens = 	lngammafn((nu + 1.0) /2.0)
+    double logdens =   lngammafn((nu + 1.0) /2.0)
       - std::log(std::sqrt(nu * M_PI))
       - lngammafn(nu / 2.0) - std::log(std::sqrt(sigma2))
       - (nu + 1.0) / 2.0 * std::log(1.0 + (std::pow((x - mu), 2.0))
-				    / (nu * sigma2));
-		
+            / (nu * sigma2));
+    
     return(std::exp(logdens));
   }
 
@@ -2442,37 +2493,37 @@ namespace SCYTHE {
    * degrees of freedom
    */
   double 
-  lndt1(	const double& x, const double& mu, const double& sigma2, 
-		const double& nu)
+  lndt1(  const double& x, const double& mu, const double& sigma2, 
+    const double& nu)
   {
     double logdens = lngammafn((nu+1.0)/2.0)
       - std::log(std::sqrt(nu*M_PI))
       - lngammafn(nu/2.0) - std::log(std::sqrt(sigma2))
       - (nu+1.0)/2.0 * std::log(1.0 + (std::pow((x-mu),2.0))
-				/(nu * sigma2));
-		
+        /(nu * sigma2));
+    
     return(logdens);
   }
 
   /**** The Uniform Distribution ****/
 
   /* Random Numbers */
-	
+  
   // double runif is inline
-	
+  
   Matrix<double>
   runif (const int &rows, const int &cols)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Attempted to create Matrix of size <= 0");
+        __LINE__, "Attempted to create Matrix of size <= 0");
     }
-		
+    
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; ++i)
       temp[i] = runif ();
-		
+    
     return temp;
   }
 
@@ -2482,31 +2533,31 @@ namespace SCYTHE {
   {
     if (b <= a) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "b <= a");
+        __LINE__, "b <= a");
     }
- 		 
+      
     if (x <= a)
       return 0.0;
-   		 
+        
     if (x >= b)
       return 1.0;
- 		 
+      
     return (x - a) / (b - a);
   }
 
   Matrix<double>
   punif(const int& rows, const int& cols, const double& x,
-	const double& a, const double& b)
+  const double& a, const double& b)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = punif(x,a,b);
-		
+    
     return temp;
   }
 
@@ -2516,28 +2567,28 @@ namespace SCYTHE {
   {
     if (b <= a) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "b <= a");
+        __LINE__, "b <= a");
     }
-		
+    
     if (a <= x && x <= b)
       return 1.0 / (b - a);
-		
+    
     return 0.0;
   }
 
   Matrix<double>
   dunif(const int& rows, const int& cols, const double& x,
-	const double& a, const double& b)
+  const double& a, const double& b)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = dunif(x,a,b);
-		
+    
     return temp;
   }
 
@@ -2549,109 +2600,109 @@ namespace SCYTHE {
   {
     if (shape <= 0 || scale <= 0)
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "shape or scale <= 0");
+        __LINE__, "shape or scale <= 0");
 
     return scale * std::pow(-std::log(runif()), 1.0 / shape);
   }
 
   Matrix<double>
   rweibull( const int& rows, const int& cols, const double& shape,
-	    const double& scale)
+      const double& scale)
   {
     int size = rows * cols;
     if (size <= 0){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = rweibull(shape,scale);
-		
+    
     return temp;
   }
 
   /* CDFs */
   double
   pweibull( const double& x, const double& shape,
-	    const double& scale)
+      const double& scale)
   {
     if (shape <= 0 || scale <= 0){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "shape or scale <= 0");
+        __LINE__, "shape or scale <= 0");
     }
-		
+    
     if (x <= 0)
       return 0.0;
-		
+    
     return 1 - std::exp(-std::pow(x / scale, shape));
   }
 
   Matrix<double>
   pweibull( const int& rows, const int& cols, const double& x,
-	    const double& shape, const double& scale)
+      const double& shape, const double& scale)
   {
     int size = rows * cols;
     if (size <= 0){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = pweibull(x,shape,scale);
-		
+    
     return temp;
   }
 
   /* PDFs */
   double
   dweibull( const double& x, const double& shape,
-	    const double& scale)
+      const double& scale)
   {
     if (shape <= 0 || scale <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "shape or scale <= 0");
+        __LINE__, "shape or scale <= 0");
     }
     if (x < 0)
       return 0;
-			
+      
     double tmp1 = std::pow(x / scale, shape - 1);
     double tmp2 = tmp1*(x / scale);
- 		 
+      
     return shape * tmp1 * std::exp(-tmp2) / scale;
   }
 
   Matrix<double>
   dweibull( const int& rows, const int& cols, const double& x,
-	    const double& shape, const double& scale)
+      const double& shape, const double& scale)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Tried to create matrix of size <= 0");
+        __LINE__, "Tried to create matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; i++)
       temp[i] = dweibull(x,shape,scale);
-		
+    
     return temp;
   }
 
   /************************************
    * Partially Finished Distributions *
    ************************************/
-	
+  
   /* Inverse Chi Squared */
   double
   richisq (const double &nu)
   {
     static double report;
- 		 
+      
     // Check for allowable parameter
     if (nu <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Degrees of freedom <= 0");
+        __LINE__, "Degrees of freedom <= 0");
     }
- 		 
+      
     // Return Inverse-Gamma(nu/2, 1/2) deviate
     report = rigamma (nu / 2, .5);
     return (report);
@@ -2663,12 +2714,12 @@ namespace SCYTHE {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Attempted to create Matrix of size <= 0");
+        __LINE__, "Attempted to create Matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; ++i)
       temp[i] = richisq (nu);
-		
+    
     return temp;
   }
 
@@ -2677,15 +2728,15 @@ namespace SCYTHE {
   rigamma (const double& alpha, const double& beta)
   {
     static double report;
-		
+    
     // Check for allowable parameters
     if (alpha <= 0) {
       throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__,
-			       __LINE__, "alpha <= 0");
+             __LINE__, "alpha <= 0");
     }
     if (beta <= 0) {
       throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__,
-			       __LINE__, "beta <= 0");
+             __LINE__, "beta <= 0");
     }
     // Return reciprocal of gamma deviate
     report = ::pow (rgamma (alpha, beta), -1);
@@ -2694,19 +2745,19 @@ namespace SCYTHE {
   }
 
   Matrix<double>
-  rigamma (	const int &rows, const int &cols, const double &alpha,
-		const double &beta)
+  rigamma (  const int &rows, const int &cols, const double &alpha,
+    const double &beta)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Attempted to create Matrix of size <= 0");
+        __LINE__, "Attempted to create Matrix of size <= 0");
     }
-		
+    
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; ++i)
       temp[i] = rigamma (alpha, beta);
-		
+    
     return temp;
   }
 
@@ -2716,17 +2767,17 @@ namespace SCYTHE {
   {
     if (! S.isSquare()) {
       throw scythe_dimension_error(__FILE__, __PRETTY_FUNCTION__,
-				   __LINE__, "S not square");
+           __LINE__, "S not square");
     }
     if (v < S.rows()) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "v < S.rows()");
+        __LINE__, "v < S.rows()");
     }
- 		 
+      
     Matrix<double> A(S.rows(), S.rows()); //XXX init to 0?
     Matrix<double> C = cholesky(S);
     Matrix<double> alpha;
- 		 
+      
     for (int i = 0; i < v; ++i) {
       alpha = C * rnorm(S.rows(), 1);
       A = A + (alpha * (!alpha));
@@ -2741,11 +2792,11 @@ namespace SCYTHE {
     // Check for allowable parameters
     if (min(alpha) <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "alpha has elements < 0");
+        __LINE__, "alpha has elements < 0");
     }
     if (alpha.cols() > 1) {
       throw scythe_dimension_error(__FILE__, __PRETTY_FUNCTION__,
-				   __LINE__, "alpha not column vector");
+           __LINE__, "alpha not column vector");
     }     
  
     int dim = alpha.rows();
@@ -2769,15 +2820,15 @@ namespace SCYTHE {
     int dim = mu.rows();
     if (mu.cols() != 1) {
       throw scythe_dimension_error(__FILE__, __PRETTY_FUNCTION__,
-				   __LINE__, "mu not column vector");
+           __LINE__, "mu not column vector");
     }
     if (! sigma.isSquare()) {
       throw scythe_dimension_error(__FILE__, __PRETTY_FUNCTION__,
-				   __LINE__, "sigma not square");
+           __LINE__, "sigma not square");
     }
     if (sigma.rows() != dim) {
       throw scythe_dimension_error(__FILE__, __PRETTY_FUNCTION__,
-				   __LINE__, "mu and sigma not conformable");
+           __LINE__, "mu and sigma not conformable");
     }       
             
     Matrix<double> A = mu + cholesky(sigma) * rnorm(dim,1);
@@ -2790,31 +2841,31 @@ namespace SCYTHE {
     Matrix<double> result;
     if (nu <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "D.O.F parameter nu <= 0");
+        __LINE__, "D.O.F parameter nu <= 0");
     }
     result = rmvnorm(Matrix<double>(sigma.rows(), 1, true, 0), sigma);
     return result / std::sqrt(rchisq(nu) / nu);
   }
-  
+
   /* Bernoulli */
   int
   rbern (const double &p)
   {
     static int report;
     double unif;
- 		 
+      
     // Check for allowable paramters
     if (p < 0 || p > 1) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "p parameter not in[0,1]");
+        __LINE__, "p parameter not in[0,1]");
     }
-		
+    
     unif = runif ();
     if (unif < p)
       report = 1;
     else
       report = 0;
-		
+    
     return (report);
   }
 
@@ -2824,55 +2875,55 @@ namespace SCYTHE {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Attempted to create Matrix of size <= 0");
+        __LINE__, "Attempted to create Matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; ++i)
       temp[i] = rbern (p);
-		
+    
     return temp;
   }
-	
+  
   /* Beta-Binomial */
   int
   rbetabin (const int& n, const double& alpha, const double& beta)
   {
     static int report;
     double phi;
-		
+    
     // Check for allowable parameters
     if (alpha <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "alpha <= 0");
+        __LINE__, "alpha <= 0");
     }
     if (beta <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "beta <= 0");
+        __LINE__, "beta <= 0");
     }
     if (n <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "n <= 0");
+        __LINE__, "n <= 0");
     }
-		
+    
     phi = rbeta (alpha, beta);
     report = rbinom (n, phi);
-		
+    
     return (report);
   }
 
   Matrix<double>
   rbetabin (const int &rows, const int &cols, const int &n, 
-	    const double &alpha, const double &beta)
+      const double &alpha, const double &beta)
   {
     int size = rows * cols;
     if (size <= 0) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Attempted to create Matrix of size <= 0");
+        __LINE__, "Attempted to create Matrix of size <= 0");
     }
     Matrix<double> temp(rows, cols, false);
     for (int i = 0; i < size; ++i)
       temp[i] = (double) rbetabin (n, alpha, beta);
- 		 
+      
     return temp;
   }
 
@@ -2880,39 +2931,37 @@ namespace SCYTHE {
 
   /* Simulates from a truncated Normal distribution */
   double 
-  rtnorm(	const double& m, const double& v, const double& below, 
-		const double& above)
+  rtnorm(  const double& m, const double& v, const double& below, 
+    const double& above)
   {  
     if (below > above) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Truncation bound not logically consistent");
+        __LINE__, "Truncation bound not logically consistent");
     }
-		
+    
     double FA = 0.0;
     double FB = 0.0;
     double sd = ::sqrt(v);
-    if ((::fabs((above-m)/sd) < 8.2) && (::fabs((below-m)/sd) < 8.2)){
+    if ((::fabs((above-m)/sd) < 6.36) && (::fabs((below-m)/sd) < 6.36)){
       FA = pnorm2((above-m)/sd, true, false);
       FB = pnorm2((below-m)/sd, true, false);
     }
-    if ((((above-m)/sd) < 8.2)  && (((below-m)/sd) <= -8.2) ){ 
+    if ((((above-m)/sd) < 6.36)  && (((below-m)/sd) <= -6.36) ){ 
       FA = pnorm2((above-m)/sd, true, false);
       FB = 0.0;
     }
-    if ( (((above-m)/sd) >= 8.2)  && (((below-m)/sd) > -8.2) ){ 
+    if ( (((above-m)/sd) >= 6.36)  && (((below-m)/sd) > -6.36) ){ 
       FA = 1.0;
       FB = FB = pnorm2((below-m)/sd, true, false);
     } 
-    if ( (((above-m)/sd) >= 8.2) && (((below-m)/sd) <= -8.2)){
+    if ( (((above-m)/sd) >= 6.36) && (((below-m)/sd) <=-6.36)){
       FA = 1.0;
       FB = 0.0;
     }
-    /*
     if ( (((above-m)/sd) <= -6.36) || (((below-m)/sd) > 6.36)){
       throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__, __LINE__,
-			       "Truncation bounds too far from 0");
+             "Truncation bounds too far from 0");
     }
-    */
     /*
     if ((::fabs((above-m)/sd) > 6.36) && (::fabs((below-m)/sd) > 6.36)){
     throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__, __LINE__,
@@ -2920,16 +2969,16 @@ namespace SCYTHE {
     }
     */
     double term = runif()*(FA-FB)+FB;
-    if (term < 5.6e-17)
-      term = 5.6e-17;
-    if (term > (1 - 5.6e-17))
-      term = 1 - 5.6e-17;
+    if (term < 1e-10)
+      term = 1e-10;
+    if (term > (1 - 1e-10))
+      term = 1 - 1e-10;
     double draw = m + sd * qnorm1(term);
     if (draw > above)
       draw = above;
     if (draw < below)
       draw = below;
- 		 
+      
     return draw;
   }
 
@@ -2985,37 +3034,40 @@ namespace SCYTHE {
   }
 
 
-
   /* Sample from a truncated Normal distribution */
   double
   rtbnorm_slice(const double& m, const double& v, const double& below,
-		const int& iter)
+    const int& iter)
   {
     if (below < m) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Truncation point < mean");
+        __LINE__, "Truncation point < mean");
     }
     if (v <= 0){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Variance non-positive");
+        __LINE__, "Variance non-positive");
     }
- 		 
+      
     double z = 0;
     double x = below + .00001;
- 		 
+      
     for (int i=0; i<iter; ++i){
       z = runif()*::exp(-1*::pow((x-m),2)/(2*v));
       x = runif()*( (m + ::sqrt(-2*v*::log(z))) - below) + below;
     }
 #ifdef __MINGW32__
-		if (! finite(x)) {
+    if (! finite(x)) {
 #else
-    if (isinf(x)){
+#ifdef sgi
+    if (IsINF(x)) {
+#else
+    if (isinf(x)) {
+#endif
 #endif
       std::cerr << "WARNING in "
-		<< __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
-		<< __LINE__ << ": Mean extremely far from truncation point. "
-		<< "Returning truncation point" << std::endl;
+    << __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
+    << __LINE__ << ": Mean extremely far from truncation point. "
+    << "Returning truncation point" << std::endl;
       return below; 
     }
     return x;
@@ -3024,82 +3076,83 @@ namespace SCYTHE {
   /* Sample from a truncated Normal distribution */
   double
   rtanorm_slice(const double& m, const double& v, const double& above, 
-		const int& iter)
+    const int& iter)
   {
     if (above > m) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Truncation point > mean");
+        __LINE__, "Truncation point > mean");
     }
     if (v <= 0){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Variance non-positive");
+        __LINE__, "Variance non-positive");
     }
   
     double below = -1*above;
     double newmu = -1*m;
     double z = 0;
     double x = below + .00001;
- 		 
+      
     for (int i=0; i<iter; ++i){
       z = runif()*::exp(-1*::pow((x-newmu),2)/(2*v));
       x = runif()*( (newmu + ::sqrt(-2*v*::log(z))) - below) + below;
     }
 #ifdef __MINGW32__
-		if (! finite(x)) {
+    if (! finite(x)) {
+#else
+#ifdef sgi
+    if (IsINF(x)) {
 #else
     if (isinf(x)){
 #endif
+#endif
       std::cerr << "WARNING in "
-		<< __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
-		<< __LINE__ << ": Mean extremely far from truncation point. "
-		<< "Returning truncation point" << std::endl;
+        << __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
+        << __LINE__ << ": Mean extremely far from truncation point. "
+        << "Returning truncation point" << std::endl;
       return above; 
     }
-		
+    
     return -1*x;
   }
 
   /* Sample from a truncated Normal distribution */
   double
   rtbnorm_combo(const double& m, const double& v, const double& below,
-		const int& iter)
+    const int& iter)
   {
     if (v <= 0){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Variance non-positive");
+        __LINE__, "Variance non-positive");
     }
-		
-    double s = ::sqrt(v);
+    
     // do rejection sampling and return value
-    //if (m >= below){
-    if ((m/s - below/s ) > 1.2){
-      double x = rnorm(m, s);
+    if (m >= below){
+      double x = rnorm(m, v);
       while (x < below)
-	x = rnorm(m,s);
-      return x; 
-    } else if ((m/s - below/s ) > 4.0 ){
-      // use the inverse cdf method
-      double above = (m+30.0)*s;
-      double x = rtnorm(m, v, below, above);
+        x = rnorm(m,v);
       return x;
     } else {
       // do slice sampling and return value
       double z = 0;
       double x = below + .00001;
       for (int i=0; i<iter; ++i){
-	z = runif()*::exp(-1*::pow((x-m),2)/(2*v));
-	x = runif()*( (m + ::sqrt(-2*v*::log(z))) - below) + below;
+        z = runif()*::exp(-1*::pow((x-m),2)/(2*v));
+        x = runif()*( (m + ::sqrt(-2*v*::log(z))) - below) + below;
       }
 #ifdef __MINGW32__
-			if (! finite(x)) {
+      if (! finite(x)) {
+#else
+#ifdef sgi
+      if (IsINF(x)) {
 #else
       if (isinf(x)){
 #endif
-	std::cerr << "WARNING in "
-		  << __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
-		  << __LINE__ << ": Mean extremely far from truncation point. "
-		  << "Returning truncation point" << std::endl;
-	return below; 
+#endif
+        std::cerr << "WARNING in "
+          << __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
+          << __LINE__ << ": Mean extremely far from truncation point. "
+          << "Returning truncation point" << std::endl;
+        return below; 
       }
       return x;
     }
@@ -3108,23 +3161,18 @@ namespace SCYTHE {
   /* Sample from a truncated Normal distribution */
   double
   rtanorm_combo(const double& m, const double& v, const double& above,
-		const int& iter)
+    const int& iter)
   {
     if (v <= 0){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "Variance non-positive");
+        __LINE__, "Variance non-positive");
     }
-    double s = ::sqrt(v);
+
     // do rejection sampling and return value
-    if ((m/s - above/s ) < 1.2){ 
-      double x = rnorm(m, s);
+    if (m <= above) {
+      double x = rnorm(m, v);
       while (x > above)
-	x = rnorm(m,s);
-      return x;
-    } else if ((m/s - above/s ) < 4.0 ){
-      // use the inverse cdf method
-      double below = (m-30.0)*s;
-      double x = rtnorm(m, v, below, above);
+        x = rnorm(m,v);
       return x;
     } else {
       // do slice sampling and return value
@@ -3132,21 +3180,25 @@ namespace SCYTHE {
       double newmu = -1*m;
       double z = 0;
       double x = below + .00001;
-   			 
+          
       for (int i=0; i<iter; ++i){
-	z = runif()*::exp(-1*::pow((x-newmu),2)/(2*v));
-	x = runif()*( (newmu + ::sqrt(-2*v*::log(z))) - below) + below;
+        z = runif()*::exp(-1*::pow((x-newmu),2)/(2*v));
+        x = runif()*( (newmu + ::sqrt(-2*v*::log(z))) - below) + below;
       }
 #ifdef __MINGW32__
-			if (finite(x)) {
+      if (finite(x)) {
+#else
+#ifdef sgi
+      if (IsINF(x)) {
 #else
       if (isinf(x)){
 #endif
-	std::cerr << "WARNING in "
-		  << __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
-		  << __LINE__ << ": Mean extremely far from truncation point. "
-		  << "Returning truncation point" << std::endl;
-	return above; 
+#endif
+        std::cerr << "WARNING in "
+          << __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
+          << __LINE__ << ": Mean extremely far from truncation point. "
+          << "Returning truncation point" << std::endl;
+        return above; 
       }
       return -1*x;
     }
@@ -3155,27 +3207,27 @@ namespace SCYTHE {
   /* Multivariate Normal */
   double
   lndmvn (const Matrix<double> &x, const Matrix<double> &mu, 
-	  const Matrix<double> &Sigma)
+    const Matrix<double> &Sigma)
   {
     if (! x.isColVector()) {
       throw scythe_dimension_error(__FILE__, __PRETTY_FUNCTION__,
-				   __LINE__, "x not column vector");
+           __LINE__, "x not column vector");
     }
     if (! mu.isColVector()) {
       throw scythe_dimension_error(__FILE__, __PRETTY_FUNCTION__,
-				   __LINE__, "mu not column vector");
+           __LINE__, "mu not column vector");
     }
     if (! Sigma.isSquare()) {
       throw scythe_dimension_error(__FILE__, __PRETTY_FUNCTION__,
-				   __LINE__, "Sigma not square");
+           __LINE__, "Sigma not square");
     }
     if (mu.rows() != Sigma.rows() || x.rows() != Sigma.rows()){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				__LINE__, "mu, x have different number of rows than Sigma");
+        __LINE__, "mu, x have different number of rows than Sigma");
     }
     int k = mu.rows();
     return ( (-k/2.0)*::log(2*M_PI) -0.5 * ::log(~Sigma) 
-	     -0.5 * (!(x - mu)) * invpd(Sigma) * (x-mu) )[0];
+       -0.5 * (!(x - mu)) * invpd(Sigma) * (x-mu) )[0];
   }
 
 
@@ -3188,27 +3240,27 @@ namespace SCYTHE {
     /* Evaluate a Chebysheve series at a given point */
     double
     chebyshev_eval (const double &x, const double *a,
-		    const int &n)
+        const int &n)
     {
       if (n < 1 || n > 1000)
-	throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				  __LINE__, "n not on [1, 1000]");
-	
+        throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
+            __LINE__, "n not on [1, 1000]");
+  
       if (x < -1.1 || x > 1.1)
-	throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				  __LINE__, "x not on [-1.1, 1.1]");
-			
+        throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
+            __LINE__, "x not on [-1.1, 1.1]");
+      
       double b0, b1, b2;
       b0 = b1 = b2 = 0;
-	
+  
       double twox = x * 2;
-	
+  
       for (int i = 1; i <= n; ++i) {
-	b2 = b1;
-	b1 = b0;
-	b0 = twox * b1 - b2 + a[n - i];
+        b2 = b1;
+        b1 = b0;
+        b0 = twox * b1 - b2 + a[n - i];
       }
-	
+  
       return (b0 - b2) * 0.5;
     }
 
@@ -3217,25 +3269,25 @@ namespace SCYTHE {
     lngammacor(const double &x)
     {
       const double algmcs[15] = {
-	+.1666389480451863247205729650822e+0,
-	-.1384948176067563840732986059135e-4,
-	+.9810825646924729426157171547487e-8,
-	-.1809129475572494194263306266719e-10,
-	+.6221098041892605227126015543416e-13,
+        +.1666389480451863247205729650822e+0,
+        -.1384948176067563840732986059135e-4,
+        +.9810825646924729426157171547487e-8,
+        -.1809129475572494194263306266719e-10,
+        +.6221098041892605227126015543416e-13,
       };
-		
+    
       if (x < 10) {
-	throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-				  __LINE__, "This function requires x >= 10");	
+        throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
+            __LINE__, "This function requires x >= 10");  
       } else if (x >= 3.745194030963158e306) {
-	throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__,
-				 __LINE__, "Underflow");
-			
+        throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__,
+            __LINE__, "Underflow");
+      
       } else if (x < 94906265.62425156) {
-	double tmp = 10 / x;
-	return chebyshev_eval(tmp * tmp * 2 - 1, algmcs, 5) / x;
+        double tmp = 10 / x;
+        return chebyshev_eval(tmp * tmp * 2 - 1, algmcs, 5) / x;
       }
-			
+      
       return 1 / (x * 12);
     }
 
@@ -3244,40 +3296,40 @@ namespace SCYTHE {
     dpois_raw (const double &x, const double &lambda)
     {
       if (lambda == 0)
-	return ( (x == 0) ? 1.0 : 0.0);
+        return ( (x == 0) ? 1.0 : 0.0);
 
       if (x == 0)
-	return std::exp(-lambda);
+        return std::exp(-lambda);
 
       if (x < 0)
-	return 0.0;
+        return 0.0;
 
       return std::exp(-stirlerr(x) - bd0(x, lambda))
-	/ std::sqrt(2 * M_PI * x);
+        / std::sqrt(2 * M_PI * x);
     }
 
     /* Evaluates the "deviance part" */
     double
     bd0(const double &x, const double &np)
     {
-			
+      
       if(std::fabs(x - np) < 0.1 * (x + np)) {
-	double v = (x - np) / (x + np);
-	double s = (x - np) * v;
-	double ej = 2 * x * v;
-	v = v * v;
-	for (int j = 1; ; j++) {
-	  ej *= v;
-	  double s1 = s + ej / ((j << 1) + 1);
-	  if (s1 == s)
-	    return s1;
-	  s = s1;
-	}
+        double v = (x - np) / (x + np);
+        double s = (x - np) * v;
+        double ej = 2 * x * v;
+        v = v * v;
+        for (int j = 1; ; j++) {
+          ej *= v;
+          double s1 = s + ej / ((j << 1) + 1);
+          if (s1 == s)
+            return s1;
+          s = s1;
+        }
       }
-			
+      
       return x * std::log(x / np) + np - x;
     }
-	
+  
     /* Computes the log of the error term in Stirling's formula */
     double
     stirlerr(const double &n)
@@ -3287,182 +3339,182 @@ namespace SCYTHE {
 #define S2 0.00079365079365079365079365  /* 1/1260 */
 #define S3 0.000595238095238095238095238 /* 1/1680 */
 #define S4 0.0008417508417508417508417508/* 1/1188 */
-			
+      
       /* error for 0, 0.5, 1.0, 1.5, ..., 14.5, 15.0 */
       const double sferr_halves[31] = {
-	0.0, /* n=0 - wrong, place holder only */
-	0.1534264097200273452913848,  /* 0.5 */
-	0.0810614667953272582196702,  /* 1.0 */
-	0.0548141210519176538961390,  /* 1.5 */
-	0.0413406959554092940938221,  /* 2.0 */
-	0.03316287351993628748511048, /* 2.5 */
-	0.02767792568499833914878929, /* 3.0 */
-	0.02374616365629749597132920, /* 3.5 */
-	0.02079067210376509311152277, /* 4.0 */
-	0.01848845053267318523077934, /* 4.5 */
-	0.01664469118982119216319487, /* 5.0 */
-	0.01513497322191737887351255, /* 5.5 */
-	0.01387612882307074799874573, /* 6.0 */
-	0.01281046524292022692424986, /* 6.5 */
-	0.01189670994589177009505572, /* 7.0 */
-	0.01110455975820691732662991, /* 7.5 */
-	0.010411265261972096497478567, /* 8.0 */
-	0.009799416126158803298389475, /* 8.5 */
-	0.009255462182712732917728637, /* 9.0 */
-	0.008768700134139385462952823, /* 9.5 */
-	0.008330563433362871256469318, /* 10.0 */
-	0.007934114564314020547248100, /* 10.5 */
-	0.007573675487951840794972024, /* 11.0 */
-	0.007244554301320383179543912, /* 11.5 */
-	0.006942840107209529865664152, /* 12.0 */
-	0.006665247032707682442354394, /* 12.5 */
-	0.006408994188004207068439631, /* 13.0 */
-	0.006171712263039457647532867, /* 13.5 */
-	0.005951370112758847735624416, /* 14.0 */
-	0.005746216513010115682023589, /* 14.5 */
-	0.005554733551962801371038690  /* 15.0 */
+        0.0, /* n=0 - wrong, place holder only */
+        0.1534264097200273452913848,  /* 0.5 */
+        0.0810614667953272582196702,  /* 1.0 */
+        0.0548141210519176538961390,  /* 1.5 */
+        0.0413406959554092940938221,  /* 2.0 */
+        0.03316287351993628748511048, /* 2.5 */
+        0.02767792568499833914878929, /* 3.0 */
+        0.02374616365629749597132920, /* 3.5 */
+        0.02079067210376509311152277, /* 4.0 */
+        0.01848845053267318523077934, /* 4.5 */
+        0.01664469118982119216319487, /* 5.0 */
+        0.01513497322191737887351255, /* 5.5 */
+        0.01387612882307074799874573, /* 6.0 */
+        0.01281046524292022692424986, /* 6.5 */
+        0.01189670994589177009505572, /* 7.0 */
+        0.01110455975820691732662991, /* 7.5 */
+        0.010411265261972096497478567, /* 8.0 */
+        0.009799416126158803298389475, /* 8.5 */
+        0.009255462182712732917728637, /* 9.0 */
+        0.008768700134139385462952823, /* 9.5 */
+        0.008330563433362871256469318, /* 10.0 */
+        0.007934114564314020547248100, /* 10.5 */
+        0.007573675487951840794972024, /* 11.0 */
+        0.007244554301320383179543912, /* 11.5 */
+        0.006942840107209529865664152, /* 12.0 */
+        0.006665247032707682442354394, /* 12.5 */
+        0.006408994188004207068439631, /* 13.0 */
+        0.006171712263039457647532867, /* 13.5 */
+        0.005951370112758847735624416, /* 14.0 */
+        0.005746216513010115682023589, /* 14.5 */
+        0.005554733551962801371038690  /* 15.0 */
       };
       double nn;
-			
+      
       if (n <= 15.0) {
-	nn = n + n;
-	if (nn == (int)nn)
-	  return(sferr_halves[(int)nn]);
-	return (lngammafn(n + 1.) - (n + 0.5) * std::log(n) + n -
-		std::log(std::sqrt(2 * M_PI)));
+        nn = n + n;
+        if (nn == (int)nn)
+          return(sferr_halves[(int)nn]);
+        return (lngammafn(n + 1.) - (n + 0.5) * std::log(n) + n -
+            std::log(std::sqrt(2 * M_PI)));
       }
-			
+      
       nn = n*n;
       if (n > 500)
-	return((S0 - S1 / nn) / n);
+        return((S0 - S1 / nn) / n);
       if (n > 80)
-	return((S0 - (S1 - S2 / nn) / nn) / n);
+        return((S0 - (S1 - S2 / nn) / nn) / n);
       if (n > 35)
-	return((S0 - (S1 - (S2 - S3 / nn) / nn) / nn) / n);
+        return((S0 - (S1 - (S2 - S3 / nn) / nn) / nn) / n);
       /* 15 < n <= 35 : */
       return((S0 - (S1 - (S2 - (S3 - S4 / nn) / nn) / nn) / nn) / n);
     }
-	
+  
     /* helper for pbeta */
     double
     pbeta_raw(const double& x, const double& pin, const double& qin)
     {
       double ans, c, finsum, p, ps, p1, q, term, xb, xi, y;
       int n, i, ib, swap_tail;
-			
+      
       const double eps = .5 * DBL_EPSILON;
       const double sml = DBL_MIN;
       const double lneps = std::log(eps);
       const double lnsml = std::log(eps);
-			
+      
       if (pin / (pin + qin) < x) {
-	swap_tail = 1;
-	y = 1 - x;
-	p = qin;
-	q = pin;
+        swap_tail = 1;
+        y = 1 - x;
+        p = qin;
+        q = pin;
       } else {
-	swap_tail=0;
-	y = x;
-	p = pin;
-	q = qin;
+        swap_tail=0;
+        y = x;
+        p = pin;
+        q = qin;
       }
-			
+      
       if ((p + q) * y / (p + 1) < eps) {
-	ans = 0;
-	xb = p * std::log(max(y,sml)) - std::log(p) - lnbetafn(p,q);
-	if (xb > lnsml && y != 0)
-	  ans = std::exp(xb);
-	if (swap_tail)
-	  ans = 1-ans;
+        ans = 0;
+        xb = p * std::log(max(y,sml)) - std::log(p) - lnbetafn(p,q);
+        if (xb > lnsml && y != 0)
+          ans = std::exp(xb);
+        if (swap_tail)
+          ans = 1-ans;
       } else {
-	ps = q - std::floor(q);
-	if (ps == 0)
-	  ps = 1;
-	xb = p * std::log(y) - lnbetafn(ps, p) - std::log(p);
-	ans = 0;
-	if (xb >= lnsml) {
-	  ans = std::exp(xb);
-	  term = ans * p;
-	  if (ps != 1) {
-	    n = (int)max(lneps/std::log(y), 4.0);
-	    for(i = 1; i <= n; i++){
-	      xi = i;
-	      term *= (xi-ps)*y/xi;
-	      ans += term/(p+xi);
-	    }
-	  }
-	}
-	if (q > 1) {
-	  xb = p * std::log(y) + q * std::log(1 - y)
-	    - lnbetafn(p, q) - std::log(q);
-	  ib = (int) max(xb / lnsml, 0.0);
-	  term = std::exp(xb - ib * lnsml);
-	  c = 1 / (1 - y);
-	  p1 = q * c / (p + q - 1);
-     				 
-	  finsum = 0;
-	  n = (int) q;
-	  if(q == n)
-	    n--;
-	  for (i = 1; i <= n; i++) {
-	    if(p1 <= 1 && term / eps <= finsum)
-	      break;
-	    xi = i;
-	    term = (q -xi + 1) * c * term / (p + q - xi);
-	    if (term > 1) {
-	      ib--;
-	      term *= sml;
-	    }
-	    if (ib == 0)
-	      finsum += term;
-	  }
-	  ans += finsum;
-	}
-				
-	if(swap_tail)
-	  ans = 1-ans;
-	ans = max(min(ans,1.),0.);
+        ps = q - std::floor(q);
+        if (ps == 0)
+          ps = 1;
+        xb = p * std::log(y) - lnbetafn(ps, p) - std::log(p);
+        ans = 0;
+        if (xb >= lnsml) {
+          ans = std::exp(xb);
+          term = ans * p;
+          if (ps != 1) {
+            n = (int)max(lneps/std::log(y), 4.0);
+            for(i = 1; i <= n; i++){
+              xi = i;
+              term *= (xi-ps)*y/xi;
+              ans += term/(p+xi);
+            }
+          }
+        }
+        if (q > 1) {
+          xb = p * std::log(y) + q * std::log(1 - y)
+            - lnbetafn(p, q) - std::log(q);
+          ib = (int) max(xb / lnsml, 0.0);
+          term = std::exp(xb - ib * lnsml);
+          c = 1 / (1 - y);
+          p1 = q * c / (p + q - 1);
+              
+          finsum = 0;
+          n = (int) q;
+          if(q == n)
+            n--;
+          for (i = 1; i <= n; i++) {
+            if(p1 <= 1 && term / eps <= finsum)
+              break;
+            xi = i;
+            term = (q -xi + 1) * c * term / (p + q - xi);
+            if (term > 1) {
+              ib--;
+              term *= sml;
+            }
+            if (ib == 0)
+              finsum += term;
+          }
+          ans += finsum;
+        }
+        
+        if(swap_tail)
+          ans = 1-ans;
+        ans = max(min(ans,1.),0.);
       }
       return ans;
     }
-	
+  
 
     double
     dbinom_raw (const double &x, const double &n, const double &p,
-		const double &q)
+    const double &q)
     { 
       double f, lc;
 
       if (p == 0)
-	return((x == 0) ? 1.0 : 0.0);
+        return((x == 0) ? 1.0 : 0.0);
       if (q == 0)
-	return((x == n) ? 1.0 : 0.0);
+        return((x == n) ? 1.0 : 0.0);
 
       if (x == 0) { 
-	if(n == 0)
-	  return 1.0;
-				
-	lc = (p < 0.1) ? -bd0(n, n * q) - n * p : n * std::log(q);
-	return(std::exp(lc));
+        if(n == 0)
+          return 1.0;
+        
+        lc = (p < 0.1) ? -bd0(n, n * q) - n * p : n * std::log(q);
+        return(std::exp(lc));
       }
       if (x == n) { 
-	lc = (q < 0.1) ? -bd0(n,n * p) - n * q : n * std::log(p);
-	return(std::exp(lc));
+        lc = (q < 0.1) ? -bd0(n,n * p) - n * q : n * std::log(p);
+        return(std::exp(lc));
       }
 
       if (x < 0 || x > n)
-	return 0.0;
+        return 0.0;
 
       lc = stirlerr(n) - stirlerr(x) - stirlerr(n-x) - bd0(x,n*p) -
-	bd0(n - x, n * q);
-			
+        bd0(n - x, n * q);
+      
       f = (M_2PI * x * (n-x)) / n;
 
       return (std::exp(lc) / std::sqrt(f));
     }
 
-	
-  }	// end namespace INTERNAL
+  
+  }  // end namespace INTERNAL
 } // end namespace SCYTHE
 
 

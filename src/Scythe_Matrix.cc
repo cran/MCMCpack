@@ -3,46 +3,56 @@
  * This file provides the class implementation of the Matrix class, part
  * of the SCYTHE project.
  *
- * Scythe C++ Library
- * Copyright (C) Kevin M. Quinn, Andrew D. Martin,
- * and Daniel B. Pemstein
+ * Scythe Statistical Library
+ * Copyright (C) 2003, Andrew D. Martin, Kevin M. Quinn, and Daniel
+ * Pemstein.  All Rights Reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or (at
+ * your option) any later version.  A copy of this license is included
+ * with this library (LICENSE.GPL).
+ *
+ * This library utilizes code from a number of other open source
+ * projects.  Specific copyright information is provided with the
+ * applicable code.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA.
  *
  * This code written by:
  *
- * Kevin Quinn
- * Assistant Professor
- * Dept. of Political Science and
- * Center for Statistics and Social Sciences
- * Box 354322
- * University of Washington
- * Seattle, WA 98195-4322
- * quinn@stat.washington.edu
- *
  * Andrew D. Martin
  * Assistant Professor
- * Dept. of Political Science
+ * Deptartment of Political Science
  * Campus Box 1063
  * Washington University
+ * One Brookings Drive
  * St. Louis, MO 63130
  * admartin@artsci.wustl.edu
- * 
- * Daniel B. Pemstein
- * dbpemste@artsci.wustl.edu
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
- * USA
+ *
+ * Kevin M. Quinn
+ * Assistant Professor
+ * Department of Government and
+ * Center for Basic Research in the Social Sciences
+ * 34 Kirkland Street
+ * Harvard University
+ * Cambridge, MA 02138
+ * kquinn@fas.harvard.edu
+ *
+ * Daniel Pemstein
+ * Deptartment of Poltical Science
+ * 702 South Wright Street
+ * University of Illinois at Urbana-Champaign
+ * Urbana, IL 61801
+ * dbp@uiuc.edu
  */
 
 #ifndef SCYTHE_MATRIX_CC
@@ -495,7 +505,7 @@ namespace SCYTHE {
     } else if (cols_ == m.rows_) {
       // Case 4: nXm *= mXk
       alloc_ = 1;
-      while (alloc_ < size_)
+      while (alloc_ < rows_ * m.cols_)
         alloc_ <<= 1;
       T* temp = new (std::nothrow) T[alloc_];
       if (temp == 0) {

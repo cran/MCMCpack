@@ -12,6 +12,8 @@ MCMCirtKd               Markov chain Monte Carlo for K-Dimensional
                         Item Response Theory Model
 MCMClogit               Markov chain Monte Carlo for Logistic
                         Regression
+MCMCmixfactanal         Markov chain Monte Carlo for Mixed Data Factor
+                        Analysis Model
 MCMCoprobit             Markov chain Monte Carlo for Ordered Probit
                         Regression
 MCMCordfactanal         Markov chain Monte Carlo for Ordinal Data
