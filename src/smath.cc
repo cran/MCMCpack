@@ -47,16 +47,16 @@ namespace SCYTHE {
     return A;
   }
   
-  /* calc the inverse hyperbolic cosine of each element of a Matrix */
-  template <class T>
-  Matrix<T>
-  acosh (Matrix<T> A)
-  {
-    for (int i = 0; i < A.size(); ++i)
-      A[i] = ::acosh(A[i]);
-
-    return A;
-  }
+//  /* calc the inverse hyperbolic cosine of each element of a Matrix */
+//  template <class T>
+//  Matrix<T>
+//  acosh (Matrix<T> A)
+//  {
+//    for (int i = 0; i < A.size(); ++i)
+//      A[i] = ::acosh(A[i]);
+//
+//    return A;
+//  }
   
   /* calc the inverse sine of each element of a Matrix */
   template <class T>
@@ -69,16 +69,16 @@ namespace SCYTHE {
     return A;
   }
   
-  /* calc the inverse hyperbolic sine of each element of a Matrix */
-  template <class T>
-  Matrix<T>
-  asinh (Matrix<T> A)
-  {
-    for (int i = 0; i < A.size(); ++i)
-      A[i] = ::asinh(A[i]);
-
-    return A;
-  }
+//  /* calc the inverse hyperbolic sine of each element of a Matrix */
+//  template <class T>
+//  Matrix<T>
+//  asinh (Matrix<T> A)
+//  {
+//    for (int i = 0; i < A.size(); ++i)
+//      A[i] = ::asinh(A[i]);
+//
+//    return A;
+//  }
   
   /* calc the inverse tangent of each element of a Matrix */
   template <class T>
@@ -91,16 +91,16 @@ namespace SCYTHE {
     return A;
   }
   
-  /* calc the inverse hyperbolic tangent of each element of a Matrix */
-  template <class T>
-  Matrix<T>
-  atanh (Matrix<T> A)
-  {
-    for (int i = 0; i < A.size(); ++i)
-      A[i] = ::atanh(A[i]);
-
-    return A;
-  }
+//  /* calc the inverse hyperbolic tangent of each element of a Matrix */
+//  template <class T>
+//  Matrix<T>
+// atanh (Matrix<T> A)
+//  {
+//    for (int i = 0; i < A.size(); ++i)
+//      A[i] = ::atanh(A[i]);
+//
+//    return A;
+//  }
   
   /* calc the angle whose tangent is y/x  */
   template <class T>
@@ -235,16 +235,16 @@ namespace SCYTHE {
     return A;
   }
   
-  /* calc the exponent - 1 of each element of a Matrix */
-  template <class T>
-  Matrix<T>
-  expm1 (Matrix<T> A)
-  {
-    for (int i = 0; i < A.size(); ++i)
-      A[i] = ::expm1(A[i]);
-
-    return A;
-  }
+//  /* calc the exponent - 1 of each element of a Matrix */
+//  template <class T>
+//  Matrix<T>
+//  expm1 (Matrix<T> A)
+//  {
+//    for (int i = 0; i < A.size(); ++i)
+//     A[i] = ::expm1(A[i]);
+//
+//    return A;
+//  }
   
   /* calc the absval of each element of a Matrix */
   template <class T>

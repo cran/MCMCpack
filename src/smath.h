@@ -47,25 +47,25 @@ namespace SCYTHE {
   template <class T>
   Matrix<T> acos (Matrix<T>);
   
-  /* acosh - inverse hyperbolic cosine function */
-  template <class T>
-  Matrix<T> acosh (Matrix<T>);
+//  /* acosh - inverse hyperbolic cosine function */
+//  template <class T>
+//  Matrix<T> acosh (Matrix<T>);
 
   /* asin - inverse sine function */
   template <class T>
   Matrix <T> asin (Matrix<T>);
 
-  /* asinh - inverse hyperbolic sine function */
-  template <class T>
-  Matrix<T> asinh (Matrix<T>);
+//  /* asinh - inverse hyperbolic sine function */
+//  template <class T>
+//  Matrix<T> asinh (Matrix<T>);
 
   /* atan - inverse tangent function */
   template <class T>
   Matrix<T> atan (Matrix<T>);
   
-  /* atanh - inverse hyperbolic tangent function */
-  template <class T>
-  Matrix<T> atanh (Matrix<T>);
+//  /* atanh - inverse hyperbolic tangent function */
+//  template <class T>
+//  Matrix<T> atanh (Matrix<T>);
   
   /* atan2 - returns angle whose tangent is y/x in the full angular
    * range [-pit,+pi].  Domain error if both x and y zero
@@ -110,9 +110,9 @@ namespace SCYTHE {
   template <class T>
   Matrix<T> exp (Matrix<T>);
 
-  /* expm1 - exponent minus 1 */
-  template <class T>
-  Matrix<T> expm1 (Matrix<T>);
+//  /* expm1 - exponent minus 1 */
+//  template <class T>
+//  Matrix<T> expm1 (Matrix<T>);
   
   /* fabs - Calculate the absolute value of each Matrix element */
   template <class T>

@@ -1,6 +1,6 @@
 \name{MCMCoprobit}
 \alias{MCMCoprobit}
-\title{Markov chain Monte Carlo for Ordered Probit Regression}
+\title{Markov Chain Monte Carlo for Ordered Probit Regression}
 \description{
   This function generates a posterior density sample
   from an ordered probit regression model using the data augmentation 

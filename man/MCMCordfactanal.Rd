@@ -1,6 +1,6 @@
 \name{MCMCordfactanal}
 \alias{MCMCordfactanal}
-\title{Markov chain Monte Carlo for Ordinal Data Factor Analysis Model}
+\title{Markov Chain Monte Carlo for Ordinal Data Factor Analysis Model}
 \description{
   This function generates a posterior density sample from an ordinal data
   factor analysis model. Normal priors are assumed on the factor
@@ -13,7 +13,7 @@
   
 \usage{
 MCMCordfactanal(x, factors, lambda.constraints=list(),
-                data=parent.environment(), burnin = 1000, mcmc = 20000,
+                data=parent.frame(), burnin = 1000, mcmc = 20000,
                 thin=1, tune=NA, verbose = FALSE, seed = NA,
                 lambda.start = NA, l0=0, L0=0,
                 store.lambda=TRUE, store.scores=FALSE,
@@ -174,8 +174,10 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
   efficiency.  Please consult the coda documentation for a comprehensive
   list of functions that can be used to analyze the posterior density
   sample. 
+  
+  As is the case with all measurement models, make sure that you have plenty
+  of free memory, especially when storing the scores.
   }
-}
 
 \references{
   Shawn Treier and Simon Jackman. 2003. ``Democracy as a Latent Variable." 

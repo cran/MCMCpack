@@ -1,6 +1,6 @@
 \name{MCMCpanel}
 \alias{MCMCpanel}
-\title{Markov chain Monte Carlo for the General Linear Panel Model}
+\title{Markov Chain Monte Carlo for the General Linear Panel Model}
 \description{
   MCMCpanel generates a posterior density sample from a General
   Linear Panel Model using Algorithm 2 of Chib and Carlin (1999).

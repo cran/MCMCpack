@@ -250,7 +250,8 @@
       cat("\nThe call to .C is:\n")      
       draw.sample.call <- parse(text=paste(output.object, " <- ", call))
       print(draw.sample.call)
-      cat("\nAUTOMATIC TEMPLATE FILE CREATION SUCCEEDED.\n\n")
+      cat("\nAUTOMATIC TEMPLATE FILE CREATION SUCCEEDED.\n")
+      cat("All created templated files placed in ", getwd(), ".\n", sep="")
       invokeRestart("abort")
     }
 

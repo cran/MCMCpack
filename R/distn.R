@@ -1,4 +1,11 @@
 ########## Density Functions and Random Number Generators ##########
+#
+# note: Matthew Fasman has been working on replacing these with
+#       functions coded in C++.  These have been moved to the tmp
+#       directory.  We need to get the R seeding issues worked out
+#       before these functions can be replaced.  In addition, they 
+#       need to be documented one distribution at a time (see the
+#       existing documentation for an example).
 
 ##
 ## Wishart

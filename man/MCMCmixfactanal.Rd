@@ -1,6 +1,6 @@
 \name{MCMCmixfactanal}
 \alias{MCMCmixfactanal}
-\title{Markov chain Monte Carlo for Mixed Data Factor Analysis Model}
+\title{Markov Chain Monte Carlo for Mixed Data Factor Analysis Model}
 \description{
   This function generates a posterior density sample from a mixed data
   (both continuous and ordinal) factor analysis model. Normal priors are
@@ -14,7 +14,7 @@
   
 \usage{
 MCMCmixfactanal(x, factors, lambda.constraints=list(),
-                data=parent.environment(), burnin = 1000, mcmc = 20000,
+                data=parent.frame(), burnin = 1000, mcmc = 20000,
                 thin=1, tune=NA, verbose = FALSE, seed = NA,
                 lambda.start = NA, psi.start=NA,
                 l0=0, L0=0, a0=0.001, b0=0.001,
@@ -25,7 +25,8 @@ MCMCmixfactanal(x, factors, lambda.constraints=list(),
 \arguments{
   \item{x}{A one-sided formula containing the
     manifest variables. Ordinal (including dichotomous) variables must
-    be coded as ordered factors. NOTE: data input is different in
+    be coded as ordered factors. Each level of these ordered factors must
+    be present in the data passed to the function.  NOTE: data input is different in
     \code{MCMCmixfactanal} than in either \code{MCMCfactanal} or
     \code{MCMCordfactanal}.}
 
@@ -207,7 +208,10 @@ MCMCmixfactanal(x, factors, lambda.constraints=list(),
   efficiency.  Please consult the coda documentation for a comprehensive
   list of functions that can be used to analyze the posterior density
   sample. 
-  }
+
+  As is the case with all measurement models, make sure that you have plenty
+  of free memory, especially when storing the scores.
+
 }
 
 \references{
@@ -232,6 +236,20 @@ MCMCmixfactanal(x, factors, lambda.constraints=list(),
 
 \examples{
 \dontrun{
+data(PErisk)
+
+post <- MCMCmixfactanal(~courts+barb2+prsexp2+prscorr2+gdpw2,
+                        factors=1, data=PErisk,
+                        lambda.constraints = list(courts=list(2,"-")),
+                        burnin=5000, mcmc=1000000, thin=50,
+                        verbose=TRUE, L0=.25, store.lambda=TRUE,
+                        store.scores=TRUE, tune=1.2)
+plot(post)
+summary(post)
+
+
+
+
 library(MASS)
 data(Cars93)
 attach(Cars93)
@@ -259,7 +277,7 @@ new.cars$Origin    <- ordered(new.cars$Origin)
 
 
 
-posterior <- MCMCmixfactanal(~log.Price+log.MPG.city+
+post <- MCMCmixfactanal(~log.Price+log.MPG.city+
                  log.MPG.highway+Cylinders+log.EngineSize+
                  log.Horsepower+RPM+Length+
                  Wheelbase+Width+Weight+Origin, data=new.cars,
@@ -267,8 +285,9 @@ posterior <- MCMCmixfactanal(~log.Price+log.MPG.city+
                  log.Horsepower=c(3,0), weight=list(3,"+")),
                  factors=2,
                  burnin=5000, mcmc=500000, thin=100, verbose=TRUE,
-                 L0=.25, tune=1.5)
-
+                 L0=.25, tune=3.0)
+plot(post)
+summary(post)
 
 }
 }

@@ -48,16 +48,17 @@ extern "C" {
    // simulate from posterior density and return an mcmc by parameters
    // matrix of the posterior density sample
    void MCMCregress(double *sampledata, const int *samplerow,
-   const int *samplecol, const double *Ydata, const int *Yrow,
-   const int *Ycol, const double *Xdata, const int *Xrow,
-   const int *Xcol, const int *burnin, const int *mcmc,
-   const int *thin, const int *lecuyer, const int *seedarray,
-   const int *lecuyerstream, const int *verbose,
-   const double *betastartdata, const int *betastartrow,
-   const int *betastartcol, const double *b0data, const int *b0row,
-   const int *b0col, const double *B0data, const int *B0row,
-   const int *B0col, const double *c0, const double *d0) {
-   
+		    const int *samplecol, const double *Ydata, const int *Yrow,
+		    const int *Ycol, const double *Xdata, const int *Xrow,
+		    const int *Xcol, const int *burnin, const int *mcmc,
+		    const int *thin, const int *lecuyer, const int *seedarray,
+		    const int *lecuyerstream, const int *verbose,
+		    const double *betastartdata, const int *betastartrow,
+		    const int *betastartcol, const double *b0data, 
+		    const int *b0row, const int *b0col, 
+		    const double *B0data, const int *B0row,
+		    const int *B0col, const double *c0, const double *d0) {
+     
      // pull together Matrix objects
      Matrix <double> Y = r2scythe(*Yrow, *Ycol, Ydata);
      Matrix <double> X = r2scythe(*Xrow, *Xcol, Xdata);
@@ -122,4 +123,3 @@ extern "C" {
 
    } // end MCMCregress 
 } // end extern "C"
-

@@ -1,6 +1,6 @@
 \name{MCMChierEI}
 \alias{MCMChierEI}
-\title{Markov chain Monte Carlo for Wakefield's Hierarchial Ecological
+\title{Markov Chain Monte Carlo for Wakefield's Hierarchial Ecological
   Inference Model}
 \description{
   `MCMChierEI' is used to fit Wakefield's hierarchical ecological inference

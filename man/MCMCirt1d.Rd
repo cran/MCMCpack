@@ -1,6 +1,6 @@
 \name{MCMCirt1d}
 \alias{MCMCirt1d}
-\title{Markov chain Monte Carlo for One Dimensional Item Response Theory
+\title{Markov Chain Monte Carlo for One Dimensional Item Response Theory
    Model}
 \description{
   This function generates a posterior density sample from a one
@@ -151,6 +151,9 @@ MCMCirt1d(datamatrix, theta.constraints=list(), burnin = 1000,
    
   The model is identified by the proper priors on the item parameters
   and constraints placed on the ability parameters.
+  
+    As is the case with all measurement models, make sure that you have plenty
+  of free memory, especially when storing the item parameters.  
 }
   
 \references{

@@ -18,8 +18,11 @@
 // Copyright (C) 2004 Andrew D. Martin and Kevin M. Quinn
 // 
 // updated to the new version of Scythe 7/26/2004 KQ
+// fixed a bug pointed out by Alexander Raach 1/16/2005 KQ
+//
 
-#include <iostream>
+#include<iostream>
+
 #include "matrix.h"
 #include "distributions.h"
 #include "stat.h"
@@ -122,12 +125,13 @@ extern "C"{
 		  pnorm(gamma[Y[i]-1] - Xbeta[i]) );
 	}
       }
-      for (int j=2; j<(ncat-1); ++j){	   
-	loggendenrat = loggendenrat 
+      for (int j=2; j<ncat; ++j){	   
+	loggendenrat = loggendenrat
 	  + log(pnorm(gamma[j+1], gamma[j], tune[0]) - 
-		pnorm(gamma[j-1], gamma[j], tune[0]) )  
+		pnorm(gamma_p[j-1], gamma[j], tune[0]) )  
 	  - log(pnorm(gamma_p[j+1], gamma_p[j], tune[0]) - 
-		pnorm(gamma_p[j-1], gamma_p[j], tune[0]) );
+		pnorm(gamma[j-1], gamma_p[j], tune[0]) );
+	  
       }
       double logacceptrat = loglikerat + loggendenrat;
       if (stream->runif() <= exp(logacceptrat)){
@@ -160,11 +164,11 @@ extern "C"{
       
       // print output to stdout
       if(*verbose == 1 && iter % 500 == 0){
-	Rprintf("\n\nMCMCprobit iteration %i of %i \n", (iter+1), tot_iter);
+	Rprintf("\n\nMCMCoprobit iteration %i of %i \n", (iter+1), tot_iter);
 	Rprintf("beta = \n");
 	for (int j=0; j<k; ++j)
 	  Rprintf("%10.5f\n", beta[j]);
-	Rprintf("Metropolis acceptance rate for beta = %3.5f\n\n", 
+	Rprintf("Metropolis acceptance rate for gamma = %3.5f\n\n", 
 		static_cast<double>(accepts) / 
 		static_cast<double>(iter+1));		
       }

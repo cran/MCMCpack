@@ -1,6 +1,6 @@
 \name{MCMCprobit}
 \alias{MCMCprobit}
-\title{Markov chain Monte Carlo for Probit Regression}
+\title{Markov Chain Monte Carlo for Probit Regression}
 \description{
   This function generates a posterior density sample
   from a probit regression model using the data augmentation

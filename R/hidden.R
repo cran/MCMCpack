@@ -479,7 +479,7 @@
        output <- mcmc(data=holder, start=1,
                       end=posterior.object$mcmc,
                       thin=posterior.object$thin)
-       varnames(output) <- names
+       varnames(output) <- as.list(names)
        attr(output,"title") <- title
        return(output)  
   }
@@ -703,7 +703,12 @@
     cat("Error: Vector tuning parameter cannot contain negative values.\n")
     stop("Please respecify and call ", calling.function(), " again.",
          call.=FALSE)
-  } 
-  return(diag(as.double(mcmc.tune)))
+  }
+  if (length(mcmc.tune)==1){
+    return(matrix(mcmc.tune, 1, 1))
+  }
+  else{
+    return(diag(as.double(mcmc.tune)))
+  }
 }
 

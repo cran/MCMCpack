@@ -1,0 +1,266 @@
+\name{MCMCmnl}
+\alias{MCMCmnl}
+
+\title{Markov Chain Monte Carlo for Multinomial Logistic Regression}
+\description{
+  This function generates a posterior density sample
+  from a multinomial logistic regression model using either a random
+  walk Metropolis algorithm or a slice sampler. The user supplies data
+  and priors, and a sample from the posterior density is returned as an
+  mcmc object, which can be subsequently analyzed with functions provided
+  in the coda package.
+}
+
+\usage{
+MCMCmnl(formula, baseline = NULL, data = parent.frame(),
+        burnin = 1000, mcmc = 10000, thin = 1,
+        mcmc.method = "MH", tune = 1.1, verbose = FALSE,
+        seed = NA, beta.start = NA, b0 = 0, B0 = 0, ...)  } 
+
+\arguments{
+  \item{formula}{Model formula.
+
+  If the choicesets do not vary across individuals,
+  the \code{y} variable should be a
+  factor or numeric variable that gives the observed choice of each
+  individual. If the choicesets do vary across individuals, \code{y} should be
+  a \eqn{n \times p}{n x p} matrix where \eqn{n}{n} is the number of
+  individuals and
+  \eqn{p}{p} is the maximum number of choices in any choiceset.
+  Here each column
+  of \code{y} corresponds to a particular observed choice and the
+  elements of \code{y}
+  should be either \code{0} (not chosen but available), \code{1}
+  (chosen),
+  or \code{-999} (not available).
+  
+  Choice-specific covariates have to be entered using the syntax:
+  \code{choicevar(cvar, "var", "choice")} where \code{cvar} is the name
+  of a variable in \code{data}, \code{"var"} is the name of the new
+  variable to be created, and \code{"choice"} is the level of \code{y}
+  that \code{cvar} corresponds to. Specifying each choice-specific
+  covariate will typically require \eqn{p}{p} calls to the
+  \code{choicevar} function in the formula.
+
+  Individual specific covariates can be entered into the formula
+  normally. 
+
+  See the examples section below to see the syntax used to fit
+  various models.}
+  
+  \item{baseline}{The baseline category of the response
+    variable. \code{baseline} should be set equal to one of the observed
+    levels of the response variable. If left equal to \code{NULL} then the
+    baseline level is set to the alpha-numerically first element of the
+    response variable. If the choicesets vary across individuals, the
+    baseline choice must be in the choiceset of each individual. 
+  }
+  \item{data}{The data frame used for the analysis. Each row of the
+    dataframe should correspond to an individual who is making a
+    choice. }
+  
+  \item{burnin}{The number of burn-in iterations for the sampler.}
+  
+  \item{mcmc}{The number of iterations to run the sampler past burn-in. }
+  
+  \item{thin}{The thinning interval used in the simulation.  The number of
+    mcmc iterations must be divisible by this value. }
+  
+  \item{mcmc.method}{Can be set to either "MH" (default) or "slice" to
+    perform random walk Metropolis sampling or slice sampling
+    respectively.}
+  
+  \item{tune}{Metropolis tuning parameter. Can be either a positive
+    scalar or a \eqn{k}{k}-vector, where \eqn{k}{k} is the length of
+    \eqn{\beta}{beta}. Make sure that the
+    acceptance rate is satisfactory (typically between 0.20 and 0.5)
+    before using the posterior density sample for inference. }
+  
+  
+  \item{verbose}{A switch which determines whether or not the progress of
+    the sampler is printed to the screen.  If TRUE, the iteration number,
+    the current beta vector, and the Metropolis acceptance rate are
+    printed to the screen every 500 iterations. }
+
+  \item{seed}{The seed for the random number generator.  If NA, the Mersenne
+    Twister generator is used with default seed 12345; if an integer is 
+    passed it is used to seed the Mersenne twister.  The user can also
+    pass a list of length two to use the L'Ecuyer random number generator,
+    which is suitable for parallel computation.  The first element of the
+    list is the L'Ecuyer seed, which is a vector of length six or NA (if NA 
+    a default seed of \code{rep(12345,6)} is used).  The second element of 
+    list is a positive substream number. See the MCMCpack 
+    specification for more details. }
+
+  \item{beta.start}{The starting value for the \eqn{\beta}{beta} vector.
+    This can either be a scalar or a column vector with dimension equal
+    to the number of betas. If this takes a scalar value, then that
+    value will serve as the starting value for all of the betas.  The
+    default value of NA will use the maximum likelihood estimate of
+    \eqn{\beta}{beta} as the starting value. }
+
+  \item{b0}{The prior mean of \eqn{\beta}{beta}.  This can either be a
+    scalar or a column vector with dimension equal to the number of
+    betas. If this takes a scalar value, then that value will serve as
+    the prior mean for all of the betas. }
+
+  \item{B0}{The prior precision of \eqn{\beta}{beta}. This can either be
+    a scalar or a square matrix with dimensions equal to the number of
+    betas.  If this takes a scalar value, then that value times an
+    identity matrix serves as the prior precision of
+    \eqn{\beta}{beta}. Default value of 0 is equivalent to an improper
+    uniform prior for beta.}
+
+  \item{\dots}{Further arguments to be passed. }
+}
+\value{
+  An mcmc object that contains the posterior density sample.  This 
+  object can be summarized by functions provided by the coda package.
+}
+\details{
+\code{MCMCmnl} simulates from the posterior density of a multinomial logistic
+  regression model using either a random walk Metropolis algorithm or a
+  univariate slice sampler. The simulation
+  proper is done in compiled C++ code to maximize efficiency.  Please consult
+  the coda documentation for a comprehensive list of functions that can be
+  used to analyze the posterior density sample.
+  
+  The model takes the following form: \deqn{y_i \sim
+    \mathcal{M}ultinomial(\pi_i)}{y_i ~ Multinomial(pi_i)}
+
+  where:
+  \deqn{\pi_{ij} =
+  \frac{\exp(x_{ij}'\beta)}{\sum_{k=1}^p\exp(x_{ik}'\beta)}}{pi_{ij} =
+  exp(x_{ij}'beta) / [sum_{k=1}^p exp(x_{ik}'beta)]}
+
+  We assume a multivariate Normal prior on \eqn{\beta}{beta}:
+    \deqn{\beta \sim \mathcal{N}(b_0,B_0^{-1})}{beta ~ N(b0,B0^(-1))}
+  The Metropollis proposal distribution is centered at the current value of
+  \eqn{\beta}{beta} and has variance-covariance \eqn{V = T
+    (B_0 + C^{-1})^{-1} T }{V = T (B0 + C^{-1})^{-1} T}, where
+  \eqn{T}{T} is a the diagonal positive definite matrix formed from the
+  \code{tune}, \eqn{B_0}{B0} is the prior precision, and \eqn{C}{C} is
+  the large sample variance-covariance matrix of the MLEs. This last
+  calculation is done via an initial call to \code{optim}.
+}
+
+\references{
+      
+  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.  
+   \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+
+   Radford Neal. 2003. ``Slice Sampling'' (with discussion). \emph{Annals of
+   Statistics}, 31: 705-767. 
+
+   Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
+   \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
+   \url{http://www-fis.iarc.fr/coda/}.
+}
+
+\seealso{\code{\link[coda]{plot.mcmc}},\code{\link[coda]{summary.mcmc}},
+\code{\link[nnet]{multinom}}}
+\examples{
+  \dontrun{
+  data(Nethvote)
+
+  ## just a choice-specific X var
+  post1 <- MCMCmnl(vote ~  
+                choicevar(distD66, "sqdist", "D66") +
+                choicevar(distPvdA, "sqdist", "PvdA") +
+                choicevar(distVVD, "sqdist", "VVD") +
+                choicevar(distCDA, "sqdist", "CDA"),
+                baseline="D66", mcmc.method="MH", B0=0,
+                verbose=TRUE, mcmc=100000, thin=10, tune=1.0,
+                data=Nethvote)
+
+  plot(post1)
+  summary(post1)
+
+
+
+  ## just individual-specific X vars
+  post2<- MCMCmnl(vote ~  
+                relig + class + income + educ + age + urban,
+                baseline="D66", mcmc.method="MH", B0=0,
+                verbose=TRUE, mcmc=100000, thin=10, tune=0.5,
+                data=Nethvote)
+
+  plot(post2)
+  summary(post2)
+
+
+
+  ## both choice-specific and individual-specific X vars
+  post3 <- MCMCmnl(vote ~  
+                choicevar(distD66, "sqdist", "D66") +
+                choicevar(distPvdA, "sqdist", "PvdA") +
+                choicevar(distVVD, "sqdist", "VVD") +
+                choicevar(distCDA, "sqdist", "CDA") +
+                relig + class + income + educ + age + urban,
+                baseline="D66", mcmc.method="MH", B0=0,
+                verbose=TRUE, mcmc=100000, thin=10, tune=0.5,
+                data=Nethvote)
+
+  plot(post3)
+  summary(post3)
+
+
+  ## numeric y variable
+  nethvote$vote <- as.numeric(nethvote$vote) 
+  post4 <- MCMCmnl(vote ~  
+                choicevar(distD66, "sqdist", "2") +
+                choicevar(distPvdA, "sqdist", "3") +
+                choicevar(distVVD, "sqdist", "4") +
+                choicevar(distCDA, "sqdist", "1") +
+                relig + class + income + educ + age + urban,
+                baseline="2", mcmc.method="MH", B0=0,
+                verbose=TRUE, mcmc=100000, thin=10, tune=0.5,
+                data=Nethvote)
+
+
+  plot(post4)
+  summary(post4)
+
+
+
+  ## Simulated data example with nonconstant choiceset
+  n <- 1000
+  y <- matrix(0, n, 4)
+  colnames(y) <- c("a", "b", "c", "d")
+  xa <- rnorm(n)
+  xb <- rnorm(n)
+  xc <- rnorm(n)
+  xd <- rnorm(n)
+  xchoice <- cbind(xa, xb, xc, xd)
+  z <- rnorm(n)
+  for (i in 1:n){
+    ## randomly determine choiceset (c is always in choiceset)
+    choiceset <- c(3, sample(c(1,2,4), 2, replace=FALSE))
+    numer <- matrix(0, 4, 1)
+    for (j in choiceset){
+      if (j == 3){
+        numer[j] <- exp(xchoice[i, j] )
+      }
+      else {
+        numer[j] <- exp(xchoice[i, j] - z[i] )
+      }
+    }
+    p <- numer / sum(numer)
+    y[i,] <- rmultinom(1, 1, p)
+    y[i,-choiceset] <- -999
+  }
+
+  post5 <- MCMCmnl(y~choicevar(xa, "x", "a") +
+                  choicevar(xb, "x", "b") +
+                  choicevar(xc, "x", "c") +
+                  choicevar(xd, "x", "d") + z,
+                  baseline="c", verbose=TRUE,
+                  mcmc=100000, thin=10, tune=.85)
+
+  plot(post5)
+  summary(post5)
+
+  }
+}
+\keyword{models}
+

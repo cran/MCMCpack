@@ -3,6 +3,7 @@ import(coda)
 import(MASS)
 
 export(    
+       choicevar,
        ddirichlet,
        dinvgamma,
        diwish,
@@ -17,12 +18,14 @@ export(
        MCMClogit,
        MCMCmetrop1R,
        MCMCmixfactanal,
+       MCMCmnl,
        MCMCoprobit,
        MCMCordfactanal,
        MCMCpanel,
        MCMCpoisson,
        MCMCprobit,
        MCMCregress,
+       MCMCtobit,
        rdirichlet,
        read.Scythe,
        rinvgamma,
@@ -34,4 +37,3 @@ export(
        write.Scythe,
        xpnd
        )
-

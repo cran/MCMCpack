@@ -43,81 +43,81 @@
 #endif
 
 namespace SCYTHE {
-
-	/* Default constructor */
-	rng::rng ()
-	{
-	}
-
-	rng::~rng()
-	{
-	}
-
-	/* Random Numbers */
-	Matrix<double>
-	rng::runif (const int &rows, const int &cols)
-	{
-		int size = rows * cols;
-		if (size <= 0) {
-			throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
+  
+  /* Default constructor */
+  rng::rng ()
+  {
+  }
+  
+  rng::~rng()
+  {
+  }
+  
+  /* Random Numbers */
+  Matrix<double>
+  rng::runif (const int &rows, const int &cols)
+  {
+    int size = rows * cols;
+    if (size <= 0) {
+      throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
 				__LINE__, "Attempted to create Matrix of size <= 0");
-		}
-		
-		Matrix<double> temp(rows, cols, false);
-		for (int i = 0; i < size; ++i)
-			temp[i] = runif();
-		
-		return temp;
-	}
-	
-	double
-	rng::rbeta (const double& alpha, const double& beta)
-	{
-		static double report;
-		double xalpha, xbeta;
-			
-		// Check for allowable parameters
-		if (alpha <= 0) {
-			throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__,
-						 __LINE__, "alpha <= 0");
-		}
-		if (beta <= 0) {
-			throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__,
-						 __LINE__, "beta <= 0");
-		}
-		
-		xalpha = rchisq (2 * alpha);
-		xbeta = rchisq (2 * beta);
-		report = xalpha / (xalpha + xbeta);
-		
-		return (report);
-	}
-
-	Matrix<double>
-	rng::rbeta (const int& rows, const int& cols, const double& alpha,
-							const double& beta)
-	{
-		int size = rows * cols;
-		if (size <= 0) {
-			throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
+    }
+    
+    Matrix<double> temp(rows, cols, false);
+    for (int i = 0; i < size; ++i)
+      temp[i] = runif();
+    
+    return temp;
+  }
+  
+  double
+  rng::rbeta (const double& alpha, const double& beta)
+  {
+    static double report;
+    double xalpha, xbeta;
+    
+    // Check for allowable parameters
+    if (alpha <= 0) {
+      throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__,
+			       __LINE__, "alpha <= 0");
+    }
+    if (beta <= 0) {
+      throw scythe_invalid_arg(__FILE__, __PRETTY_FUNCTION__,
+			       __LINE__, "beta <= 0");
+    }
+    
+    xalpha = rchisq (2 * alpha);
+    xbeta = rchisq (2 * beta);
+    report = xalpha / (xalpha + xbeta);
+    
+    return (report);
+  }
+  
+  Matrix<double>
+  rng::rbeta (const int& rows, const int& cols, const double& alpha,
+	      const double& beta)
+  {
+    int size = rows * cols;
+    if (size <= 0) {
+      throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
 				__LINE__, "Attempted to create Matrix of size <= 0");
-		}
-		
-		Matrix<double> temp(rows, cols, false);
-		for (int i = 0; i < size; ++i)
-			temp[i] = rbeta (alpha, beta);
-		
-		return temp;
-	}
-
+    }
+    
+    Matrix<double> temp(rows, cols, false);
+    for (int i = 0; i < size; ++i)
+      temp[i] = rbeta (alpha, beta);
+    
+    return temp;
+  }
+  
   /* Return a pseudo-random deviate from a non-cental hypergeometric
    * distribution
    */
   double 
-	rng::rnchypgeom(const double& m1, const double& n1, 
-        					const double& n2, const double& psi, 
-        					const double& delta)
-	{
+  rng::rnchypgeom(const double& m1, const double& n1, 
+		  const double& n2, const double& psi, 
+		  const double& delta)
+  {
     // Calculate mode of mass function
     double a = psi - 1;
     double b = -1 * ((n1+m1+2)*psi + n2 - m1);
@@ -226,24 +226,24 @@ namespace SCYTHE {
     exit(500000);
   }
 	
-	Matrix<double>
-	rng::rnchypgeom(const int &rows, const int &cols, const double &m1,
-									const double &n1, const double &n2, 
-									const double &psi, const double &delta)
-	{
-		int size = rows * cols;
-		if (size <= 0) {
-			throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
+  Matrix<double>
+  rng::rnchypgeom(const int &rows, const int &cols, const double &m1,
+		  const double &n1, const double &n2, 
+		  const double &psi, const double &delta)
+  {
+    int size = rows * cols;
+    if (size <= 0) {
+      throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
 				__LINE__, "Attempted to create Matrix of size <= 0");
-		}
-		
-		Matrix<double> temp(rows, cols, false);
-		for (int i = 0; i < size; ++i)
-			temp[i] = rnchypgeom (m1, n1, n2, psi, delta);
-		
-		return temp;
-	}
-
+    }
+    
+    Matrix<double> temp(rows, cols, false);
+    for (int i = 0; i < size; ++i)
+      temp[i] = rnchypgeom (m1, n1, n2, psi, delta);
+    
+    return temp;
+  }
+  
   /* Random Numbers */
   int
   rng::rbinom (const int& n, const double& p)
@@ -853,9 +853,11 @@ namespace SCYTHE {
 
   double 
   rng::rtnorm(const double& m, const double& v, const double& below, 
-	 const double& above)
+	      const double& above)
   {  
     if (below > above) {
+      std::cout << "mean = " << m << " and var = " << v << std::endl << 
+	"below = " << below << "  and above = " << above << std::endl;
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
 				__LINE__, \
 				"Truncation bound not logically consistent");
@@ -896,9 +898,9 @@ namespace SCYTHE {
 
   double
   rng::rtnorm_combo(const double& m, const double& v,
-										const double& below, const double& above)
+		    const double& below, const double& above)
   {
-    if (below > above) {
+    if (below >= above) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
 				__LINE__, "Truncation bound not logically consistent");
     }
@@ -947,7 +949,7 @@ namespace SCYTHE {
 
   double
   rng::rtbnorm_slice (const double& m, const double& v,
-											const double& below, const int& iter)
+		      const double& below, const int& iter)
   {
     if (below < m) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
@@ -977,7 +979,7 @@ namespace SCYTHE {
 
   double
   rng::rtanorm_slice (const double& m, const double& v,
-											const double& above, const int& iter)
+		      const double& above, const int& iter)
   {
     if (above > m) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
@@ -1010,13 +1012,13 @@ namespace SCYTHE {
 
   double
   rng::rtbnorm_combo (const double& m, const double& v,
-											const double& below, const int& iter)
+		      const double& below, const int& iter)
   {
     if (v <= 0){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
 				__LINE__, "Variance non-positive");
     }
-		
+    
     double s = ::sqrt(v);
     // do rejection sampling and return value
     //if (m >= below){
@@ -1027,7 +1029,7 @@ namespace SCYTHE {
       return x; 
     } else if ((m/s - below/s ) > -5.0 ){
       // use the inverse cdf method
-      double above = (m+30.0)*s;
+      double above =  std::numeric_limits<double>::infinity();
       double x = rtnorm(m, v, below, above);
       return x;
     } else {
@@ -1051,7 +1053,7 @@ namespace SCYTHE {
 
   double
   rng::rtanorm_combo (const double& m, const double& v,
-											const double& above, const int& iter)
+		      const double& above, const int& iter)
   {
     if (v <= 0){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
@@ -1066,7 +1068,7 @@ namespace SCYTHE {
       return x;
     } else if ((m/s - above/s ) < 5.0 ){
       // use the inverse cdf method
-      double below = (m-30.0)*s;
+      double below =  -std::numeric_limits<double>::infinity();
       double x = rtnorm(m, v, below, above);
       return x;
     } else {

@@ -1,6 +1,6 @@
 \name{MCMClogit}
 \alias{MCMClogit}
-\title{Markov chain Monte Carlo for Logistic Regression}
+\title{Markov Chain Monte Carlo for Logistic Regression}
 \description{
   This function generates a posterior density sample
   from a logistic regression model using a random walk Metropolis

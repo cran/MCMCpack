@@ -26,10 +26,10 @@
 #include "mersenne.h"
 #include "lecuyer.h"
 
-#include <R.h>           // needed to use Rprintf()
+//#include <R.h>           // needed to use Rprintf()
 
 using namespace std;
-using namespace SCYTHE;
+//using namespace SCYTHE;
 
 namespace SCYTHE {
   

@@ -20,7 +20,10 @@
 // revised version of older MCMCordfactanal 
 // 7/20/2004 KQ
 // updated to new version of Scythe 7/25/2004
+// fixed a bug pointed out by Alexander Raach 1/16/2005 KQ
+//
 
+#include<iostream>
 
 #include "matrix.h"
 #include "distributions.h"
@@ -66,7 +69,8 @@ mixfactanalpost (double* sampledata, const int* samplerow,
 		 const double* b0data, const int* b0row, const int* b0col,
 		 const int* storelambda,
 		 const int* storescores,
-		 int* accepts
+		 int* acceptsdata, const int* acceptsrow, 
+		 const int* acceptscol
 		 ) {
 
   // put together matrices
@@ -94,36 +98,8 @@ mixfactanalpost (double* sampledata, const int* samplerow,
 						    Lampprecdata);  
   const Matrix <double> a0 = r2scythe(*a0row, *a0col, a0data);
   const Matrix <double> b0 = r2scythe(*b0row, *b0col, b0data);
-  
- 
- /*
-  const Matrix<double> Xstar = r2scythe(*Xrow, *Xcol, Xdata);
-  const Matrix<int> X = Matrix<int>(*Xrow, *Xcol);
-  for (int i=0; i<(*Xrow * *Xcol); ++i)
-    X[i] = static_cast<int>(Xstar[i]);
-  
-  Matrix<double> Lambda = r2scythe(*Lamstartrow, *Lamstartcol, 
-				   Lamstartdata);
-  const Matrix<double> gamma = r2scythe(*gamrow, *gamcol, gamdata);
-  const Matrix<double> Psi = r2scythe(*Psistartrow, *Psistartcol, 
-				      Psistartdata);
-  const Matrix<double> Psi_inv = invpd(Psi);
-  const Matrix<int> ncateg = Matrix<int>(*ncatrow, *ncatcol);
-  for (int i=0; i<(*ncatrow * *ncatcol); ++i)
-    X[i] = static_cast<int>(ncatdata[i]);  
-  const Matrix<double> Lambda_eq = r2scythe(*Lameqrow, *Lameqcol, 
-					    Lameqdata);
-  const Matrix<double> Lambda_ineq = r2scythe(*Lamineqrow, *Lamineqcol, 
-					      Lamineqdata);
-  const Matrix<double> Lambda_prior_mean = r2scythe(*Lampmeanrow, 
-						    *Lampmeancol, 
-						    Lampmeandata);
-  const Matrix<double> Lambda_prior_prec = r2scythe(*Lampprecrow, 
-						    *Lamppreccol, 
-						    Lampprecdata);  
-  const Matrix <double> a0 = r2scythe(*a0row, *a0col, a0data);
-  const Matrix <double> b0 = r2scythe(*b0row, *b0col, b0data);
-  */
+  Matrix<int> accepts = r2scythe(*acceptsrow, *acceptscol, acceptsdata);
+
   
   // initialize rng stream
   rng *stream = MCMCpack_get_rng(*lecuyer, seedarray, *lecuyerstream);
@@ -146,7 +122,6 @@ mixfactanalpost (double* sampledata, const int* samplerow,
   // starting values for phi  and gamma_p
   Matrix<double> phi = Matrix<double>(N,D-1);
   phi = cbind(ones<double>(N,1), phi);
-  Matrix<double> gamma_p = gamma(_,0);
   
   // storage matrices (row major order)
   Matrix<double> Lambda_store;
@@ -231,17 +206,22 @@ mixfactanalpost (double* sampledata, const int* samplerow,
 
     // sample gamma
     for (int j=0; j<K; ++j){ // do the sampling for each categ. var
+      Matrix<double> gamma_p = gamma(_,j);
+      if (ncateg[j] <= 2){ 
+	++accepts[j]; 
+      }
       if (ncateg[j] > 2){
 	const Matrix<double> X_mean = phi * t(Lambda(j,_));
 	for (int i=2; i<(ncateg[j]); ++i){
 	  if (i==(ncateg[j]-1)){
-	    gamma_p[i] = stream->rtbnorm_combo(gamma(i,j), ::pow(tune[j], 2.0), 
-				       gamma_p[i-1]);
+	    gamma_p[i] = stream->rtbnorm_combo(gamma(i,j), 
+					       ::pow(tune[j], 2.0), 
+					       gamma_p[i-1]);
 	  }
 	  else {
 	    gamma_p[i] = stream->rtnorm_combo(gamma(i,j), ::pow(tune[j], 2.0), 
-				      gamma_p[i-1], 
-				      gamma(i+1, j));
+					      gamma_p[i-1], 
+					      gamma(i+1, j));
 	  }
 	}
 	double loglikerat = 0.0;
@@ -271,24 +251,25 @@ mixfactanalpost (double* sampledata, const int* samplerow,
 	    }
 	  }
 	}
-	for (int k=2; k<(ncateg[j]-1); ++k){
+	for (int k=2; k<ncateg[j]; ++k){
 	  loggendenrat = loggendenrat 
 	    + log(pnorm(gamma(k+1,j), gamma(k,j), tune[j]) - 
-		  pnorm(gamma(k-1,j), gamma(k,j), tune[j]) )  
+		  pnorm(gamma_p[k-1], gamma(k,j), tune[j]) )  
 	    - log(pnorm(gamma_p[k+1], gamma_p[k], tune[j]) - 
-		  pnorm(gamma_p[k-1], gamma_p[k], tune[j]) );
+		  pnorm(gamma(k-1,j), gamma_p[k], tune[j]) );
 	}
 	double logacceptrat = loglikerat + loggendenrat;
+	  
 	if (stream->runif() <= exp(logacceptrat)){
 	  for (int i=0; i<*gamrow; ++i){
 	    if (gamma(i,j) == 300) break;
 	    gamma(i,j) = gamma_p[i];
 	  }
-	  ++accepts[0];
+	  ++accepts[j];
 	}
       }
     }
-    
+
     // print results to screen
     if (*verbose == 1 && iter % 500 == 0){
       Rprintf("\n\nMCMCmixfactanal iteration %i of %i \n", (iter+1), tot_iter);
@@ -304,9 +285,12 @@ mixfactanalpost (double* sampledata, const int* samplerow,
 	Rprintf("%10.5f", Psi(i,i));
       }
       Rprintf("\n");
-      Rprintf("\nMetropolis-Hastings acceptance rate = %10.5f\n", 
-	      static_cast<double>(*accepts)/(static_cast<double>((iter+1) *
-								 n_ord_ge3))); 
+      Rprintf("\nMetropolis-Hastings acceptance rates = \n");
+      for (int j = 0; j<K; ++j){
+	Rprintf("%6.2f", 
+		static_cast<double>(accepts[j]) / 
+		static_cast<double>((iter+1)));
+      } 
     }
     
     // store results
@@ -358,6 +342,10 @@ mixfactanalpost (double* sampledata, const int* samplerow,
   const int size = *samplerow * *samplecol;
   for (int i=0; i<size; ++i)
     sampledata[i] = output[i];
+
+  for (int j=0; j<K; ++j)
+    acceptsdata[j] = accepts[j];
+
   
 }
 
