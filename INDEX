@@ -37,7 +37,7 @@ dnoncenhypergeom        Evaluate Density of Noncentral Hypergeometric
 dtomogplot              Dynamic Tomography Plot
 dwish                   Evaluate the Density of the Wishart
                         Distribution
-mcmc2                   CreateMarkov Chain Monte Carlo Objects
+mcmc2                   Create Markov Chain Monte Carlo Objects
 mcmc2dataframe          Convert Markov Chain Monte Carlo Objects to
                         Dataframes
 rdirichlet              Generate Random Draws from the Dirichlet

@@ -561,34 +561,38 @@ namespace SCYTHE {
 	int rbetabin (const int &, const double &, const double &);
 
 	Matrix<double> rbetabin ( const int &, const int &,
-														const int &, const double &,
-														const double &);
+				  const int &, const double &,
+				  const double &);
 
 	/* Truncated Normal */
 	
 	/* Simulates from a truncated Normal distribution */
 	double rtnorm(const double &, const double &, const double &, 
-								const double &);
+		      const double &);
+
+	/* Simulate from a truncated Normal distribution */
+	double rtnorm_combo(const double &, const double &, 
+			    const double &, const double &);
 
 	/* Sample from a truncated Normal distribution */
 	double rtbnorm_slice( const double &, const double &,
-												const double &, const int &iter = 10);
+			      const double &, const int &iter = 10);
 
 	/* Sample from a truncated Normal distribution */
 	double rtanorm_slice( const double &, const double &,
-												const double &, const int &iter = 10);
+			      const double &, const int &iter = 10);
 
 	/* Sample from a truncated Normal distribution */
 	double rtbnorm_combo( const double &, const double &,
-												const double &, const int &iter=10);
+			      const double &, const int &iter=10);
 
 	/* Sample from a truncated Normal distribution */
 	double rtanorm_combo( const double &, const double &,
-												const double &, const int &iter=10);
+			      const double &, const int &iter=10);
 
 	/* Multivariate Normal */
 	double lndmvn ( const Matrix<double> &, const Matrix<double> &, 
-									const Matrix<double> &);
+			const Matrix<double> &);
 
 
 	

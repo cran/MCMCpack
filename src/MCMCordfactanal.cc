@@ -101,7 +101,8 @@ ordfactanalpost (double* sam, const int* samrow, const int* samcol,
 
 
     
-    // sample Xstar
+    // sample Xstar (OLD)
+    /*
     for (int j=0; j<K; ++j){
         Matrix<double> X_mean = phi * t(Lambda(j,_));
       for (int i=0; i<N; ++i){
@@ -109,12 +110,26 @@ ordfactanalpost (double* sam, const int* samrow, const int* samcol,
 	  Xstar(i,j) = rnorm(X_mean[i], 1.0);
 	}
 	else { // if not missing
-	  Xstar(i,j) = rtnorm(X_mean[i], 1.0, 
+	  Xstar(i,j) = rtnorm_combo(X_mean[i], 1.0, 
 			      gamma(X(i,j)-1, j), gamma(X(i,j), j));
 	}
       }
     }
+    */
 
+    // sample Xstar (NEW)
+    for (int i=0; i<N; ++i){
+      Matrix<double> X_mean = Lambda * t(phi(i,_));
+      for (int j=0; j<K; ++j){
+	if (X(i,j) == -999){ // if missing
+	  Xstar(i,j) = rnorm(X_mean[j], 1.0);
+	}
+	else { // if not missing
+	  Xstar(i,j) = rtnorm_combo(X_mean[j], 1.0, 
+			      gamma(X(i,j)-1, j), gamma(X(i,j), j));
+	}
+      }
+    }
 
 
     // sample phi
@@ -142,8 +157,9 @@ ordfactanalpost (double* sam, const int* samrow, const int* samcol,
 				     gamma_p[i-1]);
 	}
 	else {
-	  gamma_p[i] = rtnorm(gamma(i,j), ::pow(tune[j], 2.0), gamma_p[i-1], 
-			      gamma(i+1, j));
+	  gamma_p[i] = rtnorm_combo(gamma(i,j), ::pow(tune[j], 2.0), 
+				    gamma_p[i-1], 
+				    gamma(i+1, j));
 	}
       }
       double loglikerat = 0.0;
@@ -156,21 +172,21 @@ ordfactanalpost (double* sam, const int* samrow, const int* samcol,
 	  if (X(i,j) == ncateg[j]){
 	    loglikerat = loglikerat 
 	      + log(1.0  - 
-		    pnorm1(gamma_p[X(i,j)-1] - X_mean[i]) ) 
+		    pnorm(gamma_p[X(i,j)-1] - X_mean[i]) ) 
 	      - log(1.0 - 
-		    pnorm1(gamma(X(i,j)-1,j) - X_mean[i]) );
+		    pnorm(gamma(X(i,j)-1,j) - X_mean[i]) );
 	  }
 	  else if (X(i,j) == 1){
 	    loglikerat = loglikerat 
-	      + log(pnorm1(gamma_p[X(i,j)] - X_mean[i])  ) 
-	      - log(pnorm1(gamma(X(i,j), j) - X_mean[i]) );
+	      + log(pnorm(gamma_p[X(i,j)] - X_mean[i])  ) 
+	      - log(pnorm(gamma(X(i,j), j) - X_mean[i]) );
 	  }
 	  else{
 	    loglikerat = loglikerat 
-	      + log(pnorm1(gamma_p[X(i,j)] - X_mean[i]) - 
-		    pnorm1(gamma_p[X(i,j)-1] - X_mean[i]) ) 
-	      - log(pnorm1(gamma(X(i,j), j) - X_mean[i]) - 
-		    pnorm1(gamma(X(i,j)-1, j) - X_mean[i]) );
+	      + log(pnorm(gamma_p[X(i,j)] - X_mean[i]) - 
+		    pnorm(gamma_p[X(i,j)-1] - X_mean[i]) ) 
+	      - log(pnorm(gamma(X(i,j), j) - X_mean[i]) - 
+		    pnorm(gamma(X(i,j)-1, j) - X_mean[i]) );
 	  }
 	}
       }
