@@ -4,13 +4,15 @@
 #
 # The model is:
 #
-# x*_i = \Lambda \phi_i + \epsilon_i,   \epsilon_i \sim N(0, I)
+# x*_i = \Lambda \phi_i + \epsilon_i,   \epsilon_i \sim N(0, \Psi)
 #
 # \lambda_{ij} \sim N(l0_{ij}, L0^{-1}_{ij})
 # \phi_i \sim N(0,I)
 #
 # and x*_i is the latent variable formed from the observed ordinal
-# variable in the usual (Albert and Chib, 1993) way.
+# variable in the usual (Albert and Chib, 1993) way and is equal to
+# x_i when x_i is continuous. When x_j is ordinal \Psi_jj is assumed
+# to be 1.
 #
 # Andrew D. Martin
 # Washington University
@@ -18,105 +20,89 @@
 # Kevin M. Quinn
 # Harvard University
 #
-# May 12, 2003
+# 12/2/2003
 #
 ##########################################################################
 
-"MCMCordfactanal" <-
+"MCMCmixfactanal" <-
   function(x, factors, lambda.constraints=list(),
            data=list(), burnin = 1000, mcmc = 10000,
            thin=5, tune=NA, verbose = FALSE, seed = 0,
-           lambda.start = NA, l0=0, L0=0,
+           lambda.start = NA, psi.start=NA,
+           l0=0, L0=0, a0=0.001, b0=0.001,
            store.lambda=TRUE, store.scores=FALSE,
-           drop.constantvars=TRUE, drop.constantcases=FALSE,... ) {
+           std.mean=TRUE, std.var=TRUE, ... ) {
+    
+    call <- match.call()
+    mt <- terms(x, data=data)
+    if (attr(mt, "response") > 0) 
+      stop("Response not allowed in formula in MCMCmixfactanal().\n")
+    if(missing(data)) data <- sys.frame(sys.parent())
+    mf <- match.call(expand.dots = FALSE)
+    mf$factors <- mf$lambda.constraints <- mf$burnin <- mf$mcmc <- NULL
+    mf$thin <- mf$tune <- mf$verbose <- mf$seed <- NULL
+    mf$lambda.start <- mf$l0 <- mf$L0 <- mf$a0 <- mf$b0 <- NULL
+    mf$store.lambda <- mf$store.scores <- mf$std.var <- mf$... <- NULL
+    mf$drop.unused.levels <- TRUE
+    mf[[1]] <- as.name("model.frame")
+    mf <- eval(mf, sys.frame(sys.parent()))
+    attributes(mt)$intercept <- 0
+    Xterm.length <- length(attr(mt, "variables"))
+    X <- subset(mf,
+                select=as.character(attr(mt, "variables"))[2:Xterm.length])
 
-    # check for MCMCirtKd special case, this is used to tell the R
-    # and C++ code what to echo (1 if regular, 2 if MCMCirtKd)
-    # the test is based on the existence of a string
-    # "special.case" coming through the ellipses
-    args <- list(...)
-
-    if(length(args) > 0) test.string <- args[[1]][1]
-    else test.string <- "xxx"
-        
-    if(test.string=="special.case") {
-      case.switch <- 2
-      echo.name <- "MCMCirtKd"
-    }
-    else {
-      case.switch <- 1
-      echo.name <- "MCMCordfactanal"
-    } 
- 
-    # extract X and variable names from the model formula and frame       
-    if (is.matrix(x)){
-      if (drop.constantvars==TRUE){
-        x.col.var <- apply(x, 2, var, na.rm=TRUE)
-        x <- x[,x.col.var!=0]
-        x.row.var <- apply(x, 1, var, na.rm=TRUE)
-        x <- x[x.row.var!=0,]
-      }
-      X <- as.data.frame(x)
-      xvars <- dimnames(X)[[2]]
-      xobs <- dimnames(X)[[1]]
-      N <- nrow(X)    # number of observations
-      K <- ncol(X)    # number of manifest variables
-      ncat <- matrix(NA, K, 1) # vector of number of categ. in each man. var. 
-      for (i in 1:K){
-        X[,i] <- factor(X[,i], ordered=TRUE)
-        ncat[i] <- nlevels(X[,i])
-        X[,i] <- as.integer(X[,i])
+    N <- nrow(X)	      # number of observations      
+    K <- ncol(X)              # number of manifest variables
+    ncat <- matrix(NA, K, 1)  # vector of number of categ. in each man. var. 
+    for (i in 1:K){ 
+      if (is.numeric(X[,i])){
+        ncat[i] <- -999
         X[is.na(X[,i]), i] <- -999
       }
-      X <- as.matrix(X)
-    }
-    else {
-      call <- match.call()
-      mt <- terms(x, data=data)
-      if (attr(mt, "response") > 0) 
-        stop("Response not allowed in formula in ", echo.name, "().\n")
-      if(missing(data)) data <- sys.frame(sys.parent())
-      mf <- match.call(expand.dots = FALSE)
-      mf$factors <- mf$lambda.constraints <- mf$burnin <- mf$mcmc <- NULL
-      mf$thin <- mf$tune <- mf$verbose <- mf$seed <- NULL
-      mf$lambda.start <- mf$l0 <- mf$L0 <- NULL
-      mf$store.lambda <- mf$store.scores <- mf$drop.constantvars <- NULL
-      mf$drop.constantcases <- mf$... <- NULL
-      mf$drop.unused.levels <- TRUE
-      mf[[1]] <- as.name("model.frame")
-      mf <- eval(mf, sys.frame(sys.parent()))
-      attributes(mt)$intercept <- 0
-      Xterm.length <- length(attr(mt, "variables"))
-      X <- subset(mf,
-                  select=as.character(attr(mt, "variables"))[2:Xterm.length])
-      if (drop.constantvars==TRUE){
-        x.col.var <- apply(X, 2, var, na.rm=TRUE)
-        X <- X[,x.col.var!=0]
-      }
-      if (drop.constantcases==TRUE){
-        x.row.var <- apply(X, 1, var, na.rm=TRUE)
-        X <- X[x.row.var!=0,]
-      }
-      N <- nrow(X)	        # number of observations      
-      K <- ncol(X)              # number of manifest variables
-      ncat <- matrix(NA, K, 1)  # vector of number of categ. in each man. var. 
-      for (i in 1:K){
-        X[,i] <- factor(X[,i], ordered=TRUE)
+      else if (is.ordered(X[,i])){
         ncat[i] <- nlevels(X[,i])      
         X[,i] <- as.integer(X[,i])
         X[is.na(X[,i]), i] <- -999
       }
-      X <- as.matrix(X)
-      xvars <- dimnames(X)[[2]] # X variable names
-      xobs <- dimnames(X)[[1]]  # observation names
+      else {
+        stop("Manifest variable ", dimnames(X)[[2]][i],
+             " neither ordered factor nor numeric variable.\n")
+      }
     }
+    
+    X <- as.matrix(X)
+    xvars <- dimnames(X)[[2]] # X variable names
+    xobs <- dimnames(X)[[1]]  # observation names
     
     if (is.null(xobs)){
       xobs <- 1:N
     }
 
+    # standardize X
+    if (std.mean){
+      for (i in 1:K){
+        if (ncat[i] == -999){
+          X[,i] <- X[,i]-mean(X[,i])
+        }
+      }
+    }
+    if (std.var){
+      for (i in 1:K){
+        if (ncat[i] == -999){
+          X[,i] <- (X[,i])/sd(X[,i])
+        }
+      }
+    }
+     
+
+
+    n.ord.ge3 <- 0
+    for (i in 1:K)
+      if (ncat[i] >= 3) n.ord.ge3 <- n.ord.ge3 + 1
     
-    check.parameters(burnin, mcmc, thin, echo.name)
+    check.parameters(burnin, mcmc, thin, "MCMCmixfactanal()")
+
+
     
     # give names to the rows of Lambda related matrices
     Lambda.eq.constraints <- matrix(NA, K, factors+1)
@@ -161,18 +147,22 @@
         }
       }
     }
+
+    # if subtracting out the mean of continuous X then constrain
+    # the mean parameter to 0
+    for (i in 1:K){
+      if (ncat[i] < 2 && std.mean==TRUE){
+        Lambda.eq.constraints[i,1] <- 0.0
+      }
+    }
+    
     
     testmat <- Lambda.ineq.constraints * Lambda.eq.constraints
     
     if (min(is.na(testmat))==0){
       if ( min(testmat[!is.na(testmat)]) < 0){
-        if(case.switch==1) {
           cat("Constraints on Lambda are logically inconsistent.\n")
-        }
-        else {
-          cat("Constraints on item parameters are logically inconsistent.\n")
-        }
-        stop("Please respecify and call ", echo.name, "() again\n")
+        stop("Please respecify and call MCMCmixfactanal() again\n")
       }
     }
     Lambda.eq.constraints[is.na(Lambda.eq.constraints)] <- -999
@@ -183,13 +173,8 @@
       if (nrow(l0)==K && ncol(l0)==(factors+1))
         Lambda.prior.mean <- l0
       else {
-        if(case.switch==1) {
-          cat("l0 not of correct size for model specification.\n")
-        }
-        else {
-          cat("b0 not of correct size for model specification.\n")
-        }
-        stop("Please respecify and call ", echo.name, "() again\n")
+        cat("l0 not of correct size for model specification.\n")
+        stop("Please respecify and call MCMCmixfactanal() again\n")
       }
     }
     else if (is.list(l0)){ # list input for l0
@@ -209,13 +194,8 @@
       Lambda.prior.mean <- matrix(l0, K, factors+1)
     }
     else {
-      if(case.switch==1) {    
-        cat("l0 neither matrix, list, nor scalar.\n")
-      }
-      else {
-        cat("b0 neither matrix, list, nor scalar.\n")      
-      }
-      stop("Please respecify and call ", echo.name, "() again\n")
+      cat("l0 neither matrix, list, nor scalar.\n")
+      stop("Please respecify and call MCMCmixfactanal() again\n")
     }
     
     # prior precisions
@@ -223,13 +203,8 @@
       if (nrow(L0)==K && ncol(L0)==(factors+1))
         Lambda.prior.prec <- L0
       else {
-        if(case.switch==1) {       
-          cat("L0 not of correct size for model specification.\n")
-        }
-        else {
-          cat("B0 not of correct size for model specification.\n")      
-        }
-        stop("Please respecify and call ", echo.name, "() again\n")
+        cat("L0 not of correct size for model specification.\n")
+        stop("Please respecify and call MCMCmixfactanal() again\n")
       }
     }
     else if (is.list(L0)){ # list input for L0
@@ -249,22 +224,12 @@
       Lambda.prior.prec <- matrix(L0, K, factors+1)
     }
     else {
-      if(case.switch==1) {  
-        cat("L0 neither matrix, list, nor scalar.\n")
-      }
-      else {
-        cat("B0 neither matrix, list, nor scalar.\n")      
-      }
-      stop("Please respecify and call ", echo.name, "() again\n")
+      cat("L0 neither matrix, list, nor scalar.\n")
+      stop("Please respecify and call MCMCmixfactanal() again\n")
     }
     if (min(L0) < 0){
-      if(case.switch==1) {      
-        cat("L0 contains negative elements.\n")
-      }
-      else {
-        cat("B0 contains negative elements.\n")      
-      }
-      stop("Please respecify and call ", echo.name, "() again\n")
+      cat("L0 contains negative elements.\n")
+      stop("Please respecify and call MCMCmixfactanal() again\n")
     }
     
     # Starting values for Lambda
@@ -275,6 +240,9 @@
           if (Lambda.eq.constraints[i,j]==-999){
             if(Lambda.ineq.constraints[i,j]==0){
               if (j==1){
+                if (ncat[i] < 2){
+                  Lambda[i,j] <- mean(X[,i]!=-999)
+                }
                 if (ncat[i] == 2){
                   probit.out <- glm(as.factor(X[X[,i]!=-999,i])~1,
                                     family=binomial(link=probit))
@@ -324,7 +292,7 @@
     if (is.na(tune)){
       tune <- matrix(NA, K, 1)
       for (i in 1:K){
-        tune[i] <- 0.05/ncat[i]
+        tune[i] <- abs(0.05/ncat[i])
       }
     }
     else if (is.double(tune)){
@@ -332,11 +300,16 @@
     }
     if(min(tune) < 0) {
       cat("Tuning parameter is negative.\n")
-      stop("Please respecify and call ", echo.name, "() again\n")
+      stop("Please respecify and call MCMCmixfactanal() again\n")
     }
   
     # starting values for gamma (note: not changeable by user)
-    gamma <- matrix(0, max(ncat)+1, K)
+    if (max(ncat) <= 2){
+      gamma <- matrix(0, 3, K)
+    }
+    else {
+      gamma <- matrix(0, max(ncat)+1, K)
+    }
     for (i in 1:K){
       if (ncat[i]<=2){
         gamma[1,i] <- -300
@@ -353,28 +326,86 @@
       }
     }
 
+    # starting value for Psi
+    Psi <- matrix(0, K, K)
+    if (is.na(psi.start)){
+      for (i in 1:K){
+        if (ncat[i] < 2) {
+          Psi[i,i] <- 0.5 *var(X[,i])
+        }
+        else {
+          Psi[i,i] <- 1.0
+        }
+      }
+    }
+    else if (is.double(psi.start)){
+      for (i in 1:K){
+        Psi <- diag(K) * psi.start
+        if (ncat[i] >= 2) {
+          Psi[i] <- 1.0
+        }
+      }
+    }
+    else {
+      cat("psi.start neither NA, nor double.\n")
+      stop("Please respecify and call MCMCmixfactanal() again.\n")
+    }
+    if (nrow(Psi) != K || ncol(Psi) != K){
+      cat("Psi starting value not K by K matrix.\n")
+      stop("Please respecify and call MCMCmixfactanal() again.\n")    
+    }
+
+
+    # setup prior for diag(Psi)
+    if (length(a0)==1 && is.double(a0))
+      a0 <- matrix(a0, K, 1)
+    else if (length(a0) == K && is.double(a0))
+      a0 <- matrix(a0, K, 1)
+    else {
+      cat("a0 not properly specified.\n")
+      stop("Please respecify and call MCMCmixfactanal() again.\n")
+    }
+    if (length(b0)==1 && is.double(b0))
+      b0 <- matrix(b0, K, 1)
+    else if (length(b0) == K && is.double(b0))
+      b0 <- matrix(b0, K, 1)
+    else {
+      cat("b0 not properly specified.\n")
+      stop("Please respecify and call MCMCmixfactanal() again.\n")
+    }
+    
+    # prior for Psi error checking
+    if(min(a0) <= 0) {
+      cat("IG(a0/2,b0/2) prior parameter a0 less than or equal to zero.\n")
+      stop("Please respecify and call MCMCmixfactanal() again.\n")
+    }
+    if(min(b0) <= 0) {
+      cat("IG(a0/2,b0/2) prior parameter b0 less than or equal to zero.\n")
+      stop("Please respecify and call MCMCmixfactanal() again.\n")      
+    }  
+   
+    
     # define holder for posterior density sample
     if (store.scores == FALSE && store.lambda == FALSE){
-      sample <- matrix(data=0, mcmc/thin, length(gamma))
+      sample <- matrix(data=0, mcmc/thin, length(gamma)+K)
     }
     else if (store.scores == TRUE && store.lambda == FALSE){
-      sample <- matrix(data=0, mcmc/thin, (factors+1)*N + length(gamma))
+      sample <- matrix(data=0, mcmc/thin, (factors+1)*N + length(gamma)+K)
     }
     else if(store.scores == FALSE && store.lambda == TRUE) {
-      sample <- matrix(data=0, mcmc/thin, K*(factors+1)+length(gamma))
+      sample <- matrix(data=0, mcmc/thin, K*(factors+1)+length(gamma)+K)
     }
     else { # store.scores==TRUE && store.lambda==TRUE
       sample <- matrix(data=0, mcmc/thin, K*(factors+1)+(factors+1)*N +
-                       length(gamma))
+                       length(gamma)+K)
     }
-
     
     # Call the C++ code to do the real work
-    posterior <- .C("ordfactanalpost",
+    posterior <- .C("mixfactanalpost",
                     samdata = as.double(sample),
                     samrow = as.integer(nrow(sample)),
                     samcol = as.integer(ncol(sample)),
-                    X = as.integer(X),
+                    X = as.double(X),
                     Xrow = as.integer(nrow(X)),
                     Xcol = as.integer(ncol(X)),
                     burnin = as.integer(burnin),
@@ -389,6 +420,9 @@
                     gamma = as.double(gamma),
                     gammarow = as.integer(nrow(gamma)),
                     gammacol = as.integer(ncol(gamma)),
+                    Psi = as.double(Psi),
+                    Psirow = as.integer(nrow(Psi)),
+                    Psicol = as.integer(ncol(Psi)),
                     ncat = as.integer(ncat),
                     ncatrow = as.integer(nrow(ncat)),
                     ncatcol = as.integer(ncol(ncat)),
@@ -404,16 +438,21 @@
                     Lampprec = as.double(Lambda.prior.prec),
                     Lampprecrow = as.integer(nrow(Lambda.prior.prec)),
                     Lamppreccol = as.integer(ncol(Lambda.prior.prec)),
+                    a0 = as.double(a0),
+                    a0row = as.integer(nrow(a0)),
+                    a0col = as.integer(ncol(a0)),
+                    b0 = as.double(b0),
+                    b0row = as.integer(nrow(b0)),
+                    b0col = as.integer(ncol(b0)),
                     storelambda = as.integer(store.lambda),
                     storescores = as.integer(store.scores),
                     accepts = as.integer(0),
-                    outswitch = as.integer(case.switch),
                     PACKAGE="MCMCpack"
                     )
-    if(case.switch==1) {
-      cat(" overall acceptance rate = ",
-          posterior$accepts / ((posterior$burnin+posterior$mcmc)*K), "\n")
-    }
+
+    cat(" overall acceptance rate = ",
+        posterior$accepts / ((posterior$burnin+posterior$mcmc)*n.ord.ge3), "\n")
+
     
     # put together matrix and build MCMC object to return
     sample <- matrix(posterior$samdata, posterior$samrow, posterior$samcol,
@@ -422,22 +461,10 @@
     
     par.names <- NULL
     if (store.lambda==TRUE){
-      if(case.switch==1) {
       Lambda.names <- paste(paste("Lambda",
                                   rep(X.names,
                                       each=(factors+1)), sep=""),
                             rep(1:(factors+1),K), sep=".")
-      }
-      if(case.switch==2) {
-        alpha.hold <- paste("alpha", X.names, sep=".")
-        beta.hold <- paste("beta", X.names, sep = ".")
-        beta.hold <- rep(beta.hold, factors, each=factors)
-        beta.hold <- paste(beta.hold, 1:factors, sep=".")
-                
-        Lambda.names <- t(cbind(matrix(alpha.hold, K, 1), 
-                                matrix(beta.hold,K,factors,byrow=TRUE)))  
-        dim(Lambda.names) <- NULL
-      }
       par.names <- c(par.names, Lambda.names)
     }
     
@@ -448,20 +475,14 @@
     par.names <- c(par.names, gamma.names)
     
     if (store.scores==TRUE){
-      if(case.switch==1) {
       phi.names <- paste(paste("phi",
                                rep(xobs, each=(factors+1)), sep="."),
                          rep(1:(factors+1),(factors+1)), sep=".")
       par.names <- c(par.names, phi.names)
-      }
-      if(case.switch==2) {
-      phi.names <- paste(paste("theta",
-                               rep(xobs, each=(factors+1)), sep="."),
-                         rep(0:factors,(factors+1)), sep=".")
-      par.names <- c(par.names, phi.names)      
-      
-      }
     }
+
+    Psi.names <- paste("Psi", X.names, sep=".")
+    par.names <- c(par.names, Psi.names)
     
     varnames(output) <- par.names
 
@@ -476,15 +497,10 @@
     attr(output, "n.manifest") <- K
     attr(output, "n.factors") <- factors
     attr(output, "accept.rate") <- posterior$accepts /
-      ((posterior$burnin+posterior$mcmc)*K)
-    if(case.switch==1) {
+      ((posterior$burnin+posterior$mcmc)*n.ord.ge3)
       attr(output,"title") <-
-        "MCMCpack Ordinal Data Factor Analysis Posterior Density Sample"
-    }
-    if(case.switch==2) {
-      attr(output,"title") <-
-        "MCMCpack K-Dimensional Item Response Theory Model Posterior Density Sample"
-    }
+        "MCMCpack Mixed Data Factor Analysis Posterior Density Sample"
+    
     return(output)
     
   }

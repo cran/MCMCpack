@@ -146,6 +146,7 @@ factanalpost (double* sam, const int* samrow, const int* samcol,
 	  if (free_indic[j]==1)
 	    ineq_holds = std::min(ineq_holds, 
 				  Lambda_ineq_vec[j]*Lambdafree_i[Lam_count]);
+	  ++Lam_count;
 	}
 	while (ineq_holds < 0){
 	  Lambdafree_i = 
@@ -158,8 +159,8 @@ factanalpost (double* sam, const int* samrow, const int* samcol,
 	      Matrix<double> prodcheck = 
 		Lambda_ineq_vec[j]*Lambdafree_i[Lam_count];    
 	      test = std::min(test, prodcheck[0]); 	      
+	      ++Lam_count;
 	    }
-	    ++Lam_count;
 	  }
 	  ineq_holds = test;
 	}
@@ -197,7 +198,6 @@ factanalpost (double* sam, const int* samrow, const int* samcol,
 	// check to see if inequality constraints hold
 	Matrix<double> Lambda_ineq_vec = Lambda_ineq(i,_);
 	double ineq_holds = 0;
-	int Lam_count = 0;
 	for (int j=0; j<D; ++j){
 	  ineq_holds = 
 	    std::min(ineq_holds, Lambda_ineq_vec[j]*Lambdafree_i[j]);
@@ -206,23 +206,18 @@ factanalpost (double* sam, const int* samrow, const int* samcol,
 	  Lambdafree_i = 
 	    gaxpy(Lam_post_C, rnorm(hold.rows(), 1), Lam_post_mean);
 	  //Lambdafree_i = Lam_post_C * rnorm(hold.rows(), 1) + Lam_post_mean;
-	  Lam_count = 0;
 	  double test = 0;
 	  for (int j=0; j<D; ++j){
 	    //if (free_indic[j]==1)
-	    double prodcheck = Lambda_ineq_vec[j]*Lambdafree_i[Lam_count];
+	    double prodcheck = Lambda_ineq_vec[j]*Lambdafree_i[j];
 	    test = std::min(test, prodcheck); 
-	    ++Lam_count;
 	  }
 	  ineq_holds = test;
 	}
 	
 	// put draw into Lambda
-	Lam_count = 0;
 	for (int j=0; j<D; ++j){
-	  //if (free_indic[j] == 1){
-	  Lambda(i,j) = Lambdafree_i[Lam_count];
-	  ++Lam_count;
+	  Lambda(i,j) = Lambdafree_i[j];
 	}
       }	
     }      
@@ -232,8 +227,8 @@ factanalpost (double* sam, const int* samrow, const int* samcol,
     for (int i=0; i<K; ++i){
       Matrix<double> epsilon = X(_,i) - phi * t(Lambda(i,_));
       Matrix<double>  SSE = crossprod(epsilon);
-      double new_nu = nu[i] + N;
-      double new_delta = delta[i] + SSE[0];
+      double new_nu = (nu[i] + N)*0.5;
+      double new_delta = (delta[i] + SSE[0])*0.5;
       Psi(i,i) = rigamma(new_nu, new_delta);
     }
     Psi_inv = invpd(Psi);

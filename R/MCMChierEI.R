@@ -120,8 +120,8 @@
     output <- mcmc2(data=sample, start=1, end=mcmc, thin=thin)
     p0names <- paste("p0table", 1:ntables, sep="")
     p1names <- paste("p1table", 1:ntables, sep="")
-    varnames(output) <- c(p0names, p1names, "mu0", "mu1", "sigma^2_0",
-                          "sigma^2_1")
+    varnames(output) <- c(p0names, p1names, "mu0", "mu1", "sigma^2.0",
+                          "sigma^2.1")
     
     attr(output, "title") <- "MCMCpack Wakefield's Hierarchical EI Model Posterior Density Sample"
         

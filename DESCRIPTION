@@ -1,6 +1,6 @@
 Package: MCMCpack
-Version: 0.4-6
-Date: 2003-11-21
+Version: 0.4-7
+Date: 2004-2-4
 Title: Markov chain Monte Carlo (MCMC) Package
 Author: Andrew D. Martin <admartin@wustl.edu>, and
   Kevin M. Quinn <kquinn@latte.harvard.edu>
@@ -15,5 +15,4 @@ Description: This package contains functions for posterior
   functions, including some additional PDFs and pseudo-random
   number generators for statistical distributions.
 License: GPL version 2 or newer
-URL: http://www.r-project.org, http://scythe.wustl.edu, 
-   http://scythe.wustl.edu/mcmcpack.html
+URL: http://mcmcpack.wustl.edu, http://www.r-project.org

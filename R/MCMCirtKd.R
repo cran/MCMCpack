@@ -31,6 +31,7 @@
                             l0=b0, L0=B0, store.lambda=store.item,
                             store.scores=store.ability,
                             drop.constantvars=drop.constantvars,
+                            drop.constantcases=drop.constantcases,
                             special.case="special.case")
     return(post)
   }

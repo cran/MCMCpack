@@ -1,29 +1,33 @@
-\name{MCMCordfactanal}
-\alias{MCMCordfactanal}
-\title{Markov chain Monte Carlo for Ordinal Data Factor Analysis Model}
+\name{MCMCmixfactanal}
+\alias{MCMCmixfactanal}
+\title{Markov chain Monte Carlo for Mixed Data Factor Analysis Model}
 \description{
-  This function generates a posterior density sample from an ordinal data
-  factor analysis model. Normal priors are assumed on the factor
-  loadings and factor scores while improper uniform priors are assumed
-  on the cutpoints. The user supplies data and parameters for the prior
-  distributions, and a sample from the posterior density is returned as
-  an mcmc object, which can be subsequently analyzed with
-  functions provided in the coda package.
+  This function generates a posterior density sample from a mixed data
+  (both continuous and ordinal) factor analysis model. Normal priors are
+  assumed on the factor loadings and factor scores, improper
+  uniform priors are assumed on the cutpoints, and inverse gamma priors
+  are assumed for the error variances (uniquenesses). The user supplies
+  data and parameters for the prior distributions, and a sample from the
+  posterior density is returned as an mcmc object, which can be
+  subsequently analyzed with functions provided in the coda package.
 }
   
 \usage{
-MCMCordfactanal(x, factors, lambda.constraints=list(),
+MCMCmixfactanal(x, factors, lambda.constraints=list(),
                 data=list(), burnin = 1000, mcmc = 10000,
                 thin=5, tune=NA, verbose = FALSE, seed = 0,
-                lambda.start = NA, l0=0, L0=0,
+                lambda.start = NA, psi.start=NA,
+                l0=0, L0=0, a0=0.001, b0=0.001,
                 store.lambda=TRUE, store.scores=FALSE,
-                drop.constantvars=TRUE,
-                drop.constantcases=FALSE, ... )
+                std.mean=TRUE, std.var=TRUE, ... )
  }
 
 \arguments{
-  \item{x}{Either a formula or a numeric matrix containing the
-    manifest variables.}
+  \item{x}{A one-sided formula containing the
+    manifest variables. Ordinal (including dichotomous) variables must
+    be coded as ordered factors. NOTE: data input is different in
+    \code{MCMCmixfactanal} than in either \code{MCMCfactanal} or
+    \code{MCMCordfactanal}.}
 
   \item{factors}{The number of factors to be fitted.}
   
@@ -39,8 +43,9 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
     used. Note that, unlike \code{MCMCfactanal}, the
     \eqn{\Lambda}{Lambda} matrix used here has \code{factors}+1
     columns. The first column of \eqn{\Lambda}{Lambda} corresponds to
-    negative item difficulty parameters and should generally not be
-    constrained. 
+    negative item difficulty parameters for ordinal manifest variables
+    and mean parameters for continuous manifest variables and should
+    generally not be constrained directly by the user.  
     }
   
   \item{data}{A data frame.}
@@ -53,7 +58,8 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
     iterations must be divisible by this value.}
 
   \item{tune}{The tuning parameter for the Metropolis-Hastings
-    sampling. Can be either a scalar or a \eqn{k}{k}-vector. Must be
+    sampling. Can be either a scalar or a \eqn{k}{k}-vector (where
+    \eqn{k}{k} is the number of manifest variables). \code{tune} must be
     strictly positive.}
   
   \item{verbose}{A switch which determines whether or not the progress of
@@ -73,8 +79,23 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
     \code{NA} (the default) then starting values for unconstrained
     elements in the first column of Lambda are based on the observed
     response pattern, the remaining unconstrained elements of Lambda are
-    set to , and starting values for inequality constrained elements are
-    set to either 1.0 or -1.0 depending on the nature of the constraints.}
+    set to 0, and starting values for inequality constrained elements
+    are set to either 1.0 or -1.0 depending on the  nature of the
+    constraints.} 
+
+  \item{psi.start}{Starting values for the error variance (uniqueness)
+    matrix. If  \code{psi.start} is set to a scalar then the starting
+    value for all diagonal elements of \code{Psi} that represent error
+    variances for continuous variables are set to this value. If
+    \code{psi.start} is a \eqn{k}{k}-vector (where \eqn{k}{k} is the
+    number of manifest variables) then the staring value of \code{Psi}
+    has \code{psi.start} on the main diagonal with the exception that
+    entries corresponding to error variances for ordinal variables are
+    set to 1.. If \code{psi.start} is set to \code{NA} (the default) the
+    starting values of all the continuous variable uniquenesses are set
+    to 0.5. Error variances for ordinal response variables are always
+    constrained (regardless of the value of \code{psi.start} to have an
+    error variance of 1 in order to achieve identification.} 
   
   \item{l0}{The means of the independent Normal prior on the factor
     loadings. Can be either a scalar or a matrix with the same
@@ -83,6 +104,14 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
   \item{L0}{The precisions (inverse variances) of the independent Normal
     prior on the factor loadings. Can be either a scalar or a matrix with
     the same dimensions as \code{Lambda}.}
+
+  \item{a0}{Controls the shape of the inverse Gamma prior on the
+    uniqueness. The actual shape parameter is set to \code{a0/2}. Can be
+    either a scalar or a \eqn{k}{k}-vector.} 
+
+  \item{b0}{Controls the scale of the inverse Gamma prior on the
+    uniquenesses. The actual scale parameter is set to \code{b0/2}. Can
+    be either a scalar or a \eqn{k}{k}-vector.} 
 
   \item{store.lambda}{A switch that determines whether or not to store
     the factor loadings for posterior analysis. By default, the factor
@@ -95,15 +124,12 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
       applications with a small number of observations}.  By default, the
     factor scores are not stored.}
 
-  \item{drop.constantvars}{A switch that determines whether or not
-        manifest variables that have no variation should be deleted
-	before fitting the model. Default = TRUE.}
-
-  \item{drop.constantcases}{A switch that determines whether or not
-        observations that have no variation should be deleted
-	before fitting the model. Only useful when manifest variables
-	are all dichotomous. Default = FALSE.}
-  
+  \item{std.mean}{If \code{TRUE} (the default) the continuous manifest
+    variables are rescaled to have zero mean.}
+    
+  \item{std.var}{If \code{TRUE} (the default) the continuous manifest
+    variables are rescaled to have unit variance.}
+    
   \item{...}{further arguments to be passed}       
 }
 
@@ -116,16 +142,18 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
 
   Let \eqn{i=1,\ldots,N}{1=1,...,n} index observations and
   \eqn{j=1,\ldots,K}{j=1,...,K} index response variables within an
-  observation. The typical observed
-  variable \eqn{x_{ij}}{x_ij} is ordinal with a total of \eqn{C_j}{C_j}  
-  categories. The distribution of \eqn{X}{X} is governed by a \eqn{N
+  observation. An observed
+  variable \eqn{x_{ij}}{x_ij} can be either ordinal with a
+  total of \eqn{C_j}{C_j}  
+  categories or continuous.
+  The distribution of \eqn{X}{X} is governed by a \eqn{N
     \times K}{N by K} matrix of latent variables \eqn{X^*}{Xstar} and a
   series of cutpoints \eqn{\gamma}{gamma}. \eqn{X^*}{Xstar} is assumed
   to be generated according to:
   
   \deqn{x^*_i = \Lambda \phi_i + \epsilon_i}{xstar_i = Lambda phi_i +
     epsilon_i}
-  \deqn{\epsilon_i \sim \mathcal{N}(0,I)}{epsilon_i ~ N(0, I)}
+  \deqn{\epsilon_i \sim \mathcal{N}(0,\Psi)}{epsilon_i ~ N(0, Psi)}
 
   where \eqn{x^*_i}{xstar_i} is the \eqn{k}{k}-vector of latent variables
   specific to observation \eqn{i}{i}, \eqn{\Lambda}{Lambda} is the
@@ -135,8 +163,8 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
   first element of \eqn{\phi_i}{phi_i} is equal to 1 for all
   \eqn{i}{i}. 
 
-  The probability that the \eqn{j}{j}th variable in observation
-  \eqn{i}{i} takes the value \eqn{c}{c} is:
+  If the \eqn{j}{j}th variable is ordinal, the probability that it takes
+  the value \eqn{c}{c} in observation \eqn{i}{i} is:
 
    \deqn{
      \pi_{ijc} = \Phi(\gamma_{jc} - \Lambda'_j\phi_i) -
@@ -145,7 +173,10 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
      pi_ijc = pnorm(gamma_jc - Lambda'_j phi_i) -
      pnorm(gamma_j(c-1) - Lambda'_j phi_i)
    }
-  
+
+  If the \eqn{j}{j}th variable is continuous, it is assumed that
+  \eqn{x^*_{ij} = x_{ij}}{xstar_{ij} = x_{ij}} for all \eqn{i}{i}. 
+   
   The implementation used here assumes independent conjugate priors for
   each element of \eqn{\Lambda}{Lambda} and each
   \eqn{\phi_i}{phi_i}. More specifically we assume:
@@ -158,16 +189,12 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
     i=1,\dots,n}{phi_i(2:d) ~ N(0, I),
       i=1,...,n} 
 
-
-    The standard two-parameter item response theory model with probit
-    link is a special case of the model sketched above. 
-    
-  \code{MCMCordfactanal} simulates from the posterior density using
+  \code{MCMCmixfactanal} simulates from the posterior density using
   a Metropolis-Hastings within Gibbs sampling algorithm. The algorithm
   employed is based on work by Cowles (1996).  Note that
   the first element of \eqn{\phi_i}{phi_i} is a 1. As a result, the
-  first column of \eqn{\Lambda}{Lambda} can be interpretated as item
-  difficulty parameters.  Further, the first
+  first column of \eqn{\Lambda}{Lambda} can be interpretated as negative
+  item difficulty parameters.  Further, the first
   element  \eqn{\gamma_1}{gamma_1} is normalized to zero, and thus not 
   returned in the mcmc object.
   The simulation proper is done in compiled C++ code to maximize
@@ -178,9 +205,9 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
 }
 
 \references{
-  Shawn Treier and Simon Jackman. 2003. ``Democracy as a Latent Variable." 
-  Paper presented at the Midwest Political Science Association Annual Meeting.
-
+  Kevin M. Quinn. N.D. ``Bayesian Factor Analysis for Mixed Ordinal and
+  Continuous Responses". Typescript Harvard University.
+  
   M. K. Cowles. 1996. ``Accelerating Monte Carlo Markov Chain Convergence for
   Cumulative-link Generalized Linear Models." \emph{Statistics and Computing.}
   6: 101-110.
@@ -198,31 +225,51 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
 
 
 \examples{
-   \dontrun{
-   data(painters)
-   new.painters <- painters[,1:4]
-   cuts <- apply(new.painters, 2, quantile, c(.25, .50, .75))
-   for (i in 1:4){
-      new.painters[new.painters[,i]<cuts[1,i],i] <- 100
-     new.painters[new.painters[,i]<cuts[2,i],i] <- 200
-     new.painters[new.painters[,i]<cuts[3,i],i] <- 300
-     new.painters[new.painters[,i]<100,i] <- 400
-   }
+\dontrun{
+data(Cars93)
+attach(Cars93)
+new.cars <- data.frame(Price, MPG.city, MPG.highway,
+                 Cylinders, EngineSize, Horsepower,
+                 RPM, Length, Wheelbase, Width, Weight, Origin)
+rownames(new.cars) <- paste(Manufacturer, Model)
+detach(Cars93)
 
-   posterior <- MCMCordfactanal(~Composition+Drawing+Colour+Expression,
-                        data=new.painters, factors=1,
-                        lambda.constraints=list(Drawing=list(2,"+")),
-                        burnin=5000, mcmc=500000, thin=200, verbose=TRUE,
-                        L0=0.5, store.lambda=TRUE,
-                        store.scores=TRUE, tune=.6)
-   plot(posterior)
-   summary(posterior)
-   }
+# drop obs 57 (Mazda RX 7) b/c it has a rotary engine
+new.cars <- new.cars[-57,]
+# drop 3 cylinder cars
+new.cars <- new.cars[new.cars$Cylinders!=3,]
+# drop 5 cylinder cars
+new.cars <- new.cars[new.cars$Cylinders!=5,]
+
+new.cars$log.Price <- log(new.cars$Price)
+new.cars$log.MPG.city <- log(new.cars$MPG.city)
+new.cars$log.MPG.highway <- log(new.cars$MPG.highway)
+new.cars$log.EngineSize <- log(new.cars$EngineSize)
+new.cars$log.Horsepower <- log(new.cars$Horsepower)
+
+new.cars$Cylinders <- ordered(new.cars$Cylinders)
+new.cars$Origin    <- ordered(new.cars$Origin)
+
+
+
+posterior <- MCMCmixfactanal(~log.Price+log.MPG.city+
+                 log.MPG.highway+Cylinders+log.EngineSize+
+                 log.Horsepower+RPM+Length+
+                 Wheelbase+Width+Weight+Origin, data=new.cars,
+                 lambda.constraints=list(log.Horsepower=list(2,"+"),
+                 log.Horsepower=c(3,0), weight=list(3,"+")),
+                 factors=2,
+                 burnin=5000, mcmc=500000, thin=100, verbose=TRUE,
+                 L0=.25, tune=1.5)
+
+
+}
 }
 
 \keyword{models}
 
 \seealso{\code{\link[coda]{plot.mcmc}}, \code{\link[coda]{summary.mcmc}},
   \code{\link[mva]{factanal}}, \code{\link[MCMCpack]{MCMCfactanal}},
+  \code{\link[MCMCpack]{MCMCordfactanal}},
   \code{\link[MCMCpack]{MCMCirt1d}}, \code{\link[MCMCpack]{MCMCirtKd}}}
 

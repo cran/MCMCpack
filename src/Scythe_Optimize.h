@@ -3,46 +3,56 @@
  * This header provides optimization functions for the Scythe
  * Statistical Library.
  *
- * Scythe C++ Library
- * Copyright (C) Kevin M. Quinn, Andrew D. Martin,
- * and Daniel B. Pemstein
+ * Scythe Statistical Library
+ * Copyright (C) 2003, Andrew D. Martin, Kevin M. Quinn, and Daniel
+ * Pemstein.  All Rights Reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or (at
+ * your option) any later version.  A copy of this license is included
+ * with this library (LICENSE.GPL).
+ *
+ * This library utilizes code from a number of other open source
+ * projects.  Specific copyright information is provided with the
+ * applicable code.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA.
  *
  * This code written by:
  *
- * Kevin Quinn
- * Assistant Professor
- * Dept. of Political Science and
- * Center for Statistics and Social Sciences
- * Box 354322
- * University of Washington
- * Seattle, WA 98195-4322
- * quinn@stat.washington.edu
- *
  * Andrew D. Martin
  * Assistant Professor
- * Dept. of Political Science
+ * Deptartment of Political Science
  * Campus Box 1063
  * Washington University
+ * One Brookings Drive
  * St. Louis, MO 63130
  * admartin@artsci.wustl.edu
- * 
- * Daniel B. Pemstein
- * dbpemste@artsci.wustl.edu
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
- * USA
+ *
+ * Kevin M. Quinn
+ * Assistant Professor
+ * Department of Government and
+ * Center for Basic Research in the Social Sciences
+ * 34 Kirkland Street
+ * Harvard University
+ * Cambridge, MA 02138
+ * kquinn@fas.harvard.edu
+ *
+ * Daniel Pemstein
+ * Deptartment of Poltical Science
+ * 702 South Wright Street
+ * University of Illinois at Urbana-Champaign
+ * Urbana, IL 61801
+ * dbp@uiuc.edu
  */
 
 #ifndef SCYTHE_OPTIMIZE_H
@@ -55,20 +65,20 @@ namespace SCYTHE {
   
   /* returns the machine epsilon (float, double, or long double) */
   template <class T>
-    T epsilon();
+  T epsilon();
  
   /* Caculates the definite integral of a function from a to b, given
    * the function, a, b, and the number of subintervals
    */
   template <class T>
-    T	intsimp(T (*fun)(const T &), const T &, const T &, const int &);
+  T  intsimp(T (*fun)(const T &), const T &, const T &, const int &);
   
   /* Calculates the definite integral of a function from a to b, given
    * the function, a, b, the  of subintervals, and a tolerance
    */
   template <class T>
-    T adaptsimp(T (*fun)(const T &), const T &, const T &, const int &, 
-		const T &tol = 1e-5);
+  T adaptsimp(T (*fun)(const T &), const T &, const T &, const int &, 
+              const T &tol = 1e-5);
   
   /* Numerically calculates the gradient of a function at theta using
    * a forward difference formula, given the function, theta (col
@@ -76,9 +86,9 @@ namespace SCYTHE {
    * function takes three matrices)
    */
   template <class T>
-    Matrix<T> gradfdif (T (*fun)(const Matrix<T> &, const Matrix<T> &,
-				 const Matrix<T> &), const Matrix<T> &,
-			const Matrix<T> &, const Matrix<T> &);
+  Matrix<T> gradfdif (T (*fun)(const Matrix<T> &, const Matrix<T> &,
+                      const Matrix<T> &), const Matrix<T> &,
+                      const Matrix<T> &, const Matrix<T> &);
   
   /* Numerically calculates the first deriv.of a function wrt alpha at
    * (theta + alpha *p) using a forward difference formula, given the
@@ -86,17 +96,17 @@ namespace SCYTHE {
    * function.  (Primarily useful in linesearches)
    */
   template <class T>
-    T gradfdifls(T (*fun)(const Matrix<T> &, const Matrix<T> &,
-			  const Matrix<T> &), const T &,
-		 const Matrix<T> &, const Matrix<T> &,
-		 const Matrix<T> &, const Matrix<T> &);
+  T gradfdifls (T (*fun)(const Matrix<T> &, const Matrix<T> &,
+                const Matrix<T> &), const T &,
+                const Matrix<T> &, const Matrix<T> &,
+                const Matrix<T> &, const Matrix<T> &);
   
   /* Numerically calculates the jacobian of a function at theta using
    * a forward difference formula, given the function and theta
    */
   template <class T>
-    Matrix<T> jacfdif(Matrix<T> (*fun)(const Matrix<T> &),
-		      const Matrix<T> &);
+  Matrix<T> jacfdif(Matrix<T> (*fun)(const Matrix<T> &),
+                    const Matrix<T> &);
   
   /* Numerically calculates the Jacobian of a function a theta using a
    * forward difference formula given the function, theta, and psi ( a
@@ -104,18 +114,18 @@ namespace SCYTHE {
    * jacobian)
    */
   template <class T>
-    Matrix<T> jacfdif(Matrix<T> (*fun)(const Matrix<T> &,
-				       const Matrix<T> &), const Matrix<T> &,
-		      const Matrix<T> &);
+  Matrix<T> jacfdif(Matrix<T> (*fun)(const Matrix<T> &,
+                    const Matrix<T> &), const Matrix<T> &,
+                    const Matrix<T> &);
 
   /* Numerically calculates the Hessian of a function at theta using a
    * central difference formula given the function, theta, and two
    * matrix arguments for the function
    */
   template <class T>
-    Matrix<T> hesscdif (T (*fun)(const Matrix<T> &, const Matrix<T> &,
-				 const Matrix<T> &), const Matrix<T> &,
-			const Matrix<T> &, const Matrix<T> &);
+  Matrix<T> hesscdif (T (*fun)(const Matrix<T> &, const Matrix<T> &,
+                      const Matrix<T> &), const Matrix<T> &,
+                      const Matrix<T> &, const Matrix<T> &);
   
   /* Performs a line search to find the step length alpha that
    * approximately minimizes an implied 1d function, given the
@@ -123,40 +133,40 @@ namespace SCYTHE {
    * for the function
    */
   template <class T>
-    T linesearch1(T (*fun)(const Matrix<T> &, const Matrix<T> &, 
-			   const Matrix<T> &), const Matrix<T> &,
-		  const Matrix<T> &, const Matrix<T> &,
-		  const Matrix<T> &);
+  T linesearch1(T (*fun)(const Matrix<T> &, const Matrix<T> &, 
+                const Matrix<T> &), const Matrix<T> &,
+                const Matrix<T> &, const Matrix<T> &,
+                const Matrix<T> &);
   
   /* Performs a line search to find the step length alpha that
    * approximately minimizes an implied 1d function, given the
    * function, theta, direction vec p, and two matrix args
    */
   template <class T>
-    T linesearch2(T (*fun)(const Matrix<T> &, const Matrix<T> &, 
-			   const Matrix<T> &), const Matrix<T> &,
-		  const Matrix<T> &, const Matrix<T> &,
-		  const Matrix<T> &);
+  T linesearch2(T (*fun)(const Matrix<T> &, const Matrix<T> &, 
+                const Matrix<T> &), const Matrix<T> &,
+                const Matrix<T> &, const Matrix<T> &,
+                const Matrix<T> &);
   
   /* Finds minimum of a function once bracketed, given the function,
    * lower bracket, upper bracket, theta, direction vector p, and to
    * matrix arguments
    */
   template <class T>
-    T zoom (T (*fun)(const Matrix<T> &, const Matrix<T> &,
-		     const Matrix<T> &), const T &, const T &, const Matrix<T> &,
-	    const Matrix<T> &, const Matrix<T> &, const Matrix<T> &);
+  T zoom (T (*fun)(const Matrix<T> &, const Matrix<T> &,
+          const Matrix<T> &), const T &, const T &, const Matrix<T> &,
+          const Matrix<T> &, const Matrix<T> &, const Matrix<T> &);
   
   
   /* Numerically finds the minimum of a function using the BFGS
    * algorithm, given the function, theta, and two matrix args
    */
   template <class T>
-    Matrix<T> BFGS (T (*fun)(const Matrix<T> &, const Matrix<T> &,
-			     const Matrix<T> &), const Matrix<T> &,
-		    const Matrix<T> &y = Matrix<T>(1,1),
-		    const Matrix<T> & X = Matrix<T>(1,1),
-		    const int &maxit=1000, const T &tolerance=1e-4);
+  Matrix<T> BFGS (T (*fun)(const Matrix<T> &, const Matrix<T> &,
+                  const Matrix<T> &), const Matrix<T> &,
+                  const Matrix<T> &y = Matrix<T>(1,1),
+                  const Matrix<T> & X = Matrix<T>(1,1),
+                  const int &maxit=1000, const T &tolerance=1e-4);
   
   /* Solves a system of n nonlinear equations in n unknowns of the form
    * fun(thetastar) = 0 for thetastar given the function, starting 
@@ -164,9 +174,9 @@ namespace SCYTHE {
    * Uses Broyden's method.
    */
   template <class T>
-    Matrix<T> nls_broyden(Matrix<T> (*fun)(const Matrix<T> &),
-			  const Matrix<T> &, const int &maxit=5000,
-			  const T &tolerance=1e-6);
+  Matrix<T> nls_broyden(Matrix<T> (*fun)(const Matrix<T> &),
+                        const Matrix<T> &, const int &maxit=5000,
+                        const T &tolerance=1e-6);
 
   /* Nls_broyden  - Solves a system of n nonlinear equations in n
    * unknowns of the form:
@@ -176,10 +186,10 @@ namespace SCYTHE {
    * Uses Broyden's method.
    */
   template <class T>
-    Matrix<T> nls_broyden(Matrix<T> (*fun)(const Matrix<T> &,
-					   const Matrix<T> &), const Matrix<T> &,
-			  const Matrix<T> &, const int &maxit = 5000,
-			  const T& tolerance = 1e-6);
+  Matrix<T> nls_broyden(Matrix<T> (*fun)(const Matrix<T> &,
+                        const Matrix<T> &), const Matrix<T> &,
+                        const Matrix<T> &, const int &maxit = 5000,
+                        const T& tolerance = 1e-6);
   
 }  // namespace dec
 
