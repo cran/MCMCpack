@@ -1,0 +1,4 @@
+PKG_CXXFLAGS = -funroll-loops -Wall -pedantic
+
+
+

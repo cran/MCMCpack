@@ -1,0 +1,30 @@
+MCMCbaselineEI          Markov chain Monte Carlo for Wakefield's
+                        Baseline Ecological Inference Model
+MCMCdynamicEI           Markov chain Monte Carlo for Quinn's Dynamic
+                        Ecological Inference Model
+MCMChierEI              Markov chain Monte Carlo for Wakefield's
+                        Hierarchial Ecological Inference Model
+MCMCirt1d               Markov chain Monte Carlo for One Dimensional
+                        Item Response Theory Model
+MCMClogit               Markov chain Monte Carlo for Logistic
+                        Regression
+MCMCoprobit             Markov chain Monte Carlo for Ordered Probit
+                        Regression
+MCMCpanel               Markov chain Monte Carlo for the General Linear
+                        Panel Model
+MCMCpoisson             Markov chain Monte Carlo for Poisson Regression
+MCMCprobit              Markov chain Monte Carlo for Probit Regression
+MCMCregress             Markov chain Monte Carlo for Gaussian Linear
+                        Regression
+diwish                  Evaluate the PDF of the inverse Wishart
+                        Distribution
+dtomogplot              Dynamic Tomography Plot
+dwish                   Evaluate the PDF of the Wishart Distribution
+mcmc2                   Markov Chain Monte Carlo Objects
+mcmc2dataframe          Convert Markov Chain Monte Carlo Objects to
+                        Dataframes
+riwish                  Generate Random Draw from inverse Wishart
+                        Distribution
+rwish                   Generate Random Draw from Wishart Distribution
+write.Scythe            Write a Matrix to a File to be Read by Scythe
+tomogplot               Tomography Plot
