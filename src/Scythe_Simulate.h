@@ -89,7 +89,7 @@ namespace SCYTHE {
    * Copyright (C) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura,
    * All rights reserved.
    *
-   * The bulk of the mersenne code is in Scythe_Simluate.cc,
+   * The bulk of the mersenne code is in ../src/Scythe_Simluate.cc,
    * along with a full copy of the license (BSD) under which the
    * original code was distributed.
    */
@@ -586,10 +586,11 @@ namespace SCYTHE {
   /* Simulates from a truncated Normal distribution */
   double rtnorm(const double &, const double &, const double &, 
                 const double &);
-
-  /* Simulate from a truncated Normal distribution */
-  double rtnorm_combo(const double &, const double &, 
-              const double &, const double &);
+	
+  /* Sample from a truncated Normal distribution */
+  double
+    rtnorm_combo( const double &, const double &, const double &,
+		  const double &);
 
   /* Sample from a truncated Normal distribution */
   double rtbnorm_slice( const double &, const double &,
