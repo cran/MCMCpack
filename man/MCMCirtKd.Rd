@@ -5,19 +5,19 @@
 \description{
   This function generates a posterior density sample from a
   K-dimensional item response theory (IRT) model, with standard
-  Normal priors on the subject abilities (ideal points), and
-  Normal priors on the item parameters.  The user
+  normal priors on the subject abilities (ideal points), and
+  normal priors on the item parameters.  The user
   supplies data and priors, and a sample from the posterior
-  density is returned as an mcmc object, which can be
+  distribution is returned as an mcmc object, which can be
   subsequently analyzed with functions provided in the coda
   package.
 }
   
 \usage{
 MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
-   burnin = 1000, mcmc = 10000, thin=1, verbose = FALSE, seed = NA,
+   burnin = 1000, mcmc = 10000, thin=1, verbose = 0, seed = NA,
    alphabeta.start = NA, b0 = 0, B0=0, store.item = FALSE,
-   store.ability=TRUE, drop.constantvars=TRUE, ... )  }
+   store.ability=TRUE, drop.constant.items=TRUE, ... )  }
 
 \arguments{
     \item{datamatrix}{The matrix of data.  Must be 0, 1, or missing values.  
@@ -32,16 +32,16 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
     rowname to be equal to c, \code{rowname=list(d,"+")} which will
     constrain the dth item parameter for the item named rowname to be
     positive, and\code{rowname=list(d, "-")} which will constrain the dth
-    item parameter for the item named varname to be negative. If x is a
+    item parameter for the item named rowname to be negative. If x is a
     matrix without row names defaults names of ``V1", ``V2", ... , etc
-    will be used. In a d dimensional model, the first item parameter for
+    will be used. In a K dimensional model, the first item parameter for
     item \eqn{i}{i} is the difficulty parameter (\eqn{\alpha_i}{alpha_i}),
     the second item parameter is the discrimation parameter on dimension
-    1 (\eqn{\beta_{i,1}{beta_{i,1}}}), the third item parameter is the
+    1 (\eqn{\beta_{i,1}}{beta_{i,1}}), the third item parameter is the
     discrimation parameter on dimension 2
-    (\eqn{\beta_{i,2}{beta_{i,2}}}), ...,  and the (d+1)th item parameter
-    is the discrimation parameter on dimension d
-    (\eqn{\beta_{i,1}{beta_{i,1}}}). 
+    (\eqn{\beta_{i,2}}{beta_{i,2}}), ...,  and the (K+1)th item parameter
+    is the discrimation parameter on dimension K
+    (\eqn{\beta_{i,1}}{beta_{i,1}}). 
     The item difficulty parameters (\eqn{\alpha}{alpha}) should
     generally not be constrained. 
     }
@@ -54,8 +54,9 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
     iterations must be divisible by this value.}
 
     \item{verbose}{A switch which determines whether or not the progress of
-    the sampler is printed to the screen.  If TRUE, the iteration number and
-    the subject abilities (ideal points) are printed to the screen.}
+    the sampler is printed to the screen.   If \code{verbose} is greater
+    than 0 then every \code{verbose}th iteration will be printed to the
+    screen.}
     
     \item{seed}{The seed for the random number generator.  If NA, the Mersenne
       Twister generator is used with default seed 12345; if an integer is 
@@ -88,38 +89,42 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
     is used as the prior mean for all items.}
     
     \item{B0}{The prior precisions (inverse variances) of the
-    independent Normal prior on the item parameters.
+    independent normal prior on the item parameters.
     Can be either a scalar or a matrix of dimension
     \eqn{(K+1) \times items}{(K+1) x items}.}
 
     \item{store.item}{A switch that determines whether or not to
     store the item parameters for posterior analysis. 
-    \emph{NOTE: This takes an enormous amount of memory, so
-    should only be used if the chain is thinned heavily, or for
-    applications with a small number of items}.  By default, the
+    \emph{NOTE: In applications with many items
+      this takes an enormous amount of memory. If you have many items
+    and want to want to store the item parameters you may want to thin
+    the chain heavily}.  By default, the
     item parameters are not stored.}
  
    \item{store.ability}{A switch that determines whether or not to store
-    the subject abilities for posterior analysis.  By default, the
-    item parameters are all stored.}
+     the subject abilities for posterior analysis. \emph{NOTE: In
+     applications with many subjects this takes an enormous amount of
+     memory. If you have many subjects and want to want to store the ability
+     parameters you may want to thin the chain heavily}. By default, the
+     ability parameters are all stored.}
 
-  \item{drop.constantvars}{A switch that determines whether or not
-        items and subjects that have no variation
+  \item{drop.constant.items}{A switch that determines whether or not
+        items that have no variation
 	should be deleted before fitting the model. Default = TRUE.}
   
     \item{...}{further arguments to be passed}       
 }
 
 \value{
-   An mcmc object that contains the posterior density sample.  This 
+   An mcmc object that contains the posterior sample.  This 
    object can be summarized by functions provided by the coda package.
 }
 
 \details{
-  \code{MCMCirtKd} simulates from the posterior density using
-  standard Gibbs sampling using data augmentation (a Normal draw
-  for the subject abilities, a multivariate Normal
-  draw for the item parameters, and a truncated Normal draw for
+  \code{MCMCirtKd} simulates from the posterior distribution using
+  standard Gibbs sampling using data augmentation (a normal draw
+  for the subject abilities, a multivariate normal
+  draw for the item parameters, and a truncated normal draw for
   the latent utilities). The simulation proper is done in
   compiled C++ code to maximize efficiency.  Please consult the
   coda documentation for a comprehensive list of functions that
@@ -129,15 +134,14 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
   smaller than the typical default values in MCMCpack.  This is
   because fitting this model is extremely computationally
   expensive.  It does not mean that this small of a number of
-  scans will yield good estimates. If the verbose option is
-  chosen, output will be printed to the screen every fifty
-  iterations.  The priors of this model need to be proper for
+  scans will yield good estimates.
+  The priors of this model need to be proper for
   identification purposes.  The user is asked to provide prior
   means and precisions \emph{(not variances)} for the item
   parameters and the subject parameters.
   
   The model takes the following form.  We assume that each
-  subject has an subject ability (ideal point) denoted
+  subject has an ability (ideal point) denoted
   \eqn{\theta_j}{theta_j} \eqn{(K \times 1)}{(K x 1)},
   and that each item has a difficulty
   parameter \eqn{\alpha_i}{alpha_i} and discrimination parameter
@@ -145,17 +149,18 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
   The observed choice by subject
   \eqn{j}{j} on item \eqn{i}{i} is the observed data matrix which
   is \eqn{(I \times J)}{(I * J)}.  We assume that the choice is
-  dictated by an unobserved utility: \deqn{z_{i,j} = \alpha_i +
+  dictated by an unobserved utility: \deqn{z_{i,j} = - \alpha_i +
   \beta_i' \theta_j + \varepsilon_{i,j}}{z_ij = alpha_i +
-  beta_i'*theta_j + epsilon_ij} Where the errors are assumed to be
-  distributed standard Normal.  The parameters of interest are
+  beta_i'*theta_j + epsilon_ij} Where the
+  \eqn{\varepsilon_{i,j}}{epsilon_ij}s are assumed to be
+  distributed standard normal.  The parameters of interest are
   the subject abilities (ideal points) and the item parameters.
 
   We assume the following priors.  For the subject abilities (ideal points)
-  we assume independent standard Normal priors:
+  we assume independent standard normal priors:
   \deqn{\theta_{j,k} \sim \mathcal{N}(0,1)}{theta_j,k ~ N(0, 1)}
   These cannot be changed by the user.
-  For each item parameter, we assume independent Normal priors:
+  For each item parameter, we assume independent normal priors:
   \deqn{\left[\alpha_i, \beta_i \right]' \sim \mathcal{N}_{(K+1)} 
   (b_{0,i},B_{0,i})}{[alpha_i beta_i]' ~ N_(K+1) (b_0,i, B_0,i)}
   Where \eqn{B_{0,i}}{B_0,i} is a diagonal matrix.
@@ -215,10 +220,18 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
 
 
    data(Senate)
-   rownames(Senate) <- Senate$member
+   namestring <- as.character(Senate$member)
+   namestring[78] <- "CHAFEE1"
+   namestring[79] <- "CHAFEE2"
+   namestring[59] <- "SMITH.NH"
+   namestring[74] <- "SMITH.OR"
+   rownames(Senate) <- namestring
+
+   Sen.rollcalls <- Senate[,6:677]
+
    # note that we need to transpose the data to get
    # the bills on the rows
-   posterior2 <- MCMCirtKd(Senate[,6:677], dimensions=2,
+   posterior2 <- MCMCirtKd(Sen.rollcalls, dimensions=2,
                    burnin=5000, mcmc=50000, thin=10,
                    item.constraints=list(rc2=list(2,"-"), rc2=c(3,0),
                                          rc3=list(3,"-")),

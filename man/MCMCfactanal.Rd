@@ -14,7 +14,7 @@
 \usage{
 MCMCfactanal(x, factors, lambda.constraints=list(),
              data=parent.frame(), burnin = 1000, mcmc = 20000,
-             thin=1, verbose = FALSE, seed = NA,
+             thin=1, verbose = 0, seed = NA,
              lambda.start = NA, psi.start = NA,
              l0=0, L0=0, a0=0.001, b0=0.001,
              store.scores = FALSE, std.var=TRUE, ... )
@@ -47,8 +47,10 @@ MCMCfactanal(x, factors, lambda.constraints=list(),
     iterations must be divisible by this value.}
   
   \item{verbose}{A switch which determines whether or not the progress of
-    the sampler is printed to the screen.  If TRUE, the iteration number and
-    the factor loadings and uniquenesses are printed to the screen.}
+    the sampler is printed to the screen.  If \code{verbose} is greater
+    than 0 the iteration number and
+    the factor loadings and uniquenesses are printed to the screen every
+    \code{verbose}th iteration.}
   
     \item{seed}{The seed for the random number generator.  If NA, the Mersenne
     Twister generator is used with default seed 12345; if an integer is 
@@ -172,7 +174,7 @@ MCMCfactanal(x, factors, lambda.constraints=list(),
                     lambda.constraints=list(Examination=list(1,"+"),
                        Examination=list(2,"-"), Education=c(2,0),
                        Infant.Mortality=c(1,0)),
-                    verbose=FALSE, store.scores=FALSE, a0=1, b0=0.15,
+                    verbose=0, store.scores=FALSE, a0=1, b0=0.15,
                     data=swiss, burnin=5000, mcmc=50000, thin=20)
    plot(posterior)
    summary(posterior)
@@ -187,7 +189,7 @@ MCMCfactanal(x, factors, lambda.constraints=list(),
                         lambda.constraints=list(Examination=list(1,"+"),
                           Examination=list(2,"-"), Education=c(2,0),
                           Infant.Mortality=c(1,0)),
-                        verbose=FALSE, store.scores=FALSE, a0=1, b0=0.15,
+                        verbose=0, store.scores=FALSE, a0=1, b0=0.15,
                         burnin=5000, mcmc=50000, thin=20)
    }
 }

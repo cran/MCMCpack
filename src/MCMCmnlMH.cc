@@ -141,14 +141,16 @@ extern "C" {
        
        // store values in matrices
        if (iter >= *burnin && ((iter % *thin)==0)){ 
+	 
 	 for (int j = 0; j < k; j++)
 	   storemat(count, j) = beta[j];
 	 ++count;
        }
        
        // print output to stdout
-       if(*verbose == 1 && iter % 500 == 0){
-	 Rprintf("\n\nMCMCmnl Metropolis iteration %i of %i \n", (iter+1), tot_iter);
+       if(*verbose > 0 && iter % *verbose == 0){
+	 Rprintf("\n\nMCMCmnl Metropolis iteration %i of %i \n", 
+		 (iter+1), tot_iter);
 	 Rprintf("beta = \n");
 	 for (int j=0; j<k; ++j)
 	   Rprintf("%10.5f\n", beta[j]);
@@ -157,7 +159,7 @@ extern "C" {
 		 static_cast<double>(iter+1));	
        }
        
-       void R_CheckUserInterrupt(void); // allow user interrupts
+       R_CheckUserInterrupt(); // allow user interrupts       
      } // end MCMC loop
 
      delete stream; // clean up random number stream

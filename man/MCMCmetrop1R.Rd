@@ -8,7 +8,7 @@
 }
 \usage{
 MCMCmetrop1R(fun, theta.init, burnin = 500, mcmc = 20000, thin = 1,
-             tune = 1, verbose = TRUE, seed=NA, logfun = TRUE,
+             tune = 1, verbose = 0, seed=NA, logfun = TRUE,
              optim.trace = 0, optim.REPORT = 10, optim.maxit = 500, ...)
 }
 \arguments{
@@ -16,8 +16,8 @@ MCMCmetrop1R(fun, theta.init, burnin = 500, mcmc = 20000, thin = 1,
     be a function defined in R and it should take a single
     argument. Additional arguments can be passed implicitly by either
     putting them in the global environment or by passing them as
-    additional arguments to \code{MCMCmetrop1R()}. The examples below
-    demonstrate both of these approaches. }
+    additional arguments to \code{MCMCmetrop1R()}. See the Details section 
+    and the examples below. }
   \item{theta.init}{Starting values for the sampling. Must be of the
     appropriate dimension.}
 
@@ -33,9 +33,10 @@ MCMCmetrop1R(fun, theta.init, burnin = 500, mcmc = 20000, thin = 1,
     \eqn{\theta}{theta}.}
 
   \item{verbose}{A switch which determines whether or not the progress of
-    the sampler is printed to the screen.  If TRUE, the iteration number, the
+    the sampler is printed to the screen.  If \code{verbose} is greater
+    than 0 the iteration number, the
     \eqn{\theta}{theta} vector, the function value, and the Metropolis
-    acceptance rate are sent to the screen every 500 iterations.}
+    acceptance rate are sent to the screen every \code{verbose}th iteration.}
   
   \item{seed}{The seed for the random number generator.  If NA, the Mersenne
     Twister generator is used with default seed 12345; if an integer is 
@@ -75,6 +76,14 @@ diagonal positive definite matrix formed from the \code{tune} and
 mode. This last calculation is done via an initial call to
 \code{optim}.
 
+Passing data into a (log)density function does not conform to standard R 
+practice.  The (log)density function should have only one argument -- the 
+parameter vector.  The data used by the (log)density need to be either in the 
+global environment or defined in the call to \code{MCMCmetrop1R()}, which will 
+create an environment that contains the data and then call the (log)density function in that environment.  The names of the data objects 
+are not checked, so be careful that these match the names used with the 
+(log)density function.  \emph{NOTE:} This interface will likely be changed in 
+a future implementation of MCMCpack.
 }
 \value{
    An mcmc object that contains the posterior density sample.  This 
@@ -102,7 +111,7 @@ mode. This last calculation is done via an initial call to
                               X=Xdata, y=yvector,
                               thin=1, mcmc=40000, burnin=500,
                               tune=c(1.5, 1.5, 1.5),
-                              verbose=TRUE, logfun=TRUE, optim.maxit=100)
+                              verbose=500, logfun=TRUE, optim.maxit=100)
 
     raftery.diag(post.samp)
     plot(post.samp)
@@ -128,7 +137,7 @@ mode. This last calculation is done via an initial call to
     post.samp <- MCMCmetrop1R(logitfun, theta.init=c(0,0,0),
                               thin=1, mcmc=40000, burnin=500,
                               tune=c(1.5, 1.5, 1.5),
-                              verbose=TRUE, logfun=TRUE, optim.maxit=100)
+                              verbose=500, logfun=TRUE, optim.maxit=100)
 
     raftery.diag(post.samp)
     plot(post.samp)
@@ -159,7 +168,7 @@ mode. This last calculation is done via an initial call to
 
     post.samp <- MCMCmetrop1R(negbinfun, theta.init=c(0,0,0,0), y=yy, X=XX,
                               thin=1, mcmc=35000, burnin=1000,
-                              tune=1.5, verbose=TRUE, logfun=TRUE,
+                              tune=1.5, verbose=500, logfun=TRUE,
                               optim.maxit=500, seed=list(NA,1))
     raftery.diag(post.samp)
     plot(post.samp)

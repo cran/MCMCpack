@@ -9,7 +9,7 @@
   
 \usage{
 MCMChierEI(r0, r1, c0, c1, burnin=5000, mcmc=50000, thin=1,
-           verbose=FALSE, seed=NA,
+           verbose=0, seed=NA,
            m0=0, M0=2.287656, m1=0, M1=2.287656, a0=0.825, b0=0.0105,
            a1=0.825, b1=0.0105, ...)
    }
@@ -35,8 +35,9 @@ MCMChierEI(r0, r1, c0, c1, burnin=5000, mcmc=50000, thin=1,
     mcmc iterations must be divisible by this value.}
 
   \item{verbose}{A switch which determines whether or not the progress of
-    the sampler is printed to the screen.  Information is printed
-    if TRUE.}
+    the sampler is printed to the screen. If \code{verbose} is greater
+    than 0 then every \code{verbose}th iteration will be printed to the
+    screen. }
 
     \item{seed}{The seed for the random number generator.  If NA, the Mersenne
     Twister generator is used with default seed 12345; if an integer is 
@@ -171,7 +172,7 @@ c1 <- (r0+r1) - c0
 tomogplot(r0, r1, c0, c1)
 
 ## fit exchangeable hierarchical model
-post <- MCMChierEI(r0,r1,c0,c1, mcmc=40000, thin=5, verbose=TRUE,
+post <- MCMChierEI(r0,r1,c0,c1, mcmc=40000, thin=5, verbose=100,
                     seed=list(NA, 1))
 
 p0meanHier <- colMeans(post)[1:n]

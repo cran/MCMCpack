@@ -124,7 +124,7 @@ extern "C" {
 
       
       // print results to screen
-      if (iter % 500 == 0 && verbose[0] == 1){
+      if (iter % verbose[0] == 0 && verbose[0] > 0){
 	Rprintf("\n\nMCMCfactanal iteration %i of %i \n", (iter+1), tot_iter);
 	Rprintf("Lambda = \n");
 	for (int i=0; i<K; ++i){
@@ -157,9 +157,10 @@ extern "C" {
 	}
 	count++;
       }
-      
+
       // allow user interrupts
-      void R_CheckUserInterrupt(void);
+      R_CheckUserInterrupt();
+            
     } // end Gibbs loop
     
       delete stream; // clean up random number stream   

@@ -12,7 +12,7 @@
   
 \usage{
 MCMCprobit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
-   thin = 1, verbose = FALSE, seed = NA, beta.start = NA,
+   thin = 1, verbose = 0, seed = NA, beta.start = NA,
    b0 = 0, B0 = 0, bayes.resid = FALSE, ...) }
 
 \arguments{
@@ -28,8 +28,9 @@ MCMCprobit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
     Gibbs iterations must be divisible by this value.}
 
     \item{verbose}{A switch which determines whether or not the progress of
-    the sampler is printed to the screen.  If TRUE, the iteration number and
-    the betas are printed to the screen.}
+    the sampler is printed to the screen.  If \code{verbose} is greater
+    than 0 the iteration number and
+    the betas are printed to the screen every \code{verbose}th iteration.}
   
     \item{seed}{The seed for the random number generator.  If NA, the Mersenne
       Twister generator is used with default seed 12345; if an integer is 

@@ -15,7 +15,7 @@
   
 \usage{
 MCMCpanel(obs, Y, X, W, burnin = 1000, mcmc = 10000, thin = 5, 
-    verbose = FALSE, seed = NA, sigma2.start = NA,
+    verbose = 0, seed = NA, sigma2.start = NA,
     D.start = NA, b0 = 0, B0 = 1, eta0, R0, nu0 = 0.001,
     delta0 = 0.001, ...)
    }
@@ -52,8 +52,9 @@ MCMCpanel(obs, Y, X, W, burnin = 1000, mcmc = 10000, thin = 5,
 
 
     \item{verbose}{A switch which determines whether or not the progress of
-    the sampler is printed to the screen.  If TRUE, the iteration number
-    and parameters are printed to the screen.}
+    the sampler is printed to the screen.  If \code{verbose} is greater
+    than 0 the iteration number
+    and parameters are printed to the screen every \code{verbose}th iteration.}
 
     \item{sigma2.start}{The starting value for the conditional error
     variance. Default value of NA uses the least squares estimates.}

@@ -15,7 +15,7 @@
 
 "MCMCpanel" <-
   function(obs, Y, X, W, burnin = 1000, mcmc = 10000, thin = 5, 
-           verbose = FALSE, seed = NA, sigma2.start = NA,
+           verbose = 0, seed = NA, sigma2.start = NA,
            D.start = NA, b0 = 0, B0 = 1, eta0, R0, nu0 = 0.001,
            delta0 = 0.001, ...) {
 

@@ -16,10 +16,10 @@
 "MCMCirtKd" <-
   function(datamatrix, dimensions, item.constraints=list(),
            burnin = 1000, mcmc = 10000,
-           thin=1, verbose = FALSE, seed = NA,
+           thin=1, verbose = 0, seed = NA,
            alphabeta.start = NA, b0=0, B0=0,
            store.item=FALSE, store.ability=TRUE,
-           drop.constantvars=TRUE, ... ) {
+           drop.constant.items=TRUE, ... ) {
 
     datamatrix <- as.matrix(datamatrix)   
     
@@ -30,7 +30,7 @@
                             lambda.start=alphabeta.start,
                             l0=b0, L0=B0, store.lambda=store.item,
                             store.scores=store.ability,
-                            drop.constantvars=drop.constantvars,
+                            drop.constantvars=drop.constant.items,
                             model="MCMCirtKd")
     return(post)
   }

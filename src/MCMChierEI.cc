@@ -323,6 +323,9 @@ extern "C"{
       nu2 = (nu1 + ntables)*0.5;
       delta2 = (delta1 + SSE[0])*0.5;
       sigma1 = stream->rigamma(nu2,delta2);           
+
+      // allow user interrupts
+      R_CheckUserInterrupt();        
     }
     // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -413,13 +416,13 @@ extern "C"{
       }
       
       // print output to screen
-      if (verbose==1 && (iter%1000)==0){
+      if (verbose>0 && (iter%verbose)==0){
 	Rprintf("\nMCMChierEI iteration %i of %i \n", (iter+1), 
 		tot_iter);
       }
       
       // allow user interrupts
-      void R_CheckUserInterrupt(void);        
+      R_CheckUserInterrupt();        
     }
     
     delete stream; // clean up random number stream   

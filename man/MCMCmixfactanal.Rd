@@ -15,7 +15,7 @@
 \usage{
 MCMCmixfactanal(x, factors, lambda.constraints=list(),
                 data=parent.frame(), burnin = 1000, mcmc = 20000,
-                thin=1, tune=NA, verbose = FALSE, seed = NA,
+                thin=1, tune=NA, verbose = 0, seed = NA,
                 lambda.start = NA, psi.start=NA,
                 l0=0, L0=0, a0=0.001, b0=0.001,
                 store.lambda=TRUE, store.scores=FALSE,
@@ -64,8 +64,10 @@ MCMCmixfactanal(x, factors, lambda.constraints=list(),
     strictly positive.}
   
   \item{verbose}{A switch which determines whether or not the progress of
-    the sampler is printed to the screen.  If TRUE, the iteration number and
-    the Metropolis-Hastings acceptance rate are printed to the screen.}
+    the sampler is printed to the screen.  If \code{verbose} is great
+    than 0 the iteration number and
+    the Metropolis-Hastings acceptance rate are printed to the screen
+    every \code{verbose}th iteration.}
   
     \item{seed}{The seed for the random number generator.  If NA, the Mersenne
     Twister generator is used with default seed 12345; if an integer is 
@@ -242,7 +244,7 @@ post <- MCMCmixfactanal(~courts+barb2+prsexp2+prscorr2+gdpw2,
                         factors=1, data=PErisk,
                         lambda.constraints = list(courts=list(2,"-")),
                         burnin=5000, mcmc=1000000, thin=50,
-                        verbose=TRUE, L0=.25, store.lambda=TRUE,
+                        verbose=500, L0=.25, store.lambda=TRUE,
                         store.scores=TRUE, tune=1.2)
 plot(post)
 summary(post)
@@ -284,7 +286,7 @@ post <- MCMCmixfactanal(~log.Price+log.MPG.city+
                  lambda.constraints=list(log.Horsepower=list(2,"+"),
                  log.Horsepower=c(3,0), weight=list(3,"+")),
                  factors=2,
-                 burnin=5000, mcmc=500000, thin=100, verbose=TRUE,
+                 burnin=5000, mcmc=500000, thin=100, verbose=500,
                  L0=.25, tune=3.0)
 plot(post)
 summary(post)

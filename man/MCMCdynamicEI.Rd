@@ -9,7 +9,7 @@
   
 \usage{
 MCMCdynamicEI(r0, r1, c0, c1, burnin=5000, mcmc=50000, thin=1,
-              verbose=FALSE, seed=NA, W=0, a0=0.825,
+              verbose=0, seed=NA, W=0, a0=0.825,
               b0=0.0105, a1=0.825, b1=0.0105, ...)
    }
 
@@ -34,9 +34,10 @@ MCMCdynamicEI(r0, r1, c0, c1, burnin=5000, mcmc=50000, thin=1,
     mcmc iterations must be divisible by this value.}
 
   \item{verbose}{A switch which determines whether or not the progress of
-    the sampler is printed to the screen.  Information is printed
-    if TRUE.}
-
+    the sampler is printed to the screen.  If \code{verbose} is greater
+    than 0 then every \code{verbose}th iteration will be printed to the
+    screen.}
+ 
     \item{seed}{The seed for the random number generator.  If NA, the Mersenne
     Twister generator is used with default seed 12345; if an integer is 
     passed it is used to seed the Mersenne twister.  The user can also
@@ -171,11 +172,11 @@ c1 <- (r0+r1) - c0
 dtomogplot(r0, r1, c0, c1, delay=0.1)
 
 ## fit dynamic model
-post1 <- MCMCdynamicEI(r0,r1,c0,c1, mcmc=40000, thin=5, verbose=TRUE,
+post1 <- MCMCdynamicEI(r0,r1,c0,c1, mcmc=40000, thin=5, verbose=100,
                     seed=list(NA, 1))
 
 ## fit exchangeable hierarchical model 
-post2 <- MCMChierEI(r0,r1,c0,c1, mcmc=40000, thin=5, verbose=TRUE,
+post2 <- MCMChierEI(r0,r1,c0,c1, mcmc=40000, thin=5, verbose=100,
                     seed=list(NA, 2))
 
 p0meanDyn <- colMeans(post1)[1:n]
@@ -203,11 +204,11 @@ c1 <- (r0+r1) - c0
 dtomogplot(r0, r1, c0, c1, delay=0.1)
 
 ## fit dynamic model
-post1 <- MCMCdynamicEI(r0,r1,c0,c1, mcmc=40000, thin=5, verbose=TRUE,
+post1 <- MCMCdynamicEI(r0,r1,c0,c1, mcmc=40000, thin=5, verbose=100,
                     seed=list(NA, 1))
 
 ## fit exchangeable hierarchical model 
-post2 <- MCMChierEI(r0,r1,c0,c1, mcmc=40000, thin=5, verbose=TRUE,
+post2 <- MCMChierEI(r0,r1,c0,c1, mcmc=40000, thin=5, verbose=100,
                     seed=list(NA, 2))
 
 p0meanDyn <- colMeans(post1)[1:n]

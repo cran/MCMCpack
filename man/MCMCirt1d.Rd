@@ -19,9 +19,9 @@
 
 \usage{
 MCMCirt1d(datamatrix, theta.constraints=list(), burnin = 1000,
-   mcmc = 20000, thin=1, verbose = FALSE, seed = NA, theta.start = NA, 
+   mcmc = 20000, thin=1, verbose = 0, seed = NA, theta.start = NA, 
    alpha.start = NA, beta.start = NA, t0 = 0, T0 = 1, ab0=0, AB0=.25,
-   store.item = FALSE, ... )  }
+   store.item = FALSE, drop.constant.items=TRUE, ... )  }
 
 \arguments{
     \item{datamatrix}{The matrix of data.  Must be 0, 1, or missing values.  
@@ -48,8 +48,9 @@ MCMCirt1d(datamatrix, theta.constraints=list(), burnin = 1000,
     Gibbs iterations must be divisible by this value.}
 
     \item{verbose}{A switch which determines whether or not the progress of
-      the sampler is printed to the screen.  If TRUE, the iteration number
-      is printed to the screen every 100 iterations.}
+      the sampler is printed to the screen.   If \code{verbose} is greater
+      than 0 then every \code{verbose}th iteration will be printed to the
+      screen.}
     
     \item{seed}{The seed for the random number generator.  If NA, the Mersenne
     Twister generator is used with default seed 12345; if an integer is 
@@ -111,6 +112,10 @@ MCMCirt1d(datamatrix, theta.constraints=list(), burnin = 1000,
     should only be used if the chain is thinned heavily, or for
     applications with a small number of items}.  By default, the
     item parameters are not stored.}
+
+  \item{drop.constant.items}{A switch that determines whether or not
+        items that have no variation
+	should be deleted before fitting the model. Default = TRUE.}
     
     \item{...}{further arguments to be passed}       
 }
@@ -187,7 +192,7 @@ MCMCirt1d(datamatrix, theta.constraints=list(), burnin = 1000,
    posterior1 <- MCMCirt1d(t(SupremeCourt),
                    theta.constraints=list(Scalia="+", Ginsburg="-"),
                    B0.alpha=.2, B0.beta=.2,
-                   burnin=500, mcmc=100000, thin=20, verbose=TRUE,
+                   burnin=500, mcmc=100000, thin=20, verbose=500,
                    store.item=TRUE)
    geweke.diag(posterior1)
    plot(posterior1)
@@ -195,11 +200,18 @@ MCMCirt1d(datamatrix, theta.constraints=list(), burnin = 1000,
 
    ## US Senate Example with equality constraints
    data(Senate)
+   namestring <- as.character(Senate$member)
+   namestring[78] <- "CHAFEE1"
+   namestring[79] <- "CHAFEE2"
+   namestring[59] <- "SMITH.NH"
+   namestring[74] <- "SMITH.OR"
+   rownames(Senate) <- namestring
+
    Sen.rollcalls <- Senate[,6:677]
-   rownames(Sen.rollcalls) <- as.character(Senate$member)
+
    posterior2 <- MCMCirt1d(Sen.rollcalls,
                     theta.constraints=list(KENNEDY=-2, HELMS=2),
-                    burnin=2000, mcmc=100000, thin=20, verbose=TRUE)
+                    burnin=2000, mcmc=100000, thin=20, verbose=500)
    geweke.diag(posterior2)
    plot(posterior2)
    summary(posterior2)

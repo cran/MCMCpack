@@ -189,7 +189,7 @@
 "MCMCmnl" <-
   function(formula, baseline=NULL, data = parent.frame(), 
            burnin = 1000, mcmc = 10000, thin=1,
-           mcmc.method = "MH", tune = 1.1, verbose = FALSE, seed = NA,
+           mcmc.method = "MH", tune = 1.1, verbose = 0, seed = NA,
            beta.start = NA, b0 = 0, B0 = 0, ...) {
 
     ## checks

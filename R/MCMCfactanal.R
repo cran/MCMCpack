@@ -27,7 +27,7 @@
 "MCMCfactanal" <-
   function(x, factors, lambda.constraints=list(),
            data=parent.frame(), burnin = 1000, mcmc = 20000,
-           thin=1, verbose = FALSE, seed = NA,
+           thin=1, verbose = 0, seed = NA,
            lambda.start = NA, psi.start = NA,
            l0=0, L0=0, a0=0.001, b0=0.001,
            store.scores = FALSE, std.var=TRUE, ... ) {
@@ -143,7 +143,8 @@
     output.var <- diag(var(output.df))
     output.df <- output.df[,output.var != 0]
     
-    output <- mcmc(as.matrix(output.df), start=1, end=mcmc, thin=thin)
+    output <- mcmc(as.matrix(output.df), start=burnin+1, end=mcmc+burnin,
+                   thin=thin)
 
     ## add constraint info so this isn't lost
     attr(output, "constraints") <- lambda.constraints
