@@ -25,8 +25,8 @@
 }
 
 \references{
-  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2003.
-  \emph{Scythe Statistical Library 0.4.} \url{http://scythe.wustl.edu}.
+  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.
+  \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
 }
 
 \keyword{file}

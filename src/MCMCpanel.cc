@@ -2,21 +2,21 @@
 // model.  It is called from R.
 // 
 // ADM 10/10/2002
-// 
+// updated to new Scythe spec and new rngs ADM 7/28/2004
 
-#include <iostream>
-#include "Scythe_Matrix.h"
-#include "Scythe_Simulate.h"
-#include "Scythe_Stat.h"
-#include "Scythe_LA.h"
-#include "Scythe_IDE.h"
+#include "matrix.h"
+#include "distributions.h"
+#include "stat.h"
+#include "la.h"
+#include "ide.h"
+#include "smath.h"
+#include "MCMCrng.h"
+#include "MCMCfcds.h"
+
+#include <R.h>           // needed to use Rprintf()
+#include <R_ext/Utils.h> // needed to allow user interrupts
 
 extern "C"{
-
-// add seed
-// add starting values
-// add verbosity
-
 
 using namespace SCYTHE;
 using namespace std;
@@ -30,7 +30,8 @@ panelpost (double* sample, const int* samrow, const int* samcol,
          const double* X, const int* Xrow, const int* Xcol,
          const double* W, const int* Wrow, const int* Wcol,                
          const int* burnin, const int* gibbs,  const int* thin,
-         const int* seed, const int* verbose,
+         const int *lecuyer, const int *seedarray,
+         const int *lecuyerstream,  const int* verbose,
          const double* bstart, const int* bstartrow, const int* bstartcol,
          const double* sigma2start, const double* Dstart,
          const int* Dstartrow, const int* Dstartcol,
@@ -74,6 +75,9 @@ panelpost (double* sample, const int* samrow, const int* samcol,
    int Mthin = thin[0];
    int Mtotiter = Mburnin + Mgibbs;
 
+     // initialize rng stream
+     rng *stream = MCMCpack_get_rng(*lecuyer, seedarray, *lecuyerstream);
+
    // create arrays of matrices for data access
    // Matrix<double> Yarr[Mn];
    Matrix<double>* Yarr = new Matrix<double>[Mn];
@@ -114,10 +118,6 @@ panelpost (double* sample, const int* samrow, const int* samcol,
    Matrix<double> D_holder(Mgibbs/Mthin,Mq*Mq);
    Matrix<double> sigma2_holder(Mgibbs/Mthin, 1);
   
-   // initialize seed (mersenne twister / use default seed unless specified)
-   if(seed==0) set_mersenne_seed(5489UL);
-   else set_mersenne_seed(seed[0]);
-
    // starting values for sampler
    Matrix<double> beta_sim = Mbetastart;
    double sigma2_sim = sigma2start[0];   
@@ -137,7 +137,8 @@ panelpost (double* sample, const int* samrow, const int* samcol,
          }
       Matrix<double> beta_sim_var = invpd(MB0 + (1/sigma2_sim) * beta_var_sum);
       Matrix<double> beta_sim_mean = beta_sim_var * (MB0 * Mb0 + (1/sigma2_sim) * beta_mean_sum);
-      Matrix<double> beta_sim = beta_sim_mean + cholesky(beta_sim_var) * rnorm(Mp,1);
+      Matrix<double> beta_sim = beta_sim_mean + cholesky(beta_sim_var) *
+         stream->rnorm(Mp,1);
   
       // simulate \b_i | Y, \beta, \sigma^2, D 
       // note: these are not stored because of their large number
@@ -145,7 +146,8 @@ panelpost (double* sample, const int* samrow, const int* samcol,
       for(int i = 0; i < Mn; ++i) {
          Matrix<double> b_sim_var = invpd(invpd(D_sim) + (1/sigma2_sim) * t(Warr[i]) * Warr[i]);
          Matrix<double> b_sim_mean = b_sim_var * (1/sigma2_sim * t(Warr[i]) * (Yarr[i] - Xarr[i] * beta_sim));
-         Matrix<double> bi_sim = b_sim_mean + cholesky(b_sim_var) * rnorm(Mq,1,0,1);
+         Matrix<double> bi_sim = b_sim_mean + cholesky(b_sim_var) *
+           stream->rnorm(Mq,1,0,1);
          for(int w = 0; w < Mq; ++w) {
             bi(i,w) = bi_sim(w,0);
          }
@@ -162,7 +164,7 @@ panelpost (double* sample, const int* samrow, const int* samcol,
       }      
       int D_sim_dof = eta0[0] + Mn;
       Matrix<double> D_sim_scale = invpd(invpd(MR0) + SSB);   
-      D_sim = invpd(rwish(D_sim_dof,D_sim_scale));   
+      D_sim = invpd(stream->rwish(D_sim_dof,D_sim_scale));   
 
       // simulate \sigma^2 | Y, \beta, \b_i, D 
       double SSE = 0;
@@ -177,7 +179,7 @@ panelpost (double* sample, const int* samrow, const int* samcol,
          }
       double nu_sim = (nu0[0] + Mn * Mk)/2;
       double delta_sim = (delta0[0] + SSE)/2;
-      sigma2_sim = 1/rgamma(nu_sim, delta_sim);
+      sigma2_sim = 1/stream->rgamma(nu_sim, delta_sim);
 
       // save values
       if (g >= Mburnin && (g % Mthin == 0)) {
@@ -194,14 +196,23 @@ panelpost (double* sample, const int* samrow, const int* samcol,
          sigma2_holder(count,0) = sigma2_sim;
          ++count;
          }
-      
-      if (verbose[0] == 1 && g % 500 == 0) {   
-         cout << "MCMCpanel iteration = " << g + 1 << endl;
-         cout << " sigma2 = " << sigma2_sim << endl;
-         cout << " beta = " << endl << beta_sim.toString() << endl;
-         cout << " D = " << endl << D_sim.toString() << endl << endl;
-         }
+ 
+        // print output to stdout
+       if(*verbose == 1 && g % 500 == 0) {
+         Rprintf("\n\nMCMCpanel iteration %i of %i \n",
+           (g+1), Mtotiter);
+         Rprintf("beta = \n");
+         for (int j=0; j<Mp; ++j)
+           Rprintf("%10.5f\n", beta_sim[j]);
+         Rprintf("sigma2 = %10.5f\n", sigma2_sim);
+       }
+
+         
+       void R_CheckUserInterrupt(void); // allow user interrupts
+
       }
+
+     delete stream; // clean up random number stream
  
   // return posterior denisty sample to R
   Matrix<double> storeagem = cbind(beta_holder, D_holder);

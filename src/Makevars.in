@@ -1,0 +1,2 @@
+PKG_CXXFLAGS = -Wall -pedantic -DSCYTHE_COMPILE_DIRECT -DSCYTHE_NO_RANGE -O3 -fno-gcse -funroll-loops @MV_HAVE_IEEEFP_H@ @MV_HAVE_TRUNC@
+

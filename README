@@ -1,16 +1,17 @@
 //
-// MCMCpack, Version 0.4-9
+// MCMCpack, Version 0.5-1
 //
 
-Release Date: July 2, 2004
+Release Date: July 28, 2004
 
 This package contains functions for posterior simulation for a number of
 statistical models. All simulation is done in compiled C++ written in
-the Scythe Statistical Library Version 0.4. All models return coda mcmc
+the Scythe Statistical Library Version 1.0. All models return coda mcmc
 objects that can then be summarized using coda functions or the coda
 menu interface.  The package also contains some useful utility
-functions, including some additional PDFs and pseudo-random number
-generators for statistical distributions.
+functions, including some additional density functions and pseudo-random
+number generators for statistical distributions, a general purpose Metropolis
+sampling algorithm, and tools for visualization.
 
 //
 // Authors
@@ -20,96 +21,12 @@ Andrew D. Martin <admartin@wustl.edu>
 Kevin M. Quinn <kquinn@latte.harvard.edu>
 
 //
-// Changes and Bug Fixes
-//
-
-NOTE: We are still working on implementing a NAMESPACE for this package. We
-plant to do so in our next major release.
-
-
-0.4-8 to 0.4-9
-   * Fixed Scythe issues to work with gcc 3.4.0 (as requested by Brain Ripley).
-
-0.4-7 to 0.4-8
-   * Repaired Scythe_Simulate.*, for which an outdated version was included
-     in the last release.
-
-0.4-6 to 0.4-7
-   * Fixed some Scythe bugs, including a problem with memory allocation for
-     matrix multiplication.  See http://sourceforge.net/projects/scythestat/
-     for the latest version of Scythe, which is now distributed with MCMCpack.
-     The Scythe code differs slightly in the paths ../include and ../src are
-     replace with the current path, and in pnorm2 the isnan() function is
-     commented out to allow for cross-compilation.
-   * Rolled out http://mcmcpack.wustl.edu website.
-   * Mixed response factor code.
-   * Fixed factanal.
-   * Fixed irtKd.
-   
-0.4-5 to 0.4-6
-   * Fixed a bug in rnoncenhypergeom() [thanks to Tom LaFramboise]
-   * Patched Scythe0.3 to fix an error in inv() [thanks to Donour Sizemore].  
-     Note that this function is not called in MCMCpack, so was causing no
-     explicit errors.
-
-0.4-3 to 0.4-5
-   * Fixed a bug in xpnd() [thanks to Michael Man]
-   * Fixed some inconsistencies in documentation [thanks to Kurt Hornik]
-
-0.4-2 to 0.4-3
-   * Fixed bug in Scythe truncated Normal generators (which had been
-     fixed before but sneaked into the last release) -- this fixes 
-     a problem with MCMCirt1d
-   * Cleaned up MCMCbaselineDA.cc (eliminated unused arguments)
-   * Cleaned up MCMCbaseline.R (tuning argument)
-   * Set seed in MCMClogit.cc fixed
-   * Set seed in MCMCpoisson.cc fixed   
-   * Fixed all examples such that they work out of the box
-
-0.4-1 to 0.4-2
-   * Optimized some of the Scythe 0.4 code, which provides faster
-     computation for most models.
-   * Corrected a permissions problem on cleanup [thanks to Kurt Hornik] 
-   * Added explicit licensing information and a text echo when loading
-     MCMCpack.
-
-0.3-11 to 0.4-1
-   * Ported to Scythe Version 0.4 (which will soon be publicly available)
-   * Cleaned up the codebase and documentation (changes will 
-     soon be part of the specification)
-   * Added vech() and xpnd() utility functions
-   * Included data file of 106th Senate roll call votes for the
-     MCMCirt1d() and MCMCirtKd() models
-   * Added Dirichlet, Noncentral Hypergeometric, and Inverse Gamma
-     generators and densities [with contributions from Kevin Rompala]
-   * Added read.Scythe() function to read matrices written by Scythe
-     [contributed by Kevin Rompala]
-   * Added helper functions to make coding easier [contributed by
-     Kevin Rompala]
-   * Added three models: a K-dimensional item response theory
-     model (MCMCirtKd), a linear factor model (MCMCfactanal), and
-     an ordinal item response theory model (MCMCordfactanal)
-   * Added a pre-processor command to handle ininf() compilation
-     issues on SGI [thanks to Dave Henderson]
-   * All MCMC* functions now only allow starting values for the
-     first simulated block of parameters and use check.parameters()
-     function.
-   * Range checking is turned off in the compiled C++ code, yielding
-     significant speed gains for most models.
-
-0.3-10 to 0.3-11
-   * Fixed a bug in MCMCpoisson() re: non-negative counts
-   * Included a data file of Supreme Court votes for the
-     MCMCirt1d() model [thanks to Simon Jackman for the suggestion]
-   * Fixed memory leak caused by Scythe_Matrix.cc [thanks to Dan Pemstein]
-
-//
 // Compilation
 //
 
 This package (along with Scythe) uses C++ and the Standard Template
 Library (STL).  It requires use of the GCC compiler 3.0 or greater.  It
-has been tested on GCC 3.1, and 3.2 on Linux and MacOS X.
+has been tested on GCC 3.1, 3.2, 3.3, and 3.4 on Linux and MacOS X. 
 
 We have also successfully compiled this package for Windows using
 a MinGW cross-compiler using binutils 2.13, gcc 3.2, mingw
@@ -119,6 +36,27 @@ versions of the compiler to successfully handle the C++ issues
 noted above. Many thanks to Dan Pemstein for helping with the
 cross-compilation, and to Kurt Hornik and Fritz Leisch for their
 help with debugging and service to the R community.
+
+//
+// Acknowledgments
+//
+
+We gratefully acknowledge support from:
+
+* National Science Foundation, Program in Methodology, Measurement, and 
+Statistics, Grants SES-0350646 and SES-0350613
+
+* Washington University, Department of Political Science and the
+Weidenbaum Center on the Economy, Government, and Public Policy
+http://wc.wustl.edu
+
+* Harvard University, Department of Government and the
+Center for Basic Research in the Social Sciences
+http://cbrss.harvard.edu}
+
+Neither the National Science Foundation, Washington University, or
+Harvard University bear any responsibility for the content of this
+package.
 
 Please contact Andrew D. Martin <admartin@wustl.edu> if
 you have any problems or questions.

@@ -15,7 +15,7 @@
   
 \usage{
 MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
-   burnin = 1000, mcmc = 10000, thin=5, verbose = FALSE, seed = 0,
+   burnin = 1000, mcmc = 10000, thin=1, verbose = FALSE, seed = NA,
    alphabeta.start = NA, b0 = 0, B0=0, store.item = FALSE,
    store.ability=TRUE, drop.constantvars=TRUE, ... )  }
 
@@ -57,9 +57,15 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
     the sampler is printed to the screen.  If TRUE, the iteration number and
     the subject abilities (ideal points) are printed to the screen.}
     
-    \item{seed}{The seed for the random number generator.  The code uses the
-    Mersenne Twister, which requires an integer as an input.  If nothing
-    is provided, the Scythe default seed is used.}
+    \item{seed}{The seed for the random number generator.  If NA, the Mersenne
+      Twister generator is used with default seed 12345; if an integer is 
+      passed it is used to seed the Mersenne twister.  The user can also
+      pass a list of length two to use the L'Ecuyer random number generator,
+      which is suitable for parallel computation.  The first element of the
+      list is the L'Ecuyer seed, which is a vector of length six or NA (if NA 
+      a default seed of \code{rep(12345,6)} is used).  The second element of 
+      list is a positive substream number. See the MCMCpack 
+      specification for more details.}
 
     \item{alphabeta.start}{The starting values for the
     \eqn{\alpha}{alpha} and \eqn{\beta}{beta} difficulty and
@@ -180,8 +186,8 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
    Valen E. Johnson and James H. Albert. 1999. ``Ordinal Data Modeling." 
    Springer: New York.
 
-   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2003.  
-   \emph{Scythe Statistical Library 0.4.} \url{http://scythe.wustl.edu}.
+   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.  
+   \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.

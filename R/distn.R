@@ -490,6 +490,3 @@
     for(i in 1:n) output[i] <- single.draw(n1, n2, m1, psi, ll, uu, mode, pi)    
     return(output)
   }
-
-
-

@@ -1,179 +1,189 @@
-// MCMCprobit.cc is a program that simulates draws from the posterior
-// density of an ordered probit regression model.  It is written
-// modularly, with the goal of creating an R object that will reference
-// this code.
+// MCMCoprobit.cc is C++ code to estimate a ordinalprobit regression 
+//   model with a multivariate normal prior
+//
+// Andrew D. Martin
+// Dept. of Political Science
+// Washington University in St. Louis
+// admartin@wustl.edu
+//
+// Kevin M. Quinn
+// Dept. of Government
+// Harvard University
+// kevin_quinn@harvard.edu
 // 
-// KQ 1/24/2003 
+// This software is distributed under the terms of the GNU GENERAL
+// PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
+// file for more information.
+//
+// Copyright (C) 2004 Andrew D. Martin and Kevin M. Quinn
 // 
+// updated to the new version of Scythe 7/26/2004 KQ
 
 #include <iostream>
-#include "Scythe_Matrix.h"
-#include "Scythe_Simulate.h"
-#include "Scythe_Stat.h"
-#include "Scythe_LA.h"
-#include "Scythe_IDE.h"
+#include "matrix.h"
+#include "distributions.h"
+#include "stat.h"
+#include "la.h"
+#include "ide.h"
+#include "smath.h"
+#include "MCMCrng.h"
+#include "MCMCfcds.h"
 
+#include <R.h>           // needed to use Rprintf()
+#include <R_ext/Utils.h> // needed to allow user interrupts
 
 using namespace SCYTHE;
 using namespace std;
 
-
 extern "C"{
 
-  using namespace SCYTHE;
-
-
-  // simulate from posterior density and return a Gibbs by parameters matrix 
-  // of the posterior density sample
-  void
-  oprobitpost (double* sample, const int* samrow, const int* samcol,
-	       const int* Y, const int* Yrow, const int* Ycol,
-	       const double* X, const int* Xrow, const int* Xcol,
-	       const int* burnin, const int* mcmc,  const int* thin,
-	       const double* tune, const int* seed, const int* verbose, 
-	       const double* bstart, const int* bstartrow, 
-	       const int* bstartcol,
-	       const double* gammastart, const int* gammastartrow, 
-	       const int* gammastartcol,
-	       const double* b0, const int* b0row, const int* b0col,
-	       const double* B0, const int* B0row, const int* B0col,
-	       int* accepts){
-
-    // put together matrices
-    Matrix<double> Msample(samcol[0], samrow[0], sample);
-    Msample = t(Msample);
-    Matrix<double> MX(Xcol[0], Xrow[0], X);
-    MX = t(MX);
-    Matrix<int> MY(Ycol[0], Yrow[0], Y);
-    MY = t(MY);
-    Matrix<double> Mbetastart(bstartcol[0],bstartrow[0], bstart);
-    Mbetastart = t(Mbetastart);
-    Matrix<double> Mgammastart(gammastartcol[0], gammastartrow[0], gammastart);
-    Mgammastart = t(Mgammastart);
-    Matrix<double> Mb0(b0col[0], b0row[0], b0);
-    Mb0 = t(Mb0);
-    Matrix<double> MB0(B0col[0], B0row[0], B0);
-    MB0 = t(MB0);
+  
+  void MCMCoprobit(double *sampledata, const int *samplerow, 
+		   const int *samplecol, const int *Y, 
+		   const double *Xdata, 
+		   const int *Xrow, const int *Xcol, const int *burnin, 
+		   const int *mcmc, const int *thin, const double* tune,
+		   const int *lecuyer, const int *seedarray, 
+		   const int *lecuyerstream, const int *verbose, 
+		   const double *betadata, const int *betarow, 
+		   const int *betacol, const double* gammadata, 
+		   const int* gammarow, const int* gammacol,
+		   const double *b0data, const int *b0row, const int *b0col, 
+		   const double *B0data, const int *B0row, const int *B0col) {  
+    
+    // pull together Matrix objects
+    const Matrix <double> X = r2scythe(*Xrow, *Xcol, Xdata);
+    Matrix <double> beta = r2scythe(*betarow, *betacol, 
+				    betadata);
+    Matrix <double> gamma = r2scythe(*gammarow, *gammacol, 
+				     gammadata);
+    const Matrix <double> b0 = r2scythe(*b0row, *b0col, b0data);
+    const Matrix <double> B0 = r2scythe(*B0row, *B0col, B0data);
 
     // define constants and from cross-product matrices
-    int k = MX.cols();
-    int ncat = Mgammastart.rows() - 1;
-    int N = MX.rows();
-    int tot_iter = burnin[0] + mcmc[0];
-    Matrix<double> XpX = crossprod (MX);
+    const int tot_iter = *burnin + *mcmc;  // total number of mcmc iterations
+    const int nstore = *mcmc / *thin;      // number of draws to store
+    const int k = X.cols();
+    const int N = X.rows();
+    const int ncat = gamma.rows() - 1;
+    const Matrix<double> XpX = crossprod(X);
 
-
-    // holding matrices
-    Matrix<double> betam(mcmc[0]/thin[0], k);
-    Matrix<double> gammam(mcmc[0]/thin[0], ncat+1);
+    // storage matrix or matrices
+    Matrix<double> storemat(nstore, k+ncat+1);
     
-    // initialize seed (mersenne twister / use default seed unless specified)
-    if(seed==0) set_mersenne_seed(5489UL);
-    else set_mersenne_seed(seed[0]);
-     
-    // starting values
-    Matrix<double> beta = Mbetastart;
-    Matrix<double> gamma = Mgammastart;
+    // initialize rng stream
+    rng *stream = MCMCpack_get_rng(*lecuyer, seedarray, *lecuyerstream);
+    
+    // initialize Z
     Matrix<double> gamma_p = gamma;
     Matrix<double> Z(N,1);
-    Matrix<double> Xbeta = MX * beta;
-    
+    Matrix<double> Xbeta = X * beta;
+
 
     // Gibbs loop
     int count = 0;
-    for (int iter = 0; iter < tot_iter; ++iter)
-      {
-
-
-
-	// [gamma | Z, beta]
-	for (int i=2; i<(ncat); ++i){
-	  if (i==(ncat-1)){
-	    gamma_p[i] = rtbnorm_combo(gamma[i], ::pow(tune[0], 2.0), 
-				       gamma_p[i-1]);
-	  }
-	  else {
-	    gamma_p[i] = rtnorm_combo(gamma[i], ::pow(tune[0], 2.0), 
-				      gamma_p[i-1], 
-				      gamma[i+1]);
-	  }
-	}
-	double loglikerat = 0.0;
-	double loggendenrat = 0.0;
-	
-	// loop over observations and construct the acceptance ratio
-	for (int i=0; i<N; ++i){
-	  if (MY[i] == ncat){
-	    loglikerat = loglikerat 
-	      + log(1.0  - 
-		    pnorm(gamma_p[MY[i]-1] - Xbeta[i]) ) 
-	      - log(1.0 - 
-		    pnorm(gamma[MY[i]-1] - Xbeta[i]) );
-	  }
-	  else if (MY[i] == 1){
-	    loglikerat = loglikerat 
-	      + log(pnorm(gamma_p[MY[i]] - Xbeta[i])  ) 
-	      - log(pnorm(gamma[MY[i]] - Xbeta[i]) );
-	  }
-	  else{
-	    loglikerat = loglikerat 
-	      + log(pnorm(gamma_p[MY[i]] - Xbeta[i]) - 
-		    pnorm(gamma_p[MY[i]-1] - Xbeta[i]) ) 
-	      - log(pnorm(gamma[MY[i]] - Xbeta[i]) - 
-		    pnorm(gamma[MY[i]-1] - Xbeta[i]) );
-	  }
-	}
-	for (int j=2; j<(ncat-1); ++j){	   
-	  loggendenrat = loggendenrat 
-	    + log(pnorm(gamma[j+1], gamma[j], tune[0]) - 
-		  pnorm(gamma[j-1], gamma[j], tune[0]) )  
-	    - log(pnorm(gamma_p[j+1], gamma_p[j], tune[0]) - 
-		  pnorm(gamma_p[j-1], gamma_p[j], tune[0]) );
-	}
-	double logacceptrat = loglikerat + loggendenrat;
-	if (runif() <= exp(logacceptrat)){
-	  gamma = gamma_p;
-	  ++accepts[0];
-	}
-	
-
-	// [Z| gamma, beta, y] 
-	Matrix<double> Z_mean = MX * beta;
-	for (int i=0; i<N; ++i){
-	  Z[i] = rtnorm_combo(Z_mean[i], 1.0, gamma[MY[i]-1], gamma[MY[i]]);
-	}
-	
+    int accepts = 0;
+    for (int iter = 0; iter < tot_iter; ++iter){
       
-	// [beta|Z, gamma]
-	Matrix<double> XpZ = t(MX) * Z;
-	Matrix<double> sig_beta = invpd (MB0 + XpX );
-	Matrix<double> C = cholesky (sig_beta);
-	Matrix<double> betahat = sig_beta * (XpZ + MB0 * Mb0);
-	beta = betahat + C * rnorm (k, 1);
-	Xbeta = MX * beta;
-
-	// store values in matrices
-	if (iter >= burnin[0] && ((iter%thin[0])==0)){ 
-	  for (int j = 0; j < k; j++)
-	    betam (count,j) = beta[j];
-	  for (int j = 0; j<(ncat+1); ++j)
-	    gammam (count, j) = gamma[j];;
-	  ++count;
+      // [gamma | Z, beta]
+      for (int i=2; i<(ncat); ++i){
+	if (i==(ncat-1)){
+	  gamma_p[i] = stream->rtbnorm_combo(gamma[i], ::pow(tune[0], 2.0), 
+					     gamma_p[i-1]);
 	}
-	  
-	if (verbose[0] == 1 && iter % 500 == 0) {
-	  cout << "MCMCoprobit iteration = " << iter + 1 << endl;
-	  cout << " beta = " << endl << beta.toString();
-	  cout << " acceptance rate = " << static_cast<double>(accepts[0])/
-	    static_cast<double>(iter+1) << endl << endl;
+	else {
+	  gamma_p[i] = stream->rtnorm_combo(gamma[i], ::pow(tune[0], 2.0), 
+					    gamma_p[i-1], 
+					    gamma[i+1]);
 	}
       }
+      double loglikerat = 0.0;
+      double loggendenrat = 0.0;
+      
+      // loop over observations and construct the acceptance ratio
+      for (int i=0; i<N; ++i){
+	if (Y[i] == ncat){
+	  loglikerat = loglikerat 
+	    + log(1.0  - 
+		  pnorm(gamma_p[Y[i]-1] - Xbeta[i]) ) 
+	    - log(1.0 - 
+		  pnorm(gamma[Y[i]-1] - Xbeta[i]) );
+	}
+	else if (Y[i] == 1){
+	  loglikerat = loglikerat 
+	    + log(pnorm(gamma_p[Y[i]] - Xbeta[i])  ) 
+	    - log(pnorm(gamma[Y[i]] - Xbeta[i]) );
+	}
+	else{
+	  loglikerat = loglikerat 
+	    + log(pnorm(gamma_p[Y[i]] - Xbeta[i]) - 
+		  pnorm(gamma_p[Y[i]-1] - Xbeta[i]) ) 
+	    - log(pnorm(gamma[Y[i]] - Xbeta[i]) - 
+		  pnorm(gamma[Y[i]-1] - Xbeta[i]) );
+	}
+      }
+      for (int j=2; j<(ncat-1); ++j){	   
+	loggendenrat = loggendenrat 
+	  + log(pnorm(gamma[j+1], gamma[j], tune[0]) - 
+		pnorm(gamma[j-1], gamma[j], tune[0]) )  
+	  - log(pnorm(gamma_p[j+1], gamma_p[j], tune[0]) - 
+		pnorm(gamma_p[j-1], gamma_p[j], tune[0]) );
+      }
+      double logacceptrat = loglikerat + loggendenrat;
+      if (stream->runif() <= exp(logacceptrat)){
+	gamma = gamma_p;
+	++accepts;
+      }
+      
+      
+      // [Z| gamma, beta, y] 
+      //Matrix<double> Z_mean = X * beta;
+      for (int i=0; i<N; ++i){
+	Z[i] = stream->rtnorm_combo(Xbeta[i], 1.0, gamma[Y[i]-1], gamma[Y[i]]);
+      }
+      
+      
+      // [beta|Z, gamma]
+      const Matrix<double> XpZ = t(X) * Z;
+      beta = NormNormregress_beta_draw(XpX, XpZ, b0, B0, 1.0, stream);      
+      Xbeta = X * beta;
+      
+      
+      // store values in matrices
+      if (iter >= *burnin && ((iter % *thin)==0)){ 
+	for (int j=0; j<k; ++j)
+	  storemat(count, j) = beta[j];
+	for (int j=0; j<(ncat+1); ++j)
+	  storemat(count, j+k) = gamma[j];	    
+	++count;
+      }
+      
+      // print output to stdout
+      if(*verbose == 1 && iter % 500 == 0){
+	Rprintf("\n\nMCMCprobit iteration %i of %i \n", (iter+1), tot_iter);
+	Rprintf("beta = \n");
+	for (int j=0; j<k; ++j)
+	  Rprintf("%10.5f\n", beta[j]);
+	Rprintf("Metropolis acceptance rate for beta = %3.5f\n\n", 
+		static_cast<double>(accepts) / 
+		static_cast<double>(iter+1));		
+      }
+     
+      
+      void R_CheckUserInterrupt(void); // allow user interrupts     
+    }
+
+     delete stream; // clean up random number stream
 
     // return output
-    Matrix<double> datam = cbind(betam, gammam);
-    int loop = samrow[0] * samcol[0];
-    for (int i=0; i<loop; ++i)
-      sample[i] = datam[i];
+    const int size = *samplerow * *samplecol;
+    for (int i=0; i<size; ++i)
+      sampledata[i] = storemat[i];
+    
+    Rprintf("\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+    Rprintf("The Metropolis acceptance rate for beta was %3.5f", 
+	    static_cast<double>(accepts) / static_cast<double>(tot_iter));
+    Rprintf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
 
   }
   

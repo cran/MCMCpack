@@ -9,8 +9,9 @@
   
 \usage{
 MCMChierEI(r0, r1, c0, c1, burnin=1000, mcmc=50000, thin=1,
-           m0=0, M0=10, m1=0, M1=10, nu0=1, delta0=0.5, nu1=1,
-           delta1=0.5, verbose=FALSE, tune=2.65316, seed=0, ...)
+           verbose=FALSE, tune=2.65316, seed=NA,
+           m0=0, M0=10, m1=0, M1=10, a0=1, b0=0.5, a1=1,
+           b1=0.5, ...)
    }
 
 \arguments{
@@ -33,17 +34,32 @@ MCMChierEI(r0, r1, c0, c1, burnin=1000, mcmc=50000, thin=1,
   \item{thin}{The thinning interval used in the simulation.  The number of
     mcmc iterations must be divisible by this value.}
 
-  \item{tune}{Tuning parameter for the Metropolis-Hasting sampling.}
-
+  \item{tune}{Tuning parameter for the Metropolis-Hasting sampling. The
+    default value has been chosen to work well across most datasets. The
+  user should only change the tuning parameter if s/he has carefully
+  inspected the C++ code where the sampling takes place and understands
+  what s/he is doing. Note that the acceptance rate will typically be
+  much lower (say around 0.01) than would ordinarily be advisable. The
+  reason for this low acceptance rate is because the proposal
+  distribution is evenly spread around the entire tomography line while
+  the posterior is concentrated in one area of the line. While many
+  candidate draws are rejected, this algorithm mixes better than
+  algorithms that use more local proposal distributions.}
 
   \item{verbose}{A switch which determines whether or not the progress of
     the sampler is printed to the screen.  Information is printed
     if TRUE.}
 
-  \item{seed}{The seed for the random number generator.  The code uses the
-  Mersenne Twister, which requires an integer as an input.  If nothing
-  is provided, the Scythe default seed is used.}
-
+    \item{seed}{The seed for the random number generator.  If NA, the Mersenne
+    Twister generator is used with default seed 12345; if an integer is 
+    passed it is used to seed the Mersenne twister.  The user can also
+    pass a list of length two to use the L'Ecuyer random number generator,
+    which is suitable for parallel computation.  The first element of the
+    list is the L'Ecuyer seed, which is a vector of length six or NA (if NA 
+    a default seed of \code{rep(12345,6)} is used).  The second element of 
+    list is a positive substream number. See the MCMCpack 
+    specification for more details.}
+    
   \item{m0}{Prior mean of the \eqn{\mu_0}{mu0} parameter.}
 
   \item{M0}{Prior variance of the \eqn{\mu_0}{mu0} parameter.}
@@ -52,19 +68,18 @@ MCMChierEI(r0, r1, c0, c1, burnin=1000, mcmc=50000, thin=1,
 
   \item{M1}{Prior variance of the \eqn{\mu_1}{mu1} parameter.}
 
-  \item{nu0}{Shape parameter for the inverse-gamma prior on the
-    \eqn{\sigma^2_0}{sigma^2_0} parameter.}
+  \item{a0}{\code{a0/2} is the shape parameter for the inverse-gamma
+    prior on the \eqn{\sigma^2_0}{sigma^2_0} parameter.}
   
-  \item{delta0}{Scale parameter for the inverse-gamma prior on the
-    \eqn{\sigma^2_0}{sigma^2_0} parameter.}
+  \item{b0}{\code{b0/2} is the scale parameter for the inverse-gamma
+    prior on the \eqn{\sigma^2_0}{sigma^2_0} parameter.}
              
-  \item{nu1}{Shape parameter for the inverse-gamma prior on the
-    \eqn{\sigma^2_1}{sigma^2_1} parameter.}
+  \item{a1}{\code{a1/2} is the shape parameter for the inverse-gamma
+    prior on the \eqn{\sigma^2_1}{sigma^2_1} parameter.}
   
-  \item{delta1}{Scale parameter for the inverse-gamma prior on the
-    \eqn{\sigma^2_1}{sigma^2_1} parameter.}
-
-
+  \item{b1}{\code{b1/2} is the scale parameter for the inverse-gamma
+    prior on the \eqn{\sigma^2_1}{sigma^2_1} parameter.}
+  
   \item{...}{further arguments to be passed}     
 }
 
@@ -112,10 +127,10 @@ MCMChierEI(r0, r1, c0, c1, burnin=1000, mcmc=50000, thin=1,
   \eqn{\mu_1 \sim \mathcal{N}(m_1,
     M_1)}{mu1 ~ Normal(m1,
     M1)},
-  \eqn{\sigma^2_0 \sim \mathcal{IG}(\nu_0/2, \delta_0/2)}{\sigma^2_0 ~
-    InvGamma(nu0/2, delta0/2)}, and
-  \eqn{\sigma^2_1 \sim \mathcal{IG}(\nu_1/2, \delta_1/2)}{\sigma^2_1 ~
-    InvGamma(nu1/2, delta1/2)}.
+  \eqn{\sigma^2_0 \sim \mathcal{IG}(a_0/2, b_0/2)}{\sigma^2_0 ~
+    InvGamma(a0/2, b0/2)}, and
+  \eqn{\sigma^2_1 \sim \mathcal{IG}(a_1/2, b_1/2)}{\sigma^2_1 ~
+    InvGamma(a1/2, b1/2)}.
 
    Inference centers on \eqn{p_0}{p0}, \eqn{p_1}{p1}, \eqn{\mu_0}{mu0},
    \eqn{\mu_1}{mu1}, \eqn{\sigma^2_0}{sigma^2_0}, and
@@ -129,9 +144,9 @@ MCMChierEI(r0, r1, c0, c1, burnin=1000, mcmc=50000, thin=1,
    Center for Statistics and the Social Sciences Working Paper
    no. 12. University of Washington. 
 
-   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2003. 
+   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004. 
     \emph{Scythe Statistical 
-   Library 0.4.} \url{http://scythe.wustl.edu}.
+   Library 1.0.} \url{http://scythe.wustl.edu}.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.

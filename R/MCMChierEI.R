@@ -5,11 +5,11 @@
 
 "MCMChierEI" <-
   function(r0, r1, c0, c1, burnin=1000, mcmc=50000, thin=1,
+           verbose=FALSE, tune=2.65316, seed=NA,
            m0=0, M0=10,
            m1=0, M1=10,
-           nu0=1.0, delta0=0.5,
-           nu1=1.0, delta1=0.5,
-           verbose=FALSE, tune=2.65316, seed=0, ...){
+           a0=1.0, b0=0.5,
+           a1=1.0, b1=0.5, ...){
     
     # Error checking
     if (length(r0) != length(r1)){
@@ -47,7 +47,16 @@
       stop("Please check data and try MCMChierEI() again.\n")
     }
 
-    check.parameters(burnin, mcmc, thin, "MCMChierEI", tune)
+    check.mcmc.parameters(burnin, mcmc, thin)
+    tune <- scalar.tune(tune)
+    
+     
+    # seeds
+    seeds <- form.seeds(seed) 
+    lecuyer <- seeds[[1]]
+    seed.array <- seeds[[2]]
+    lecuyer.stream <- seeds[[3]]
+   
     
     if (M0 <= 0 ){
       cat("Parameter M0 <= 0.\n")
@@ -59,23 +68,23 @@
       stop("Please respecify and try MCMChierEI() again.\n")
     }
     
-    if (nu0 <= 0 ){
-      cat("Parameter nu0 <= 0.\n")
+    if (a0 <= 0 ){
+      cat("Parameter a0 <= 0.\n")
       stop("Please respecify and try MCMChierEI() again.\n")
     }
     
-    if (nu1 <= 0 ){
-      cat("Parameter nu1 <= 0.\n")
+    if (a1 <= 0 ){
+      cat("Parameter a1 <= 0.\n")
       stop("Please respecify and try MCMChierEI() again.\n")
     }
     
-    if (delta0 <= 0 ){
-      cat("Parameter delta0 <= 0.\n")
+    if (b0 <= 0 ){
+      cat("Parameter b0 <= 0.\n")
       stop("Please respecify and try MCMChierEI() again.\n")
     }
     
-    if (delta1 <= 0 ){
-      cat("Parameter delta1 <= 0.\n")
+    if (b1 <= 0 ){
+      cat("Parameter b1 <= 0.\n")
       stop("Please respecify and try MCMChierEI() again.\n")
     }
    
@@ -100,13 +109,15 @@
                    mu0priorvar = as.double(M0),
                    mu1priormean = as.double(m1),
                    mu1priorvar = as.double(M1),
-                   nu0 = as.double(nu0),
-                   delta0 = as.double(delta0),
-                   nu1 = as.double(nu1),
-                   delta1 = as.double(delta1),
+                   a0 = as.double(a0),
+                   b0 = as.double(b0),
+                   a1 = as.double(a1),
+                   b1 = as.double(b1),
                    verbose = as.integer(verbose),
                    tune = as.double(tune),
-                   seed = as.integer(seed),
+                   lecuyer = as.integer(lecuyer),
+                   seedarray = as.integer(seed.array),
+                   lecuyerstream = as.integer(lecuyer.stream),
                    accepts = as.integer(0),
                    PACKAGE="MCMCpack"
                    )
@@ -117,7 +128,7 @@
     sample <- matrix(C.sample$samdata, C.sample$samrow, C.sample$samcol,
                      byrow=TRUE)
     
-    output <- mcmc2(data=sample, start=1, end=mcmc, thin=thin)
+    output <- mcmc(data=sample, start=1, end=mcmc, thin=thin)
     p0names <- paste("p0table", 1:ntables, sep="")
     p1names <- paste("p1table", 1:ntables, sep="")
     varnames(output) <- c(p0names, p1names, "mu0", "mu1", "sigma^2.0",

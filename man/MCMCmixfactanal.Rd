@@ -14,8 +14,8 @@
   
 \usage{
 MCMCmixfactanal(x, factors, lambda.constraints=list(),
-                data=list(), burnin = 1000, mcmc = 10000,
-                thin=5, tune=NA, verbose = FALSE, seed = 0,
+                data=parent.environment(), burnin = 1000, mcmc = 20000,
+                thin=1, tune=NA, verbose = FALSE, seed = NA,
                 lambda.start = NA, psi.start=NA,
                 l0=0, L0=0, a0=0.001, b0=0.001,
                 store.lambda=TRUE, store.scores=FALSE,
@@ -66,9 +66,15 @@ MCMCmixfactanal(x, factors, lambda.constraints=list(),
     the sampler is printed to the screen.  If TRUE, the iteration number and
     the Metropolis-Hastings acceptance rate are printed to the screen.}
   
-  \item{seed}{The seed for the random number generator.  The code uses the
-    Mersenne Twister, which requires an integer as an input.  If nothing
-    is provided, the Scythe default seed is used.}
+    \item{seed}{The seed for the random number generator.  If NA, the Mersenne
+    Twister generator is used with default seed 12345; if an integer is 
+    passed it is used to seed the Mersenne twister.  The user can also
+    pass a list of length two to use the L'Ecuyer random number generator,
+    which is suitable for parallel computation.  The first element of the
+    list is the L'Ecuyer seed, which is a vector of length six or NA (if NA 
+    a default seed of \code{rep(12345,6)} is used).  The second element of 
+    list is a positive substream number. See the MCMCpack 
+    specification for more details.}
   
   \item{lambda.start}{Starting values for the factor loading matrix
     Lambda. If \code{lambda.start} is set to a scalar the starting value for
@@ -205,8 +211,8 @@ MCMCmixfactanal(x, factors, lambda.constraints=list(),
 }
 
 \references{
-  Kevin M. Quinn. N.D. ``Bayesian Factor Analysis for Mixed Ordinal and
-  Continuous Responses". Typescript Harvard University.
+  Kevin M. Quinn. 2004. ``Bayesian Factor Analysis for Mixed Ordinal and
+  Continuous Responses.'' \emph{Political Analysis}. 12: 338-353.
   
   M. K. Cowles. 1996. ``Accelerating Monte Carlo Markov Chain Convergence for
   Cumulative-link Generalized Linear Models." \emph{Statistics and Computing.}
@@ -215,8 +221,8 @@ MCMCmixfactanal(x, factors, lambda.constraints=list(),
   Valen E. Johnson and James H. Albert. 1999. ``Ordinal Data Modeling." 
   Springer: New York.
   
-   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2003.  
-   \emph{Scythe Statistical Library 0.4.} \url{http://scythe.wustl.edu}.
+   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.  
+   \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
@@ -226,6 +232,7 @@ MCMCmixfactanal(x, factors, lambda.constraints=list(),
 
 \examples{
 \dontrun{
+library(MASS)
 data(Cars93)
 attach(Cars93)
 new.cars <- data.frame(Price, MPG.city, MPG.highway,

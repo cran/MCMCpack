@@ -4,22 +4,25 @@
 //
 // KQ 3/2/2002
 // KQ 10/22/2002 [ported to Scythe0.3 and written for an R interface]
-//
+// KQ 7/20/2004 [minor changes regarding output and user interrupts]
+// ADM 7/24/2004 [new Scythe version and seeds]
 
-#include <iostream> 
-#include "Scythe_Matrix.h"
-#include "Scythe_Simulate.h"
-#include "Scythe_Stat.h"
-#include "Scythe_Math.h"
-#include "Scythe_LA.h"
-#include "Scythe_IDE.h"
+#include "matrix.h"
+#include "distributions.h"
+#include "stat.h"
+#include "la.h"
+#include "ide.h"
+#include "smath.h"
+#include "MCMCrng.h"
+#include "MCMCfcds.h"
 
-
+#include <R.h>           // needed to use Rprintf()
+#include <R_ext/Utils.h> // needed to allow user interrupts
 
 extern "C"{
  
   using namespace SCYTHE;
-	using namespace std;
+  using namespace std;
   
   void baselineNA(double* sample, const int* samrow, const int* samcol,
 		  const double* Rr0, const double* Rr1, const double* Rc0,
@@ -27,7 +30,8 @@ extern "C"{
 		  const int* Rmcmc, const int* Rthin, const double* Ralpha0,
 		  const double* Rbeta0, const double* Ralpha1, 
 		  const double* Rbeta1, const int* Rverbose, 
-		  const double* Rtune, const int* Rseed, int* accepts){
+		  const double* Rtune, const int *lecuyer, const int *seedarray,
+        const int *lecuyerstream, int* accepts){
 
 
     // load data
@@ -40,13 +44,11 @@ extern "C"{
     //   c0  | c1  | N
 
    
-    // initialize seed (mersenne twister / use default seed unless specified)
-    if(Rseed[0]==0) set_mersenne_seed(5489UL);
-    else set_mersenne_seed(Rseed[0]);
-
+     // initialize rng stream
+     rng *stream = MCMCpack_get_rng(*lecuyer, seedarray, *lecuyerstream);
     
-    int ntables = *Rntables;
-    int verbose = *Rverbose;
+    const int ntables = *Rntables;
+    const int verbose = *Rverbose;
 
     Matrix<double> r0(ntables, 1, Rr0);
     Matrix<double> r1(ntables, 1, Rr1);
@@ -122,8 +124,8 @@ extern "C"{
 	// sample (p0,p1)|r0,r1,c0,c1
       
 	// sample candidate values of p0 and p1
-	double u = runif()*(p0max[i]-p0min[i]) + p0min[i]; 
-	double length = rnorm(0.0, orthoSD[i]);
+	double u = stream->runif()*(p0max[i]-p0min[i]) + p0min[i]; 
+	double length = stream->rnorm(0.0, orthoSD[i]);
 	double s = sgn(length);
 	length = fabs(length);
 	double run = s * ::sqrt(4.0 * ::pow(length, 2) * 
@@ -163,7 +165,7 @@ extern "C"{
 	double alpha = ::exp(logpost_can - logpost_cur + logjumpdens_cur[i] - 
 			     logjumpdens_can);
 	
-	if (runif() < alpha){
+	if (stream->runif() < alpha){
 	  p0[i] = p0_can;
 	  p1[i] = p1_can;
 	  logjumpdens_cur[i] = logjumpdens_can;
@@ -182,15 +184,18 @@ extern "C"{
 
       // print output to screen
       if (verbose==1 && (iter%25000)==0){
-	cout << "MCMCbaselineEI iteration = " << iter <<  endl;
-	cout << " Metropolis-Hastings acceptance rate = " << 
-	  static_cast<double>(accepts[0]) / static_cast<double>(iter) / 
-	  static_cast<double>(ntables) << endl << endl;
+	Rprintf("\nMCMCbaselineEI iteration %i of %i \n", (iter+1), 
+		tot_iter);
+	Rprintf("Metropolis acceptance rate = %3.5f\n", 
+		static_cast<double>(accepts[0]) / static_cast<double>(iter) / 
+		static_cast<double>(ntables));
       }
-    
+
+      // allow user interrupts
+      void R_CheckUserInterrupt(void);    
     }
 
-
+     delete stream; // clean up random number stream
 
     // return sample
     Matrix<double> zeros(mcmc/thin, ntables);

@@ -13,12 +13,11 @@
   
 \usage{
 MCMCordfactanal(x, factors, lambda.constraints=list(),
-                data=list(), burnin = 1000, mcmc = 10000,
-                thin=5, tune=NA, verbose = FALSE, seed = 0,
+                data=parent.environment(), burnin = 1000, mcmc = 20000,
+                thin=1, tune=NA, verbose = FALSE, seed = NA,
                 lambda.start = NA, l0=0, L0=0,
                 store.lambda=TRUE, store.scores=FALSE,
-                drop.constantvars=TRUE,
-                drop.constantcases=FALSE, ... )
+                drop.constantvars=TRUE, ... )
  }
 
 \arguments{
@@ -60,9 +59,15 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
     the sampler is printed to the screen.  If TRUE, the iteration number and
     the Metropolis-Hastings acceptance rate are printed to the screen.}
   
-  \item{seed}{The seed for the random number generator.  The code uses the
-    Mersenne Twister, which requires an integer as an input.  If nothing
-    is provided, the Scythe default seed is used.}
+    \item{seed}{The seed for the random number generator.  If NA, the Mersenne
+    Twister generator is used with default seed 12345; if an integer is 
+    passed it is used to seed the Mersenne twister.  The user can also
+    pass a list of length two to use the L'Ecuyer random number generator,
+    which is suitable for parallel computation.  The first element of the
+    list is the L'Ecuyer seed, which is a vector of length six or NA (if NA 
+    a default seed of \code{rep(12345,6)} is used).  The second element of 
+    list is a positive substream number. See the MCMCpack 
+    specification for more details.}
   
   \item{lambda.start}{Starting values for the factor loading matrix
     Lambda. If \code{lambda.start} is set to a scalar the starting value for
@@ -99,11 +104,6 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
         manifest variables that have no variation should be deleted
 	before fitting the model. Default = TRUE.}
 
-  \item{drop.constantcases}{A switch that determines whether or not
-        observations that have no variation should be deleted
-	before fitting the model. Only useful when manifest variables
-	are all dichotomous. Default = FALSE.}
-  
   \item{...}{further arguments to be passed}       
 }
 
@@ -188,8 +188,8 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
   Valen E. Johnson and James H. Albert. 1999. ``Ordinal Data Modeling." 
   Springer: New York.
   
-   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2003.  
-   \emph{Scythe Statistical Library 0.4.} \url{http://scythe.wustl.edu}.
+   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.  
+   \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
@@ -214,7 +214,7 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
                         lambda.constraints=list(Drawing=list(2,"+")),
                         burnin=5000, mcmc=500000, thin=200, verbose=TRUE,
                         L0=0.5, store.lambda=TRUE,
-                        store.scores=TRUE, tune=.6)
+                        store.scores=TRUE, tune=1.2)
    plot(posterior)
    summary(posterior)
    }

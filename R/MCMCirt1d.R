@@ -1,213 +1,171 @@
-# sample from the posterior distribution of a one-dimensional item
-# response theory model in R using linked C++ code in Scythe.
-#
-# ADM and KQ 1/23/2003
+## sample from the posterior distribution of a one-dimensional item
+## response theory model in R using linked C++ code in Scythe.
+##
+## ADM and KQ 1/23/2003
+## updated extensively ADM & KQ 7/28/2004
  
 "MCMCirt1d" <-
-  function(datamatrix, theta.fixed = 1, burnin = 500, mcmc = 1000,
-           thin=5, verbose = FALSE, seed = 0, theta.start = NA, 
-           alpha.start = NA, beta.start = NA, t0 = 0, T0 = 1,
-           b0.alpha = 0, b0.beta = 0, B0.alpha = 1, B0.beta = 1,
-           B0.corr = 0, store.item = FALSE, ... ) {
-
-    set.seed(83829)
+  function(datamatrix, theta.constraints=list(), burnin = 1000,
+           mcmc = 20000, thin=1, verbose = FALSE, seed = NA,
+           theta.start = NA, alpha.start = NA, beta.start = NA, t0 = 0,
+           T0 = 1, ab0=0, AB0=.25, store.item = FALSE, ... ) {
     
-    # burnin / mcmc / thin error checking
-    check.parameters(burnin, mcmc, thin, "MCMCirt1d")
+    ## checks
+    check.offset(list(...))
+    check.mcmc.parameters(burnin, mcmc, thin)
 
-    # check vote matrix and convert to work with C++ code 
+    ## check vote matrix and convert to work with C++ code 
     datamatrix <- as.matrix(datamatrix)   
-    K <- nrow(datamatrix)   # cases
-    J <- ncol(datamatrix)   # justices
+    K <- ncol(datamatrix)   # cases, bills, items, etc
+    J <- nrow(datamatrix)   # justices, legislators, subjects, etc
     if(sum(datamatrix==1 | datamatrix==0 | is.na(datamatrix)) != (J*K)) {
-      cat("Data matrix contains elements other than 0, 1 or NA.\n")
-      stop("Please check data and try MCMCirt1d() again.\n")
+      cat("Error: Data matrix contains elements other than 0, 1 or NA.\n")
+      stop("Please check data and try MCMCirt1d() again.\n",
+              call.=FALSE)
     }
     datamatrix[is.na(datamatrix)] <- 9   
+    item.names <- colnames(datamatrix)
+    subject.names <- rownames(datamatrix)
+    
+    ## setup constraints on theta
+    for (i in 1:length(theta.constraints)){
+      theta.constraints[[i]] <- list(as.integer(1), theta.constraints[[i]][1])
+    }
+    holder <- build.factor.constraints(theta.constraints, t(datamatrix), J, 1)
+    theta.eq.constraints <- holder[[1]]
+    theta.ineq.constraints <- holder[[2]]
+    subject.names <- holder[[3]]
+    ## names
+    item.names <- colnames(datamatrix)
+    if (is.null(item.names)){
+      item.names <- paste("item", 1:K, sep="")
+    }
 
-    # starting values for theta error checking
-    if (is.na(theta.start)) {
-      theta.start <- as.matrix(rnorm(J,1))
-    }
-    else if(is.null(dim(theta.start))) {
-      theta.start <- theta.start * matrix(1,J,1)  
-    }
-    else if((dim(theta.start)[1] != J) || (dim(theta.start)[2] != 1)) {
-      cat("Starting value for theta not conformable.\n")
-      stop("Please respecify and call MCMCirt1d() again.\n")
-    }
+    ## prior for theta 
+    holder <- form.mvn.prior(t0, T0, 1)
+    t0 <- holder[[1]]
+    T0 <- holder[[2]]
 
-    # starting values for alpha and beta error checking
+    ## prior for (alpha, beta)
+    holder <- form.mvn.prior(ab0, AB0, 2)
+    ab0 <- holder[[1]]
+    AB0 <- holder[[2]]
+    
+    ## starting values for theta error checking
+    theta.start <- factor.score.start.check(theta.start, datamatrix,
+                                            t0, T0,
+                                            theta.eq.constraints,
+                                            theta.ineq.constraints, 1)
+    
+    ## starting values for (alpha, beta)
+    ab.starts <- matrix(NA, K, 2)
+    for (i in 1:K){
+      local.y <-  datamatrix[,i]
+      local.y[local.y==9] <- NA
+      if (var(na.omit(local.y))==0){
+        ab.starts[i,] <- c(0,10)
+      }
+      else {
+        ab.starts[i,] <- coef(suppressWarnings(glm(local.y~theta.start,
+                                                   family=binomial(probit),
+                                                   control=glm.control(
+                                                     maxit=8, epsilon=1e-3)
+                                                   )))
+      }
+    }
+    ab.starts[,1] <- -1 * ab.starts[,1] # make this into a difficulty param
+ 
+    ## starting values for alpha and beta error checking
     if (is.na(alpha.start)) {
-      alpha.start <- as.matrix(rnorm(K,1))
+      alpha.start <- ab.starts[,1]
     }
     else if(is.null(dim(alpha.start))) {
       alpha.start <- alpha.start * matrix(1,K,1)  
     }
     else if((dim(alpha.start)[1] != K) || (dim(alpha.start)[2] != 1)) {
-      cat("Starting value for alpha not conformable.\n")
-      stop("Please respecify and call MCMCirt1d() again.\n")
+      cat("Error: Starting value for alpha not conformable.\n")
+      stop("Please respecify and call MCMCirt1d() again.\n",
+           call.=FALSE)
     }      
     if (is.na(beta.start)) {
-      beta.start <- as.matrix(rnorm(K,1))
+      beta.start <- ab.starts[,2]
     }
     else if(is.null(dim(beta.start))) {
       beta.start <- beta.start * matrix(1,K,1)  
     }
     else if((dim(beta.start)[1] != K) || (dim(beta.start)[2] != 1)) {
-      cat("Starting value for beta not conformable.\n")
-      stop("Please respecify and call MCMCirt1d() again.\n")
+      cat("Error: Starting value for beta not conformable.\n")
+      stop("Please respecify and call MCMCirt1d() again.\n",
+              call.=FALSE)
     }    
 
-    # theta fixed error checking / this is the index of the person
-    # to constrain to be negative, which identifies the model
-    theta.fixed <- as.integer(theta.fixed)
-    if(theta.fixed < 1 || theta.fixed > J) {
-      cat("Index of actor to fix is outside range.\n")
-      stop("Please respecify and call MCMCirt1d() again.\n")      
-    }
-
-    # prior for theta error checking (mean)
-    if(is.null(dim(t0))) {
-      t0 <- t0 * matrix(1,J,1)  
-    }
-    if((dim(t0)[1] != J) || (dim(t0)[2] != 1)) {
-      cat("Vector of prior means t0 not conformable.\n")
-      stop("Please respecify and call MCMCirt1d() again.\n")
-    }
-   
-    # prior for theta error checking (variance)
-    if(is.null(dim(T0))) {
-      T0 <- T0 * matrix(1,J,1)  
-    }
-    if((dim(T0)[1] != J) || (dim(T0)[2] != 1)) {
-      cat("Vector of prior variances T0 not conformable.\n")
-      stop("Please respecify and call MCMCirt1d() again.\n")
-    }
-    if(sum(T0 > 0) != J) {
-      cat("Some Elements of Vector of prior variances T0 not conformable.\n")
-      stop("Please respecify and call MCMCirt1d() again.\n")         
-    }
-
-    # prior for alpha and beta error checking (mean)
-    if(is.null(dim(b0.alpha))) {
-      b0.alpha <- b0.alpha * matrix(1,K,1)  
-    }
-    if((dim(b0.alpha)[1] != K) || (dim(b0.alpha)[2] != 1)) {
-      cat("Vector of prior means b0.alpha not conformable.\n")
-      stop("Please respecify and call MCMCirt1d() again.\n")
-    }
-    if(is.null(dim(b0.beta))) {
-      b0.beta <- b0.beta * matrix(1,K,1)  
-    }
-    if((dim(b0.beta)[1] != K) || (dim(b0.beta)[2] != 1)) {
-      cat("Vector of prior means b0.beta not conformable.\n")
-      stop("Please respecify and call MCMCirt1d() again.\n")
-    }
-         
-    # prior for alpha and beta error checking (variance)
-    if(is.null(dim(B0.alpha))) {
-      B0.alpha <- B0.alpha * matrix(1,K,1)  
-    }
-    if((dim(B0.alpha)[1] != K) || (dim(B0.alpha)[2] != 1)) {
-      cat("Vector of prior variances B0.alpha not conformable.\n")
-      stop("Please respecify and call MCMCirt1d() again.\n")
-    }
-    if(sum(B0.alpha > 0) != K) {
-      cat("Elements of prior variances B0.alpha not conformable.\n")
-      stop("Please respecify and call MCMCirt1d() again.\n")         
-    }
-    if(is.null(dim(B0.beta))) {
-      B0.beta <- B0.beta * matrix(1,K,1)  
-    }
-    if((dim(B0.beta)[1] != K) || (dim(B0.beta)[2] != 1)) {
-      cat("Elements of prior variances B0.beta not conformable.\n")
-      stop("Please respecify and call MCMCirt1d() again.\n")
-    }
-    if(sum(B0.beta > 0) != K) {
-      cat("Elements of prior variances B0.beta negative.\n")
-      stop("Please respecify and call MCMCirt1d() again.\n")         
-    }
-   
-    # prior for alpha and beta error checking (correlation)
-    if(is.null(dim(B0.corr))) {
-      B0.corr <- B0.corr * matrix(1,K,1)  
-    }
-    if((dim(B0.corr)[1] != K) || (dim(B0.corr)[2] != 1)) {
-      cat("Vector of covariances alpha.b0.beta not conformable.\n")
-      stop("Please respecify and call MCMCirt1d() again.\n")
-    }
-    if(sum(B0.corr >= -1.0 & B0.corr<=1.0) != K) {
-      cat("Elements of prior correlations B0.corr not defined.\n")
-      stop("Please respecify and call MCMCirt1d() again.\n")       
-    }
-    alpha.beta.cov <- B0.corr / (sqrt(B0.alpha) * sqrt(B0.beta))   
-         
-    # define holder for posterior density sample
+    ## define holder for posterior density sample
     if(store.item == FALSE) {
       sample <- matrix(data=0, mcmc/thin, J)
     }
     else {
       sample <- matrix(data=0, mcmc/thin, J + 2 * K)
     }
-   
+
+    ## seeds
+    seeds <- form.seeds(seed) 
+    lecuyer <- seeds[[1]]
+    seed.array <- seeds[[2]]
+    lecuyer.stream <- seeds[[3]]
+    
     # call C++ code to draw sample
-    inv.obj <- .C("irt1dpost",
-                  samdata = as.double(sample),
-                  samrow = as.integer(nrow(sample)),
-                  samcol = as.integer(ncol(sample)),
-                  votedata = as.double(datamatrix),
-                  voterow = as.integer(nrow(datamatrix)),
-                  votecol = as.integer(ncol(datamatrix)),    
-                  burnin = as.integer(burnin),
-                  gibbs = as.integer(mcmc),
-                  thin = as.integer(thin),
-                  seed = as.integer(seed),
-                  verbose = as.integer(verbose),
-                  tstartdata = as.double(theta.start),
-                  tstartrow = as.integer(nrow(theta.start)),
-                  tstartcol = as.integer(ncol(theta.start)),
-                  thetafixed = as.integer(theta.fixed),
-                  astartdata = as.double(alpha.start),
-                  astartrow = as.integer(nrow(alpha.start)),
-                  astartcol = as.integer(ncol(alpha.start)),
-                  bstartdata = as.double(beta.start),
-                  bstartrow = as.integer(nrow(beta.start)),
-                  bstartcol = as.integer(ncol(beta.start)),
-                  t0data = as.double(t0),
-                  t0row = as.integer(nrow(t0)),
-                  t0col = as.integer(ncol(t0)),   
-                  T0data = as.double(T0),
-                  T0row = as.integer(nrow(T0)),
-                  T0col = as.integer(ncol(T0)),
-                  ameandata = as.double(b0.alpha),
-                  ameanrow = as.integer(nrow(b0.alpha)),
-                  ameancol = as.integer(ncol(b0.alpha)),   
-                  bmeandata = as.double(b0.beta),
-                  bmeanrow = as.integer(nrow(b0.beta)),
-                  bmeancol = as.integer(ncol(b0.beta)), 
-                  avardata = as.double(B0.alpha),
-                  avarrow = as.integer(nrow(B0.alpha)),
-                  avarcol = as.integer(ncol(B0.alpha)), 
-                  bvardata = as.double(B0.beta),
-                  bvarrow = as.integer(nrow(B0.beta)),
-                  bvarcol = as.integer(ncol(B0.beta)), 
-                  abcovdata = as.double(alpha.beta.cov),
-                  abcovrow = as.integer(nrow(alpha.beta.cov)),
-                  abcovcol = as.integer(ncol(alpha.beta.cov)),
-                  store = as.integer(store.item),
-                  PACKAGE="MCMCpack"
+    posterior <- .C("MCMCirt1d",
+                    sampledata = as.double(sample),
+                    samplerow = as.integer(nrow(sample)),
+                    samplecol = as.integer(ncol(sample)),
+                    Xdata = as.integer(datamatrix),
+                    Xrow = as.integer(nrow(datamatrix)),
+                    Xcol = as.integer(ncol(datamatrix)),    
+                    burnin = as.integer(burnin),
+                    mcmc = as.integer(mcmc),
+                    thin = as.integer(thin),
+                    lecuyer = as.integer(lecuyer),
+                    seedarray = as.integer(seed.array),
+                    lecuyerstream = as.integer(lecuyer.stream),
+                    verbose = as.integer(verbose),
+                    thetastartdata = as.double(theta.start),
+                    thetastartrow = as.integer(nrow(theta.start)),
+                    thetastartcol = as.integer(ncol(theta.start)),
+                    astartdata = as.double(alpha.start),
+                    astartrow = as.integer(length(alpha.start)),
+                    astartcol = as.integer(1),
+                    bstartdata = as.double(beta.start),
+                    bstartrow = as.integer(length(beta.start)),
+                    bstartcol = as.integer(1),
+                    t0 = as.double(t0),
+                    T0 = as.double(T0),
+                    ab0data = as.double(ab0),
+                    ab0row = as.integer(nrow(ab0)),
+                    ab0col = as.integer(ncol(ab0)),
+                    AB0data = as.double(AB0),
+                    AB0row = as.integer(nrow(AB0)),
+                    AB0col = as.integer(ncol(AB0)),
+                    thetaeqdata = as.double(theta.eq.constraints),
+                    thetaeqrow = as.integer(nrow(theta.eq.constraints)),
+                    thetaeqcol = as.integer(ncol(theta.eq.constraints)),
+                    thetaineqdata = as.double(theta.ineq.constraints),
+                    thetaineqrow = as.integer(nrow(theta.ineq.constraints)),
+                    thetaineqcol = as.integer(ncol(theta.ineq.constraints)),
+                    store = as.integer(store.item),
+                    PACKAGE="MCMCpack"
                   )
     
-    theta.names <- paste("theta", 1:J, sep = "")
-    alpha.beta.names <- paste(rep(c("alpha","beta"), K), rep(1:K, each = 2),
+    theta.names <- paste("theta.", subject.names, sep = "")
+    alpha.beta.names <- paste(rep(c("alpha.","beta."), K),
+                              rep(item.names, each = 2),
                               sep = "")
    
     # put together matrix and build MCMC object to return
-    sample <- matrix(inv.obj$samdata, inv.obj$samrow, inv.obj$samcol,
+    sample <- matrix(posterior$sampledata, posterior$samplerow,
+                     posterior$samplecol,
                      byrow=TRUE)
-    output <- mcmc2(data=sample,start=1, end=mcmc, thin=thin)
-   
+    output <- mcmc(data=sample, start=1, end=mcmc, thin=thin)
+    
     if(store.item == FALSE) {
       names <- theta.names
     }
@@ -216,7 +174,7 @@
     }
     varnames(output) <- names
     attr(output,"title") <-
-      "MCMCpack One Dimensional IRT Model Posterior Density Sample"
+      "MCMCirt1d Posterior Density Sample"
     return(output)
     
   }

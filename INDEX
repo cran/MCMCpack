@@ -1,3 +1,6 @@
+Dirichlet               The Dirichlet Distribution
+InvGamma                The Inverse Gamma Distribution
+InvWishart              The Inverse Wishart Distribution
 MCMCbaselineEI          Markov chain Monte Carlo for Wakefield's
                         Baseline Ecological Inference Model
 MCMCdynamicEI           Markov chain Monte Carlo for Quinn's Dynamic
@@ -12,6 +15,8 @@ MCMCirtKd               Markov chain Monte Carlo for K-Dimensional
                         Item Response Theory Model
 MCMClogit               Markov chain Monte Carlo for Logistic
                         Regression
+MCMCmetrop1R            Metropolis Sampling from User-Written R
+                        function
 MCMCmixfactanal         Markov chain Monte Carlo for Mixed Data Factor
                         Analysis Model
 MCMCoprobit             Markov chain Monte Carlo for Ordered Probit
@@ -23,35 +28,16 @@ MCMCpanel               Markov chain Monte Carlo for the General
 MCMCpoisson             Markov chain Monte Carlo for Poisson
                         Regression
 MCMCprobit              Markov chain Monte Carlo for Probit Regression
-MCMCregress             Markov chain Monte Carlo for Gaussian Linear
+MCMCregress             Markov Chain Monte Carlo for Gaussian Linear
                         Regression
+NoncenHypergeom         The Noncentral Hypergeometric Distribution
+PErisk                  Political Economic Risk Data from 62 Countries
+                        in 1987
 Senate                  106th U.S. Senate Roll Call Vote Matrix
 SupremeCourt            U.S. Supreme Court Vote Matrix
-check.parameters        MCMCpack Helper Function: Check Simulation
-                        Parameters
-ddirichlet              Evaluate Density of Dirichlet Distribution
-dinvgamma               Evaluate the Density of the Inverse Gamma
-                        Distribution
-diwish                  Evaluate the Density of the Inverse Wishart
-                        Distribution
-dnoncenhypergeom        Evaluate Density of Noncentral Hypergeometric
-                        Distribution
+Wishart                 The Wishart Distribution
 dtomogplot              Dynamic Tomography Plot
-dwish                   Evaluate the Density of the Wishart
-                        Distribution
-mcmc2                   Create Markov Chain Monte Carlo Objects
-mcmc2dataframe          Convert Markov Chain Monte Carlo Objects to
-                        Dataframes
-rdirichlet              Generate Random Draws from the Dirichlet
-                        Distribution
 read.Scythe             Read a Matrix from a File written by Scythe
-rinvgamma               Generate Random Draw from Inverse Gamma
-                        Distribution
-riwish                  Generate Random Draw from Inverse Wishart
-                        Distribution
-rnoncenhypergeom        Generate Random Draw from Noncentral
-                        Hypergeometric Distribution
-rwish                   Generate Random Draw from Wishart Distribution
 tomogplot               Tomography Plot
 vech                    Extract Lower Triangular Elements from a
                         Symmetric Matrix

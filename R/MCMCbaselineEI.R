@@ -5,8 +5,8 @@
 
 "MCMCbaselineEI" <-
   function(r0, r1, c0, c1, burnin=1000, mcmc=50000, thin=10,
-           tune=2.65316, verbose=FALSE, seed=0,
-           alpha0=1, beta0=1, alpha1=1, beta1=1, method="NA",
+           tune=2.65316, verbose=FALSE, seed=NA,
+           a0=1, b0=1, a1=1, b1=1, method="NA",
            ...){
 
 
@@ -45,25 +45,32 @@
       stop("Please check data and try MCMCbaselineEI() again.\n")
     }
 
-    check.parameters(burnin, mcmc, thin, "MCMCbaselineEI()", tune)
- 
-    if (alpha0 <= 0 ){
-      cat("Parameter alpha0 <= 0.\n")
+    check.mcmc.parameters(burnin, mcmc, thin)
+    tune <- scalar.tune(tune)
+    
+    # seeds
+    seeds <- form.seeds(seed) 
+    lecuyer <- seeds[[1]]
+    seed.array <- seeds[[2]]
+    lecuyer.stream <- seeds[[3]]
+    
+    if (a0 <= 0 ){
+      cat("Parameter a0 <= 0.\n")
       stop("Please respecify and try MCMCbaselineEI() again.\n")
     }
 
-    if (beta0 <= 0 ){
-      cat("Parameter beta0 <= 0.\n")
+    if (b0 <= 0 ){
+      cat("Parameter b0 <= 0.\n")
       stop("Please respecify and try MCMCbaselineEI() again.\n")
     }
 
-    if (alpha1 <= 0 ){
-      cat("Parameter alpha1 <= 0.\n")
+    if (a1 <= 0 ){
+      cat("Parameter a1 <= 0.\n")
       stop("Please respecify and try MCMCbaselineEI() again.\n")
     }
 
-    if (beta1 <= 0 ){
-      cat("Parameter beta1 <= 0.\n")
+    if (b1 <= 0 ){
+      cat("Parameter b1 <= 0.\n")
       stop("Please respecify and try  MCMCbaselineEI() again.\n")
     }
 
@@ -90,13 +97,15 @@
                      burnin = as.integer(burnin),
                      mcmc = as.integer(mcmc),
                      thin = as.integer(thin),
-                     alpha0 = as.double(alpha0),
-                     beta0 = as.double(beta0),
-                     alpha1 = as.double(alpha1),
-                     beta1 = as.double(beta1),
+                     a0 = as.double(a0),
+                     b0 = as.double(b0),
+                     a1 = as.double(a1),
+                     b1 = as.double(b1),
                      verbose = as.integer(verbose),
                      tune = as.double(tune),
-                     seed = as.integer(seed),
+                     lecuyer = as.integer(lecuyer),
+                     seedarray = as.integer(seed.array),
+                     lecuyerstream = as.integer(lecuyer.stream),
                      accepts = as.integer(0),
                      PACKAGE="MCMCpack"
                      )
@@ -114,12 +123,14 @@
                      burnin = as.integer(burnin),
                      mcmc = as.integer(mcmc),
                      thin = as.integer(thin),
-                     alpha0 = as.double(alpha0),
-                     beta0 = as.double(beta0),
-                     alpha1 = as.double(alpha1),
-                     beta1 = as.double(beta1),
+                     a0 = as.double(a0),
+                     b0 = as.double(b0),
+                     a1 = as.double(a1),
+                     b1 = as.double(b1),
                      verbose = as.integer(verbose),
-                     seed = as.integer(seed),
+                     lecuyer = as.integer(lecuyer),
+                     seedarray = as.integer(seed.arry),
+                     lecuyerstream = as.integer(lecuyer.stream),
                      PACKAGE="MCMCpack"
                      )
     }
@@ -128,7 +139,7 @@
                      byrow=TRUE)
     if (method=="NA"){
       sample <- sample[,1:(ntables*2)]
-      output <- mcmc2(data=sample, start=1, end=mcmc, thin=thin)
+      output <- mcmc(data=sample, start=1, end=mcmc, thin=thin)
       p0names <- paste("p0table", 1:ntables, sep="")
       p1names <- paste("p1table", 1:ntables, sep="")
       varnames(output) <- c(p0names, p1names)
@@ -136,7 +147,7 @@
           C.sample$accepts / (C.sample$burnin+C.sample$mcmc) / ntables, "\n")
     }
     else{
-      output <- mcmc2(data=sample, start=1, end=mcmc, thin=thin)
+      output <- mcmc(data=sample, start=1, end=mcmc, thin=thin)
       p0names <- paste("p0table", 1:ntables, sep="")
       p1names <- paste("p1table", 1:ntables, sep="")
       y0names <- paste("y0table", 1:ntables, sep="")
@@ -149,3 +160,4 @@
     return(output)
     
   }
+  

@@ -3,30 +3,33 @@
 //
 // KQ 2/24/2002
 // KQ 10/23/2002 [ported to Scythe0.3 and written for an R interface]
-//
+// KQ 7/20/2004 [minor changes regarding output and user interrupts]
+// ADM 7/24/2004 [new Scythe version and seeds]
 
-#include <iostream> 
-#include "Scythe_Matrix.h"
-#include "Scythe_Simulate.h"
-#include "Scythe_Stat.h"
-#include "Scythe_Math.h"
-#include "Scythe_LA.h"
-#include "Scythe_IDE.h"
+#include "matrix.h"
+#include "distributions.h"
+#include "stat.h"
+#include "la.h"
+#include "ide.h"
+#include "MCMCrng.h"
+#include "MCMCfcds.h"
+
+#include <R.h>           // needed to use Rprintf()
+#include <R_ext/Utils.h> // needed to allow user interrupts
 
 extern "C"{
  
-using namespace SCYTHE;
-using namespace std;
-
+  using namespace SCYTHE;
+  using namespace std;
+  
   void baselineDA(double* sample, const int* samrow, const int* samcol,
 		  const double* Rr0, const double* Rr1, const double* Rc0,
 		  const double* Rc1, const int* Rntables, const int* Rburnin,
 		  const int* Rmcmc, const int* Rthin, const double* Ralpha0,
 		  const double* Rbeta0, const double* Ralpha1, 
 		  const double* Rbeta1, const int* Rverbose, 
-		  const int* Rseed){
-
-
+		  const int *lecuyer, const int *seedarray,
+        const int *lecuyerstream){
 
     // load data
     // table notation is:
@@ -38,15 +41,12 @@ using namespace std;
     //   c0  | c1  | N
 
   
-    // initialize seed (mersenne twister / use default seed unless specified)
-    if(Rseed[0]==0) 
-      set_mersenne_seed(5489UL);
-    else 
-      set_mersenne_seed(Rseed[0]);
+     // initialize rng stream
+     rng *stream = MCMCpack_get_rng(*lecuyer, seedarray, *lecuyerstream);
     
     
-    int ntables = *Rntables;
-    int verbose = *Rverbose;
+    const int ntables = *Rntables;
+    const int verbose = *Rverbose;
 
     Matrix<double> r0(ntables, 1, Rr0);
     Matrix<double> r1(ntables, 1, Rr1);
@@ -89,12 +89,12 @@ using namespace std;
       for (int j=0; j<ntables; ++j){
 	// sample y0|c1,r0,r1,p0,p1
 	double psi = ( p0[j]*(1.0-p1[j]) ) / ( p1[j]*(1.0-p0[j]));
-	y0[j] = rnchypgeom(c0[j], r0[j], r1[j], psi);
+	y0[j] = stream->rnchypgeom(c0[j], r0[j], r1[j], psi);
 	y1[j] = c0[j] - y0[j];
       
 	// sample (p0,p1)|y0,y1,r0,r1,c0,c1
-	p0[j] = rbeta(alpha0+y0[j], beta0+(r0[j]-y0[j]));
-	p1[j] = rbeta(alpha1+y1[j], beta1+(r1[j]-y1[j]));
+	p0[j] = stream->rbeta(alpha0+y0[j], beta0+(r0[j]-y0[j]));
+	p1[j] = stream->rbeta(alpha1+y1[j], beta1+(r1[j]-y1[j]));
       
 	// if after burnin store samples
 	if ((iter >= burnin) && ((iter%thin)==0)){
@@ -107,10 +107,15 @@ using namespace std;
       if ((iter>=burnin) && ((iter%thin)==0)) ++count;
       // print output to screen
       if (verbose==1 && (iter%10000)==0){
-	  cout << "MCMCbaselineEI iteration = " << iter << endl;
+	Rprintf("\n\nMCMCbaselineEI iteration %i of %i \n", (iter+1), 
+		tot_iter);
       }
-    
+
+      // allow user interrupts
+      void R_CheckUserInterrupt(void);
     }
+
+     delete stream; // clean up random number stream
 
     // return sample
     Matrix<double> storeagem = cbind(p0mat, p1mat);
@@ -119,7 +124,6 @@ using namespace std;
     int mat_size = samrow[0] * samcol[0];
     for (int i=0; i<mat_size; ++i)
       sample[i] = storeagem[i];
-
 
   }
 

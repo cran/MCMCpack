@@ -1,0 +1,117 @@
+/* 
+ * Scythe Statistical Library
+ * Copyright (C) 2000-2002 Andrew D. Martin and Kevin M. Quinn;
+ * 2002-2004 Andrew D. Martin, Kevin M. Quinn, and Daniel
+ * Pemstein.  All Rights Reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * under the terms of the GNU General Public License as published by
+ * Free Software Foundation; either version 2 of the License, or (at
+ * your option) any later version.  See the text files COPYING
+ * and LICENSE, distributed with this source code, for further
+ * information.
+ * --------------------------------------------------------------------
+ * scythestat/rng/mersenne.h
+ *
+ * Provides the class definition for the mersenne random number
+ * generator.  This class extends the base rng class by providing an
+ * implementation of runif() based on an implementation of the
+ * mersenne twister, released under the following license:
+ *
+ * A C-program for MT19937, with initialization improved 2002/1/26.
+ * Coded by Takuji Nishimura and Makoto Matsumoto.
+ * 
+ * Copyright (C) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura,
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright
+ *    notice, this list of conditions and the following disclaimer
+ *    in the documentation and/or other materials provided with the
+ *    distribution.
+ *
+ * 3. The names of its contributors may not be used to endorse or
+ *    promote products derived from this software without specific
+ *    prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+ * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * For more information see:
+ * http://www.math.keio.ac.jp/matumoto/emt.html
+ *
+ */
+
+#ifndef SCYTHE_MERSENNE_H
+#define SCYTHE_MERSENNE_H
+
+#ifdef SCYTHE_COMPILE_DIRECT
+#include "rng.h"
+#else
+#include "scythestat/rng.h"
+#endif
+
+namespace SCYTHE {
+
+	class mersenne: public rng
+	{
+		public:
+
+			mersenne ();
+
+			mersenne (const mersenne &);
+
+			~mersenne ();
+			
+			void initialize (const unsigned long &);
+			
+			inline double runif()
+			{
+				return (((double) genrand_int32()) + 0.5) * 
+					(1.0 / 4294967296.0);
+			}
+
+			/* We have to override the overloaded form of runif because
+			 * overloading the no-arg runif() hides the base class
+			 * definition; C++ stops looking once it finds the above.
+			 */
+			inline Matrix<double> runif(const int &rows, const int &cols)
+			{
+				return rng::runif(rows, cols);
+			}
+
+			unsigned long genrand_int32();
+		
+		protected:
+			/* Period parameters */
+			static const int N = 624;
+			static const int M = 398;
+		
+			/* the array for the state vector  */
+			unsigned long mt[N];
+
+			/* mti==N+1 means mt[N] is not initialized */
+			int mti;
+	};
+
+}
+
+#endif /* SCYTHE_MERSENNE_H */

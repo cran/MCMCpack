@@ -8,30 +8,36 @@
 //
 // KQ 3/9/2002
 // KQ 10/25/2002 [ported to Scythe0.3 and written for an R interface]
-//
+// KQ 7/20/2004 [minor changes regarding output and user interrupts]
+// ADM 7/24/2004 [updated to new Scythe version]
 
-#include <iostream> 
-#include "Scythe_Matrix.h"
-#include "Scythe_Simulate.h"
-#include "Scythe_Stat.h"
-#include "Scythe_Math.h"
-#include "Scythe_LA.h"
-#include "Scythe_IDE.h"
+#include "matrix.h"
+#include "distributions.h"
+#include "stat.h"
+#include "la.h"
+#include "ide.h"
+#include "smath.h"
+#include "MCMCrng.h"
+#include "MCMCfcds.h"
+
+#include <R.h>           // needed to use Rprintf()
+#include <R_ext/Utils.h> // needed to allow user interrupts
 
 extern "C"{
- 
+  
   using namespace SCYTHE;
-	using namespace std;
+  using namespace std;
   
   void dynamicEI(double* sample, const int* samrow, const int* samcol,
-		  const double* Rr0, const double* Rr1, const double* Rc0,
-		  const double* Rc1, const int* Rntables, const int* Rburnin,
-		  const int* Rmcmc, const int* Rthin, 
-		  const double* RW, const double* Rnu0,
-		  const double* Rdelta0, const double* Rnu1, 
-		  const double* Rdelta1, const int* Rverbose, 
-		  const double* Rtune, const int* Rseed, int* accepts){
-
+		 const double* Rr0, const double* Rr1, const double* Rc0,
+		 const double* Rc1, const int* Rntables, const int* Rburnin,
+		 const int* Rmcmc, const int* Rthin, 
+		 const double* RW, const double* Rnu0,
+		 const double* Rdelta0, const double* Rnu1, 
+		 const double* Rdelta1, const int* Rverbose, 
+		 const double* Rtune, const int *lecuyer, const int *seedarray,
+       const int *lecuyerstream, int* accepts){
+    
 
     // load data
     // table notation is:
@@ -43,13 +49,11 @@ extern "C"{
     //   c0  | c1  | N
 
    
-    // initialize seed (mersenne twister / use default seed unless specified)
-    if(Rseed[0]==0) set_mersenne_seed(5489UL);
-    else set_mersenne_seed(Rseed[0]);
+     // initialize rng stream
+     rng *stream = MCMCpack_get_rng(*lecuyer, seedarray, *lecuyerstream);
 
-    
-    int ntables = *Rntables;
-    int verbose = *Rverbose;
+    const int ntables = *Rntables;
+    const int verbose = *Rverbose;
 
     Matrix<double> r0(ntables, 1, Rr0);
     Matrix<double> r1(ntables, 1, Rr1);
@@ -101,12 +105,12 @@ extern "C"{
     for (int j=0; j<ntables; ++j){
       // sample y0|c1,r0,r1,p0,p1
       double psi = ( p0[j]*(1.0-p1[j]) ) / ( p1[j]*(1.0-p0[j]));
-      y0[j] = rnchypgeom(c0[j], r0[j], r1[j], psi);
+      y0[j] = stream->rnchypgeom(c0[j], r0[j], r1[j], psi);
       y1[j] = c0[j] - y0[j];
     
       // sample (p0,p1)|y0,y1,r0,r1,c0,c1
-      p0[j] = rbeta(1+y0[j], 1+(r0[j]-y0[j]));
-      p1[j] = rbeta(1+y1[j], 1+(r1[j]-y1[j]));
+      p0[j] = stream->rbeta(1+y0[j], 1+(r0[j]-y0[j]));
+      p1[j] = stream->rbeta(1+y1[j], 1+(r1[j]-y1[j]));
     }
     Matrix<double> theta0 = log(p0/(1.0 - p0));
     Matrix<double> theta1 = log(p1/(1.0 - p1));
@@ -153,8 +157,8 @@ extern "C"{
 	// sample (p0,p1)|r0,r1,c0,c1
       
 	// sample candidate values of p0 and p1
-	double u = runif()*(p0max[i]-p0min[i]) + p0min[i]; 
-	double length = rnorm(0.0, orthoSD[i]);
+	double u = stream->runif()*(p0max[i]-p0min[i]) + p0min[i]; 
+	double length = stream->rnorm(0.0, orthoSD[i]);
 	double s = sgn(length);
 	length = fabs(length);
 	double run = s * ::sqrt(4.0 * ::pow(length, 2) * 
@@ -208,7 +212,7 @@ extern "C"{
 			     logjumpdens_can);
       
       
-	if (runif() < alpha){
+	if (stream->runif() < alpha){
 	  p0[i] = p0_can;
 	  p1[i] = p1_can;
 	  theta0[i] = theta0_can;
@@ -223,12 +227,12 @@ extern "C"{
 	  (theta0 - meanc(theta0));
 	double nu2 = (nu0 + ntables)*0.5;
 	double delta2 = (delta0 + SSE[0])*0.5;
-	sigma_theta0 = rigamma(nu2, delta2);
+	sigma_theta0 = stream->rigamma(nu2, delta2);
       
 	SSE = t(theta1-meanc(theta1)) * P * (theta1 - meanc(theta1));
 	nu2 = (nu1 + ntables)*0.5;
 	delta2 = (delta1 + SSE[0])*0.5;
-	sigma_theta1 = rigamma(nu2, delta2);
+	sigma_theta1 = stream->rigamma(nu2, delta2);
       
 
 	// if after burnin store samples
@@ -248,17 +252,20 @@ extern "C"{
     
       // print output to screen
       if (verbose==1 && (iter%10000)==0){
-	cout << "MCMCdynamicEI iteration = " << iter <<  endl;
-	cout << " sigma_theta0 = " << sigma_theta0 << endl;
-	cout << " sigma_theta1 = " << sigma_theta1 << endl;
-	cout << " MH acceptance rate = " << 
-	  static_cast<double>(accepts[0]) / static_cast<double>(iter) 
-	  / static_cast<double>(ntables) << endl << endl;
+	Rprintf("\nMCMCdynamicEI iteration %i of %i \n", (iter+1), 
+		tot_iter);
+	Rprintf("sigma_theta0 = %10.5f\n", sigma_theta0);
+	Rprintf("sigma_theta1 = %10.5f\n", sigma_theta1);
+	Rprintf("Metropolis acceptance rate = %3.5f\n", 
+		static_cast<double>(accepts[0]) / static_cast<double>(iter) / 
+		static_cast<double>(ntables));	
       }
-    
+      
+      // allow user interrupts
+      void R_CheckUserInterrupt(void);        
     }
 
-
+     delete stream; // clean up random number stream
     // return sample
     Matrix<double> storeagem = cbind(p0mat, p1mat);
     storeagem = cbind(storeagem, sig0mat);
