@@ -254,11 +254,18 @@
   N <- nrow(X)
   
   ## set value of theta.start
-  if (is.na(theta.start)) {
+  if (is.na(theta.start)) { 
     theta.start <- factor.score.eigen.start(agree.mat(X), 1)
     for (i in 1:factors){
       theta.start[,i] <- prior.mean[i] + theta.start[,i] *
         sqrt(1/prior.prec[i,i])
+      
+      # make sure these are consistent with hard and soft constraints  
+      theta.start[eq.constraints[,i]!=-999,i] <-
+         eq.constraints[eq.constraints[,i]!=-999,i]
+      theta.start[ineq.constraints[,i]!=0,i] <-
+         abs(theta.start[ineq.constraints[,i]!=0,i]) * 
+         ineq.constraints[ineq.constraints[,i]!=0,i]
     }
   }
   else if(is.numeric(theta.start) && is.null(dim(theta.start))) {

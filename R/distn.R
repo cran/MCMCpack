@@ -120,7 +120,7 @@
 
 "riwish" <-
   function(v, S) {
-    return(solve(rwish(v,S)))
+    return(solve(rwish(v,solve(S))))
   }
 
 # diwish evaluates the inverse Wishart pdf at positive definite
@@ -186,31 +186,33 @@
 ## Inverse Gamma
 ##
 
-# evaluate the inverse gamma density
-#
-# Kevin Rompala 5/6/2003
+## evaluate the inverse gamma density
+##
+## Kevin Rompala 5/6/2003
+## fixed KQ 3/8/2005
 
 "dinvgamma" <-
-  function(x, shape, rate = 1) {
+  function(x, shape, scale = 1) {
 
     # error checking
-    if(shape <= 0 | rate <=0) {
-      stop("Shape or rate parameter negative in dinvgamma().\n")
+    if(shape <= 0 | scale <=0) {
+      stop("Shape or scale parameter negative in dinvgamma().\n")
     }
    
     alpha <- shape
-    beta <- rate
+    beta <- scale
     return(beta^alpha / gamma(alpha) * x^(-1*(alpha + 1)) * exp(-beta/x))
   }
 
-# generate draws from the inverse gamma density (using
-# the gamma simulator)
-#
-# Kevin Rompala 5/6/2003
+## generate draws from the inverse gamma density (using
+## the gamma simulator)
+##
+## Kevin Rompala 5/6/2003
+## fixed KQ 3/8/2005
 
 "rinvgamma" <-
-  function(n, shape, rate = 1) {
-    return(1 / rgamma(n, shape, rate))
+  function(n, shape, scale = 1) {
+    return(1 / rgamma(n, shape, scale))
   }
 
 ##

@@ -17,6 +17,9 @@
 #include <R.h>           // needed to use Rprintf()
 #include <R_ext/Utils.h> // needed to allow user interrupts
 
+using namespace SCYTHE;
+using namespace std;
+
 extern "C"{
 
 // function called by R to fit model
@@ -133,7 +136,7 @@ extern "C"{
 	count++;	
       }
       
-      void R_CheckUserInterrupt(void); // allow user interrupts
+   void R_CheckUserInterrupt(void); // allow user interrupts
     } // end Gibbs loop
     
     delete stream; // clean up random number stream

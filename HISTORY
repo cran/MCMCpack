@@ -2,6 +2,19 @@
 // Changes and Bug Fixes
 //
 
+0.6-1 to 0.6-2
+  * fixed documentation for rinvgamma() and dinvgamma() so that it is clear
+    that these functions take shape and scale parameters as arguments.
+  * fixed documentation and R code for riwish(), diwish(), rwish(), and 
+    dwish() so that it is more clear how these distributions are parameterized.
+  * fixed line endings in MCMCtobit.cc
+  * changed how MCMCordfactanal and MCMCmixfactanal report MH acceptance
+    rates. They now report separate rates for each manifest variable.
+  * fixed a bug with starting values in the IRT and factor models.  If no
+    starting values were passed, those created in factor.score.start.check()
+    did not include the constraints (hard or soft), so the check failed.  Now
+    the constructed starting values meet the constraints.
+
 0.5-2 to 0.6-1
    * added a tobit model for a linear model with censoring in MCMCtobit()
    * added multinomial logit model in MCMCmnl()
