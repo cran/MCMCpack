@@ -6,15 +6,22 @@
  
 "MCMCirt1d" <-
   function(datamatrix, theta.constraints=list(), burnin = 1000,
-           mcmc = 20000, thin=1, verbose = FALSE, seed = NA,
+           mcmc = 20000, thin=1, verbose = 0, seed = NA,
            theta.start = NA, alpha.start = NA, beta.start = NA, t0 = 0,
-           T0 = 1, ab0=0, AB0=.25, store.item = FALSE, ... ) {
+           T0 = 1, ab0=0, AB0=.25, store.item = FALSE,
+           drop.constant.items=TRUE, ... ) {
     
     ## checks
     check.offset(list(...))
     check.mcmc.parameters(burnin, mcmc, thin)
 
-    ## check vote matrix and convert to work with C++ code 
+    ## check vote matrix and convert to work with C++ code
+    if (drop.constant.items==TRUE){
+      x.col.var <- apply(datamatrix, 2, var, na.rm=TRUE)
+      keep.inds <- x.col.var>0
+      keep.inds[is.na(keep.inds)] <- FALSE      
+      datamatrix <- datamatrix[,keep.inds]
+    }
     datamatrix <- as.matrix(datamatrix)   
     K <- ncol(datamatrix)   # cases, bills, items, etc
     J <- nrow(datamatrix)   # justices, legislators, subjects, etc
@@ -164,7 +171,7 @@
     sample <- matrix(posterior$sampledata, posterior$samplerow,
                      posterior$samplecol,
                      byrow=TRUE)
-    output <- mcmc(data=sample, start=1, end=mcmc, thin=thin)
+    output <- mcmc(data=sample, start=burnin+1, end=burnin+mcmc, thin=thin)
     
     if(store.item == FALSE) {
       names <- theta.names

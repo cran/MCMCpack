@@ -254,13 +254,23 @@
   N <- nrow(X)
   
   ## set value of theta.start
-  if (is.na(theta.start)) { 
+  if (max(is.na(theta.start))==1) { 
     theta.start <- factor.score.eigen.start(agree.mat(X), 1)
     for (i in 1:factors){
       theta.start[,i] <- prior.mean[i] + theta.start[,i] *
         sqrt(1/prior.prec[i,i])
       
       # make sure these are consistent with hard and soft constraints  
+      for (j in 1:nrow(theta.start)){
+        if (eq.constraints[j,i] != -999){
+          if (theta.start[j,i] * eq.constraints[j,i] < 0){
+            theta.start[,i] <- -1*theta.start[,i]
+          }
+        }
+        if (theta.start[j,i] * ineq.constraints[j,i] < 0){
+          theta.start[,i] <- -1*theta.start[,i]
+        }        
+      }
       theta.start[eq.constraints[,i]!=-999,i] <-
          eq.constraints[eq.constraints[,i]!=-999,i]
       theta.start[ineq.constraints[,i]!=0,i] <-
@@ -478,17 +488,17 @@
 # pull together the posterior density sample
 "form.mcmc.object" <-
   function(posterior.object, names, title) {
-     holder <- matrix(posterior.object$sampledata,
-                      posterior.object$samplerow,
-                      posterior.object$samplecol,
-                      byrow=TRUE)
-
-       output <- mcmc(data=holder, start=1,
-                      end=posterior.object$mcmc,
-                      thin=posterior.object$thin)
-       varnames(output) <- as.list(names)
-       attr(output,"title") <- title
-       return(output)  
+    holder <- matrix(posterior.object$sampledata,
+                     posterior.object$samplerow,
+                     posterior.object$samplecol,
+                     byrow=TRUE)
+    
+    output <- mcmc(data=holder, start=(posterior.object$burnin+1),
+                   end=(posterior.object$burnin+posterior.object$mcmc),
+                   thin=posterior.object$thin)
+    varnames(output) <- as.list(names)
+    attr(output,"title") <- title
+    return(output)  
   }
 
 # form multivariate Normal prior

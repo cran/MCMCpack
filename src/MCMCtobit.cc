@@ -112,6 +112,7 @@ extern "C" {
        
        // store draws in storage matrix (or matrices)
        if (iter >= *burnin && (iter % 1 == 0)) {
+
          sigmamatrix (0, count) = sigma2;
          for (int j = 0; j < k; j++)
            betamatrix (j, count) = beta[j];
@@ -119,7 +120,7 @@ extern "C" {
        }
        
        // print output to stdout
-       if(*verbose == 1 && iter % 1000 == 0) {
+       if(*verbose > 0 && iter % *verbose == 0) {
          Rprintf("\n\nMCMCtobit iteration %i of %i \n",
 		 (iter+1), tot_iter);
          Rprintf("beta = \n");
@@ -127,8 +128,9 @@ extern "C" {
            Rprintf("%10.5f\n", beta[j]);
          Rprintf("sigma2 = %10.5f\n", sigma2);
        }
+
+       R_CheckUserInterrupt(); // allow user interrupts
        
-       void R_CheckUserInterrupt(void); // allow user interrupts
      } // end MCMC loop
      
      delete stream; // clean up random number stream

@@ -5,7 +5,7 @@
 
 "MCMCdynamicEI" <-
   function(r0, r1, c0, c1, burnin=5000, mcmc=50000,
-           thin=1, verbose=FALSE, seed=NA,
+           thin=1, verbose=0, seed=NA,
            W=0, a0=0.825, b0=0.0105, a1=0.825,
            b1=0.0105, ...){
     
@@ -114,7 +114,7 @@
     
     sample <- matrix(C.sample$samdata, C.sample$samrow, C.sample$samcol,
                      byrow=TRUE)
-    output <- mcmc(data=sample, start=1, end=mcmc, thin=thin)
+    output <- mcmc(data=sample, start=(burnin+1), end=burnin+mcmc, thin=thin)
     p0names <- paste("p0table", 1:ntables, sep="")
     p1names <- paste("p1table", 1:ntables, sep="")
     varnames(output) <- c(p0names, p1names, "sigma^2_0", "sigma^2_1")

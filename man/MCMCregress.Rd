@@ -14,7 +14,7 @@
   
 \usage{
 MCMCregress(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
-   thin = 1, verbose = FALSE, seed = NA, beta.start = NA, 
+   thin = 1, verbose = 0, seed = NA, beta.start = NA, 
    b0 = 0, B0 = 0, c0 = 0.001, d0 = 0.001, ...) }
 
 \arguments{
@@ -30,10 +30,10 @@ MCMCregress(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
       MCMC iterations must be divisible by this value.}
 
     \item{verbose}{A switch which determines whether or not the progress of
-    the sampler is printed to the screen.  If TRUE, the iteration number, the
-    \eqn{\beta}{beta} vector, and the conditional error variance is printed to 
-    the screen 
-    every 500 iterations.}
+    the sampler is printed to the screen.  If \code{verbose} is greater
+    than 0 the iteration number, the
+    \eqn{\beta}{beta} vector, and the error variance are printed to 
+    the screen every \code{verbose}th iteration.}
 
     \item{seed}{The seed for the random number generator.  If NA, the Mersenne
     Twister generator is used with default seed 12345; if an integer is 
@@ -123,7 +123,7 @@ MCMCregress(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
 \examples{
 \dontrun{
 line   <- list(X = c(-2,-1,0,1,2), Y = c(1,3,3,3,5))
-posterior  <- MCMCregress(Y~X, data=line, verbose=TRUE)
+posterior  <- MCMCregress(Y~X, data=line, verbose=1000)
 plot(posterior)
 raftery.diag(posterior)
 summary(posterior)

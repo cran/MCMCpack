@@ -14,7 +14,7 @@
 \usage{
 MCMCmnl(formula, baseline = NULL, data = parent.frame(),
         burnin = 1000, mcmc = 10000, thin = 1,
-        mcmc.method = "MH", tune = 1.1, verbose = FALSE,
+        mcmc.method = "MH", tune = 1.1, verbose = 0,
         seed = NA, beta.start = NA, b0 = 0, B0 = 0, ...)  } 
 
 \arguments{
@@ -78,9 +78,10 @@ MCMCmnl(formula, baseline = NULL, data = parent.frame(),
   
   
   \item{verbose}{A switch which determines whether or not the progress of
-    the sampler is printed to the screen.  If TRUE, the iteration number,
+    the sampler is printed to the screen.  If \code{verbose} is greater
+    than 0 the iteration number,
     the current beta vector, and the Metropolis acceptance rate are
-    printed to the screen every 500 iterations. }
+    printed to the screen every \code{verbose}th iteration. }
 
   \item{seed}{The seed for the random number generator.  If NA, the Mersenne
     Twister generator is used with default seed 12345; if an integer is 
@@ -170,7 +171,7 @@ MCMCmnl(formula, baseline = NULL, data = parent.frame(),
                 choicevar(distVVD, "sqdist", "VVD") +
                 choicevar(distCDA, "sqdist", "CDA"),
                 baseline="D66", mcmc.method="MH", B0=0,
-                verbose=TRUE, mcmc=100000, thin=10, tune=1.0,
+                verbose=500, mcmc=100000, thin=10, tune=1.0,
                 data=Nethvote)
 
   plot(post1)
@@ -182,7 +183,7 @@ MCMCmnl(formula, baseline = NULL, data = parent.frame(),
   post2<- MCMCmnl(vote ~  
                 relig + class + income + educ + age + urban,
                 baseline="D66", mcmc.method="MH", B0=0,
-                verbose=TRUE, mcmc=100000, thin=10, tune=0.5,
+                verbose=500, mcmc=100000, thin=10, tune=0.5,
                 data=Nethvote)
 
   plot(post2)
@@ -198,7 +199,7 @@ MCMCmnl(formula, baseline = NULL, data = parent.frame(),
                 choicevar(distCDA, "sqdist", "CDA") +
                 relig + class + income + educ + age + urban,
                 baseline="D66", mcmc.method="MH", B0=0,
-                verbose=TRUE, mcmc=100000, thin=10, tune=0.5,
+                verbose=500, mcmc=100000, thin=10, tune=0.5,
                 data=Nethvote)
 
   plot(post3)
@@ -214,7 +215,7 @@ MCMCmnl(formula, baseline = NULL, data = parent.frame(),
                 choicevar(distCDA, "sqdist", "1") +
                 relig + class + income + educ + age + urban,
                 baseline="2", mcmc.method="MH", B0=0,
-                verbose=TRUE, mcmc=100000, thin=10, tune=0.5,
+                verbose=500, mcmc=100000, thin=10, tune=0.5,
                 data=Nethvote)
 
 
@@ -254,7 +255,7 @@ MCMCmnl(formula, baseline = NULL, data = parent.frame(),
                   choicevar(xb, "x", "b") +
                   choicevar(xc, "x", "c") +
                   choicevar(xd, "x", "d") + z,
-                  baseline="c", verbose=TRUE,
+                  baseline="c", verbose=500,
                   mcmc=100000, thin=10, tune=.85)
 
   plot(post5)

@@ -6,7 +6,7 @@
 
 "MCMCmetrop1R" <- function(fun, theta.init,
                            burnin=500, mcmc=20000, thin=1,
-                           tune=1, verbose=TRUE, seed=NA, logfun=TRUE,
+                           tune=1, verbose=0, seed=NA, logfun=TRUE,
                            optim.trace=0, optim.REPORT=10,
                            optim.maxit=500, ...){
   
@@ -62,7 +62,7 @@
                   PACKAGE="MCMCpack")
 
   ## turn sample into an mcmc object
-  sample <- mcmc(data=sample, start=1, end = mcmc, thin=thin)
+  sample <- mcmc(data=sample, start=burnin+1, end=burnin+mcmc, thin=thin)
   return(sample)
 }
  

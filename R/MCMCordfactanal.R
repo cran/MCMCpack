@@ -26,7 +26,7 @@
 "MCMCordfactanal" <-
   function(x, factors, lambda.constraints=list(),
            data=parent.frame(), burnin = 1000, mcmc = 20000,
-           thin=1, tune=NA, verbose = FALSE, seed = NA,
+           thin=1, tune=NA, verbose = 0, seed = NA,
            lambda.start = NA, l0=0, L0=0,
            store.lambda=TRUE, store.scores=FALSE,
            drop.constantvars=TRUE, ... ) {
@@ -55,9 +55,9 @@
     if (is.matrix(x)){
       if (drop.constantvars==TRUE){
         x.col.var <- apply(x, 2, var, na.rm=TRUE)
-        x <- x[,x.col.var!=0]
-        x.row.var <- apply(x, 1, var, na.rm=TRUE)
-        x <- x[x.row.var!=0,]
+        keep.inds <- x.col.var>0
+        keep.inds[is.na(keep.inds)] <- FALSE      
+        x <- x[,keep.inds]
       }
       X <- as.data.frame(x)
       xvars <- dimnames(X)[[2]]
@@ -129,7 +129,10 @@
     holder <- form.factload.norm.prior(l0, L0, K, factors+1, X.names)
     Lambda.prior.mean <- holder[[1]]
     Lambda.prior.prec <- holder[[2]]
-
+    if (case.switch==2){# if MCMCirtKD make it a prior on the diff. param.
+      Lambda.prior.mean[,1] <- Lambda.prior.mean[,1] * -1 
+    }
+    
     # seeds
     seeds <- form.seeds(seed) 
     lecuyer <- seeds[[1]]
@@ -349,7 +352,8 @@
     output.df <- as.data.frame(as.matrix(output))
     output.var <- diag(var(output.df))
     output.df <- output.df[,output.var != 0]
-    output <- mcmc(as.matrix(output.df), start=1, end=mcmc, thin=thin)
+    output <- mcmc(as.matrix(output.df), start=burnin+1, end=burnin+mcmc,
+                   thin=thin)
     
     # add constraint info so this isn't lost
     attr(output, "constraints") <- lambda.constraints

@@ -8,7 +8,7 @@
 
 "MCMCoprobit" <-
   function(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
-           thin = 1, tune = NA, verbose = FALSE, seed = NA, beta.start = NA,
+           thin = 1, tune = NA, verbose = 0, seed = NA, beta.start = NA,
            b0 = 0, B0 = 0, ...) {
 
 
@@ -128,7 +128,7 @@
     sample <- matrix(posterior$sampledata, posterior$samplerow,
                      posterior$samplecol, byrow=TRUE)
     sample <- sample[,c(1:K, (K+3):(K+ncat))]
-    output <- mcmc(data=sample, start=1, end=mcmc, thin=thin)
+    output <- mcmc(data=sample, start=burnin+1, end=burnin+mcmc, thin=thin)
     xnames <- c(X.names, paste("gamma", 2:(ncat-1), sep=""))
     varnames(output) <- xnames
     attr(output, "title") <- "MCMCoprobit Posterior Density Sample"

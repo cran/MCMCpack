@@ -2,6 +2,26 @@
 // Changes and Bug Fixes
 //
 
+0.6-2 to 0.6-3
+  * cleaned up the docs for MCMCirtKd
+  * MCMCirtKd now fits a model with a difficulty parameter rather than
+    a negative difficulty (easiness ???) parameter
+  * MCMCirtKd and MCMCordfactanal now do a better job of dropping 
+    variables that have 0 variance.
+  * fixed Senate examples for MCMCirt1d and MCMCirtKd. EVENTUALLY THE 
+    SENATE DATA SHOULD BE FIXED DIRECTLY SO THAT THERE ARE NO DUPLICATE 
+    NAMES IN THE MEMBER VARIABLE.
+  * users can interrupt all estimation algorithms now with CTL-C
+  * changed the behavior of the verbose switch. Now if verbose is greater
+    than 0 output is printed every verboseth iteration.
+  * changed the settings when mcmc objects are created so that 
+    "start=burnin+1" and "end=mcmc+burnin"
+  * fixed documentation of MCMCmetrop1R to make clear how data are passed
+    to the log-posterior function
+  * fixed factor.score.start.check to not return an error when a vector of
+    starting values is passed
+  * improved the way factor.score.start.check enforces constraints
+
 0.6-1 to 0.6-2
   * fixed documentation for rinvgamma() and dinvgamma() so that it is clear
     that these functions take shape and scale parameters as arguments.

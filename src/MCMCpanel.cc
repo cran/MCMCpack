@@ -198,7 +198,7 @@ panelpost (double* sample, const int* samrow, const int* samcol,
          }
  
         // print output to stdout
-       if(*verbose == 1 && g % 500 == 0) {
+       if(*verbose > 0 && g % *verbose == 0) {
          Rprintf("\n\nMCMCpanel iteration %i of %i \n",
            (g+1), Mtotiter);
          Rprintf("beta = \n");
@@ -207,13 +207,11 @@ panelpost (double* sample, const int* samrow, const int* samcol,
          Rprintf("sigma2 = %10.5f\n", sigma2_sim);
        }
 
-         
-       void R_CheckUserInterrupt(void); // allow user interrupts
-
-      }
-
-     delete stream; // clean up random number stream
- 
+       R_CheckUserInterrupt(); // allow user interrupt
+   }
+   
+   delete stream; // clean up random number stream
+   
   // return posterior denisty sample to R
   Matrix<double> storeagem = cbind(beta_holder, D_holder);
   storeagem = cbind(storeagem, sigma2_holder);

@@ -14,7 +14,7 @@
 \usage{
 MCMCordfactanal(x, factors, lambda.constraints=list(),
                 data=parent.frame(), burnin = 1000, mcmc = 20000,
-                thin=1, tune=NA, verbose = FALSE, seed = NA,
+                thin=1, tune=NA, verbose = 0, seed = NA,
                 lambda.start = NA, l0=0, L0=0,
                 store.lambda=TRUE, store.scores=FALSE,
                 drop.constantvars=TRUE, ... )
@@ -56,8 +56,10 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
     strictly positive.}
   
   \item{verbose}{A switch which determines whether or not the progress of
-    the sampler is printed to the screen.  If TRUE, the iteration number and
-    the Metropolis-Hastings acceptance rate are printed to the screen.}
+    the sampler is printed to the screen.  If \code{verbose} is greater
+    than 0 the iteration number and
+    the Metropolis-Hastings acceptance rate are printed to the screen
+    every \code{verbose}th iteration.}
   
     \item{seed}{The seed for the random number generator.  If NA, the Mersenne
     Twister generator is used with default seed 12345; if an integer is 
@@ -214,7 +216,7 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
    posterior <- MCMCordfactanal(~Composition+Drawing+Colour+Expression,
                         data=new.painters, factors=1,
                         lambda.constraints=list(Drawing=list(2,"+")),
-                        burnin=5000, mcmc=500000, thin=200, verbose=TRUE,
+                        burnin=5000, mcmc=500000, thin=200, verbose=500,
                         L0=0.5, store.lambda=TRUE,
                         store.scores=TRUE, tune=1.2)
    plot(posterior)

@@ -137,7 +137,7 @@ extern "C" {
 	++count;
       }
             
-      if (iter % 500 == 0 && INTEGER(verbose)[0] != 0 ) {
+      if (iter % INTEGER(verbose)[0] == 0 && INTEGER(verbose)[0] > 0 ) {
 	Rprintf("MCMCmetrop1R iteration %i of %i \n", (iter+1), tot_iter);
 	Rprintf("theta = \n");
 	for (int i=0; i<npar; ++i)
@@ -148,8 +148,9 @@ extern "C" {
 		static_cast<double>(iter+1));	
       } 
 
+      
       UNPROTECT(1);      
-     void R_CheckUserInterrupt(void); // allow user interrupts
+      R_CheckUserInterrupt(); // allow user interrupts
     }
 
     // put the sample into a SEXP and return it   

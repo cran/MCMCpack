@@ -107,14 +107,15 @@ extern "C"{
 	}
 	
 	// print output to stdout
-	if(*verbose == 1 && iter % 500 == 0){
+	if(*verbose > 0 && iter % *verbose == 0){
 	  Rprintf("\n\nMCMCprobit iteration %i of %i \n", (iter+1), tot_iter);
 	  Rprintf("beta = \n");
 	  for (int j=0; j<k; ++j)
 	    Rprintf("%10.5f\n", beta[j]);
 	}
 	
-	void R_CheckUserInterrupt(void); // allow user interrupts    
+	R_CheckUserInterrupt(); // allow user interrupts   
+
       } // end MCMC loop
 
      delete stream; // clean up random number stream

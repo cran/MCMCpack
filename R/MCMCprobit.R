@@ -8,7 +8,7 @@
 
 "MCMCprobit" <-
   function(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
-           thin = 1, verbose = FALSE, seed = NA, beta.start = NA,
+           thin = 1, verbose = 0, seed = NA, beta.start = NA,
            b0 = 0, B0 = 0, bayes.resid=FALSE, ...) {
     
     ## checks

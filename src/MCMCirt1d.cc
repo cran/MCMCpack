@@ -115,7 +115,7 @@ extern "C"{
 			theta_ineq, stream);
 
       // print results to screen
-      if (*verbose == 1 && iter % 100 == 0){
+      if (*verbose > 0 && iter % *verbose == 0){
 	Rprintf("\n\nMCMCirt1d iteration %i of %i \n",
 		(iter+1), tot_iter);
 	//Rprintf("theta = \n");
@@ -135,8 +135,9 @@ extern "C"{
 	  eta_store(count, l) = eta[l];
 	count++;	
       }
+
+      R_CheckUserInterrupt(); // allow user interrupts
       
-   void R_CheckUserInterrupt(void); // allow user interrupts
     } // end Gibbs loop
     
     delete stream; // clean up random number stream

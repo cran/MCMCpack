@@ -224,7 +224,7 @@ ordfactanalpost (double* sampledata, const int* samplerow,
   
     
     // print results to screen
-    if (verbose[0] == 1 && iter % 500 == 0 && *outswitch == 1){
+    if (verbose[0] > 0 && iter % verbose[0] == 0 && *outswitch == 1){
       Rprintf("\n\nMCMCordfactanal iteration %i of %i \n", (iter+1), tot_iter);
       Rprintf("Lambda = \n");
       for (int i=0; i<K; ++i){
@@ -240,16 +240,20 @@ ordfactanalpost (double* sampledata, const int* samplerow,
 		  static_cast<double>((iter+1)));
 	} 
     }
-    if (verbose[0] == 1 && iter % 500 == 0 && *outswitch == 2){
+    if (verbose[0] > 0 && iter % verbose[0] == 0 && *outswitch == 2){
       Rprintf("\n\nMCMCirtKd iteration %i of %i \n", (iter+1), tot_iter);
     }
     
     
     // store results
     if ((iter >= burnin[0]) && ((iter % thin[0]==0))) {      
-
       // store Lambda
       if (storelambda[0]==1){
+	if (*outswitch==2){
+	  for(int l=0; l<K; ++l){
+	    Lambda(l,0) = Lambda(l,0) * -1.0;
+	  }	    
+	}
 	Matrix<double> Lambda_store_vec = reshape(Lambda,1,K*D);
 	for (int l=0; l<K*D; ++l)
 	  Lambda_store(count, l) = Lambda_store_vec[l];
@@ -268,9 +272,10 @@ ordfactanalpost (double* sampledata, const int* samplerow,
       }
       count++;
     }
-    
+
     // allow user interrupts
-    void R_CheckUserInterrupt(void);    
+    R_CheckUserInterrupt();    
+
   } // end MCMC loop
   
      delete stream; // clean up random number stream  

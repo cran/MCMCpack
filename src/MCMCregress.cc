@@ -101,7 +101,7 @@ extern "C" {
        }
        
        // print output to stdout
-       if(*verbose == 1 && iter % 500 == 0) {
+       if(*verbose > 0 && iter % *verbose == 0) {
          Rprintf("\n\nMCMCregress iteration %i of %i \n",
            (iter+1), tot_iter);
          Rprintf("beta = \n");
@@ -110,7 +110,8 @@ extern "C" {
          Rprintf("sigma2 = %10.5f\n", sigma2);
        }
 
-       void R_CheckUserInterrupt(void); // allow user interrupts
+       R_CheckUserInterrupt(); // allow user interrupts
+
      } // end MCMC loop
 
      delete stream; // clean up random number stream

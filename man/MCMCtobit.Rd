@@ -14,7 +14,7 @@
   }
 \usage{
 MCMCtobit(formula, data = parent.frame(), below = 0, above = Inf, 
-  burnin = 1000, mcmc = 10000, thin = 1, verbose = FALSE, seed = NA, 
+  burnin = 1000, mcmc = 10000, thin = 1, verbose = 0, seed = NA, 
   beta.start = NA, b0 = 0, B0 = 0, c0 = 0.001, d0 = 0.001, ...)
 }
 \arguments{
@@ -38,9 +38,10 @@ MCMCtobit(formula, data = parent.frame(), below = 0, above = Inf,
       MCMC iterations must be divisible by this value.}
 
     \item{verbose}{A switch which determines whether or not the progress of
-    the sampler is printed to the screen.  If TRUE, the iteration number, the
-    \eqn{\beta}{beta} vector, and the conditional error variance is printed to 
-    the screen every 1000 iterations.}
+    the sampler is printed to the screen.  If \code{verbose} is greater
+    than 0 the iteration number, the
+    \eqn{\beta}{beta} vector, and the error variance is printed to 
+    the screen every \code{verbose}th iteration.}
 
     \item{seed}{The seed for the random number generator.  If NA, the Mersenne
     Twister generator is used with default seed 12345; if an integer is 
@@ -146,7 +147,8 @@ MCMCtobit(formula, data = parent.frame(), below = 0, above = Inf,
 library(survival)
 example(tobin)
 summary(tfit)
-tfit.mcmc <- MCMCtobit(durable ~ age + quant, data=tobin, mcmc=30000, verbose=TRUE)
+tfit.mcmc <- MCMCtobit(durable ~ age + quant, data=tobin, mcmc=30000,
+                        verbose=1000)
 plot(tfit.mcmc)
 raftery.diag(tfit.mcmc)
 summary(tfit.mcmc)

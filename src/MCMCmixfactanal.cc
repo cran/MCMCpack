@@ -271,7 +271,7 @@ mixfactanalpost (double* sampledata, const int* samplerow,
     }
 
     // print results to screen
-    if (*verbose == 1 && iter % 500 == 0){
+    if (*verbose > 0 && iter % *verbose == 0){
       Rprintf("\n\nMCMCmixfactanal iteration %i of %i \n", (iter+1), tot_iter);
       Rprintf("Lambda = \n");
       for (int i=0; i<K; ++i){
@@ -322,7 +322,8 @@ mixfactanalpost (double* sampledata, const int* samplerow,
     }
     
     // allow user interrupts
-    void R_CheckUserInterrupt(void);    
+    R_CheckUserInterrupt();    
+    
   } // end Gibbs loop
   
      delete stream; // clean up random number stream  
