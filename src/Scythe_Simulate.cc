@@ -2129,7 +2129,7 @@ namespace SCYTHE {
   pnorm2 (const double &x, const bool &lower_tail, const bool &log_p)
   {
     // XXX An sgi fix is probably required here
-    // if (isnan(x))
+    //if (isnan(x))
     //  throw scythe_nan_error (__FILE__, __PRETTY_FUNCTION__,
     //      __LINE__, "Quantile x is not a number (NaN)");
 #ifdef __MINGW32__
@@ -2927,60 +2927,54 @@ namespace SCYTHE {
     return temp;
   }
 
+
+
   /* Truncated Normal */
 
   /* Simulates from a truncated Normal distribution */
   double 
-  rtnorm(  const double& m, const double& v, const double& below, 
-    const double& above)
+  rtnorm(const double& m, const double& v, const double& below, 
+	 const double& above)
   {  
     if (below > above) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-        __LINE__, "Truncation bound not logically consistent");
+				__LINE__, \
+				"Truncation bound not logically consistent");
     }
-    
+		
     double FA = 0.0;
     double FB = 0.0;
     double sd = ::sqrt(v);
-    if ((::fabs((above-m)/sd) < 6.36) && (::fabs((below-m)/sd) < 6.36)){
+    if ((::fabs((above-m)/sd) < 8.2) && (::fabs((below-m)/sd) < 8.2)){
       FA = pnorm2((above-m)/sd, true, false);
       FB = pnorm2((below-m)/sd, true, false);
     }
-    if ((((above-m)/sd) < 6.36)  && (((below-m)/sd) <= -6.36) ){ 
+    if ((((above-m)/sd) < 8.2)  && (((below-m)/sd) <= -8.2) ){ 
       FA = pnorm2((above-m)/sd, true, false);
       FB = 0.0;
     }
-    if ( (((above-m)/sd) >= 6.36)  && (((below-m)/sd) > -6.36) ){ 
+    if ( (((above-m)/sd) >= 8.2)  && (((below-m)/sd) > -8.2) ){ 
       FA = 1.0;
       FB = FB = pnorm2((below-m)/sd, true, false);
     } 
-    if ( (((above-m)/sd) >= 6.36) && (((below-m)/sd) <=-6.36)){
+    if ( (((above-m)/sd) >= 8.2) && (((below-m)/sd) <= -8.2)){
       FA = 1.0;
       FB = 0.0;
     }
-    if ( (((above-m)/sd) <= -6.36) || (((below-m)/sd) > 6.36)){
-      throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__, __LINE__,
-             "Truncation bounds too far from 0");
-    }
-    /*
-    if ((::fabs((above-m)/sd) > 6.36) && (::fabs((below-m)/sd) > 6.36)){
-    throw scythe_range_error(__FILE__, __PRETTY_FUNCTION__, __LINE__,
-    "Truncation bounds too far from 0");
-    }
-    */
     double term = runif()*(FA-FB)+FB;
-    if (term < 1e-10)
-      term = 1e-10;
-    if (term > (1 - 1e-10))
-      term = 1 - 1e-10;
+    if (term < 5.6e-17)
+      term = 5.6e-17;
+    if (term > (1 - 5.6e-17))
+      term = 1 - 5.6e-17;
     double draw = m + sd * qnorm1(term);
     if (draw > above)
       draw = above;
     if (draw < below)
       draw = below;
-      
+ 		 
     return draw;
   }
+
 
   /* Sample from a truncated Normal distribution */
   double
@@ -3034,23 +3028,24 @@ namespace SCYTHE {
   }
 
 
+
   /* Sample from a truncated Normal distribution */
   double
   rtbnorm_slice(const double& m, const double& v, const double& below,
-    const int& iter)
+		const int& iter)
   {
     if (below < m) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-        __LINE__, "Truncation point < mean");
+				__LINE__, "Truncation point < mean");
     }
     if (v <= 0){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-        __LINE__, "Variance non-positive");
+				__LINE__, "Variance non-positive");
     }
-      
+ 		 
     double z = 0;
     double x = below + .00001;
-      
+ 		 
     for (int i=0; i<iter; ++i){
       z = runif()*::exp(-1*::pow((x-m),2)/(2*v));
       x = runif()*( (m + ::sqrt(-2*v*::log(z))) - below) + below;
@@ -3065,33 +3060,34 @@ namespace SCYTHE {
 #endif
 #endif
       std::cerr << "WARNING in "
-    << __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
-    << __LINE__ << ": Mean extremely far from truncation point. "
-    << "Returning truncation point" << std::endl;
+		<< __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
+		<< __LINE__ << ": Mean extremely far from truncation point. "
+		<< "Returning truncation point" << std::endl;
       return below; 
     }
     return x;
   }
 
+
   /* Sample from a truncated Normal distribution */
   double
   rtanorm_slice(const double& m, const double& v, const double& above, 
-    const int& iter)
+		const int& iter)
   {
     if (above > m) {
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-        __LINE__, "Truncation point > mean");
+				__LINE__, "Truncation point > mean");
     }
     if (v <= 0){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-        __LINE__, "Variance non-positive");
+				__LINE__, "Variance non-positive");
     }
   
     double below = -1*above;
     double newmu = -1*m;
     double z = 0;
     double x = below + .00001;
-      
+ 		 
     for (int i=0; i<iter; ++i){
       z = runif()*::exp(-1*::pow((x-newmu),2)/(2*v));
       x = runif()*( (newmu + ::sqrt(-2*v*::log(z))) - below) + below;
@@ -3102,77 +3098,91 @@ namespace SCYTHE {
 #ifdef sgi
     if (IsINF(x)) {
 #else
-    if (isinf(x)){
+    if (isinf(x)) {
 #endif
 #endif
       std::cerr << "WARNING in "
-        << __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
-        << __LINE__ << ": Mean extremely far from truncation point. "
-        << "Returning truncation point" << std::endl;
+		<< __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
+		<< __LINE__ << ": Mean extremely far from truncation point. "
+		<< "Returning truncation point" << std::endl;
       return above; 
     }
-    
+		
     return -1*x;
   }
+
 
   /* Sample from a truncated Normal distribution */
   double
   rtbnorm_combo(const double& m, const double& v, const double& below,
-    const int& iter)
+		const int& iter)
   {
     if (v <= 0){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-        __LINE__, "Variance non-positive");
+				__LINE__, "Variance non-positive");
     }
-    
+		
+    double s = ::sqrt(v);
     // do rejection sampling and return value
-    if (m >= below){
-      double x = rnorm(m, v);
+    //if (m >= below){
+    if ((m/s - below/s ) > 1.2){
+      double x = rnorm(m, s);
       while (x < below)
-        x = rnorm(m,v);
+	x = rnorm(m,s);
+      return x; 
+    } else if ((m/s - below/s ) > 4.0 ){
+      // use the inverse cdf method
+      double above = (m+30.0)*s;
+      double x = rtnorm(m, v, below, above);
       return x;
     } else {
       // do slice sampling and return value
       double z = 0;
       double x = below + .00001;
       for (int i=0; i<iter; ++i){
-        z = runif()*::exp(-1*::pow((x-m),2)/(2*v));
-        x = runif()*( (m + ::sqrt(-2*v*::log(z))) - below) + below;
+	z = runif()*::exp(-1*::pow((x-m),2)/(2*v));
+	x = runif()*( (m + ::sqrt(-2*v*::log(z))) - below) + below;
       }
 #ifdef __MINGW32__
-      if (! finite(x)) {
+    if (! finite(x)) {
 #else
 #ifdef sgi
-      if (IsINF(x)) {
+    if (IsINF(x)) {
 #else
-      if (isinf(x)){
+    if (isinf(x)) {
 #endif
 #endif
-        std::cerr << "WARNING in "
-          << __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
-          << __LINE__ << ": Mean extremely far from truncation point. "
-          << "Returning truncation point" << std::endl;
-        return below; 
+	std::cerr << "WARNING in "
+		  << __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
+		  << __LINE__ << ": Mean extremely far from truncation point. "
+		  << "Returning truncation point" << std::endl;
+	return below; 
       }
       return x;
     }
   }
 
+
   /* Sample from a truncated Normal distribution */
   double
   rtanorm_combo(const double& m, const double& v, const double& above,
-    const int& iter)
+		const int& iter)
   {
     if (v <= 0){
       throw scythe_invalid_arg (__FILE__, __PRETTY_FUNCTION__,
-        __LINE__, "Variance non-positive");
+				__LINE__, "Variance non-positive");
     }
-
+    double s = ::sqrt(v);
     // do rejection sampling and return value
-    if (m <= above) {
-      double x = rnorm(m, v);
+    if ((m/s - above/s ) < 1.2){ 
+      double x = rnorm(m, s);
       while (x > above)
-        x = rnorm(m,v);
+	x = rnorm(m,s);
+      return x;
+    } else if ((m/s - above/s ) < 4.0 ){
+      // use the inverse cdf method
+      double below = (m-30.0)*s;
+      double x = rtnorm(m, v, below, above);
       return x;
     } else {
       // do slice sampling and return value
@@ -3180,29 +3190,30 @@ namespace SCYTHE {
       double newmu = -1*m;
       double z = 0;
       double x = below + .00001;
-          
+   			 
       for (int i=0; i<iter; ++i){
-        z = runif()*::exp(-1*::pow((x-newmu),2)/(2*v));
-        x = runif()*( (newmu + ::sqrt(-2*v*::log(z))) - below) + below;
+	z = runif()*::exp(-1*::pow((x-newmu),2)/(2*v));
+	x = runif()*( (newmu + ::sqrt(-2*v*::log(z))) - below) + below;
       }
 #ifdef __MINGW32__
-      if (finite(x)) {
+    if (! finite(x)) {
 #else
 #ifdef sgi
-      if (IsINF(x)) {
+    if (IsINF(x)) {
 #else
-      if (isinf(x)){
+    if (isinf(x)) {
 #endif
 #endif
-        std::cerr << "WARNING in "
-          << __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
-          << __LINE__ << ": Mean extremely far from truncation point. "
-          << "Returning truncation point" << std::endl;
-        return above; 
+	std::cerr << "WARNING in "
+		  << __FILE__ << ", " << __PRETTY_FUNCTION__ << ", "
+		  << __LINE__ << ": Mean extremely far from truncation point. "
+		  << "Returning truncation point" << std::endl;
+	return above; 
       }
       return -1*x;
     }
   }
+
 
   /* Multivariate Normal */
   double
