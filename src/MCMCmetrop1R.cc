@@ -137,7 +137,7 @@ extern "C" {
 	++count;
       }
             
-      if (iter % INTEGER(verbose)[0] == 0 && INTEGER(verbose)[0] > 0 ) {
+      if (INTEGER(verbose)[0] > 0 && iter % INTEGER(verbose)[0] == 0) {
 	Rprintf("MCMCmetrop1R iteration %i of %i \n", (iter+1), tot_iter);
 	Rprintf("theta = \n");
 	for (int i=0; i<npar; ++i)

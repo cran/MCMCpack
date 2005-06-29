@@ -220,17 +220,7 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
 
 
    data(Senate)
-   namestring <- as.character(Senate$member)
-   namestring[78] <- "CHAFEE1"
-   namestring[79] <- "CHAFEE2"
-   namestring[59] <- "SMITH.NH"
-   namestring[74] <- "SMITH.OR"
-   rownames(Senate) <- namestring
-
    Sen.rollcalls <- Senate[,6:677]
-
-   # note that we need to transpose the data to get
-   # the bills on the rows
    posterior2 <- MCMCirtKd(Sen.rollcalls, dimensions=2,
                    burnin=5000, mcmc=50000, thin=10,
                    item.constraints=list(rc2=list(2,"-"), rc2=c(3,0),

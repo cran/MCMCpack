@@ -200,15 +200,7 @@ MCMCirt1d(datamatrix, theta.constraints=list(), burnin = 1000,
 
    ## US Senate Example with equality constraints
    data(Senate)
-   namestring <- as.character(Senate$member)
-   namestring[78] <- "CHAFEE1"
-   namestring[79] <- "CHAFEE2"
-   namestring[59] <- "SMITH.NH"
-   namestring[74] <- "SMITH.OR"
-   rownames(Senate) <- namestring
-
    Sen.rollcalls <- Senate[,6:677]
-
    posterior2 <- MCMCirt1d(Sen.rollcalls,
                     theta.constraints=list(KENNEDY=-2, HELMS=2),
                     burnin=2000, mcmc=100000, thin=20, verbose=500)

@@ -2,12 +2,13 @@
 ## random walk Metropolis algorithm
 ##
 ## KQ 6/24/2004
+## modified to work with non-invertible Hessian  KQ 6/28/2005
 ##
 
 "MCMCmetrop1R" <- function(fun, theta.init,
                            burnin=500, mcmc=20000, thin=1,
                            tune=1, verbose=0, seed=NA, logfun=TRUE,
-                           optim.trace=0, optim.REPORT=10,
+                           force.samp=FALSE, optim.trace=0, optim.REPORT=10,
                            optim.maxit=500, ...){
   
   ## error checking here
@@ -46,8 +47,38 @@
   if(opt.out$convergence!=0){
     warning("Mode and Hessian were not found with call to optim().\nSampling proceeded anyway. \n") 
   }
+
+ 
+  CC <- NULL
+  try(CC <- chol(-1*opt.out$hessian), silent=TRUE)
+  hess.new <- opt.out$hessian
+  hess.flag <- 0
+  if (force.samp==TRUE){
+    while (is.null(CC)){
+      hess.flag <- 1
+      hess.new <- hess.new - diag(diag(0.01 * abs(opt.out$hessian)))
+      try(CC <- chol(-1*hess.new), silent=TRUE)
+    }
+  }
+  else{
+    if (is.null(CC)){
+      hess.flag <- 2
+    }
+  }
+  if (hess.flag==1){
+    warning("Hessian from call to optim() not negative definite.\nSampling proceeded after enforcing negative definiteness. \n")     
+  }
+  if (hess.flag==2){
+    cat("Hessian from call to optim() not negative definite.\n")
+    cat("Sampling (as specified) cannot proceed.\n")
+    stop("Check data and fun() and call MCMCmetrop1R() again. \n",
+         call.=FALSE)     
+  }
   
-  propvar <- tune %*% solve(-1*opt.out$hessian) %*% tune
+  propvar <- tune %*% solve(-1*hess.new) %*% tune
+  ## the old way that only worked when Hessian was neg. def.
+  ##propvar <- tune %*% solve(-1*opt.out$hessian) %*% tune
+
   
   ## Call the C++ function to do the MCMC sampling 
   sample <- .Call("MCMCmetrop1R_cc", fun, as.double(theta.init),

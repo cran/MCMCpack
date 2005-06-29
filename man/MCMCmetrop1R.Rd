@@ -9,7 +9,8 @@
 \usage{
 MCMCmetrop1R(fun, theta.init, burnin = 500, mcmc = 20000, thin = 1,
              tune = 1, verbose = 0, seed=NA, logfun = TRUE,
-             optim.trace = 0, optim.REPORT = 10, optim.maxit = 500, ...)
+             force.samp=FALSE, optim.trace = 0, optim.REPORT = 10,
+             optim.maxit = 500, ...)
 }
 \arguments{
   \item{fun}{The (log)density from which to take a sample. This should
@@ -51,6 +52,24 @@ MCMCmetrop1R(fun, theta.init, burnin = 500, mcmc = 20000, thin = 1,
   \item{logfun}{Logical indicating whether \code{fun} returns the natural log
     of a density function (TRUE) or a density (FALSE).}
 
+  \item{force.samp}{Logical indicating whether the sampling should
+    proceed if the Hessian calculated from the initial call to
+    \code{optim} routine to maximize the (log)posterior
+    is not negative definite. If \code{force.samp==TRUE}
+    and the Hessian from \code{optim} is non-negative definite, the
+    Hessian is rescaled by subtracting small values from it's main
+    diagonal until it is negative definite. Sampling proceeds using
+    this rescaled Hessian in place of the original Hessian from
+    \code{optim}. By default, if \code{force.samp==FALSE} and the Hessian from
+    \code{optim} is non-negative definite, an error message is
+    printed and the call to \code{MCMCmetrop1R} is terminated.
+    
+    \emph{Please note that a non-negative Hessian at the mode is a very
+      good indication that the model being fitted is not
+      identified. Thus, \code{force.samp} should only be set equal to
+      \code{TRUE} with great caution.}
+    }
+  
   \item{optim.trace}{The value of the \code{trace} parameter sent to
     \code{optim} during an initial maximization of \code{fun}. }
 

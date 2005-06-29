@@ -24,8 +24,8 @@ data(SupremeCourt)
 }
 
 \source{
-  Harold J. Spaeth. 2003. \emph{Original United States Supreme Court Database: 
-    1953-2001 Terms.}  \url{http://polisci.msu.edu/pljp/}.
+  Harold J. Spaeth. 2005. \emph{Original United States Supreme Court Database: 
+    1953-2004 Terms.} \url{http://www.as.uky.edu/polisci/ulmerproject/sctdata.htm}.
 }
 
 \keyword{datasets}

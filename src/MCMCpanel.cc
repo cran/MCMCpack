@@ -135,8 +135,8 @@ panelpost (double* sample, const int* samrow, const int* samcol,
          beta_var_sum = beta_var_sum + t(Xarr[i]) * invVi * Xarr[i];
          beta_mean_sum = beta_mean_sum + t(Xarr[i]) * invVi * Yarr[i];
          }
-      Matrix<double> beta_sim_var = invpd(MB0 + (1/sigma2_sim) * beta_var_sum);
-      Matrix<double> beta_sim_mean = beta_sim_var * (MB0 * Mb0 + (1/sigma2_sim) * beta_mean_sum);
+      Matrix<double> beta_sim_var = invpd(MB0 + beta_var_sum);
+      Matrix<double> beta_sim_mean = beta_sim_var * (MB0 * Mb0 + beta_mean_sum);
       Matrix<double> beta_sim = beta_sim_mean + cholesky(beta_sim_var) *
          stream->rnorm(Mp,1);
   

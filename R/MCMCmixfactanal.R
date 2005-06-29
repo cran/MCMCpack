@@ -22,6 +22,7 @@
 ##
 ## 12/2/2003
 ## Revised to accommodate new spec 7/20/2004
+## Minor bug fix regarding std.mean 6/25/2004
 ##
 ##########################################################################
 
@@ -43,7 +44,8 @@
     mf$factors <- mf$lambda.constraints <- mf$burnin <- mf$mcmc <- NULL
     mf$thin <- mf$tune <- mf$verbose <- mf$seed <- NULL
     mf$lambda.start <- mf$l0 <- mf$L0 <- mf$a0 <- mf$b0 <- NULL
-    mf$store.lambda <- mf$store.scores <- mf$std.var <- mf$... <- NULL
+    mf$store.lambda <- mf$store.scores <- mf$std.mean <- NULL
+    mf$std.var <- mf$... <- NULL
     mf$drop.unused.levels <- TRUE
     mf[[1]] <- as.name("model.frame")
     mf$na.action <- 'na.pass'
@@ -61,8 +63,13 @@
         ncat[i] <- -999
         X[is.na(X[,i]), i] <- -999
       }
-   else if (is.ordered(X[, i])) {      ncat[i] <- nlevels(X[, i])      temp <- as.integer(X[,i])      temp <- ifelse(is.na(X[,i]) | (X[,i] == "<NA>"), -999, temp)      X[, i] <- temp}
-      else {
+   else if (is.ordered(X[, i])) {
+     ncat[i] <- nlevels(X[, i])
+     temp <- as.integer(X[,i])
+     temp <- ifelse(is.na(X[,i]) | (X[,i] == "<NA>"), -999, temp)
+     X[, i] <- temp
+   }
+   else {
         stop("Manifest variable ", dimnames(X)[[2]][i],
              " neither ordered factor nor numeric variable.\n")
       }
@@ -87,7 +94,7 @@
     if (std.var){
       for (i in 1:K){
         if (ncat[i] == -999){
-          X[,i] <- (X[,i])/sd(X[,i])
+          X[,i] <- (X[,i] - mean(X[,i]))/sd(X[,i]) + mean(X[,i])
         }
       }
     }
