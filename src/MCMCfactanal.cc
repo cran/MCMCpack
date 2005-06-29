@@ -124,7 +124,7 @@ extern "C" {
 
       
       // print results to screen
-      if (iter % verbose[0] == 0 && verbose[0] > 0){
+      if (verbose[0] > 0 && iter % verbose[0] == 0){
 	Rprintf("\n\nMCMCfactanal iteration %i of %i \n", (iter+1), tot_iter);
 	Rprintf("Lambda = \n");
 	for (int i=0; i<K; ++i){

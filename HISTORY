@@ -2,6 +2,29 @@
 // Changes and Bug Fixes
 //
 
+0.6-4 to 0.6-5
+  * added a check so one can run MCMCirt1d without passing constraints
+  * fixed the Senate dataset so there are no duplicate names in the
+    member variables, and modified examples accordingly 
+  * slightly edited DESCRIPTION file to get some important keywords
+    in the first sentence
+  * compute dinvgamma() on the log scale so it does not blow up
+    for large shape and scale parameters
+  * changed how MCMCmetrop1R handles a non-negative definite Hessian
+    from optim--sampling can now proceed if the user flips a switch
+  * fixed minor error in how std.mean was passed to MCMCmixfactanal
+  * fixed the error in the beta full conditional in MCMCpanel that resulted
+    from a typo in the Chib and Carlin paper
+  * changed factor.score.eigen.start() in hidden.R to use squared 
+    distances rather than distances so as to be compatible with 
+    Poole, 2005. _Spatial Models of Parliamentary Voting_	
+  * fixed a minor bug in how the verbose argument was handled in the C++
+    code for MCMCmetrop1R and MCMCfactanal [thanks to Lingji Chen]
+  * fixed a minor documentation bug in the MCMCirtKd model [thanks to
+    Guillermo Rosas]
+  * fixed the text echoed at start-up so it does not have to be updated 
+    year to year
+
 0.6-3 to 0.6-4
   * fixed bug with verbose in MCMCmetrop1R pointed out by a referee for 
     Rnews

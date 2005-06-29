@@ -35,8 +35,11 @@
     subject.names <- rownames(datamatrix)
     
     ## setup constraints on theta
-    for (i in 1:length(theta.constraints)){
-      theta.constraints[[i]] <- list(as.integer(1), theta.constraints[[i]][1])
+    if(length(theta.constraints) != 0) {
+       for (i in 1:length(theta.constraints)){
+          theta.constraints[[i]] <-
+             list(as.integer(1), theta.constraints[[i]][1])
+       }
     }
     holder <- build.factor.constraints(theta.constraints, t(datamatrix), J, 1)
     theta.eq.constraints <- holder[[1]]

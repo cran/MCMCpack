@@ -216,6 +216,7 @@
 ## takes a subject by subject agreement score matrix as input
 "factor.score.eigen.start" <- function(A, factors){
 
+  A <- (1 - A)^2
   AA <- A
   arow <- matrix(NA, nrow(A), 1)
   acol <- matrix(NA, ncol(A), 1)
@@ -231,7 +232,7 @@
   
   for (i in 1:nrow(A)){
     for (j in 1:ncol(A)){
-      AA[i,j] <- (A[i,j]-arow[i]-acol[j]+matrixmean)/(2)
+      AA[i,j] <- (A[i,j]-arow[i]-acol[j]+matrixmean)/(-2)
     }
   }
   

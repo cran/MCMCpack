@@ -198,10 +198,14 @@
     if(shape <= 0 | scale <=0) {
       stop("Shape or scale parameter negative in dinvgamma().\n")
     }
-   
+    
     alpha <- shape
     beta <- scale
-    return(beta^alpha / gamma(alpha) * x^(-1*(alpha + 1)) * exp(-beta/x))
+   
+    # done on log scale to allow for large alphas and betas
+    log.density <- alpha * log(beta) - lgamma(alpha) -
+       (alpha + 1) * log(x) - (beta/x)
+    return(exp(log.density))
   }
 
 ## generate draws from the inverse gamma density (using
