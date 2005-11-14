@@ -104,7 +104,7 @@ static double mnl_logpost(const Matrix<double>& Y, const Matrix<double>& X,
   beta_R[index] = R;
   int K = p;
   while (K > 0 && 
-	 (z < logfun(Y, X, beta_L, beta_prior_mean, beta_prior_prec) |
+	 (z < logfun(Y, X, beta_L, beta_prior_mean, beta_prior_prec) ||
 	  z < logfun(Y, X, beta_R, beta_prior_mean, beta_prior_prec))){
     double V = stream->runif();
     if (V < 0.5){

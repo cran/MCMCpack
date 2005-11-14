@@ -9,8 +9,8 @@ MCMChierEI              Markov Chain Monte Carlo for Wakefield's
                         Hierarchial Ecological Inference Model
 MCMCirt1d               Markov Chain Monte Carlo for One Dimensional
                         Item Response Theory Model
-MCMCirtKd               Markov Chain Monte Carlo for K-Dimensional
-                        Item Response Theory Model
+MCMCirtKd               Markov Chain Monte Carlo for K-Dimensional Item
+                        Response Theory Model
 MCMClogit               Markov Chain Monte Carlo for Logistic
                         Regression
 MCMCmetrop1R            Metropolis Sampling from User-Written R
@@ -23,10 +23,9 @@ MCMCoprobit             Markov Chain Monte Carlo for Ordered Probit
                         Regression
 MCMCordfactanal         Markov Chain Monte Carlo for Ordinal Data
                         Factor Analysis Model
-MCMCpanel               Markov Chain Monte Carlo for the General
-                        Linear Panel Model
-MCMCpoisson             Markov Chain Monte Carlo for Poisson
-                        Regression
+MCMCpanel               Markov Chain Monte Carlo for the General Linear
+                        Panel Model
+MCMCpoisson             Markov Chain Monte Carlo for Poisson Regression
 MCMCprobit              Markov Chain Monte Carlo for Probit Regression
 MCMCregress             Markov Chain Monte Carlo for Gaussian Linear
                         Regression

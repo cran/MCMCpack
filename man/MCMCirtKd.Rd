@@ -3,7 +3,7 @@
 \title{Markov Chain Monte Carlo for K-Dimensional Item Response Theory
    Model}
 \description{
-  This function generates a posterior density sample from a
+  This function generates a sample from the posterior distribution of a
   K-dimensional item response theory (IRT) model, with standard
   normal priors on the subject abilities (ideal points), and
   normal priors on the item parameters.  The user
@@ -128,7 +128,7 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
   the latent utilities). The simulation proper is done in
   compiled C++ code to maximize efficiency.  Please consult the
   coda documentation for a comprehensive list of functions that
-  can be used to analyze the posterior density sample.
+  can be used to analyze the posterior sample.
   
   The default number of burnin and mcmc iterations is much
   smaller than the typical default values in MCMCpack.  This is

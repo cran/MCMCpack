@@ -2,7 +2,11 @@
 ## random walk Metropolis algorithm
 ##
 ## KQ 6/24/2004
+##
 ## modified to work with non-invertible Hessian  KQ 6/28/2005
+##
+## changed the method used to pass additional arguments to the user-defined
+##   function KQ 8/15/2005
 ##
 
 "MCMCmetrop1R" <- function(fun, theta.init,
@@ -26,24 +30,28 @@
   
   
   ## setup the environment so that fun can see the things passed as ...
-  ## it should be the case that users can specify arguments with the same
-  ## names as variables defined in MCMCmetrop1R without causing problems.
-  my.env <- new.env()
-  environment(fun) <- my.env
-  dots <- list(...)
-  dotnames <- names(dots)
-  ndots <- length(dots)
-  if (ndots >= 1){
-    for (i in 1:ndots){
-      assign(x=dotnames[[i]], value=dots[[i]], inherits=FALSE, envir=my.env)
-    }
+  userfun <- function(ttt) fun(ttt, ...)
+  my.env <- environment(fun = userfun)
+
+
+  ## setup function for maximization based on value of logfun
+  if (logfun){
+    maxfun <- fun
+  }
+  else if (logfun==FALSE){
+    maxfun <- function(ttt, ...) log(fun(ttt, ...))
+  }
+  else{
+    cat("logfun not a logical value.\n")
+    stop("Respecifiy and call MCMCmetrop1R() again. \n",
+         call.=FALSE)         
   }
   
   ## find approx mode and Hessian using optim()
-  opt.out <- optim(theta.init, fun,
+  opt.out <- optim(theta.init, maxfun,
                    control=list(fnscale=-1, trace=optim.trace,
                      REPORT=optim.REPORT, maxit=optim.maxit),
-                   method="BFGS", hessian=TRUE)
+                   method="BFGS", hessian=TRUE, ...)
   if(opt.out$convergence!=0){
     warning("Mode and Hessian were not found with call to optim().\nSampling proceeded anyway. \n") 
   }
@@ -54,6 +62,13 @@
   hess.new <- opt.out$hessian
   hess.flag <- 0
   if (force.samp==TRUE){
+    if (max(diag(optim.out$hessian)==0)){
+      for (i in 1:nrow(hess.new)){
+        if (hess.new[i,i] == 0){
+          hess.new[i,i] <- -1e-6
+        }
+      }
+    }
     while (is.null(CC)){
       hess.flag <- 1
       hess.new <- hess.new - diag(diag(0.01 * abs(opt.out$hessian)))
@@ -76,12 +91,10 @@
   }
   
   propvar <- tune %*% solve(-1*hess.new) %*% tune
-  ## the old way that only worked when Hessian was neg. def.
-  ##propvar <- tune %*% solve(-1*opt.out$hessian) %*% tune
 
   
   ## Call the C++ function to do the MCMC sampling 
-  sample <- .Call("MCMCmetrop1R_cc", fun, as.double(theta.init),
+  sample <- .Call("MCMCmetrop1R_cc", userfun, as.double(theta.init),
                   my.env, as.integer(burnin), as.integer(mcmc),
                   as.integer(thin),
                   as.integer(verbose),

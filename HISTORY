@@ -2,6 +2,20 @@
 // Changes and Bug Fixes
 //
 
+0.6-5 to 0.6-6
+  * fixed the std::accumulate problem pointed out by Kurt Hornik. Thanks
+    to Dan Pemstein for tracking the problem down and making the fix.
+  * fixed up how the force.samp option works with MCMCmetrop1R-- previously
+    if a diagonal element of the Hessian was 0 the correction wouldn't work. 
+  * changed how additional arguments are passed to user-defined function
+    in MCMCmetrop1R. This breaks old code but provides a more standard
+    interface. 
+  * when logfun==FALSE in MCMCmetrop1R the initial call to optim() now
+    maximizes the log of the user-defined function
+  * cleaned up the *.Rd files for the model fitting functions a bit 
+    (more still needs to be done)
+  * MCMClogit now optionally accepts a user-defined prior density
+
 0.6-4 to 0.6-5
   * added a check so one can run MCMCirt1d without passing constraints
   * fixed the Senate dataset so there are no duplicate names in the

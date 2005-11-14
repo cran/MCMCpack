@@ -2,12 +2,12 @@
 \alias{MCMCfactanal}
 \title{Markov Chain Monte Carlo for Normal Theory Factor Analysis Model}
 \description{
-  This function generates a posterior density sample from Normal theory
-  factor analysis model. Normal priors are assumed on the factor
-  loadings and factor scores while inverse Gamma priors are assumed for
-  the uniquenesses. The user supplies data and parameters for the prior
-  distributions, and a sample from the posterior density is returned as
-  an mcmc object, which can be subsequently analyzed with
+  This function generates a sample from the posterior distribution of
+  a normal theory factor analysis model. Normal priors are assumed on
+  the factor loadings and factor scores while inverse Gamma priors are
+  assumed for the uniquenesses. The user supplies data and parameters
+  for the prior distributions, and a sample from the posterior distribution
+  is returned as an mcmc object, which can be subsequently analyzed with
   functions provided in the coda package.
 }
   
@@ -114,8 +114,9 @@ MCMCfactanal(x, factors, lambda.constraints=list(),
 }
 
 \value{
-   An mcmc object that contains the posterior density sample.  This 
-   object can be summarized by functions provided by the coda package.
+  An mcmc object that contains the sample from the posterior
+  distribution. This object can be summarized by functions provided by
+  the coda package. 
 }
 
 \details{The model takes the following form:
@@ -145,11 +146,11 @@ MCMCfactanal(x, factors, lambda.constraints=list(),
     \deqn{\Psi_{ii} \sim \mathcal{IG}(a_{0_i}/2, b_{0_i}/2), 
       i=1,\ldots,k}{Psi_ii ~ IG(a0_i/2, b0_i/2), i=1,...,k}
     
-  \code{MCMCfactanal} simulates from the posterior density using
+  \code{MCMCfactanal} simulates from the posterior distribution using
   standard Gibbs sampling. The simulation proper is done in
   compiled C++ code to maximize efficiency.  Please consult the
   coda documentation for a comprehensive list of functions that
-  can be used to analyze the posterior density sample.     
+  can be used to analyze the posterior sample.     
  
      As is the case with all measurement models, make sure that you have plenty
   of free memory, especially when storing the scores.

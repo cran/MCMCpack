@@ -2,10 +2,10 @@
 \alias{MCMCpoisson}
 \title{Markov Chain Monte Carlo for Poisson Regression}
 \description{
-  This function generates a posterior density sample
-  from a Poisson regression model using a random walk Metropolis
+  This function generates a sample from the posterior distribution
+  of a Poisson regression model using a random walk Metropolis
   algorithm. The user supplies data and priors,
-  and a sample from the posterior density is returned as an mcmc
+  and a sample from the posterior distribution is returned as an mcmc
   object, which can be subsequently analyzed with functions 
   provided in the coda package.
   }
@@ -31,7 +31,7 @@ MCMCpoisson(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
       scalar or a \eqn{k}{k}-vector, where \eqn{k}{k} is the length of
       \eqn{\beta}{beta}.Make sure that the
       acceptance rate is satisfactory (typically between 0.20 and 0.5)
-      before using the posterior density sample for inference.}
+      before using the posterior sample for inference.}
 
     
     \item{verbose}{A switch which determines whether or not the progress of
@@ -76,15 +76,16 @@ MCMCpoisson(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
 }
 
 \value{
-   An mcmc object that contains the posterior density sample.  This 
+   An mcmc object that contains the posterior sample.  This 
    object can be summarized by functions provided by the coda package.
 }
 
-\details{\code{MCMCpoisson} simulates from the posterior density of a Poisson
-  regression model using a random walk Metropolis algorithm. The simulation
-  proper is done in compiled C++ code to maximize efficiency.  Please consult
-  the coda documentation for a comprehensive list of functions that can be
-  used to analyze the posterior density sample.
+\details{\code{MCMCpoisson} simulates from the posterior distribution of
+  a Poisson regression model using a random walk Metropolis
+  algorithm. The simulation proper is done in compiled C++ code to
+  maximize efficiency.  Please consult the coda documentation for a
+  comprehensive list of functions that can be used to analyze the
+  posterior sample. 
   
   The model takes the following form:
   \deqn{y_i \sim \mathcal{P}oisson(\mu_i)}{y_i ~ Poisson(mu_i)}

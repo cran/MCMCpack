@@ -3,8 +3,7 @@
 \title{Metropolis Sampling from User-Written R function}
 \description{
   This function allows a user to construct a sample from a user-defined
-  R function using a random walk Metropolis algorithm. It assumes the
-  parameters to be sampled are in a single block. 
+  continuous distribution using a random walk Metropolis algorithm.
 }
 \usage{
 MCMCmetrop1R(fun, theta.init, burnin = 500, mcmc = 20000, thin = 1,
@@ -13,14 +12,20 @@ MCMCmetrop1R(fun, theta.init, burnin = 500, mcmc = 20000, thin = 1,
              optim.maxit = 500, ...)
 }
 \arguments{
-  \item{fun}{The (log)density from which to take a sample. This should
-    be a function defined in R and it should take a single
-    argument. Additional arguments can be passed implicitly by either
-    putting them in the global environment or by passing them as
-    additional arguments to \code{MCMCmetrop1R()}. See the Details section 
-    and the examples below. }
+  \item{fun}{The unnormalized (log)density of the distribution from
+    which to take a sample. This must be a function defined in R whose first
+    argument is a continuous (possibly vector) variable. This first
+    argument is the point in the state space at which the (log)density
+    is to be evaluated. Additional arguments can be passed
+    to \code{fun()} by inserting them in the call to
+    \code{MCMCmetrop1R()}. See the Details section and the examples
+    below for more information.}
+  
   \item{theta.init}{Starting values for the sampling. Must be of the
-    appropriate dimension.}
+    appropriate dimension. It must also be the case that
+    \code{fun(theta.init, ...)} is greater than \code{-Inf} if
+    \code{fun()} is a logdensity or greater than 0 if \code{fun()} is a
+    density.}
 
   \item{burnin}{The number of burn-in iterations for the sampler.}
 
@@ -29,9 +34,9 @@ MCMCmetrop1R(fun, theta.init, burnin = 500, mcmc = 20000, thin = 1,
   \item{thin}{The thinning interval used in the simulation.  The number of
     MCMC iterations must be divisible by this value.}
 
-  \item{tune}{Can be either a positive scalar or a
-    \eqn{k}{k}-vector, where \eqn{k}{k} is the length of
-    \eqn{\theta}{theta}.}
+  \item{tune}{The tuning parameter for the Metropolis sampling.
+    Can be either a positive scalar or a \eqn{k}{k}-vector, where
+    \eqn{k}{k} is the length of \eqn{\theta}{theta}.}
 
   \item{verbose}{A switch which determines whether or not the progress of
     the sampler is printed to the screen.  If \code{verbose} is greater
@@ -54,7 +59,7 @@ MCMCmetrop1R(fun, theta.init, burnin = 500, mcmc = 20000, thin = 1,
 
   \item{force.samp}{Logical indicating whether the sampling should
     proceed if the Hessian calculated from the initial call to
-    \code{optim} routine to maximize the (log)posterior
+    \code{optim} routine to maximize the (log)density
     is not negative definite. If \code{force.samp==TRUE}
     and the Hessian from \code{optim} is non-negative definite, the
     Hessian is rescaled by subtracting small values from it's main
@@ -64,9 +69,9 @@ MCMCmetrop1R(fun, theta.init, burnin = 500, mcmc = 20000, thin = 1,
     \code{optim} is non-negative definite, an error message is
     printed and the call to \code{MCMCmetrop1R} is terminated.
     
-    \emph{Please note that a non-negative Hessian at the mode is a very
-      good indication that the model being fitted is not
-      identified. Thus, \code{force.samp} should only be set equal to
+    \emph{Please note that a non-negative Hessian at the mode is often
+      an indication that the function of interest is not a proper
+      density. Thus, \code{force.samp} should only be set equal to
       \code{TRUE} with great caution.}
     }
   
@@ -82,7 +87,7 @@ MCMCmetrop1R(fun, theta.init, burnin = 500, mcmc = 20000, thin = 1,
   \item{\dots}{Additional arguments.}
 }
 \details{
-MCMCmetrop1R produces a sample from a user-defined (log)density using a
+MCMCmetrop1R produces a sample from a user-defined distribution using a
 random walk Metropolis algorithm with multivariate normal proposal
 distribution. See Gelman et al. (2003) and Robert & Casella (2004) for
 details of the random walk Metropolis algorithm.
@@ -94,15 +99,6 @@ diagonal positive definite matrix formed from the \code{tune} and
 \eqn{H}{H} is the approximate Hessian of \code{fun} evaluated at it's
 mode. This last calculation is done via an initial call to
 \code{optim}.
-
-Passing data into a (log)density function does not conform to standard R 
-practice.  The (log)density function should have only one argument -- the 
-parameter vector.  The data used by the (log)density need to be either in the 
-global environment or defined in the call to \code{MCMCmetrop1R()}, which will 
-create an environment that contains the data and then call the (log)density function in that environment.  The names of the data objects 
-are not checked, so be careful that these match the names used with the 
-(log)density function.  \emph{NOTE:} This interface will likely be changed in 
-a future implementation of MCMCpack.
 }
 \value{
    An mcmc object that contains the posterior density sample.  This 
@@ -114,7 +110,7 @@ a future implementation of MCMCpack.
     ## logistic regression with an improper uniform prior
     ## X and y are passed as args to MCMCmetrop1R
 
-    logitfun <- function(beta){
+    logitfun <- function(beta, y, X){
       eta <- X \%*\% beta
       p <- 1.0/(1.0+exp(-eta))
       sum( y * log(p) + (1-y)*log(1-p) )
@@ -137,36 +133,10 @@ a future implementation of MCMCpack.
     summary(post.samp)
     ## ##################################################
 			      
-    
-    ## logistic regression with an improper uniform prior
-    ## X and y are now in the global environment
-
-    logitfun <- function(beta){
-      eta <- X \%*\% beta
-      p <- 1.0/(1.0+exp(-eta))
-      sum( y * log(p) + (1-y)*log(1-p) )
-    }
-    
-    x1 <- rnorm(1000)
-    x2 <- rnorm(1000)
-    X <- cbind(1,x1,x2)
-    p <- exp(.5 - x1 + x2)/(1+exp(.5 - x1 + x2))
-    y <- rbinom(1000, 1, p)
-    
-    post.samp <- MCMCmetrop1R(logitfun, theta.init=c(0,0,0),
-                              thin=1, mcmc=40000, burnin=500,
-                              tune=c(1.5, 1.5, 1.5),
-                              verbose=500, logfun=TRUE, optim.maxit=100)
-
-    raftery.diag(post.samp)
-    plot(post.samp)
-    summary(post.samp)
-    ## ##################################################
-
 
     ##  negative binomial regression with an improper unform prior
     ## X and y are passed as args to MCMCmetrop1R
-    negbinfun <- function(theta){
+    negbinfun <- function(theta, y, X){
       k <- length(theta)
       beta <- theta[1:(k-1)]
       alpha <- exp(theta[k])
@@ -193,7 +163,22 @@ a future implementation of MCMCpack.
     plot(post.samp)
     summary(post.samp)
     ## ##################################################
- 
+
+
+    ## sample from a univariate normal distribution with
+    ## mean 5 and standard deviation 0.1
+    ##
+    ## (MCMC obviously not necessary here and this should
+    ##  really be done with the logdensity for better
+    ##  numerical accuracy-- this is just an illustration of how
+    ##  MCMCmetrop1R works with a density rather than logdensity)
+
+    post.samp <- MCMCmetrop1R(dnorm, theta.init=5.3, mean=5, sd=0.1,
+                          thin=1, mcmc=50000, burnin=500,
+                          tune=2.0, verbose=5000, logfun=FALSE)
+
+    summary(post.samp)
+
   }
 }
 \references{
@@ -212,6 +197,7 @@ a future implementation of MCMCpack.
      Statistical Methods}. 2nd Edition. New York: Springer.   
 }
 \seealso{\code{\link[coda]{plot.mcmc}},
-  \code{\link[coda]{summary.mcmc}}, \code{\link[stats]{optim}}}
+  \code{\link[coda]{summary.mcmc}}, \code{\link[stats]{optim}},
+  \code{\link[mcmc]{metrop}}}
 
 \keyword{models}

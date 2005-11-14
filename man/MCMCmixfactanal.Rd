@@ -2,13 +2,13 @@
 \alias{MCMCmixfactanal}
 \title{Markov Chain Monte Carlo for Mixed Data Factor Analysis Model}
 \description{
-  This function generates a posterior density sample from a mixed data
-  (both continuous and ordinal) factor analysis model. Normal priors are
-  assumed on the factor loadings and factor scores, improper
+  This function generates a sample from the posterior distribution of a
+  mixed data (both continuous and ordinal) factor analysis model. Normal
+  priors are assumed on the factor loadings and factor scores, improper
   uniform priors are assumed on the cutpoints, and inverse gamma priors
   are assumed for the error variances (uniquenesses). The user supplies
   data and parameters for the prior distributions, and a sample from the
-  posterior density is returned as an mcmc object, which can be
+  posterior distribution is returned as an mcmc object, which can be
   subsequently analyzed with functions provided in the coda package.
 }
   
@@ -143,7 +143,7 @@ MCMCmixfactanal(x, factors, lambda.constraints=list(),
 }
 
 \value{
-   An mcmc object that contains the posterior density sample.  This 
+   An mcmc object that contains the posterior sample.  This 
    object can be summarized by functions provided by the coda package.
 }
 
@@ -198,7 +198,7 @@ MCMCmixfactanal(x, factors, lambda.constraints=list(),
     i=1,\dots,n}{phi_i(2:d) ~ N(0, I),
       i=1,...,n} 
 
-  \code{MCMCmixfactanal} simulates from the posterior density using
+  \code{MCMCmixfactanal} simulates from the posterior distribution using
   a Metropolis-Hastings within Gibbs sampling algorithm. The algorithm
   employed is based on work by Cowles (1996).  Note that
   the first element of \eqn{\phi_i}{phi_i} is a 1. As a result, the
@@ -208,8 +208,7 @@ MCMCmixfactanal(x, factors, lambda.constraints=list(),
   returned in the mcmc object.
   The simulation proper is done in compiled C++ code to maximize
   efficiency.  Please consult the coda documentation for a comprehensive
-  list of functions that can be used to analyze the posterior density
-  sample. 
+  list of functions that can be used to analyze the posterior sample. 
 
   As is the case with all measurement models, make sure that you have plenty
   of free memory, especially when storing the scores.

@@ -2,10 +2,10 @@
 \alias{MCMCoprobit}
 \title{Markov Chain Monte Carlo for Ordered Probit Regression}
 \description{
-  This function generates a posterior density sample
-  from an ordered probit regression model using the data augmentation 
+  This function generates a sample from the posterior distribution of
+  an ordered probit regression model using the data augmentation 
   approach of Cowles (1996). The user supplies data and priors,
-  and a sample from the posterior density is returned as an mcmc
+  and a sample from the posterior distribution is returned as an mcmc
   object, which can be subsequently analyzed with functions 
   provided in the coda package.
   }
@@ -70,16 +70,16 @@ MCMCoprobit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
 }
 
 \value{
-   An mcmc object that contains the posterior density sample.  This 
+   An mcmc object that contains the posterior sample.  This 
    object can be summarized by functions provided by the coda package.
 }
 
 \details{
-\code{MCMCoprobit} simulates from the posterior density of a ordered probit
-  regression model using data augmentation. The simulation proper is
-  done in compiled C++ code to maximize efficiency.  Please consult the
-  coda documentation for a comprehensive list of functions that can be
-  used to analyze the posterior density sample. 
+\code{MCMCoprobit} simulates from the posterior distribution of a
+ordered probit regression model using data augmentation. The simulation
+proper is done in compiled C++ code to maximize efficiency.  Please
+consult the coda documentation for a comprehensive list of functions
+that can be used to analyze the posterior sample. 
   
   The observed variable \eqn{y_i}{y_i} is ordinal with a total of \eqn{C}{C} 
   categories, with distribution

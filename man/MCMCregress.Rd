@@ -2,12 +2,12 @@
 \alias{MCMCregress}
 \title{Markov Chain Monte Carlo for Gaussian Linear Regression}
 \description{
-  This function generates a posterior density sample
-  from a linear regression model with Gaussian errors using
+  This function generates a sample from the posterior distribution
+  of a linear regression model with Gaussian errors using
   Gibbs sampling (with a multivariate Gaussian prior on the
   beta vector, and an inverse Gamma prior on the conditional
   error variance).  The user supplies data and priors, and 
-  a sample from the posterior density is returned as an mcmc
+  a sample from the posterior distribution is returned as an mcmc
   object, which can be subsequently analyzed with functions 
   provided in the coda package.
   }
@@ -81,17 +81,17 @@ MCMCregress(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
 }
 
 \value{
-   An mcmc object that contains the posterior density sample.  This 
+   An mcmc object that contains the posterior sample.  This 
    object can be summarized by functions provided by the coda package.
 }
 
 \details{
-  \code{MCMCregress} simulates from the posterior density using 
+  \code{MCMCregress} simulates from the posterior distribution using 
   standard Gibbs sampling (a multivariate Normal draw for the betas, and an
   inverse Gamma draw for the conditional error variance).  The simulation
   proper is done in compiled C++ code to maximize efficiency.  Please consult
   the coda documentation for a comprehensive list of functions that can be
-  used to analyze the posterior density sample.
+  used to analyze the posterior sample.
   
   The model takes the following form:
   \deqn{y_i = x_i ' \beta + \varepsilon_{i}}{y_i = x_i'beta + epsilon_i}

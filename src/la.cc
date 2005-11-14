@@ -23,6 +23,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <numeric>
 #include <set>
 
 #ifdef SCYTHE_COMPILE_DIRECT
@@ -198,7 +199,7 @@ namespace SCYTHE {
     }
     
     // See how many rows are true
-    int N = accumulate(e.begin(), e.end(), (int) 0);
+    int N = std::accumulate(e.begin(), e.end(), (int) 0);
     
     // declare and form output Matrix
     Matrix<T> temp(N, A.cols(), false);
@@ -349,17 +350,37 @@ namespace SCYTHE {
   Matrix<T>
   crossprod (const Matrix<T> &A)
   {
-    Matrix<T> temp(A.cols(), A.cols(), false);
+		int rows = A.rows();
+		int cols = A.cols();
+    Matrix<T> result(cols, cols, true);
+		T tmp;
+		
+		if (rows == 1) {
+			for (int k = 0; k < rows; ++k) {
+				for (int i = 0; i < cols; ++i) {
+					tmp = A[k * cols + i];
+					for (int j = i; j < cols; ++j) {
+						result[j * cols +i] =
+							result[i * cols + j] += tmp * A[k * cols + j];
+					}
+				}
+			}
+		} else {
+			for (int k = 0; k < rows; ++k) {
+				for (int i = 0; i < cols; ++i) {
+					tmp = A[k * cols + i];
+					for (int j = i; j < cols; ++j) {
+							result[i * cols + j] += tmp * A[k * cols + j];
+					}
+				}
+			}
+
+			for (int i = 0; i < cols; ++i)
+				for (int j = i + 1; j < cols; ++j)
+					result[j * cols + i] = result[i * cols + j];
+		}
   
-    for (int i = 0; i < A.cols(); ++i) {
-      for (int j = i; j < A.cols(); ++j) {
-        temp(i,j) = T (0);
-        for (int k = 0; k < A.rows(); ++k)
-          temp(j,i) = temp(i,j) += A(k,i) * A(k,j);
-      }
-    }
-  
-    return temp;
+    return result;
   }
 
 } // end namespace SCYTHE

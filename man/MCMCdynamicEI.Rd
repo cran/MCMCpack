@@ -74,7 +74,7 @@ MCMCdynamicEI(r0, r1, c0, c1, burnin=5000, mcmc=50000, thin=1,
 }
 
 \value{
-  An mcmc object that contains the posterior density sample.
+  An mcmc object that contains the sample from the posterior distribution.
   This object can  be summarized by functions provided by the coda package.
 }
 
@@ -129,7 +129,7 @@ MCMCdynamicEI(r0, r1, c0, c1, burnin=5000, mcmc=50000, thin=1,
   Inference centers on \eqn{p_0}{p0}, \eqn{p_1}{p1},
   \eqn{\sigma^2_0}{sigma^2_0}, and \eqn{\sigma^2_1}{sigma^2_1}.
    Univariate slice sampling (Neal, 2003) together with Gibbs sampling
-   is used to sample from the posterior density. 
+   is used to sample from the posterior distribution. 
   }
   
 \references{

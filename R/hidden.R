@@ -9,6 +9,8 @@
 
 ## create an agreement score matrix from a vote matrix
 ## subjects initially on rows and items on cols of X
+## note: treats missing votes as category for agreement / might be
+##       more principled to treat them in another fashion
 "agree.mat" <- function(X){
   X <- t(X) # put subjects on columns
   n <- ncol(X)
