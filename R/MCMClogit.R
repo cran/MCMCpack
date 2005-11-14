@@ -6,11 +6,13 @@
 ## Modified to meet new developer specification 7/15/2004 KQ
 ## Modified for new Scythe and rngs 7/25/2004 KQ
 ## note: B0 is now a precision
+## Modified to allow user-specified prior density 8/17/2005 KQ
+##
 
 "MCMClogit" <-
   function(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
            thin=1, tune=1.1, verbose = 0, seed = NA, beta.start = NA,
-           b0 = 0, B0 = 0, ...) {
+           b0 = 0, B0 = 0, user.prior.density=NULL, logfun=TRUE, ...) {
 
     ## checks
     check.offset(list(...))
@@ -35,6 +37,50 @@
     b0 <- mvn.prior[[1]]
     B0 <- mvn.prior[[2]]
 
+    ## setup the environment so that fun can see the things passed as ...
+    userfun <- function(ttt) user.prior.density(ttt, ...)
+    my.env <- environment(fun = userfun)
+    
+    
+    
+    ## check to make sure user.prior.density returns a numeric scalar and
+    ## starting values have positive prior mass
+    if (is.function(user.prior.density)){
+      funval <- userfun(beta.start)
+      if (length(funval) != 1){
+        cat("user.prior.density does not return a scalar.\n")
+        stop("Respecify and call MCMClogit() again. \n")       
+      }
+      if (!is.numeric(funval)){
+        cat("user.prior.density does not return a numeric value.\n")
+        stop("Respecify and call MCMClogit() again. \n")       
+      }
+
+      if (identical(funval,  Inf)){
+        cat("user.prior.density(beta.start) == Inf.\n")
+        stop("Respecify and call MCMClogit() again. \n")       
+      }
+      
+      if (logfun){
+        if (identical(funval, -Inf)){
+          cat("user.prior.density(beta.start) == -Inf.\n")
+          stop("Respecify and call MCMClogit() again. \n")       
+        }
+      }
+      else{
+        if (funval <= 0){
+          cat("user.prior.density(beta.start) <= 0.\n")
+          stop("Respecify and call MCMClogit() again. \n")       
+        }        
+      }   
+    }
+    else if (!is.null(user.prior.density)){
+      cat("user.prior.density is neither a NULL nor a function.\n")
+      stop("Respecify and call MCMClogit() again. \n")       
+    }
+        
+
+       
     ## form the tuning parameter
     tune <- vector.tune(tune, K)
     V <- vcov(glm(formula=formula, data=data, family=binomial))
@@ -46,22 +92,50 @@
     }
    
    
-    ## define holder for posterior density sample
-    sample <- matrix(data=0, mcmc/thin, dim(X)[2] )
 
-    ## call C++ code to draw sample
-    auto.Scythe.call(output.object="posterior", cc.fun.name="MCMClogit",
-                     sample=sample, Y=Y, X=X, burnin=as.integer(burnin),
-                     mcmc=as.integer(mcmc), thin=as.integer(thin),
-                     tune=tune, lecuyer=as.integer(lecuyer),
-                     seedarray=as.integer(seed.array),
-                     lecuyerstream=as.integer(lecuyer.stream),
-                     verbose=as.integer(verbose), betastart=beta.start,
-                     b0=b0, B0=B0, V=V) 
+    propvar <- tune %*% V %*% tune
+
     
-    ## put together matrix and build MCMC object to return
-    output <- form.mcmc.object(posterior, names=xnames,
-                               title="MCMClogit Posterior Density Sample")
+    ## call C++ code to draw sample
+    if (is.null(user.prior.density)){
+      ## define holder for posterior density sample
+      sample <- matrix(data=0, mcmc/thin, dim(X)[2] )
+      
+      auto.Scythe.call(output.object="posterior", cc.fun.name="MCMClogit",
+                       sample=sample, Y=Y, X=X, burnin=as.integer(burnin),
+                       mcmc=as.integer(mcmc), thin=as.integer(thin),
+                       tune=tune, lecuyer=as.integer(lecuyer),
+                       seedarray=as.integer(seed.array),
+                       lecuyerstream=as.integer(lecuyer.stream),
+                       verbose=as.integer(verbose), betastart=beta.start,
+                       b0=b0, B0=B0, V=V) 
+
+      ## put together matrix and build MCMC object to return
+      output <- form.mcmc.object(posterior, names=xnames,
+                                 title="MCMClogit Posterior Density Sample")
+      
+      
+    }
+    else {
+      sample <- .Call("MCMClogituserprior_cc",
+                      userfun, as.integer(Y), as.matrix(X),
+                      as.double(beta.start),
+                      my.env, as.integer(burnin), as.integer(mcmc),
+                      as.integer(thin),
+                      as.integer(verbose),
+                      lecuyer=as.integer(lecuyer), 
+                      seedarray=as.integer(seed.array),
+                      lecuyerstream=as.integer(lecuyer.stream),
+                      as.logical(logfun),
+                      as.matrix(propvar),
+                      PACKAGE="MCMCpack")
+      
+      output <- mcmc(data=sample, start=burnin+1,
+                     end=burnin+mcmc, thin=thin)
+      varnames(output) <- as.list(xnames)
+      attr(output, "title") <- "MCMClogit Posterior Density Sample"
+    }
+    
     return(output)    
   }
 

@@ -73,7 +73,7 @@ MCMChierEI(r0, r1, c0, c1, burnin=5000, mcmc=50000, thin=1,
 }
 
 \value{
-  An mcmc object that contains the posterior density sample.
+  An mcmc object that contains the sample from the posterior distribution.
   This object can  be summarized by functions provided by the coda package.
 }
 
@@ -129,7 +129,7 @@ MCMChierEI(r0, r1, c0, c1, burnin=5000, mcmc=50000, thin=1,
    \eqn{\mu_1}{mu1}, \eqn{\sigma^2_0}{sigma^2_0}, and
    \eqn{\sigma^2_1}{sigma^2_1}.
    Univariate slice sampling (Neal, 2003) along with Gibbs sampling is
-   used to sample from the posterior density.
+   used to sample from the posterior distribution.
 
    See Section 5.4 of Wakefield (2003) for discussion of the priors used
    here. \code{MCMChierEI} departs from the Wakefield model in that the

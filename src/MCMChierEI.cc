@@ -66,7 +66,7 @@ static void doubling(double (*logfun)(double[], const double&, const double&,
   theta_R[index] = R;
   int K = p;
   while (K > 0 && 
-	 (z < logfun(theta_L, r0, r1, c0, mu0, mu1, sigma0, sigma1) | 
+	 (z < logfun(theta_L, r0, r1, c0, mu0, mu1, sigma0, sigma1) || 
 	  z < logfun(theta_R, r0, r1, c0, mu0, mu1, sigma0, sigma1))){
     double V = stream->runif();
     if (V < 0.5){

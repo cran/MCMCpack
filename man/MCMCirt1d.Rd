@@ -3,12 +3,12 @@
 \title{Markov Chain Monte Carlo for One Dimensional Item Response Theory
    Model}
 \description{
-  This function generates a posterior density sample from a one
+  This function generates a sample from the posterior distribution of a one
   dimentional item response theory (IRT) model, with Normal
   priors on the subject abilities (ideal points), and
   multivariate Normal priors on the item parameters.  The user
   supplies data and priors, and a sample from the posterior
-  density is returned as an mcmc object, which can be
+  distribution is returned as an mcmc object, which can be
   subsequently analyzed with functions provided in the coda
   package.
 
@@ -121,19 +121,20 @@ MCMCirt1d(datamatrix, theta.constraints=list(), burnin = 1000,
 }
 
 \value{
-   An mcmc object that contains the posterior density sample.  This 
-   object can be summarized by functions provided by the coda package.
+  An mcmc object that contains the sample from the posterior
+  distribution. This object can be summarized by functions provided by
+  the coda package. 
 }
 
 \details{
-  \code{MCMCirt1d} simulates from the posterior density using
+  \code{MCMCirt1d} simulates from the posterior distribution using
   standard Gibbs sampling using data augmentation (a Normal draw
   for the subject abilities, a multivariate Normal
   draw for the item parameters, and a truncated Normal draw for
   the latent utilities). The simulation proper is done in
   compiled C++ code to maximize efficiency.  Please consult the
   coda documentation for a comprehensive list of functions that
-  can be used to analyze the posterior density sample.
+  can be used to analyze the posterior sample.
   
   The model takes the following form.  We assume that each
   subject has an subject ability (ideal point) denoted

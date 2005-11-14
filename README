@@ -1,8 +1,8 @@
 //
-// MCMCpack, Version 0.6-1
+// MCMCpack, Version 0.6-6
 //
 
-Release Date: February 18, 2005
+Release Date: November 14, 2005
 
 This package contains functions for posterior simulation for a number of
 statistical models. All simulation is done in compiled C++ written in
@@ -10,8 +10,7 @@ the Scythe Statistical Library Version 1.0. All models return coda mcmc
 objects that can then be summarized using coda functions or the coda
 menu interface.  The package also contains some useful utility
 functions, including some additional density functions and pseudo-random
-number generators for statistical distributions, a general purpose Metropolis
-sampling algorithm, and tools for visualization.
+number generators for statistical distributions, a general purpose Metropolis sampling algorithm, and tools for visualization.
 
 //
 // Authors
@@ -26,7 +25,7 @@ Kevin M. Quinn <kevin_quinn@harvard.edu>
 
 This package (along with Scythe) uses C++ and the Standard Template
 Library (STL).  It requires use of the GCC compiler 3.0 or greater.  It
-has been tested on GCC 3.1, 3.2, 3.3, and 3.4 on Linux and MacOS X. 
+has been tested on GCC 3.1, 3.2, 3.3, 3.4, and 4.0 on Linux and MacOS X. 
 
 We have also successfully compiled this package for Windows using
 a MinGW cross-compiler using binutils 2.13, gcc 3.2, mingw

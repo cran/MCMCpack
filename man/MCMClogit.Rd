@@ -2,10 +2,10 @@
 \alias{MCMClogit}
 \title{Markov Chain Monte Carlo for Logistic Regression}
 \description{
-  This function generates a posterior density sample
-  from a logistic regression model using a random walk Metropolis
+  This function generates a sample from the posterior distribution of
+  a logistic regression model using a random walk Metropolis
   algorithm. The user supplies data and priors,
-  and a sample from the posterior density is returned as an mcmc
+  and a sample from the posterior distribution is returned as an mcmc
   object, which can be subsequently analyzed with functions 
   provided in the coda package.
   }
@@ -13,7 +13,7 @@
 \usage{
 MCMClogit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
    thin=1, tune=1.1, verbose = 0, seed = NA,  beta.start = NA,
-   b0 = 0, B0 = 0, ...) }
+   b0 = 0, B0 = 0, user.prior.density=NULL, logfun=TRUE, ...) }
 
 \arguments{
     \item{formula}{Model formula.}
@@ -31,7 +31,7 @@ MCMClogit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
       scalar or a \eqn{k}{k}-vector, where \eqn{k}{k} is the length of
       \eqn{\beta}{beta}.Make sure that the
       acceptance rate is satisfactory (typically between 0.20 and 0.5)
-      before using the posterior density sample for inference.}
+      before using the posterior sample for inference.}
     
     \item{verbose}{A switch which determines whether or not the progress of
     the sampler is printed to the screen.  If \code{verbose} is greater
@@ -57,48 +57,75 @@ MCMClogit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
     use the maximum likelihood estimate of \eqn{\beta}{beta} as the starting 
     value.}
 
-    \item{b0}{The prior mean of \eqn{\beta}{beta}.  This can either be a 
-    scalar or a column      
-    vector with dimension equal to the number of betas. If this takes a scalar
-    value, then that value will serve as the prior mean for all of the
-    betas.}
+    \item{b0}{If \code{user.prior.density==NULL} \code{b0} is the prior
+      mean of \eqn{\beta}{beta} under a multivariate normal prior.  This
+      can either be a scalar or a column vector with dimension equal to
+      the number of betas. If this takes a scalar value, then that value
+      will serve as the prior mean for all of the betas.}
     
-    \item{B0}{The prior precision of \eqn{\beta}{beta}.  This can either be a
-    scalar
-    or a square matrix with dimensions equal to the number of betas.  If this
-    takes a scalar value, then that value times an identity matrix serves
-    as the prior precision of \eqn{\beta}{beta}. Default value of 0 is
-    equivalent to an improper uniform prior for beta.}
-     
+    \item{B0}{If \code{user.prior.density==NULL} \code{B0} is the prior
+      precision of \eqn{\beta}{beta} under a multivariate normal prior.
+      This can either be a scalar or a square matrix with dimensions
+      equal to the number of betas.  If this takes a scalar value, then
+      that value times an identity matrix serves as the prior precision
+      of \eqn{\beta}{beta}. Default value of 0 is equivalent to an
+      improper uniform prior for beta.} 
+
+    \item{user.prior.density}{If non-NULL, the prior (log)density up to
+      a constant of proportionality. This must be a function defined in
+      R whose first argument is a continuous (possibly vector)
+      variable. This first argument is the point in the state space at
+      which the prior (log)density is to be evaluated. Additional
+      arguments can be passed to \code{user.prior.density()} by
+      inserting them in the call to \code{MCMClogit()}. See the Details
+      section and the examples below for more information. }
+
+  \item{logfun}{Logical indicating whether \code{use.prior.density()}
+    returns the natural log of a density function (TRUE) or a density
+    (FALSE).} 
+
     \item{\ldots}{further arguments to be passed}       
 }
 
 \value{
-   An mcmc object that contains the posterior density sample.  This 
+   An mcmc object that contains the posterior sample.  This 
    object can be summarized by functions provided by the coda package.
 }
 
-\details{\code{MCMClogit} simulates from the posterior density of a logistic
-  regression model using a random walk Metropolis algorithm. The simulation
-  proper is done in compiled C++ code to maximize efficiency.  Please consult
-  the coda documentation for a comprehensive list of functions that can be
-  used to analyze the posterior density sample.
+\details{\code{MCMClogit} simulates from the posterior distribution of a
+  logistic regression model using a random walk Metropolis
+  algorithm. The simulation proper is done in compiled C++ code to
+  maximize efficiency.  Please consult the coda documentation for a
+  comprehensive list of functions that can be used to analyze the
+  posterior sample. 
   
   The model takes the following form:
   \deqn{y_i \sim \mathcal{B}ernoulli(\pi_i)}{y_i ~ Bernoulli(pi_i)}
   Where the inverse link function:
   \deqn{\pi_i = \frac{\exp(x_i'\beta)}{1 + \exp(x_i'\beta)}}{pi_i = 
     exp(x_i'beta) / [1 + exp(x_i'beta)]}
-  We assume a multivariate Normal prior on \eqn{\beta}{beta}:
-    \deqn{\beta \sim \mathcal{N}(b_0,B_0^{-1})}{beta ~ N(b0,B0^(-1))}
+  By default, we assume a multivariate Normal prior on \eqn{\beta}{beta}:
+  \deqn{\beta \sim \mathcal{N}(b_0,B_0^{-1})}{beta ~ N(b0,B0^(-1))}
+  Additionally, arbitrary user-defined priors can be specified with the
+  \code{user.prior.density} argument. 
 
-  The Metropollis proposal distribution is centered at the current value of
-  \eqn{\theta}{theta} and has variance-covariance \eqn{V = T
-    (B_0 + C^{-1})^{-1} T }{V = T (B0 + C^{-1})^{-1} T}, where
-  \eqn{T}{T} is a the diagonal positive definite matrix formed from the
-  \code{tune}, \eqn{B_0}{B0} is the prior precision, and \eqn{C}{C} is
-  the large sample variance-covariance matrix of the MLEs. This last
-  calculation is done via an initial call to \code{glm}.
+  If the default multivariate normal prior is used, the Metropollis
+  proposal distribution is centered at the current value of
+  \eqn{\beta}{beta} and has variance-covariance \eqn{V = T (B_0 +
+    C^{-1})^{-1} T }{V = T (B0 + C^{-1})^{-1} T}, where \eqn{T}{T} is a
+  the diagonal positive definite matrix formed from the \code{tune},
+  \eqn{B_0}{B0} is the prior precision, and \eqn{C}{C} is the large
+  sample variance-covariance matrix of the MLEs. This last calculation
+  is done via an initial call to \code{glm}.
+
+  If a user-defined prior is used, the Metropollis
+  proposal distribution is centered at the current value of
+  \eqn{\beta}{beta} and has variance-covariance \eqn{V = T
+    C T }{V = T C T}, where \eqn{T}{T} is a
+  the diagonal positive definite matrix formed from the \code{tune} and
+  \eqn{C}{C} is the large sample variance-covariance matrix of the
+  MLEs. This last calculation is done via an initial call to
+  \code{glm}.   
   }
   
 \references{
@@ -114,10 +141,45 @@ MCMClogit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
 
 \examples{
    \dontrun{
+   ## default improper uniform prior
    data(birthwt)
    posterior <- MCMClogit(low~age+as.factor(race)+smoke, data=birthwt)
    plot(posterior)
    summary(posterior)
+
+
+   ## multivariate normal prior
+   data(birthwt)
+   posterior <- MCMClogit(low~age+as.factor(race)+smoke, b0=0, B0=.001,
+                          data=birthwt)
+   plot(posterior)
+   summary(posterior)
+
+
+   ## user-defined independent Cauchy prior 
+   logpriorfun <- function(beta){
+     sum(dcauchy(beta, log=TRUE))
+   }
+
+   posterior <- MCMClogit(low~age+as.factor(race)+smoke,
+                          data=birthwt, user.prior.density=logpriorfun,
+                          logfun=TRUE)
+   plot(posterior)
+   summary(posterior)
+
+
+   ## user-defined independent Cauchy prior with additional args
+   logpriorfun <- function(beta, location, scale){
+     sum(dcauchy(beta, location, scale, log=TRUE))
+   }
+
+   posterior <- MCMClogit(low~age+as.factor(race)+smoke,
+                          data=birthwt, user.prior.density=logpriorfun,
+                          logfun=TRUE, location=0, scale=10)
+   plot(posterior)
+   summary(posterior)
+
+
    }
 }
 

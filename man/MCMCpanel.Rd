@@ -2,13 +2,13 @@
 \alias{MCMCpanel}
 \title{Markov Chain Monte Carlo for the General Linear Panel Model}
 \description{
-  MCMCpanel generates a posterior density sample from a General
+  MCMCpanel generates a sample from the posterior distribution of a General
   Linear Panel Model using Algorithm 2 of Chib and Carlin (1999).
   This model uses a multivariate Normal prior for the fixed
   effects parameters, a Wishart prior on the random effects
   precision matrix, and a Gamma prior on the conditional error
   precision. The user supplies data and priors, and a sample from
-  the posterior density is returned as an mcmc object,
+  the posterior distribution is returned as an mcmc object,
   which can be subsequently analyzed with functions provided in
   the coda package.
   }
@@ -95,17 +95,17 @@ MCMCpanel(obs, Y, X, W, burnin = 1000, mcmc = 10000, thin = 5,
 }
 
 \value{
-   An mcmc object that contains the posterior density sample.  This 
+   An mcmc object that contains the posterior sample.  This 
    object can be summarized by functions provided by the coda package.
 }
 
 \details{
-  \code{MCMCpanel} simulates from the posterior density sample using 
+  \code{MCMCpanel} simulates from the posterior distribution sample using 
   the blocked Gibbs sampler of Chib and Carlin (1999), Algorithm 2. 
   The simulation proper
   is done in compiled C++ code to maximize efficiency.  Please consult
   the coda documentation for a comprehensive list of functions that can be
-  used to analyze the posterior density sample.
+  used to analyze the posterior sample.
   
   The model takes the following form:
   \deqn{y_i = X_i \beta + W_i b_i + \varepsilon_i}{y_i = X_i * beta + W_i *
