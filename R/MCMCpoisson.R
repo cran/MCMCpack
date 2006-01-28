@@ -5,15 +5,29 @@
 ## KQ 3/17/2003 [bug fix]
 ## Modified to meet new developer specification 7/15/2004 KQ
 ## Modified for new Scythe and rngs 7/26/2004 KQ
+## Modified to handle marginal likelihood calculation 1/27/2006 KQ
 
 "MCMCpoisson" <-
   function(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
            thin=1, tune=1.1, verbose = 0, seed = NA, beta.start = NA,
-           b0 = 0, B0 = 0, ...) {
+           b0 = 0, B0 = 0,
+           marginal.likelihood = c("none", "Laplace"),...) {
     
     ## checks
     check.offset(list(...))
     check.mcmc.parameters(burnin, mcmc, thin)
+
+    cl <- match.call()
+    
+    ## get marginal likelihood argument
+    marginal.likelihood  <- match.arg(marginal.likelihood)
+    if (max(B0==0) == 1){
+      if (marginal.likelihood != "none"){
+        warning("Cannot calculate marginal likelihood with improper prior\n")
+        marginal.likelihood <- "none"
+      }
+    }
+    logmarglike <- NULL
     
     ## seeds
     seeds <- form.seeds(seed) 
@@ -44,12 +58,34 @@
       stop("\n Check data and call MCMCpoisson() again. \n") 
     }
    
-    ## define holder for posterior density sample
+    ## define holder for posterior sample
     sample <- matrix(data=0, mcmc/thin, dim(X)[2] )
-  
+
+
+    
+    ## marginal likelihood calculation if Laplace
+    if (marginal.likelihood == "Laplace"){
+      theta.start <- beta.start
+      optim.out <- optim(theta.start, logpost.poisson, method="BFGS",
+                         control=list(fnscale=-1),
+                         hessian=TRUE, y=Y, X=X, b0=b0, B0=B0)
+      
+      theta.tilde <- optim.out$par
+      beta.tilde <- theta.tilde[1:K]
+      
+      Sigma.tilde <- solve(-1*optim.out$hessian)
+      
+      logmarglike <- (length(theta.tilde)/2)*log(2*pi) +
+        log(sqrt(det(Sigma.tilde))) + 
+          logpost.poisson(theta.tilde, Y, X, b0, B0)
+      
+    }
+
+    
     ## call C++ code to draw sample
     auto.Scythe.call(output.object="posterior", cc.fun.name="MCMCpoisson",
-                     sample=sample, Y=Y, X=X, burnin=as.integer(burnin),
+                     sample.nonconst=sample, Y=Y, X=X,
+                     burnin=as.integer(burnin),
                      mcmc=as.integer(mcmc), thin=as.integer(thin),
                      tune=tune, lecuyer=as.integer(lecuyer),
                      seedarray=as.integer(seed.array),
@@ -59,7 +95,8 @@
     
     ## put together matrix and build MCMC object to return
     output <- form.mcmc.object(posterior, names=xnames,
-                               title="MCMCpoisson Posterior Density Sample")
+                               title="MCMCpoisson Posterior Sample",
+                               y=Y, call=cl, logmarglike=logmarglike)
     return(output)
     
   }

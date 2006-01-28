@@ -1,4 +1,4 @@
-## MCMCmnl.R samples from the posterior density of a multinomial
+## MCMCmnl.R samples from the posterior distribution of a multinomial
 ## logit model using Metropolis-Hastings.
 ##
 ## KQ 12/22/2004
@@ -247,13 +247,14 @@
     b0 <- mvn.prior[[1]]
     B0 <- mvn.prior[[2]]
       
-    ## define holder for posterior density sample
+    ## define holder for posterior sample
     sample <- matrix(data=0, mcmc/thin, dim(X)[2] )
 
     if (mcmc.method=="MH"){
       ## call C++ code to draw sample
       auto.Scythe.call(output.object="posterior", cc.fun.name="MCMCmnlMH",
-                       sample=sample, Y=Y, X=X, burnin=as.integer(burnin),
+                       sample.nonconst=sample, Y=Y, X=X,
+                       burnin=as.integer(burnin),
                        mcmc=as.integer(mcmc), thin=as.integer(thin),
                        tune=tune, lecuyer=as.integer(lecuyer),
                        seedarray=as.integer(seed.array),
@@ -265,7 +266,7 @@
       
       ## put together matrix and build MCMC object to return
       output <- form.mcmc.object(posterior, names=xnames,
-                                 title="MCMCmnl Posterior Density Sample")
+                                 title="MCMCmnl Posterior Sample")
     }
     else if (mcmc.method=="slice"){
       ## call C++ code to draw sample
@@ -280,7 +281,7 @@
       
       ## put together matrix and build MCMC object to return
       output <- form.mcmc.object(posterior, names=xnames,
-                                 title="MCMCmnl Posterior Density Sample")
+                                 title="MCMCmnl Posterior Sample")
 
     }
 

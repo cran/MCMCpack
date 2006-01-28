@@ -4,6 +4,7 @@
 // ADM and KQ 1/15/2003
 // ADM 7/28/2004 [updated to new Scythe version]
 // completely rewritten and optimized for the 1-d case 8/2/2004 KQ
+// storage changed to save memory KQ 1/27/2006
 
 #include "matrix.h"
 #include "distributions.h"
@@ -60,7 +61,8 @@ extern "C"{
 	    const double* thetaineqdata, 
 	    const int* thetaineqrow, 
 	    const int* thetaineqcol,
-	    const int* store
+	    const int* storei,
+	    const int* storea
 	    ) {
 
     using namespace SCYTHE; //Added by Matthew S. Fasman on 11/04/2004
@@ -93,9 +95,15 @@ extern "C"{
     
 
     // storage matrices (row major order)
-    Matrix<double> theta_store = Matrix<double>(nsamp, J);
-    Matrix<double> eta_store = Matrix<double>(nsamp, K*2);
-    
+    Matrix<double> theta_store;
+    Matrix<double> eta_store;
+    if (*storea == 1){
+      theta_store = Matrix<double>(nsamp, J);
+    }
+    if (*storei == 1){
+      eta_store = Matrix<double>(nsamp, K*2);
+    }
+
     // starting values 
     Matrix<double> eta   = cbind(alpha, beta);
     Matrix<double> Z     = Matrix<double>(J,K);
@@ -127,15 +135,19 @@ extern "C"{
       if ((iter >= burnin[0]) && ((iter % thin[0]==0))) {
 	
 	// store ideal points
-	for (int l=0; l<J; ++l)
-          theta_store(count, l) = theta[l];
-        
+	if (*storea == 1){
+	  for (int l=0; l<J; ++l)
+	    theta_store(count, l) = theta[l];
+	}
+	
 	// store bill parameters
-	for (int l=0; l<K*2; ++l)
-	  eta_store(count, l) = eta[l];
+	if (*storei == 1){
+	  for (int l=0; l<K*2; ++l)
+	    eta_store(count, l) = eta[l];
+	}
 	count++;	
       }
-
+      
       R_CheckUserInterrupt(); // allow user interrupts
       
     } // end Gibbs loop
@@ -144,8 +156,11 @@ extern "C"{
     
     // return output
     Matrix<double> output;
-    if(*store == 0) {
+    if(*storei == 0 && *storea == 1) {
       output = theta_store;
+    }
+    else if (*storei == 1 && *storea == 0){
+      output = eta_store;
     }
     else {
       output = cbind(theta_store, eta_store);

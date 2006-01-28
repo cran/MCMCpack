@@ -110,12 +110,12 @@
     gamma[3:ncat] <- (polr.out$zeta[2:(ncat-1)] - polr.out$zeta[1])*.588
     gamma[ncat+1] <- 300
     
-    ## posterior density sample
+    ## posterior sample
     sample <- matrix(data=0, mcmc/thin, K + ncat + 1)
 
     ## call C++ code to draw sample
     auto.Scythe.call(output.object="posterior", cc.fun.name="MCMCoprobit",
-                     sample=sample, Y=as.integer(Y), X=X, 
+                     sample.nonconst=sample, Y=as.integer(Y), X=X, 
                      burnin=as.integer(burnin),
                      mcmc=as.integer(mcmc), thin=as.integer(thin),
                      tune=as.double(tune), lecuyer=as.integer(lecuyer),
@@ -131,7 +131,7 @@
     output <- mcmc(data=sample, start=burnin+1, end=burnin+mcmc, thin=thin)
     xnames <- c(X.names, paste("gamma", 2:(ncat-1), sep=""))
     varnames(output) <- xnames
-    attr(output, "title") <- "MCMCoprobit Posterior Density Sample"
+    attr(output, "title") <- "MCMCoprobit Posterior Sample"
         
     return(output)
   }

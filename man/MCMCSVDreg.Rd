@@ -1,0 +1,161 @@
+\name{MCMCSVDreg}
+\alias{MCMCSVDreg}
+\title{Markov Chain Monte Carlo for SVD Regression}
+\description{
+  This function generates a sample from the posterior distribution
+  of a linear regression model with Gaussian errors in which the
+  design matrix has been decomposed with singular value
+  decomposition.The sampling is done via the Gibbs sampling algorithm.
+  The user supplies data and priors, and 
+  a sample from the posterior distribution is returned as an mcmc
+  object, which can be subsequently analyzed with functions 
+  provided in the coda package.
+  }
+  
+\usage{
+MCMCSVDreg(formula, data=parent.frame(), burnin = 1000, mcmc = 10000,
+           thin=1, verbose = 0, seed = NA, tau2.start = 1,
+           g0 = 0, a0 = 0.001, b0 = 0.001, c0=2, d0=2, w0=1,
+           beta.samp=FALSE, intercept=TRUE, ...)}
+
+\arguments{
+    \item{formula}{Model formula. Predictions are returned for elements
+      of y that are coded as NA.}
+
+    \item{data}{Data frame.}
+
+    \item{burnin}{The number of burn-in iterations for the sampler.}
+
+    \item{mcmc}{The number of MCMC iterations after burnin.}
+
+    \item{thin}{The thinning interval used in the simulation.  The number of
+      MCMC iterations must be divisible by this value.}
+
+    \item{verbose}{A switch which determines whether or not the progress of
+    the sampler is printed to the screen.  If \code{verbose} is greater
+    than 0 the iteration number, the
+    \eqn{\beta}{beta} vector, and the error variance are printed to 
+    the screen every \code{verbose}th iteration.}
+
+    \item{seed}{The seed for the random number generator.  If NA, the Mersenne
+    Twister generator is used with default seed 12345; if an integer is 
+    passed it is used to seed the Mersenne twister.  The user can also
+    pass a list of length two to use the L'Ecuyer random number generator,
+    which is suitable for parallel computation.  The first element of the
+    list is the L'Ecuyer seed, which is a vector of length six or NA (if NA 
+    a default seed of \code{rep(12345,6)} is used).  The second element of 
+    list is a positive substream number. See the MCMCpack 
+    specification for more details.}
+
+  \item{tau2.start}{The starting values for the \eqn{\tau^2}{tau^2} vector. Can
+  be either a scalar or a vector. If a scalar is passed then that value
+  will be the starting value for all elements of \eqn{\tau^2}{tau^2}.}
+
+  
+
+    \item{g0}{The prior mean of \eqn{\gamma}{gamma}.  This can either be a 
+    scalar or a
+    column vector with dimension equal to the number of gammas. If this
+    takes a scalar  value, then that value will serve as the prior
+    mean for all of the betas.} 
+
+  
+  \item{a0}{\eqn{a_0/2}{a0/2} is the shape parameter for the inverse
+    Gamma prior on \eqn{\sigma^2}{sigma^2} (the variance of the
+    disturbances). The amount of information in the inverse Gamma prior
+    is something like that from \eqn{a_0}{a0} pseudo-observations.} 
+    
+    \item{b0}{\eqn{b_0/2}{b0/2} is the scale parameter for the
+    inverse Gamma prior on \eqn{\sigma^2}{sigma^2} (the variance of the
+    disturbances). In constructing the inverse Gamma prior,
+    \eqn{b_0}{b0} acts like the sum of squared errors from the
+    \eqn{a_0}{a0} pseudo-observations.}
+
+  \item{c0}{\eqn{c_0/2}{c0/2} is the shape parameter for the inverse
+    Gamma prior on \eqn{\tau_i^2}{tau[i]^2}.} 
+    
+    \item{d0}{\eqn{d_0/2}{d0/2} is the scale parameter for the
+    inverse Gamma prior on \eqn{\tau_i^2}{tau[i]^2}.}
+
+  \item{w0}{The prior probability that \eqn{\gamma_i = 0}{gamma[i] = 0}.
+    Can be either a scalar or an \eqn{N}{N} vector where \eqn{N}{N} is the
+    number of observations.}
+
+  \item{beta.samp}{Logical indicating whether the sampled elements of
+    beta should be stored and returned.}
+
+  \item{intercept}{Logical indicating whether the original design matrix
+    should include a constant term.}
+  
+    \item{...}{further arguments to be passed}       
+}
+
+\value{
+   An mcmc object that contains the posterior sample.  This 
+   object can be summarized by functions provided by the coda package.
+}
+
+\details{
+  The model takes the following form:
+  \deqn{y = X \beta + \varepsilon}{y = X beta + epsilon}
+  Where the errors are assumed to be iid Gaussian:
+  \deqn{\varepsilon_{i} \sim \mathcal{N}(0, \sigma^2)}{epsilon_i ~ N(0,
+    sigma^2)}.
+
+  Let \eqn{N}{N} denote the number of rows of \eqn{X}{X} and \eqn{P}{P}
+  the number of columns of \eqn{X}{X}. Unlike the standard regression
+  setup where \eqn{N >> P}{N >> P} here it is the case that \eqn{P >>
+    N}{P >> N}.
+
+  To deal with this problem a singular value decomposition of
+  \eqn{X'}{X'} is performed: \eqn{X' = ADF}{X' = ADF} and the regression
+  model becomes
+
+  \deqn{y = F'D \gamma + \varepsilon}{y = F'D gamma + epsilon}
+
+  where \eqn{\gamma = A' \beta}{gamma = A' beta}. 
+
+  We assume the following priors:
+
+  \deqn{\sigma^{-2} \sim \mathcal{G}amma(a_0/2, b_0/2)}{sigma^(-2) ~
+    Gamma(a0/2, b0/2)}
+
+  \deqn{\tau^{-2} \sim \mathcal{G}amma(c_0/2, d_0/2)}{tau^(-2) ~
+    Gamma(c0/2, d0/2)}
+
+  \deqn{\gamma_i \sim w0_i \delta_0 + (1-w0_i) \mathcal{N}(g0_i,
+    \sigma^2 \tau^2_i / d_i^2)}{
+    gamma[i] ~ w0[i] delta0 + (1-w0[i] N(g0[i], sigma^2  tau[i]^2/ d[i]^2)}
+
+  where \eqn{\delta_0}{delta0} is a unit point mass at 0 and
+  \eqn{d_i}{d[i]} is the \eqn{i}{i}th diagonal element of \eqn{D}{D}.
+
+  }
+  
+  \references{
+   West, Mike; Josheph Nevins; Jeffrey Marks; Rainer Spang, and Harry
+   Zuzan. 2000. "DNA MICROARRAY DATA ANALYSIS AND REGRESSION MODELING
+   FOR GENETIC EXPRESSION PROFILING" Duke ISDS working paper.
+
+   Gottardo, Raphael, and Adrian Raftery. 2004. "Markov chain Monte
+   Carlo with mixtures of singular distributions". Statistics
+   department, University of Washington, Technical report 470. 
+    
+   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.  
+   \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+   
+   Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
+   \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
+   \url{http://www-fis.iarc.fr/coda/}.
+}
+
+
+\examples{
+\dontrun{
+}
+}
+
+\keyword{models}
+
+\seealso{\code{\link[coda]{plot.mcmc}},
+  \code{\link[coda]{summary.mcmc}}, \code{\link[stats]{lm}}}

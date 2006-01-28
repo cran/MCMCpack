@@ -2,7 +2,8 @@ useDynLib(MCMCpack)
 import(coda)
 import(MASS)
 
-export(    
+export(
+       BayesFactor,
        choicevar,
        ddirichlet,
        dinvgamma,
@@ -10,11 +11,16 @@ export(
        dnoncenhypergeom,
        dtomogplot,
        dwish,
+       MCbinomialbeta,
+       MCpoissongamma,
+       MCnormalnormal,
+       MCmultinomdirichlet,
        MCMCdynamicEI,
        MCMCfactanal,
        MCMChierEI,
        MCMCirt1d,
        MCMCirtKd,
+       MCMCirtKdRob,
        MCMClogit,
        MCMCmetrop1R,
        MCMCmixfactanal,
@@ -25,7 +31,9 @@ export(
        MCMCpoisson,
        MCMCprobit,
        MCMCregress,
+       MCMCSVDreg,
        MCMCtobit,
+       PostProbMod,
        rdirichlet,
        read.Scythe,
        rinvgamma,
@@ -37,3 +45,7 @@ export(
        write.Scythe,
        xpnd
        )
+
+
+S3method(print, BayesFactor)
+S3method(summary, BayesFactor)

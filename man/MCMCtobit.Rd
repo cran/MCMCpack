@@ -144,6 +144,7 @@ MCMCtobit(formula, data = parent.frame(), below = 0, above = Inf,
   \code{\link[MCMCpack]{MCMCregress}}}
 
 \examples{
+\dontrun{
 library(survival)
 example(tobin)
 summary(tfit)
@@ -152,6 +153,7 @@ tfit.mcmc <- MCMCtobit(durable ~ age + quant, data=tobin, mcmc=30000,
 plot(tfit.mcmc)
 raftery.diag(tfit.mcmc)
 summary(tfit.mcmc)
+}
 }
 
 \keyword{models}

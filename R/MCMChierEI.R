@@ -1,4 +1,4 @@
-# sample from the posterior distribution of Wakefield's baseline model
+# sample from the posterior distribution of Wakefield's hierarchical model
 # for ecological inference in R using linked C++ code in Scythe
 #
 # KQ 10/22/2002
@@ -127,7 +127,7 @@
     varnames(output) <- c(p0names, p1names, "mu0", "mu1", "sigma^2.0",
                           "sigma^2.1")
     
-    attr(output, "title") <- "MCMCpack Wakefield's Hierarchical EI Model Posterior Density Sample"
+    attr(output, "title") <- "MCMCpack Wakefield's Hierarchical EI Model Posterior Sample"
         
     return(output)
     

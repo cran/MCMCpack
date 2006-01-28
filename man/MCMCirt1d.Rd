@@ -21,7 +21,8 @@
 MCMCirt1d(datamatrix, theta.constraints=list(), burnin = 1000,
    mcmc = 20000, thin=1, verbose = 0, seed = NA, theta.start = NA, 
    alpha.start = NA, beta.start = NA, t0 = 0, T0 = 1, ab0=0, AB0=.25,
-   store.item = FALSE, drop.constant.items=TRUE, ... )  }
+   store.item = FALSE, store.ability = TRUE,
+   drop.constant.items=TRUE, ... )  }
 
 \arguments{
     \item{datamatrix}{The matrix of data.  Must be 0, 1, or missing values.  
@@ -108,10 +109,19 @@ MCMCirt1d(datamatrix, theta.constraints=list(), burnin = 1000,
     
     \item{store.item}{A switch that determines whether or not to
     store the item parameters for posterior analysis. 
-    \emph{NOTE: This takes an enormous amount of memory, so
-    should only be used if the chain is thinned heavily, or for
-    applications with a small number of items}.  By default, the
-    item parameters are not stored.}
+    \emph{NOTE: In situations with many items storing the item
+      parameters takes an enormous amount of memory, so
+      \code{store.item} should only be \code{FALSE} if the chain is thinned
+      heavily, or for applications with a small number of items}.
+    By default, the item parameters are not stored.}
+
+  \item{store.ability}{A switch that determines whether or not to
+    store the ability parameters for posterior analysis. 
+    \emph{NOTE: In situations with many individuals storing the ability
+      parameters takes an enormous amount of memory, so
+      \code{store.ability} should only be \code{TRUE} if the chain is thinned
+      heavily, or for applications with a small number of individuals}.
+    By default, the item parameters are stored.}
 
   \item{drop.constant.items}{A switch that determines whether or not
         items that have no variation

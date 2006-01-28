@@ -13,7 +13,8 @@
 \usage{
 MCMClogit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
    thin=1, tune=1.1, verbose = 0, seed = NA,  beta.start = NA,
-   b0 = 0, B0 = 0, user.prior.density=NULL, logfun=TRUE, ...) }
+   b0 = 0, B0 = 0, user.prior.density=NULL, logfun=TRUE,
+   marginal.likelihood=c("none", "Laplace"), ...) }
 
 \arguments{
     \item{formula}{Model formula.}
@@ -83,6 +84,11 @@ MCMClogit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
   \item{logfun}{Logical indicating whether \code{use.prior.density()}
     returns the natural log of a density function (TRUE) or a density
     (FALSE).} 
+
+  \item{marginal.likelihood}{How should the marginal likelihood be
+    calculated? Options are: \code{none} in which case the marginal
+    likelihood will not be calculated or \code{Laplace} in which case the
+    Laplace approximation (see Kass and Raftery, 1995) is used.}
 
     \item{\ldots}{further arguments to be passed}       
 }

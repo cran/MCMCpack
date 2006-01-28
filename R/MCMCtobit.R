@@ -42,12 +42,12 @@ function(formula, data=parent.frame(), below = 0.0, above = Inf,
     B0 <- mvn.prior[[2]]
     check.ig.prior(c0, d0)
 
-    # define holder for posterior density sample
+    # define holder for posterior sample
     sample <- matrix(data=0, mcmc/thin, K+1)
     
     # call C++ code to draw sample
     auto.Scythe.call(output.object="posterior", cc.fun.name="MCMCtobit", 
-                     sample=sample, Y=Y, X=X, below=as.double(below),
+                     sample.nonconst=sample, Y=Y, X=X, below=as.double(below),
                      above=as.double(above),
                      burnin=as.integer(burnin), mcmc=as.integer(mcmc),
                      thin=as.integer(thin),
@@ -60,6 +60,6 @@ function(formula, data=parent.frame(), below = 0.0, above = Inf,
     # pull together matrix and build MCMC object to return
     output <- form.mcmc.object(posterior,
                                names=c(xnames, "sigma2"),
-                               title="MCMCtobit Posterior Density Sample")
+                               title="MCMCtobit Posterior Sample")
     return(output)
   }

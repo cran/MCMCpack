@@ -4,16 +4,30 @@
 ## ADM and KQ 5/21/2002
 ## Modified to meet new developer specification 7/26/2004 KQ
 ## Modified for new Scythe and rngs 7/26/2004 KQ
+## Modified to handle marginal likelihood calculation 1/27/2006 KQ
 
 
 "MCMCprobit" <-
   function(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
            thin = 1, verbose = 0, seed = NA, beta.start = NA,
-           b0 = 0, B0 = 0, bayes.resid=FALSE, ...) {
+           b0 = 0, B0 = 0, bayes.resid=FALSE,
+           marginal.likelihood = c("none", "Laplace"), ...) {
     
     ## checks
     check.offset(list(...))
     check.mcmc.parameters(burnin, mcmc, thin)
+
+    cl <- match.call()
+    
+    ## get marginal likelihood argument
+    marginal.likelihood  <- match.arg(marginal.likelihood)
+    if (max(B0==0) == 1){
+      if (marginal.likelihood != "none"){
+        warning("Cannot calculate marginal likelihood with improper prior\n")
+        marginal.likelihood <- "none"
+      }
+    }
+    logmarglike <- NULL
     
     ## seeds
     seeds <- form.seeds(seed) 
@@ -25,7 +39,7 @@
     holder <- parse.formula(formula, data)
     Y <- holder[[1]]
     X <- holder[[2]]
-    xnames <- holder[[3]]    
+    xnames <- holder[[3]]     
     K <- ncol(X)  # number of covariates
         
     ## starting values and priors
@@ -53,14 +67,34 @@
       cat("Elements of Y equal to something other than 0 or 1.\n")
       stop("Check data and call MCMCprobit() again.\n") 
     }
-     
+
+    
+    ## marginal likelihood calculation if Laplace
+    if (marginal.likelihood == "Laplace"){
+      theta.start <- beta.start
+      optim.out <- optim(theta.start, logpost.probit, method="BFGS",
+                         control=list(fnscale=-1),
+                         hessian=TRUE, y=Y, X=X, b0=b0, B0=B0)
+      
+      theta.tilde <- optim.out$par
+      beta.tilde <- theta.tilde[1:K]
+      
+      Sigma.tilde <- solve(-1*optim.out$hessian)
+      
+      logmarglike <- (length(theta.tilde)/2)*log(2*pi) +
+        log(sqrt(det(Sigma.tilde))) + 
+          logpost.probit(theta.tilde, Y, X, b0, B0)
+      
+    }
+
     if (is.null(resvec)){
       ## define holder for posterior density sample
       sample <- matrix(data=0, mcmc/thin, dim(X)[2] )
   
       ## call C++ code to draw sample
       auto.Scythe.call(output.object="posterior", cc.fun.name="MCMCprobit",
-                       sample=sample, Y=Y, X=X, burnin=as.integer(burnin),
+                       sample.nonconst=sample, Y=Y, X=X,
+                       burnin=as.integer(burnin),
                        mcmc=as.integer(mcmc), thin=as.integer(thin),
                        lecuyer=as.integer(lecuyer),
                        seedarray=as.integer(seed.array),
@@ -70,7 +104,8 @@
       
       ## put together matrix and build MCMC object to return
       output <- form.mcmc.object(posterior, names=xnames,
-                                 title="MCMCprobit Posterior Density Sample")
+                                 title="MCMCprobit Posterior Sample",
+                                 y=Y, call=cl, logmarglike=logmarglike)
 
     }
     else{
@@ -79,7 +114,7 @@
 
       ## call C++ code to draw sample
       auto.Scythe.call(output.object="posterior", cc.fun.name="MCMCprobitres",
-                       sample=sample, Y=Y, X=X, resvec=resvec,
+                       sample.nonconst=sample, Y=Y, X=X, resvec=resvec,
                        burnin=as.integer(burnin),
                        mcmc=as.integer(mcmc), thin=as.integer(thin),
                        lecuyer=as.integer(lecuyer),
@@ -92,7 +127,8 @@
       xnames <- c(xnames, paste("epsilonstar", as.character(resvec), sep="") )
       
       output <- form.mcmc.object(posterior, names=xnames,
-                                 title="MCMCprobit Posterior Density Sample")
+                                 title="MCMCprobit Posterior Sample",
+                                 y=Y, call=cl, logmarglike=logmarglike)
       
     }
     return(output)
