@@ -31,10 +31,17 @@
 ##                    Matrices will be, for example, Xdata, Xrow, and
 ##                    Xcol.
 ##
-##       This also build a skeleton C++ template and clean R template
-##       for MCMCpack if developer=TRUE.  All are arguments constants
-##       except the matrix named "sample".
+##                    Any objects that are changed in the C++ code
+##                    need to have C++ names like sample.nonconst.  All
+##                    *.nonconst have the tag stripped and a pointer
+##                    is used to change values.  This is used in all models
+##                    for the posterior density sample (sample.nonconst),
+##                    and other quantities of interest.
 ##
+##       This also build a skeleton C++ template and clean R template
+##       for MCMCpack if developer=TRUE.
+##
+## Updated by ADM and KQ 1/25/2006 (to allow for multiple nonconsts)
 
 "auto.Scythe.call" <-
   function(output.object, cc.fun.name, package="MCMCpack",
@@ -44,9 +51,15 @@
    objects <- list(...)
    K <- length(objects)
    c.names <- names(objects)
-   if (max(c.names=="sample") != 1){
-     stop("argument named 'sample' must be specified in call to auto.Scythe.call()\n")
-   }
+   nonconst.indic <- rep(FALSE, K)
+   test <- grep("\.nonconst$", c.names)
+   if(length(test)==0)
+      stop("something must be declared non-constant in auto.Scythe.call()\n")
+   nonconst.indic[test] <- TRUE
+   c.names <- sub("\.nonconst$", "", c.names)
+   if(length(unique(c.names)) != K)
+      stop("non-unique nonconst names passed in auto.Scythe.call()\n")
+      
    R.names <- strsplit(toString(match.call()), ",")[[1]]
    R.names <- R.names[(length(R.names)-K+1):length(R.names)]
 
@@ -80,8 +93,6 @@
      objects <- c(objects, verbose=as.integer(FALSE))
      R.names[length(objects)] <- "as.integer(FALSE)"     
    }
-   K <- length(objects)
-   c.names <- names(objects)
 
    ## check parameters
    check.mcmc.parameters(objects$burnin, objects$mcmc, objects$thin)
@@ -139,8 +150,6 @@
        stop("Integers, doubles, or matrices only to auto.Scythe.call().")
      }
    }
-
-
    
    # clean up and return R call
    middle <- paste(middle, sep=" ", collapse=" ")
@@ -159,42 +168,32 @@
 
    for(k in 1:K) {
       if(is.double(objects[[k]]) & is.null(dim(objects[[k]]))) {
-         holder <- paste("const double *", c.names[[k]], ",", sep="")
+         holder <- paste("double *", c.names[[k]], ",", sep="")
+         if(!nonconst.indic[k]) holder <- paste("const ", holder, sep="")
          c.middle <- c(c.middle, holder)
       }
       else if(is.integer(objects[[k]]) & is.null(dim(objects[[k]]))) {
-         holder <- paste("const int *", c.names[[k]], ",", sep="")
+         holder <- paste("int *", c.names[[k]], ",", sep="")
+         if(!nonconst.indic[k]) holder <- paste("const ", holder, sep="")         
          c.middle <- c(c.middle, holder)
       }
       else if(is.matrix(objects[[k]])) {
-         
-         # pull together Scythe call [note sample]
-         if(c.names[[k]]=="sample") {
-            holder.data <- paste("double *", c.names[[k]], "data,", sep="")
-            scythe <- NULL
-            together.call <- paste(together.call, scythe, sep="")
-            sample.block <- paste("     const int size = *", c.names[[k]],
-               "row * *", c.names[[k]],
-               "col;\n     for(int i = 0; i < size; ++i)\n",
-               "       ", c.names[[k]], "data[i] = STORAGEMATRIX[i];\n", 
-               sep="")
-         }
-         else {
-           holder.data <- paste("const double *", c.names[[k]],
-                                "data,", sep="")
-           scythe <- paste("     Matrix <double> ", c.names[[k]],
-                           " = r2scythe(*",
-                           c.names[[k]], "row, *", c.names[[k]], "col, ",
-                           c.names[[k]], "data);\n", sep="")
+         holder.data <- paste("double *", c.names[[k]],
+                               "data,", sep="")
+         if(!nonconst.indic[k]) holder.data <-
+            paste("const ", holder.data, sep="")
+         scythe <- paste("     Matrix <double> ", c.names[[k]],
+                         " = r2scythe(*",
+                         c.names[[k]], "row, *", c.names[[k]], "col, ",
+                         c.names[[k]], "data);\n", sep="")
                             
-           together.call <- paste(together.call, scythe, sep="")
+          together.call <- paste(together.call, scythe, sep="")
          }
-         holder.row <- paste("const int *", c.names[[k]], "row,", sep="")
-         holder.col <- paste("const int *", c.names[[k]], "col,", sep="")
-         c.middle <- c(c.middle, holder.data, holder.row, holder.col)
+      holder.row <- paste("const int *", c.names[[k]], "row,", sep="")
+      holder.col <- paste("const int *", c.names[[k]], "col,", sep="")
+      c.middle <- c(c.middle, holder.data, holder.row, holder.col)
       }
-   }
-   
+
    # clean up and print C++ function call
    c.middle <- paste(c.middle, sep=" ", collapse=" ")
    c.call <- paste(c.start, c.middle, c.end, sep="")
@@ -230,7 +229,7 @@
       cat(comment.block, includes.block, main.block, function.call,
           together.block, together.call, constants.block, storage.block,
           seed.block, startval.block, sample.call,
-          sample.block, end.block, sep="", file=cc.file)
+          end.block, sep="", file=cc.file)
       if (cc.file != "") {
         cat("\nCreated file named '", cc.file, "'.\n", sep="")
         cat("Edit the file and move it to the appropriate directory.\n")

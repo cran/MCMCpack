@@ -13,7 +13,8 @@
 \usage{
 MCMCprobit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
    thin = 1, verbose = 0, seed = NA, beta.start = NA,
-   b0 = 0, B0 = 0, bayes.resid = FALSE, ...) }
+   b0 = 0, B0 = 0, bayes.resid = FALSE,
+   marginal.likelihood=c("none", "Laplace"), ...) }
 
 \arguments{
     \item{formula}{Model formula.}
@@ -71,7 +72,12 @@ MCMCprobit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
     giving the observation numbers for which latent residuals should be
     calculated and returned. TRUE will return draws of
     latent residuals for all observations.}
-    
+
+  \item{marginal.likelihood}{How should the marginal likelihood be
+    calculated? Options are: \code{none} in which case the marginal
+    likelihood will not be calculated or \code{Laplace} in which case the
+    Laplace approximation (see Kass and Raftery, 1995) is used.}
+
     \item{...}{further arguments to be passed}       
 }
 

@@ -2,6 +2,38 @@
 // Changes and Bug Fixes
 //
 
+0.6-6 to 0.7-1
+  * Added robust k-dimensional IRT model MCMCirtKdRob().
+  * Added SVD regression MCMCSVDreg().
+  * Updated auto.Scythe.call() to have any number of non-constants args; this
+    is necessary to return other things from the C++ code besides the
+    posterior density sample (including log-marginal likelihoods,
+    acceptance rates, etc.).
+  * Updated form.mcmc.object() to add additional attributes to an
+    mcmc object to hold other quantities of interest (such as
+    log-marginal likelihoods, acceptance rates, data, etc.).
+  * For linear regression model, added option to compute log-marginal
+    likelihood via the method of Chib (1995) or via the Laplace Approximation.
+  * For logistic regression model, added option to compute log-marginal
+    likelihood via the Laplace Approximation.
+  * For probit regression model, added option to compute log-marginal
+    likelihood via the Laplace Approximation.
+  * For Poisson regression model, added option to compute log-marginal
+    likelihood via the Laplace Approximation.
+  * Added methods to calculate Bayes factors and posterior probabilities 
+    of models and handle log-marginal likelihoods. 
+  * Added teaching model MCbinomialbeta().
+  * Added teaching model MCpoissongamma().
+  * Added teaching model MCnormalnormal().
+  * Added teaching model MCmultinomdirichlet().
+  * patched xpnd() function to provide more functionality.  Thanks to
+    Gregor Gorjan for the patches.
+  * added the function procrustes() that performs a Procrustes 
+    transformation of a matrix.
+  * made some minor changes to MCMCirt1d() to help conserve memory when
+    dealing with large datasets (MORE OPTIMIZATION NEEDS TO BE DONE IN
+    TERMS OF BOTH SPEED AND MEMORY)	
+
 0.6-5 to 0.6-6
   * fixed the std::accumulate problem pointed out by Kurt Hornik. Thanks
     to Dan Pemstein for tracking the problem down and making the fix.

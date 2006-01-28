@@ -241,7 +241,7 @@
     output <- mcmc(data=sample, start=1, end=mcmc, thin=thin)
     varnames(output) <- names
     attr(output,"title") <- 
-      "MCMCpack Linear Panel Model Posterior Density Sample"
+      "MCMCpack Linear Panel Model Posterior Sample"
     return(output)
   }
 

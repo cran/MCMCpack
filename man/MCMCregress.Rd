@@ -15,7 +15,8 @@
 \usage{
 MCMCregress(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
    thin = 1, verbose = 0, seed = NA, beta.start = NA, 
-   b0 = 0, B0 = 0, c0 = 0.001, d0 = 0.001, ...) }
+   b0 = 0, B0 = 0, c0 = 0.001, d0 = 0.001,
+   marginal.likelihood = c("none", "Laplace", "Chib95"), ...) }
 
 \arguments{
     \item{formula}{Model formula.}
@@ -76,7 +77,13 @@ MCMCregress(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
     disturbances). In constructing the inverse Gamma prior,
     \eqn{d_0}{d0} acts like the sum of squared errors from the
     \eqn{c_0}{c0} pseudo-observations.}
-    
+
+  \item{marginal.likelihood}{How should the marginal likelihood be
+    calculated? Options are: \code{none} in which case the marginal
+    likelihood will not be calculated, \code{Laplace} in which case the
+    Laplace approximation (see Kass and Raftery, 1995) is used, and
+    \code{Chib95} in which case the method of Chib (1995) is used.}
+  
     \item{...}{further arguments to be passed}       
 }
 
@@ -110,7 +117,14 @@ MCMCregress(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
   as the first block in the sampler.
   }
   
-\references{
+  \references{
+   Siddhartha Chib. 1995. "Marginal Likelihood from the Gibbs Output."
+   \emph{Journal of the American Statistical Association}. 90:
+   1313-1321.
+
+   Robert E. Kass and Adrian E. Raftery. 1995. "Bayes Factors."
+   \emph{Journal of the American Statistical Association}. 90: 773-795.
+    
    Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.  
    \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    

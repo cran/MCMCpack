@@ -119,7 +119,7 @@
     p1names <- paste("p1table", 1:ntables, sep="")
     varnames(output) <- c(p0names, p1names, "sigma^2_0", "sigma^2_1")
     
-    attr(output, "title") <- "MCMCpack Quinn's Dynamic EI Model Posterior Density Sample" 
+    attr(output, "title") <- "MCMCpack Quinn's Dynamic EI Model Posterior Sample" 
     
     
     return(output)

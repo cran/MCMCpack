@@ -13,7 +13,7 @@
 \usage{
 MCMCpoisson(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
    thin = 1, tune = 1.1, verbose = 0, seed = NA,  beta.start = NA,
-   b0 = 0, B0 = 0, ...) }
+   b0 = 0, B0 = 0, marginal.likelihood = c("none", "Laplace"), ...) }
 
 \arguments{
     \item{formula}{Model formula.}
@@ -70,7 +70,12 @@ MCMCpoisson(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
     takes a scalar value, then that value times an identity matrix serves
     as the prior precision of \eqn{\beta}{beta}. Default value of 0 is
     equivalent to an improper uniform prior for beta.}
-     
+
+  \item{marginal.likelihood}{How should the marginal likelihood be
+    calculated? Options are: \code{none} in which case the marginal
+    likelihood will not be calculated or \code{Laplace} in which case the
+    Laplace approximation (see Kass and Raftery, 1995) is used.}
+  
     \item{\ldots}{further arguments to be passed}       
 
 }

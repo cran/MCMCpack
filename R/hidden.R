@@ -5,7 +5,8 @@
 ##       fixes them in all functions simultaneously.
 ##
 ## updated by ADM 7/22/04
-## re-organized (alphabetical) by adm 7/28/04
+## re-organized (alphabetical) by ADM 7/28/04
+## added a number of functions for teaching models by ADM 1/25/2006 
 
 ## create an agreement score matrix from a vote matrix
 ## subjects initially on rows and items on cols of X
@@ -101,6 +102,66 @@
     return(0)
   }
 
+# check inverse Gamma prior
+"check.ig.prior" <-
+   function(c0, d0) {
+     
+    if(c0 <= 0) {
+      cat("Error: IG(c0/2,d0/2) prior c0 less than or equal to zero.\n")
+      stop("Please respecify and call ", calling.function(), " again.\n",
+         call.=FALSE)
+    }
+    if(d0 <= 0) {
+      cat("Error: IG(c0/2,d0/2) prior d0 less than or equal to zero.\n")
+       stop("Please respecify and call ", calling.function(), " again.\n",
+        call.=FALSE)    
+    }
+    return(0)
+  }
+
+# check Gamma prior
+# ADM 1/25/2006
+"check.gamma.prior" <-
+   function(alpha, beta) {
+     
+    if(alpha <= 0) {
+      cat("Error: Gamma(alpha,beta) prior alpha less than or equal to zero.\n")
+      stop("Please respecify and call ", calling.function(), " again.\n",
+         call.=FALSE)
+    }
+    if(alpha <= 0) {
+      cat("Error: Gamma(alpha,beta) prior beta less than or equal to zero.\n")
+       stop("Please respecify and call ", calling.function(), " again.\n",
+        call.=FALSE)    
+    }
+    return(0)
+  }   
+
+# check Normal prior
+# ADM 1/26/2006
+"check.normal.prior" <-
+   function(mu, sigma2) {
+   
+     if(sigma2 <= 0) {
+       cat("Error: Normal(mu0,tau20) prior sigma2 less than or equal to zero.\n")
+       stop("Please respecify and call ", calling.function(), " again.\n",
+         call.=FALSE)    
+     }
+   }
+
+# check mc parameter
+# ADM 1/25/2006
+"check.mc.parameter" <-
+  function(mc) {
+  
+    if(mc < 0) {
+      cat("Error: Monte Carlo iterations negative.\n")
+      stop("Please respecify and call ", calling.function(), " again.",
+         call.=FALSE) 
+    }   
+    return(0)
+  }
+
 # check mcmc parameters
 "check.mcmc.parameters" <-
   function(burnin, mcmc, thin) {
@@ -133,7 +194,8 @@
    function(args) {
       if(sum(names(args)=="offset")==1) {
          cat("Error: Offsets are currently not supported in MCMCpack.\n")
-         stop("Please respecify and call ", calling.function(), " again.\n")
+         stop("Please respecify and call ", calling.function(), " again.\n",
+            call.=FALSE)
       }
    return(0)
    }
@@ -490,17 +552,29 @@
 
 # pull together the posterior density sample
 "form.mcmc.object" <-
-  function(posterior.object, names, title) {
+  function(posterior.object, names, title, ...) {
     holder <- matrix(posterior.object$sampledata,
                      posterior.object$samplerow,
                      posterior.object$samplecol,
                      byrow=TRUE)
-    
+
+      
     output <- mcmc(data=holder, start=(posterior.object$burnin+1),
                    end=(posterior.object$burnin+posterior.object$mcmc),
                    thin=posterior.object$thin)
     varnames(output) <- as.list(names)
     attr(output,"title") <- title
+    
+    attribs <- list(...)
+    K <- length(attribs)
+    attrib.names <- names(attribs)
+
+    if (K>0){
+      for (i in 1:K){
+        attr(output, attrib.names[i]) <- attribs[[i]]
+      }
+    }
+    
     return(output)  
   }
 

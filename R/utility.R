@@ -21,10 +21,12 @@
 #
 # ADM 4/18/2003
 # ADM 11/13/2003 [bug fix]
+# ADM 1/25/2006 [patch to automatically compute matrix size]
 
 "xpnd" <-
-  function (x, nrow) {
+  function (x, nrow = NULL) {
     dim(x) <- NULL
+    if(is.null(nrow)) nrow <- (-1 + sqrt(1 + 8 * length(x))) / 2
     output <- matrix(0, nrow, nrow)
     output[lower.tri(output, diag = TRUE)] <- x
     hold <- output

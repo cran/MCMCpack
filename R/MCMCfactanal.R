@@ -103,7 +103,7 @@
     Psi <- factuniqueness.start(psi.start, X)
     
 
-    ## define holder for posterior density sample
+    ## define holder for posterior sample
     if(store.scores == FALSE) {
       sample <- matrix(data=0, mcmc/thin, K*factors+K)
     }
@@ -113,7 +113,7 @@
    
     ## call C++ code to do the sampling
     auto.Scythe.call(output.object="posterior", cc.fun.name="MCMCfactanal",
-                     sample=sample, X=X, burnin=as.integer(burnin),
+                     sample.nonconst=sample, X=X, burnin=as.integer(burnin),
                      mcmc=as.integer(mcmc), thin=as.integer(thin), 
                      lecuyer=as.integer(lecuyer), 
                      seedarray=as.integer(seed.array),
@@ -136,7 +136,7 @@
                          rep(1:factors,factors), sep="_")
       par.names <- c(par.names, phi.names)
     }
-    title <- "MCMCpack Factor Analysis Posterior Density Sample"
+    title <- "MCMCpack Factor Analysis Posterior Sample"
     output <- form.mcmc.object(posterior, par.names, title)
     ## get rid of columns for constrained parameters
     output.df <- as.data.frame(as.matrix(output))

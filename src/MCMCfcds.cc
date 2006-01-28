@@ -311,7 +311,7 @@ namespace SCYTHE {
     const Matrix<double> AB0ab0 = AB0 * ab0;
 
     // perform update 
-    const Matrix<double> Ttheta_star = t(cbind(-1.0*ones<double>(J,1),theta)); // only needed for option 2
+    //const Matrix<double> Ttheta_star = t(cbind(-1.0*ones<double>(J,1),theta)); // only needed for option 2
     const Matrix<double> tpt(2,2);
     for (int i=0; i<J; ++i){
       const double theta_i = theta[i];
@@ -357,8 +357,8 @@ namespace SCYTHE {
     const double T0t0 = T0*t0;
     const Matrix<double> alpha = eta(_, 0);
     const Matrix<double> beta =  eta(_, 1);
-    const Matrix<double> tbeta = t(beta);  // only neede for option 2
-    const Matrix<double> talpha = t(alpha); // only needed for option 2
+    //const Matrix<double> tbeta = t(beta);  // only neede for option 2
+    //const Matrix<double> talpha = t(alpha); // only needed for option 2
 
     // calculate the posterior variance outside the justice specific loop
     double theta_post_var = T0;

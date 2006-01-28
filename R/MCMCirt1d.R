@@ -3,12 +3,13 @@
 ##
 ## ADM and KQ 1/23/2003
 ## updated extensively ADM & KQ 7/28/2004
- 
+## store.ability arg added KQ 1/27/2006
+
 "MCMCirt1d" <-
   function(datamatrix, theta.constraints=list(), burnin = 1000,
            mcmc = 20000, thin=1, verbose = 0, seed = NA,
            theta.start = NA, alpha.start = NA, beta.start = NA, t0 = 0,
-           T0 = 1, ab0=0, AB0=.25, store.item = FALSE,
+           T0 = 1, ab0=0, AB0=.25, store.item = FALSE, store.ability=TRUE,
            drop.constant.items=TRUE, ... ) {
     
     ## checks
@@ -109,12 +110,20 @@
               call.=FALSE)
     }    
 
-    ## define holder for posterior density sample
-    if(store.item == FALSE) {
+    ## define holder for posterior sample
+    if(store.item == FALSE & store.ability == TRUE) {
       sample <- matrix(data=0, mcmc/thin, J)
     }
-    else {
+    else if (store.item == TRUE & store.ability == FALSE){
+      sample <- matrix(data=0, mcmc/thin, 2*K)
+    }
+    else if (store.item == TRUE & store.ability == TRUE){
       sample <- matrix(data=0, mcmc/thin, J + 2 * K)
+    }
+    else{
+      cat("Error: store.item == FALSE & store.ability == FALSE.\n")
+      stop("Please respecify and call MCMCirt1d() again.\n",
+              call.=FALSE)      
     }
 
     ## seeds
@@ -161,7 +170,8 @@
                     thetaineqdata = as.double(theta.ineq.constraints),
                     thetaineqrow = as.integer(nrow(theta.ineq.constraints)),
                     thetaineqcol = as.integer(ncol(theta.ineq.constraints)),
-                    store = as.integer(store.item),
+                    storei = as.integer(store.item),
+                    storea = as.integer(store.ability),
                     PACKAGE="MCMCpack"
                   )
     
@@ -175,16 +185,17 @@
                      posterior$samplecol,
                      byrow=TRUE)
     output <- mcmc(data=sample, start=burnin+1, end=burnin+mcmc, thin=thin)
-    
-    if(store.item == FALSE) {
-      names <- theta.names
+
+    names <- NULL
+    if(store.ability == TRUE) {
+      names <- c(names, theta.names)
     }
-    else {
-      names <- c(theta.names, alpha.beta.names)
+    if (store.item == TRUE){
+      names <- c(names, alpha.beta.names)
     }
     varnames(output) <- names
     attr(output,"title") <-
-      "MCMCirt1d Posterior Density Sample"
+      "MCMCirt1d Posterior Sample"
     return(output)
     
   }

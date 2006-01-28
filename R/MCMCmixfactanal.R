@@ -243,7 +243,7 @@
       }
     }
           
-    # define holder for posterior density sample
+    # define holder for posterior sample
     if (store.scores == FALSE && store.lambda == FALSE){
       sample <- matrix(data=0, mcmc/thin, length(gamma)+K)
     }
@@ -367,7 +367,7 @@
     attr(output, "n.factors") <- factors
     attr(output, "accept.rates") <- t(accepts) / (posterior$burnin+posterior$mcmc)
       attr(output,"title") <-
-        "MCMCpack Mixed Data Factor Analysis Posterior Density Sample"
+        "MCMCpack Mixed Data Factor Analysis Posterior Sample"
     
     return(output)
     

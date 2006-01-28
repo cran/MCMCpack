@@ -225,7 +225,7 @@
       }
     }
 
-    ## define holder for posterior density sample
+    ## define holder for posterior sample
     if (store.scores == FALSE && store.lambda == FALSE){
       sample <- matrix(data=0, mcmc/thin, length(gamma))
     }
@@ -362,11 +362,11 @@
     attr(output, "accept.rates") <- t(accepts) / (posterior$burnin+posterior$mcmc)
     if(case.switch==1) {
       attr(output,"title") <-
-        "MCMCpack Ordinal Data Factor Analysis Posterior Density Sample"
+        "MCMCpack Ordinal Data Factor Analysis Posterior Sample"
     }
     if(case.switch==2) {
       attr(output,"title") <-
-        "MCMCpack K-Dimensional Item Response Theory Model Posterior Density Sample"
+        "MCMCpack K-Dimensional Item Response Theory Model Posterior Sample"
     }
     return(output)
     

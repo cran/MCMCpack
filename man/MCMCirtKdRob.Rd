@@ -1,0 +1,358 @@
+\name{MCMCirtKdRob}
+\alias{MCMCirtKdRob}
+\title{Markov Chain Monte Carlo for Robust K-Dimensional Item Response Theory
+  Model}
+\description{
+  This function generates a posterior sample from a
+  Robust K-dimensional item response theory (IRT) model with logistic
+  link, independent standard normal priors on the subject
+  abilities (ideal points), and independent normal priors on the
+  item parameters.  The user supplies data and priors, and a sample
+  from the posterior distribution is returned as an mcmc object, which can be
+  subsequently analyzed with functions provided in the coda
+  package.
+}
+  
+\usage{
+MCMCirtKdRob(datamatrix, dimensions, item.constraints=list(),
+   ability.constraints=list(), burnin = 500, mcmc = 5000, thin=1,
+    interval.method="step", theta.w=0.5, theta.mp=4,
+    alphabeta.w=1.0, alphabeta.mp=4, delta0.w=NA, delta0.mp=3,
+    delta1.w=NA, delta1.mp=3, verbose = FALSE, seed = NA,
+    theta.start = NA, alphabeta.start = NA,
+    delta0.start = NA, delta1.start = NA,
+    b0 = 0, B0=0, k0=.1, k1=.1, c0=1, d0=1,
+    c1=1, d1=1, store.item=TRUE, store.ability=FALSE,
+    drop.constant.items=TRUE, ... )  }
+
+\arguments{
+    \item{datamatrix}{The matrix of data.  Must be 0, 1, or missing values.  
+    It is of dimensionality subjects by items.}
+
+    \item{dimensions}{The number of dimensions in the latent space.}
+    
+    \item{item.constraints}{List of lists specifying possible equality
+    or simple inequality constraints on the item parameters. A typical
+    entry in the list has one of three forms: \code{rowname=list(d,c)}
+    which will constrain the dth item parameter for the item named
+    rowname to be equal to c, \code{rowname=list(d,"+")} which will
+    constrain the dth item parameter for the item named rowname to be
+    positive, and \code{rowname=list(d, "-")} which will constrain the dth
+    item parameter for the item named rowname to be negative. If
+    datamatrix is a
+    matrix without row names defaults names of ``V1", ``V2", ... , etc
+    will be used. In a \eqn{K}{K}-dimensional model,
+    the first item parameter for
+    item \eqn{i}{i} is the difficulty parameter (\eqn{\alpha_i}{alpha_i}),
+    the second item parameter is the discrimation parameter on dimension
+    1 (\eqn{\beta_{i,1}}{beta_{i,1}}), the third item parameter is the
+    discrimation parameter on dimension 2
+    (\eqn{\beta_{i,2}}{beta_{i,2}}), ...,  and the \eqn{(K+1)}{(K+1)}th
+    item parameter
+    is the discrimation parameter on dimension \eqn{K}{K}
+    (\eqn{\beta_{i,K}}{beta_{i,K}}). 
+    The item difficulty parameters (\eqn{\alpha}{alpha}) should
+    generally not be constrained. 
+    }
+    
+    \item{ability.constraints}{List of lists specifying possible equality
+    or simple inequality constraints on the ability parameters. A typical
+    entry in the list has one of three forms: \code{colname=list(d,c)}
+    which will constrain the dth ability parameter for the subject named
+    colname to be equal to c, \code{colname=list(d,"+")} which will
+    constrain the dth ability parameter for the subject named colname to be
+    positive, and \code{colname=list(d, "-")} which will constrain the dth
+    ability parameter for the subject named colname to be negative. If
+    datamatrix  is a
+    matrix without column names defaults names of ``V1", ``V2", ... , etc
+    will be used.}
+
+    \item{burnin}{The number of burn-in iterations for the sampler.}
+
+    \item{mcmc}{The number of iterations for the sampler after burn-in.}
+
+    \item{thin}{The thinning interval used in the simulation.  The number of
+    iterations must be divisible by this value.}
+
+  \item{interval.method}{Method for finding the slicing interval. Can
+    be equal to either \code{step} in which case the stepping out
+    algorithm of Neal (2003) is used or \code{doubling} in which case the
+    doubling procedure of Neal (2003) is used. The stepping out method
+    tends to be faster on a per-iteration basis as it typically requires few
+    function calls. The doubling method expands the initial interval
+    more quickly which makes the Markov chain mix somewhat more
+    quickly-- at least in some situations. }
+  
+  \item{theta.w}{The initial width of the slice sampling interval for
+    each ability parameter (the elements of \eqn{\theta}{theta})}
+  
+  \item{theta.mp}{The parameter governing the maximum possible width of
+    the slice interval for each ability parameter (the elements of
+    \eqn{\theta}{theta}). If \code{interval.method="step"} then the maximum
+    width is \code{theta.w * theta.mp}.
+
+    If \code{interval.method="doubling"}
+    then the maximum width is \code{theta.w * 2^theta.mp}. } 
+  
+  \item{alphabeta.w}{The initial width of the slice sampling interval for
+    each item parameter (the elements of \eqn{\alpha}{alpha} and
+    \eqn{\beta}{beta})}
+  
+  \item{alphabeta.mp}{ The parameter governing the maximum possible width of
+    the slice interval for each item  parameters (the elements of
+    \eqn{\alpha}{alpha} and \eqn{\beta}{beta}). If
+    \code{interval.method="step"} then the maximum width is
+    \code{alphabeta.w * alphabeta.mp}.
+
+    If \code{interval.method="doubling"}
+    then the maximum width is \code{alphabeta.w * 2^alphabeta.mp}. } 
+  
+  \item{delta0.w}{The initial width of the slice sampling interval for
+    \eqn{\delta_0}{delta0}}
+  
+  \item{delta0.mp}{The parameter governing the maximum possible width of
+    the slice interval for \eqn{\delta_0}{delta0}. If
+    \code{interval.method="step"} then the maximum width is
+    \code{delta0.w * delta0.mp}. If \code{interval.method="doubling"}
+    then the maximum width is \code{delta0.w * 2^delta0.mp}. }
+  
+  \item{delta1.w}{The initial width of the slice sampling interval for
+    \eqn{\delta_1}{delta1}}
+  
+  \item{delta1.mp}{The parameter governing the maximum possible width of
+    the slice interval for \eqn{\delta_1}{delta1}. If
+    \code{interval.method="step"} then the maximum width is
+    \code{delta1.w * delta1.mp}. If \code{interval.method="doubling"}
+    then the maximum width is \code{delta1.w * 2^delta1.mp}. }
+
+    \item{verbose}{A switch which determines whether or not the progress of
+      the sampler is printed to the screen.  If verbose > 0, the
+      iteration number with be printed to the screen every verbose'th
+      iteration.} 
+    
+    \item{seed}{The seed for the random number generator.  If NA, the Mersenne
+      Twister generator is used with default seed 12345; if an integer is 
+      passed it is used to seed the Mersenne twister.  The user can also
+      pass a list of length two to use the L'Ecuyer random number generator,
+      which is suitable for parallel computation.  The first element of the
+      list is the L'Ecuyer seed, which is a vector of length six or NA (if NA 
+      a default seed of \code{rep(12345,6)} is used).  The second element of 
+      list is a positive substream number. See the MCMCpack 
+      specification for more details.}
+
+    \item{theta.start}{The starting values for the ability parameters
+      \eqn{\theta}{theta}. Can be either a scalar or a matrix with
+      number of rows equal to the number of subjects and number of
+      columns equal to the dimension \eqn{K}{K} of the latent space. If
+      \code{theta.start=NA} then starting values will be chosen that are
+      0 for unconstrained subjects, -0.5 for subjects with negative
+      inequality constraints and 0.5 for subjects with positive inequality
+      constraints. }
+    
+    \item{alphabeta.start}{The starting values for the
+    \eqn{\alpha}{alpha} and \eqn{\beta}{beta} difficulty and
+    discrimination parameters. If \code{alphabeta.start} is set to a
+    scalar the starting value for all unconstrained item parameters will
+    be set to that scalar. If \code{alphabeta.start} is a matrix of
+    dimension \eqn{(K+1) \times items}{(K+1) x items} then the
+    \code{alphabeta.start} matrix is used as the starting values (except
+    for equality-constrained elements). If \code{alphabeta.start} is set
+    to \code{NA} (the default) then starting values for unconstrained
+    elements are set to values generated from a series of proportional
+    odds logistic regression fits, and starting values for inequality
+    constrained elements are set to either 1.0 or -1.0 depending on the
+    nature of the constraints. }
+
+    \item{delta0.start}{The starting value for the
+      \eqn{\delta_0}{delta0} parameter.}
+    
+    \item{delta1.start}{The starting value for the
+      \eqn{\delta_1}{delta1} parameter.}
+    
+    \item{b0}{The prior means of the
+    \eqn{\alpha}{alpha} and \eqn{\beta}{beta} difficulty and
+    discrimination parameters, stacked for all items.
+    If a scalar is passed, it
+    is used as the prior mean for all items.}
+  
+  \item{B0}{The prior precisions (inverse variances) of the
+    independent Normal prior on the item parameters.
+    Can be either a scalar or a matrix of dimension
+    \eqn{(K+1) \times items}{(K+1) x items}.}
+  
+  \item{k0}{\eqn{\delta_0}{delta0} is constrained to lie in the interval
+    between 0 and \code{k0}.}
+
+  \item{k1}{\eqn{\delta_1}{delta1} is constrained to lie in the interval
+    between 0 and \code{k1}.}
+
+  \item{c0}{Parameter governing the prior for
+    \eqn{\delta_0}{delta0}. \eqn{\delta_0}{delta0} divided by \code{k0} is
+    assumed to be follow a beta distribution with first parameter
+    \code{c0}.}
+
+  \item{d0}{Parameter governing the prior for
+    \eqn{\delta_0}{delta0}. \eqn{\delta_0}{delta0} divided by \code{k0} is
+    assumed to be follow a beta distribution with second parameter
+    \code{d0}.}
+
+  \item{c1}{Parameter governing the prior for
+    \eqn{\delta_1}{delta1}. \eqn{\delta_1}{delta1} divided by \code{k1} is
+    assumed to be follow a beta distribution with first parameter
+    \code{c1}.}
+
+  \item{d1}{Parameter governing the prior for
+    \eqn{\delta_1}{delta1}. \eqn{\delta_1}{delta1} divided by \code{k1} is
+    assumed to be follow a beta distribution with second parameter
+    \code{d1}.}
+  
+  \item{store.item}{A switch that determines whether or not to
+    store the item parameters for posterior analysis. 
+    \emph{NOTE: This typically takes an enormous amount of memory, so
+      should only be used if the chain is thinned heavily, or for
+      applications with a small number of items}.  By default, the
+    item parameters are not stored.}
+  
+   \item{store.ability}{A switch that determines whether or not to store
+    the subject abilities for posterior analysis.  By default, the
+    item parameters are all stored.}
+
+  \item{drop.constant.items}{A switch that determines whether or not
+        items that have no variation
+	should be deleted before fitting the model. Default = TRUE.}
+  
+    \item{...}{further arguments to be passed}       
+}
+
+\value{
+   An mcmc object that contains the posterior sample.  This 
+   object can be summarized by functions provided by the coda package.
+}
+
+\details{
+  \code{MCMCirtKd} simulates from the posterior using
+  the slice sampling algorithm of Neal (2003).
+  The simulation proper is done in
+  compiled C++ code to maximize efficiency.  Please consult the
+  coda documentation for a comprehensive list of functions that
+  can be used to analyze the posterior sample.
+    
+  The model takes the following form.  We assume that each
+  subject has an subject ability (ideal point) denoted
+  \eqn{\theta_j}{theta_j} \eqn{(K \times 1)}{(K x 1)},
+  and that each item has a scalar difficulty
+  parameter \eqn{\alpha_i}{alpha_i} and discrimination parameter
+  \eqn{\beta_i}{beta_i} \eqn{(K \times 1)}{(K x 1)}.
+  The observed choice by subject
+  \eqn{j}{j} on item \eqn{i}{i} is the observed data matrix which
+  is \eqn{(I \times J)}{(I * J)}.
+
+  The probability that subject \eqn{j}{j} answers item \eqn{i}{i}
+  correctly is assumed to be:
+
+  \deqn{\pi_{ij} = \delta_0 + (1 - \delta_0 - \delta_1)
+    /(1+\exp(\alpha_i - \beta_i \theta_j))}{pi_{ij} =
+    delta0 + (1 - delta0 - delta1)  / (1 + exp(alpha_i - beta_i * theta_j))}
+
+  This model was discussed in Bafumi et al. (2005). 
+  
+  We assume the following priors.  For the subject abilities (ideal points)
+  we assume independent standard Normal priors:
+  \deqn{\theta_{j,k} \sim \mathcal{N}(0,1)}{theta_j,k ~ N(0, 1)}
+  These cannot be changed by the user.
+  For each item parameter, we assume independent Normal priors:
+  \deqn{\left[\alpha_i, \beta_i \right]' \sim \mathcal{N}_{(K+1)} 
+  (b_{0,i},B_{0,i})}{[alpha_i beta_i]' ~ N_(K+1) (b_0,i, B_0,i)}
+  Where \eqn{B_{0,i}}{B_0,i} is a diagonal matrix.
+  One can specify a separate prior mean and precision
+  for each item parameter. We also assume \eqn{\delta_0 / k_0 \sim
+    \mathcal{B}eta(c_0, d_0)}{delta0/k0 ~ Beta(c0, d0)} and
+  \eqn{\delta_1 / k_1 \sim
+    \mathcal{B}eta(c_1, d_1)}{delta1/k1 ~ Beta(c1, d1)}. 
+  
+  The model is identified by constraints on the item parameters and / or
+  ability parameters. See Rivers (2004) for a discussion of
+  identification of IRT models.
+    
+  As is the case with all measurement models, make sure that you have plenty
+  of free memory, especially when storing the item parameters.
+}
+
+\references{
+   James H. Albert. 1992. ``Bayesian Estimation of Normal Ogive Item Response 
+   Curves Using Gibbs Sampling." \emph{Journal of Educational Statistics}.  
+   17: 251-269.
+
+   Joseph Bafumi, Andrew Gelman, David K. Park, and Noah
+   Kaplan. 2005. ``Practical Issues in Implementing and Understanding
+   Bayesian Ideal Point Estimation.'' \emph{Political Analysis}. 
+   
+   Joshua Clinton, Simon Jackman, and Douglas Rivers. 2000. ``The Statistical 
+   Analysis of Legislative Behavior: A Unified Approach." Paper presented at 
+   the Annual Meeting of the Political Methodology Society.
+   
+   Simon Jackman. 2001. ``Multidimensional Analysis of Roll Call Data
+   via Bayesian Simulation.'' \emph{Political Analysis.} 9: 227-241.
+   
+   Valen E. Johnson and James H. Albert. 1999. ``Ordinal Data Modeling." 
+   Springer: New York.
+
+   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.  
+   \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+
+   Radford Neal. 2003. ``Slice Sampling'' (with discussion). \emph{Annals of
+   Statistics}, 31: 705-767. 
+  
+   Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
+   \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
+   \url{http://www-fis.iarc.fr/coda/}.
+   
+      Douglas Rivers.  2004.  ``Identification of Multidimensional Item-Response
+   Models."  Stanford University, typescript.
+}
+
+
+\examples{
+   \dontrun{
+   ## Court example with ability (ideal point) and
+   ##  item (case) constraints
+   data(SupremeCourt)
+   post1 <- MCMCirtKdRob(t(SupremeCourt), dimensions=1,
+                   burnin=500, mcmc=5000, thin=1,
+                   B0=.25, store.item=TRUE, store.ability=TRUE,
+                   ability.constraints=list("Thomas"=list(1,"+"),
+                   "Stevens"=list(1,-4)),
+                   item.constraints=list("1"=list(2,"-")),
+                   verbose=50)
+   plot(post1)
+   summary(post1)
+
+   ## Senate example with ability (ideal point) constraints
+   data(Senate)
+   namestring <- as.character(Senate$member)
+   namestring[78] <- "CHAFEE1"
+   namestring[79] <- "CHAFEE2"
+   namestring[59] <- "SMITH.NH"
+   namestring[74] <- "SMITH.OR"
+   rownames(Senate) <- namestring
+   post2 <- MCMCirtKdRob(Senate[,6:677], dimensions=1,
+                         burnin=1000, mcmc=5000, thin=1,
+                         ability.constraints=list("KENNEDY"=list(1,-4),
+                                  "HELMS"=list(1, 4), "ASHCROFT"=list(1,"+"),
+                                  "BOXER"=list(1,"-"), "KERRY"=list(1,"-"),
+                                  "HATCH"=list(1,"+")),
+                         B0=0.1, store.ability=TRUE, store.item=FALSE,
+                         verbose=5, k0=0.15, k1=0.15,
+                         delta0.start=0.13, delta1.start=0.13)
+
+   plot(post2)
+   summary(post2)
+   }
+}
+
+\keyword{models}
+
+\seealso{\code{\link[coda]{plot.mcmc}},\code{\link[coda]{summary.mcmc}},
+\code{\link[MCMCpack]{MCMCirt1d}}, \code{\link[MCMCpack]{MCMCirtKd}}
+}
+
