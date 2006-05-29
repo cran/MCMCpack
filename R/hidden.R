@@ -102,17 +102,17 @@
     return(0)
   }
 
-# check inverse Gamma prior
-"check.ig.prior" <-
-   function(c0, d0) {
+# check beta prior
+"check.beta.prior" <-
+   function(alpha, beta) {
      
-    if(c0 <= 0) {
-      cat("Error: IG(c0/2,d0/2) prior c0 less than or equal to zero.\n")
+    if(alpha <= 0) {
+      cat("Error: Beta(alpha,beta) prior alpha less than or equal to zero.\n")
       stop("Please respecify and call ", calling.function(), " again.\n",
          call.=FALSE)
     }
-    if(d0 <= 0) {
-      cat("Error: IG(c0/2,d0/2) prior d0 less than or equal to zero.\n")
+    if(beta <= 0) {
+      cat("Error: Beta(alpha,beta) prior beta less than or equal to zero.\n")
        stop("Please respecify and call ", calling.function(), " again.\n",
         call.=FALSE)    
     }

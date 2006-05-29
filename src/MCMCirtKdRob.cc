@@ -85,7 +85,7 @@ static double Lambda_logfcd(const double& lam_ij,
   
   // check to see if inequality constraint is satisfied and 
   // evaluate prior
-  /*  
+    
   double logprior = 0.0;  
   if (Lambda_ineq(rowindex,colindex) * lam_ij < 0){
     return log(0.0);
@@ -95,8 +95,9 @@ static double Lambda_logfcd(const double& lam_ij,
 			Lambda_prior_mean(rowindex,colindex), 
 			sqrt(1.0 / Lambda_prior_prec(rowindex,colindex)));
   } 
-  */
+  
   // prior is uniform on hypersphere with radius 10
+  /*
   if (Lambda_ineq(rowindex,colindex) * lam_ij < 0){
     return log(0.0);
   } 
@@ -113,7 +114,7 @@ static double Lambda_logfcd(const double& lam_ij,
     return log(0.0);
   }
   const double logprior = 0.0;
-
+  */
 
   // likelihood
   double loglike = 0.0;
@@ -162,14 +163,14 @@ static double theta_logfcd(const double& t_ij,
 			   const int& colindex){
  
   const int D = Lambda.cols();     
-  // evaluate prior
-  /*
+  // evaluate prior  
   if (theta_ineq(rowindex,colindex-1) * t_ij < 0){
     return log(0.0);
   } 
   const double logprior = lndnorm(t_ij, 0.0, 1.0); 
-  */
+  
   // prior is uniform on unit circle
+  /*
   if (theta_ineq(rowindex,colindex-1) * t_ij < 0){
     return log(0.0);
   } 
@@ -186,7 +187,7 @@ static double theta_logfcd(const double& t_ij,
     return log(0.0);
   }
   const double logprior = 1.0;
-
+  */
 
   // likelihood
   double loglike = 0.0;
@@ -823,10 +824,9 @@ extern "C"{
   int count = 0;  
   for (int iter=0; iter < tot_iter; ++iter){
 
-        
     double L, R, w, funval, z;
     int p;
-        
+
     // sample theta
     int param = 1;    
     SampleNoReplace(N, N, N_inds_perm, N_array, stream);   
@@ -848,11 +848,13 @@ extern "C"{
 				*k0, *k1, *c0, *d0,
 				*c1, *d1, i, j);
 	  z = funval - stream->rexp(1.0);
+
 	  if (*method_step == 1){
 	    StepOut(&theta_logfcd, X, Lambda, theta, delta0, delta1, 
 		    Lambda_prior_mean, Lambda_prior_prec, Lambda_ineq,
 		    theta_ineq, *k0, *k1, *c0, *d0, *c1, *d1, i, j, z, 
 		    w, p, stream, L, R, param);
+	    
 	    theta(i,j) = shrinkageStep(&theta_logfcd, X, Lambda, theta,
 				       delta0, delta1, Lambda_prior_mean, 
 				       Lambda_prior_prec, Lambda_ineq,
@@ -879,6 +881,7 @@ extern "C"{
     }
     
     
+
     // sample Lambda
     param = 0;
     SampleNoReplace(K, K, K_inds_perm, K_array, stream);   
@@ -927,6 +930,8 @@ extern "C"{
       }
     }
     
+
+    
     // sample delta0
     param = 2;
     w = *delta0_w;
@@ -963,6 +968,9 @@ extern "C"{
 				 *k0, *k1, *c0, *d0, *c1, *d1, 0, 0,
 				 z, w, stream, L, R, param);
     }
+
+
+
     // sample delta1
     param = 3;
     w = *delta1_w;
@@ -1029,7 +1037,7 @@ extern "C"{
     }
     
     // allow user interrupts
-    void R_CheckUserInterrupt(void);    
+    R_CheckUserInterrupt();    
   } // end MCMC loop
   
   delete stream; // clean up random number stream  

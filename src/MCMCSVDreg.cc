@@ -141,8 +141,41 @@ extern "C" {
       for (int i=0; i<n; ++i){
 	double mstar = (g0[i] + tau2[i]*gammahat[i]) / (1 + tau2[i]);
 	double vstar = (sigma2 * tau2[i]) / (dsquared[i] * (tau2[i] + 1));
-	double wstar = 1.0 - (1.0 - w0[i]) /  
-	  (1.0 - w0[i] + w0[i] * dnorm(0.0, mstar, std::sqrt(vstar))); 
+	//double wstar = 1.0 - (1.0 - w0[i]) /  
+	//  (1.0 - w0[i] + w0[i] * dnorm(0.0, mstar, std::sqrt(vstar))); 
+
+	Matrix<double> gammanoti = gamma;
+	gammanoti[i] = 0.0;
+
+	Matrix<double> residvec = y - FtD * gammanoti;
+	Matrix<double> margmeanvec = FtD(_,i) * g0[i];
+	Matrix<double> margVarmat = FtD(_,i) * t(FtD(_,i)) * 
+	  (sigma2 * tau2[i]) / (dsquared[i]) + eye<double>(n) * sigma2; 
+	
+	double logw0 = std::log(w0[i]);
+	double log1minusw0 = std::log(1.0 - w0[i]);
+	double logf0 = 0.0;
+	for (int j=0; j<n; ++j){
+	  logf0 += lndnorm(residvec[j], 0.0, std::sqrt(sigma2));
+	}
+	double logfnot0 = lndmvn(residvec, margmeanvec, margVarmat);
+	
+	double logdenom;
+	if ( (logw0 + logf0) > (log1minusw0 + logfnot0)){
+	  logdenom = logw0 + logf0 + std::log(1.0 + 
+					   std::exp(log1minusw0 - 
+						    logw0 + logfnot0 - 
+						    logf0));  
+	}
+	else{
+	  logdenom = log1minusw0 + logfnot0 + std::log(1.0 + 
+					   std::exp(logw0 - 
+						    log1minusw0 + logf0 - 
+						    logfnot0));  	  
+	}
+	double wstar = std::exp(logw0 + logf0 - logdenom);
+
+
 	if (stream->runif() < wstar){
 	  gamma[i] = 0.0;
 	}

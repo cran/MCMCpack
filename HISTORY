@@ -2,6 +2,18 @@
 // Changes and Bug Fixes
 //
 
+0.7-1 to 0.7-2
+  * added procrustes() to NAMESPACE so that it can be seen (function and 
+    documentation already there).
+  * fixed the prior in the full conditional for theta_i in MCMCirtKdRob. 
+    Previously was uniform on the unit circle which was not consistent with
+    the documentation and could cause problems given how the starting values
+    were chosen. 	
+  * fixed prior for lambda_j in MCMCirtKdRob (similar to point above)	
+  * fixed the the calculation of the full conditional for gamma[i] in 
+    MCMCSVDreg()
+  * Fixed a bug in MCMCbetabinomial() [thanks to John Wood].
+
 0.6-6 to 0.7-1
   * Added robust k-dimensional IRT model MCMCirtKdRob().
   * Added SVD regression MCMCSVDreg().
