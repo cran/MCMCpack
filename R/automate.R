@@ -21,6 +21,7 @@
 ##
 ##    R.file:         the file used to store the clean R template
 ##                    (string, output to the screen if "")
+##                    this is just the function call indented nicely
 ##
 ##    ...:            list of objects passed to C++ 
 ##                    NOTE: this will only take integers (which have
@@ -100,7 +101,9 @@
    ## write out a template R help file
    callfun <- strsplit(toString(sys.call(which=-1)),",")[[1]][1]
    if (help.file){
-     prompt(callfun,file=paste(callfun, ".template.Rd", sep=""))
+      prompt.call <- paste("prompt(", callfun, ", file =\"",
+         paste(callfun, ".template.Rd\"", sep=""), ")")
+      eval(parse(text=prompt.call))
    }
    
    ##
@@ -188,10 +191,11 @@
                          c.names[[k]], "data);\n", sep="")
                             
           together.call <- paste(together.call, scythe, sep="")
-         }
+         
       holder.row <- paste("const int *", c.names[[k]], "row,", sep="")
       holder.col <- paste("const int *", c.names[[k]], "col,", sep="")
       c.middle <- c(c.middle, holder.data, holder.row, holder.col)
+      }
       }
 
    # clean up and print C++ function call

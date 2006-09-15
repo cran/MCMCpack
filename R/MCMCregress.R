@@ -60,7 +60,8 @@
 
     ## call C++ code to draw sample
     auto.Scythe.call(output.object="posterior", cc.fun.name="MCMCregress", 
-                     sample=sample, Y=Y, X=X, burnin=as.integer(burnin),
+                     sample.nonconst=sample, Y=Y, X=X, 
+                     burnin=as.integer(burnin),
                      mcmc=as.integer(mcmc), thin=as.integer(thin),
                      lecuyer=as.integer(lecuyer), 
                      seedarray=as.integer(seed.array),

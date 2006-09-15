@@ -616,7 +616,7 @@ static double shrinkageDoubling(double (*logfun)(const double&,
   for (;;){
     const double U = stream->runif();
     const double x1 = Lbar + U*(Rbar - Lbar);
-    if (z < logfun(x1, X, Lambda, theta, delta0, delta1, Lambda_prior_mean,
+    if (z <= logfun(x1, X, Lambda, theta, delta0, delta1, Lambda_prior_mean,
 		   Lambda_prior_prec, Lambda_ineq, theta_ineq, 
 		   k0, k1, c0, d0, c1, d1, rowindex, colindex) &&
 	Accept(logfun, X, Lambda, theta, delta0, delta1, Lambda_prior_mean, 
@@ -700,7 +700,7 @@ static double shrinkageStep(double (*logfun)(const double&,
   for (;;){
     const double U = stream->runif();
     const double x1 = Lbar + U*(Rbar - Lbar);
-    if (z < logfun(x1, X, Lambda, theta, delta0, delta1, Lambda_prior_mean,
+    if (z <= logfun(x1, X, Lambda, theta, delta0, delta1, Lambda_prior_mean,
 		   Lambda_prior_prec, Lambda_ineq, theta_ineq, 
 		   k0, k1, c0, d0, c1, d1, rowindex, colindex) ){
       return(x1);
