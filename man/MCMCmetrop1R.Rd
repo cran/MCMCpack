@@ -8,8 +8,10 @@
 \usage{
 MCMCmetrop1R(fun, theta.init, burnin = 500, mcmc = 20000, thin = 1,
              tune = 1, verbose = 0, seed=NA, logfun = TRUE,
-             force.samp=FALSE, optim.trace = 0, optim.REPORT = 10,
-             optim.maxit = 500, ...)
+             force.samp = FALSE, V = NULL, optim.method = "BFGS",
+             optim.lower = -Inf, optim.upper = Inf,
+             optim.control = list(fnscale = -1, trace = 0, REPORT = 10,
+                                  maxit=500),  ...)
 }
 \arguments{
   \item{fun}{The unnormalized (log)density of the distribution from
@@ -74,15 +76,31 @@ MCMCmetrop1R(fun, theta.init, burnin = 500, mcmc = 20000, thin = 1,
       density. Thus, \code{force.samp} should only be set equal to
       \code{TRUE} with great caution.}
     }
+
+  \item{V}{The variance-covariance matrix for the Gaussian proposal
+    distribution. Must be a square  matrix or \code{NULL}. If a square
+    matrix, \code{V} must have dimension equal to the length of
+    \code{theta.init}. If \code{NULL}, \code{V} is calculated from
+    \code{tune} and an initial call to \code{optim}. See the Details
+    section below for more information. Unless the log-posterior is
+    expensive to compute it will typically be best to use the default
+    \code{V = NULL}.}
+    
+  \item{optim.method}{The value of the \code{method} parameter sent to
+    \code{optim} during an initial maximization of \code{fun}. See
+    \code{optim} for more details.}
+
+  \item{optim.lower}{The value of the \code{lower} parameter sent to
+    \code{optim} during an initial maximization of \code{fun}. See
+    \code{optim} for more details.}
+
+  \item{optim.upper}{The value of the \code{upper} parameter sent to
+    \code{optim} during an initial maximization of \code{fun}. See
+    \code{optim} for more details.}
   
-  \item{optim.trace}{The value of the \code{trace} parameter sent to
-    \code{optim} during an initial maximization of \code{fun}. }
-
-  \item{optim.REPORT}{The value of the \code{REPORT} parameter sent to
-    \code{optim} during an initial maximization of \code{fun}.}
-
-  \item{optim.maxit}{The value of the \code{maxit} parameter sent to
-    \code{optim} during an initial maximization of \code{fun}.}
+  \item{optim.control}{The value of the \code{control} parameter sent to
+    \code{optim} during an initial maximization of \code{fun}. See
+    \code{optim} for more details.}
 
   \item{\dots}{Additional arguments.}
 }
@@ -93,15 +111,17 @@ distribution. See Gelman et al. (2003) and Robert & Casella (2004) for
 details of the random walk Metropolis algorithm.
 
 The proposal distribution is centered at the current value of
-\eqn{\theta}{theta} and has variance-covariance \eqn{V = T
+\eqn{\theta}{theta} and has variance-covariance \eqn{V}{V}. If
+\eqn{V}{V} is specified by the user to be \code{NULL} then \eqn{V}{V} is
+calculated as: \eqn{V = T
   (-1\cdot H)^{-1} T }{V = T (-1*H)^{-1} T}, where \eqn{T}{T} is a the
 diagonal positive definite matrix formed from the \code{tune} and
-\eqn{H}{H} is the approximate Hessian of \code{fun} evaluated at it's
+\eqn{H}{H} is the approximate Hessian of \code{fun} evaluated at its
 mode. This last calculation is done via an initial call to
 \code{optim}.
 }
 \value{
-   An mcmc object that contains the posterior density sample.  This 
+   An mcmc object that contains the posterior sample.  This 
    object can be summarized by functions provided by the coda package.
 }
 \examples{
@@ -126,7 +146,7 @@ mode. This last calculation is done via an initial call to
                               X=Xdata, y=yvector,
                               thin=1, mcmc=40000, burnin=500,
                               tune=c(1.5, 1.5, 1.5),
-                              verbose=500, logfun=TRUE, optim.maxit=100)
+                              verbose=500, logfun=TRUE)
 
     raftery.diag(post.samp)
     plot(post.samp)
@@ -158,7 +178,7 @@ mode. This last calculation is done via an initial call to
     post.samp <- MCMCmetrop1R(negbinfun, theta.init=c(0,0,0,0), y=yy, X=XX,
                               thin=1, mcmc=35000, burnin=1000,
                               tune=1.5, verbose=500, logfun=TRUE,
-                              optim.maxit=500, seed=list(NA,1))
+                              seed=list(NA,1))
     raftery.diag(post.samp)
     plot(post.samp)
     summary(post.samp)

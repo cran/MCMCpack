@@ -2,6 +2,23 @@
 // Changes and Bug Fixes
 //
 
+0.7-2 to 0.7-3
+  * following posting by Radford Neal at: http://www.stat.columbia.edu/~cook/movabletype/archives/2006/03/adaptive_metrop.html
+    switched a < to a <= in the shrinkage procedures used in the various slice
+    sampling implementations.
+  * modified tomogplot() and dtomogplot() to handle situations in which 
+    r1[i] == 0. [thanks to David Hugh-Jones for making this suggestion].
+  * allowed for more user control of the initial call to optim in 
+    MCMCmetrop1R [thanks to Luca La Rocca for this suggestion].
+  * allowed users to pass the variance-covariance matrix of the Gaussian 
+    proposal directly without resorting to a call to optim 
+    [thanks to Luca La Rocca for this suggestion].
+  * fixed minor bug in developer mode in automate.R [thanks to Ben Goodrich].
+  * fixed a minor bug in the developer mode documentation template.
+  * fixed minor bug in nonconst call in MCMCregress.
+
+
+
 0.7-1 to 0.7-2
   * added procrustes() to NAMESPACE so that it can be seen (function and 
     documentation already there).

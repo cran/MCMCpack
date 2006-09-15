@@ -1,9 +1,11 @@
 ########## Tomography Plots for Ecological Inference ##########
 
-# produces tomography plots (see King, 1997, A Solution to the
-# Ecological Inference Problem, Princeton University Press)
-#
-# KQ 11/9/2002
+## produces tomography plots (see King, 1997, A Solution to the
+## Ecological Inference Problem, Princeton University Press)
+##
+## KQ 11/9/2002
+##
+## Modification added suggested by David Hugh-Jones 6/10/2006
 
 "tomogplot" <-
   function(r0, r1, c0, c1, 
@@ -29,7 +31,9 @@
     rect(0, 0, 1, 1, col=bgcol, lty=0)
     
     for (year in 1:N) {
-      abline(intercept[year], slope[year])
+       if (is.finite(intercept[year]) & is.finite(slope[year]))
+			abline(intercept[year], slope[year])
+		else abline(v=c0[year]/(c0[year]+c1[year]))		       
     }
     
     rect(-0.05, -0.05, 1.05, 0, col="white", lty=0)
@@ -41,11 +45,12 @@
     return(0)
   }
 
-# produces temporally organized tomography plots
-# (see King, 1997, A Solution to the Ecological Inference
-# Problem, Princeton University Press)
-#
-# KQ 11/9/2002
+## produces temporally organized tomography plots
+## (see King, 1997, A Solution to the Ecological Inference
+## Problem, Princeton University Press)
+##
+## KQ 11/9/2002
+## Modification added suggested by David Hugh-Jones 6/10/2006
 
 "dtomogplot" <-
   function(r0, r1, c0, c1, time.vec=NA, delay=0, 
@@ -102,7 +107,9 @@
       while ( (time.next - time.last) < delay ){
         time.next <- proc.time()[3]        
       }
-      abline(intercept[year], slope[year], col=col.vec[year])
+       if (is.finite(intercept[year]) & is.finite(slope[year]))
+         abline(intercept[year], slope[year], col=col.vec[year])
+       else abline(v=c0[year]/(c0[year]+c1[year]), col=col.vec[year])  
     }
 
     rect(-0.05, -0.05, 1.05, 0, col="white", lty=0)

@@ -8,6 +8,8 @@
 // ADM 7/24/2004 [updated to new Scythe version]
 // KQ 8/10/2004 bug fix and major overhaul of sampling scheme
 
+#include <iostream>
+
 #include "matrix.h"
 #include "distributions.h"
 #include "stat.h"
@@ -159,7 +161,7 @@ static double shrinkage(double (*logfun)(double[], const double&,
     const double U = stream->runif();
     const double x1 = Lbar + U*(Rbar - Lbar);
     theta_x1[index] = x1;
-    if (z < logfun(theta_x1, r0, r1, c0, mu0, mu1, sigma0, sigma1) &&
+    if (z <= logfun(theta_x1, r0, r1, c0, mu0, mu1, sigma0, sigma1) &&
 	Accept(logfun, theta_x1, index, x0, z, w, 
 	       r0, r1, c0, mu0, mu1, 
 	       sigma0, sigma1, L, R)){
@@ -331,12 +333,13 @@ extern "C"{
 
 
     // sampling constants
-    const double w = mean(widthmat);
+    double w = mean(widthmat);
     int p_temp = 2;
     while ((w * pow(2.0, p_temp) ) < max(widthmat)){
       ++p_temp;
     } 
     const int p = p_temp + 1;
+    
 
     // @@@@@@@@@@@@@@  The real sampling @@@@@@@@@@@@@@@    
     for (int iter=0; iter<tot_iter; ++iter){

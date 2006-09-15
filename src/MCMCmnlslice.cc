@@ -185,7 +185,7 @@ static double shrinkage(double (*logfun)(const Matrix<double>&,
     const double U = stream->runif();
     const double x1 = Lbar + U*(Rbar - Lbar);
     beta_x1[index] = x1;
-    if (z < logfun(Y, X, beta_x1, beta_prior_mean, beta_prior_prec) &&
+    if (z <= logfun(Y, X, beta_x1, beta_prior_mean, beta_prior_prec) &&
 	Accept(logfun, beta_x1, index, x0, z, w, 
 	       Y, X, beta_prior_mean, beta_prior_prec, L, R)){
       return(x1);

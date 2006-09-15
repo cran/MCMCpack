@@ -161,7 +161,7 @@ static double shrinkage(double (*logfun)(double[], const double&,
     const double U = stream->runif();
     const double x1 = Lbar + U*(Rbar - Lbar);
     theta_x1[index] = x1;
-    if (z < logfun(theta_x1, r0, r1, c0, mu0, mu1, sigma0, sigma1) &&
+    if (z <= logfun(theta_x1, r0, r1, c0, mu0, mu1, sigma0, sigma1) &&
 	Accept(logfun, theta_x1, index, x0, z, w, 
 	       r0, r1, c0, mu0, mu1, 
 	       sigma0, sigma1, L, R)){
