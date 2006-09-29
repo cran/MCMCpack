@@ -2,8 +2,13 @@
 // Changes and Bug Fixes
 //
 
+0.7-3 to 0.7-4
+  * fixed minor bug in MCMCpoisson() that was causing the function to 
+    not work on Windows machines.
+
 0.7-2 to 0.7-3
-  * following posting by Radford Neal at: http://www.stat.columbia.edu/~cook/movabletype/archives/2006/03/adaptive_metrop.html
+  * following posting by Radford Neal at:  
+      http://www.stat.columbia.edu/~cook/movabletype/archives/2006/03/ adaptive_metrop.html
     switched a < to a <= in the shrinkage procedures used in the various slice
     sampling implementations.
   * modified tomogplot() and dtomogplot() to handle situations in which 
