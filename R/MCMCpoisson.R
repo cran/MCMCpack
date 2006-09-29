@@ -94,7 +94,7 @@
                      b0=b0, B0=B0, V=V) 
     
     ## put together matrix and build MCMC object to return
-    output <- form.mcmc.object(sample, names=xnames,
+    output <- form.mcmc.object(posterior, names=xnames,
                                title="MCMCpoisson Posterior Sample",
                                y=Y, call=cl, logmarglike=logmarglike)
     return(output)
