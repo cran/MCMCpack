@@ -184,7 +184,7 @@ MCMCirt1d(datamatrix, theta.constraints=list(), burnin = 1000,
    Valen E. Johnson and James H. Albert. 1999. ``Ordinal Data Modeling." 
    Springer: New York.
 
-   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.  
+   Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.

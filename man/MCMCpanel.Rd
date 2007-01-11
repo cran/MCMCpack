@@ -140,8 +140,8 @@ MCMCpanel(obs, Y, X, W, burnin = 1000, mcmc = 10000, thin = 5,
    Hierarchical Longitudinal Models." \emph{Statistics and Computing.} 9: 
    17-26.
 
-   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.  \emph{Scythe 
-   Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+   Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
+   \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    
    Andrew D. Martin and Kyle L. Saunders. 2002. ``Bayesian Inference for 
    Political Science Panel Data.'' Paper presented at the 2002 Annual Meeting 

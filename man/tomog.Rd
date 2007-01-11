@@ -61,9 +61,8 @@ tomogplot(r0, r1, c0, c1, xlab="fraction of r0 in c0 (p0)",
     Gary King, 1997. \emph{A Solution to the Ecological Inference Problem}.
     Princeton: Princeton University Press.
     
-    Jonathan Wakefield. 2001. ``Ecological Inference for 2 x 2 Tables,''
-    Center for Statistics and the Social Sciences Working Paper 
-    no. 12. University of Washington.  
+  Jonathan C. Wakefield. 2004. ``Ecological Inference for 2 x 2 Tables.'' 
+  \emph{Journal of the Royal Statistical Society, Series A}. 167(3): 385Ð445.
 }
 
 \examples{

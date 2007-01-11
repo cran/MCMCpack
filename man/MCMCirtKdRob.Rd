@@ -230,7 +230,7 @@ MCMCirtKdRob(datamatrix, dimensions, item.constraints=list(),
 }
 
 \details{
-  \code{MCMCirtKd} simulates from the posterior using
+  \code{MCMCirtKdRob} simulates from the posterior using
   the slice sampling algorithm of Neal (2003).
   The simulation proper is done in
   compiled C++ code to maximize efficiency.  Please consult the
@@ -287,17 +287,17 @@ MCMCirtKdRob(datamatrix, dimensions, item.constraints=list(),
    Kaplan. 2005. ``Practical Issues in Implementing and Understanding
    Bayesian Ideal Point Estimation.'' \emph{Political Analysis}. 
    
-   Joshua Clinton, Simon Jackman, and Douglas Rivers. 2000. ``The Statistical 
-   Analysis of Legislative Behavior: A Unified Approach." Paper presented at 
-   the Annual Meeting of the Political Methodology Society.
+   Joshua Clinton, Simon Jackman, and Douglas Rivers. 2004. ``The Statistical 
+   Analysis of Roll Call Data."  \emph{American Political Science Review}.
+   98: 355-370.
    
    Simon Jackman. 2001. ``Multidimensional Analysis of Roll Call Data
    via Bayesian Simulation.'' \emph{Political Analysis.} 9: 227-241.
    
-   Valen E. Johnson and James H. Albert. 1999. ``Ordinal Data Modeling." 
+   Valen E. Johnson and James H. Albert. 1999. \emph{Ordinal Data Modeling}. 
    Springer: New York.
 
-   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.  
+   Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
 
    Radford Neal. 2003. ``Slice Sampling'' (with discussion). \emph{Annals of

@@ -53,11 +53,11 @@
    K <- length(objects)
    c.names <- names(objects)
    nonconst.indic <- rep(FALSE, K)
-   test <- grep("\.nonconst$", c.names)
+   test <- grep("\\.nonconst$", c.names)
    if(length(test)==0)
       stop("something must be declared non-constant in auto.Scythe.call()\n")
    nonconst.indic[test] <- TRUE
-   c.names <- sub("\.nonconst$", "", c.names)
+   c.names <- sub("\\.nonconst$", "", c.names)
    if(length(unique(c.names)) != K)
       stop("non-unique nonconst names passed in auto.Scythe.call()\n")
       

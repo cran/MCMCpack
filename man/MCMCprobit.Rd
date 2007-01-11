@@ -110,7 +110,7 @@ MCMCprobit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
   Albert, J. H. and S. Chib. 1995. ``Bayesian Residual Analysis for
   Binary Response Regression Models.'' \emph{Biometrika.} 82, 747-759.
       
-  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.  
+   Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.

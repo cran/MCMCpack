@@ -216,8 +216,6 @@ MCMCmixfactanal(x, factors, lambda.constraints=list(),
 }
 
 \references{
-  Kevin M. Quinn. 2004. ``Bayesian Factor Analysis for Mixed Ordinal and
-  Continuous Responses.'' \emph{Political Analysis}. 12: 338-353.
   
   M. K. Cowles. 1996. ``Accelerating Monte Carlo Markov Chain Convergence for
   Cumulative-link Generalized Linear Models." \emph{Statistics and Computing.}
@@ -226,12 +224,16 @@ MCMCmixfactanal(x, factors, lambda.constraints=list(),
   Valen E. Johnson and James H. Albert. 1999. ``Ordinal Data Modeling." 
   Springer: New York.
   
-   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.  
+   Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
    \url{http://www-fis.iarc.fr/coda/}.
+   
+     Kevin M. Quinn. 2004. ``Bayesian Factor Analysis for Mixed Ordinal and
+  Continuous Responses.'' \emph{Political Analysis}. 12: 338-353.
+   
 }
 
 

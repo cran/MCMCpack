@@ -147,7 +147,7 @@ that can be used to analyze the posterior sample.
 
 \references{
       
-  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.  
+   Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
 
    Radford Neal. 2003. ``Slice Sampling'' (with discussion). \emph{Annals of

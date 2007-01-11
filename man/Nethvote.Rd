@@ -49,7 +49,7 @@ Dutch Voting Behavior in 1989.
   Netherlands Central Bureau of Statistics, Amsterdam.
 }
 \references{
-  K.M. Quinn and A.M. Martin. 2002. ``An Integrated Computational Model
+  Kevin M. Quinn and Andrew D. Martin. 2002. ``An Integrated Computational Model
   of Multiparty Electoral Competition.'' \emph{Statistical Science}. 17:
   405-419.   
 }

@@ -139,19 +139,21 @@ Dependence." In \emph{Ecological Inference: New Methodological
 Strategies}. Gary King, Ori Rosen, and Martin A. Tanner (eds.). New
 York: Cambridge University Press. 
 
-Jonathan C. Wakefield.  2003. ``Ecological inference for 2x2 tables."  Read 
-before the Royal Statistical Society, on November 12th, 2003.
+
 
    Radford Neal. 2003. ``Slice Sampling" (with discussion). \emph{Annals of
    Statistics}, 31: 705-767. 
 
-  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004. 
-  \emph{Scythe Statistical 
-    Library 1.0.} \url{http://scythe.wustl.edu}.
-  
+   Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
+   \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+   
   Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
   \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
   \url{http://www-fis.iarc.fr/coda/}.
+
+Jonathan C. Wakefield. 2004. ``Ecological Inference for 2 x 2 Tables.'' \emph{Journal 
+   of the Royal Statistical Society, Series A}. 167(3): 385Ð445.
+
 }
 
 \examples{

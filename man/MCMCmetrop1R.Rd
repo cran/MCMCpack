@@ -206,7 +206,7 @@ mode. This last calculation is done via an initial call to
   B. Rubin. 2003. \emph{Bayesian Data Analysis}. 2nd Edition. Boca
   Raton: Chapman & Hall/CRC.
   
-  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.  
+   Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.

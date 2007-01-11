@@ -124,7 +124,7 @@ MCMCtobit(formula, data = parent.frame(), below = 0, above = Inf,
 }
 
 \references{
-   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.  
+   Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
@@ -132,10 +132,11 @@ MCMCtobit(formula, data = parent.frame(), below = 0, above = Inf,
    \url{http://www-fis.iarc.fr/coda/}.
    
    James Tobin. 1958. ``Estimation of relationships for limited dependent 
-   variables." \emph{Econometrica.}, 26:24-36.
+   variables." \emph{Econometrica.} 26:24-36.
 }
 
-\author{Ben Goodrich}
+\author{Ben Goodrich, \email{goodrich.ben@gmail.com},
+  \url{http://www.people.fas.harvard.edu/~goodrich/}}
 
 \seealso{
   \code{\link[coda]{plot.mcmc}},

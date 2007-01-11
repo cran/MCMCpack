@@ -1,57 +1,39 @@
-//
-// MCMCpack, Version 0.6-6
-//
+/////////////////////
+// MCMCpack README //
+/////////////////////
 
-Release Date: November 14, 2005
-
-This package contains functions for posterior simulation for a number of
-statistical models. All simulation is done in compiled C++ written in
-the Scythe Statistical Library Version 1.0. All models return coda mcmc
-objects that can then be summarized using coda functions or the coda
-menu interface.  The package also contains some useful utility
-functions, including some additional density functions and pseudo-random
-number generators for statistical distributions, a general purpose Metropolis sampling algorithm, and tools for visualization.
-
-//
 // Authors
-//
 
 Andrew D. Martin <admartin@wustl.edu>
 Kevin M. Quinn <kevin_quinn@harvard.edu>
 
-//
 // Compilation
-//
 
 This package (along with Scythe) uses C++ and the Standard Template
-Library (STL).  It requires use of the GCC compiler 3.0 or greater.  It
-has been tested on GCC 3.1, 3.2, 3.3, 3.4, and 4.0 on Linux and MacOS X. 
+Library (STL).  We suggest using of the GCC compiler 4.0 or greater.  The
+current package has been tested on GCC 3.1, 3.2, 3.3, 3.4, and 4.0 on Linux
+and MacOS X. 
 
-We have also successfully compiled this package for Windows using
-a MinGW cross-compiler using binutils 2.13, gcc 3.2, mingw
-runtime 2.2, and w32api 2.0.  This is essentially the same setup
-described by Yan and Rossini (2002), except for more recent
-versions of the compiler to successfully handle the C++ issues
-noted above. Many thanks to Dan Pemstein for helping with the
-cross-compilation, and to Kurt Hornik and Fritz Leisch for their
-help with debugging and service to the R community.
+We have also successfully compiled this package for Windows using a
+MinGW cross-compiler using the setup described by Yan and Rossini
+(2006).  Many thanks to Dan Pemstein for helping with the
+cross-compilation, and to Kurt Hornik and Fritz Leisch for their help
+with debugging as well as their service to the R community.
 
-//
 // Acknowledgments
-//
 
 We gratefully acknowledge support from:
 
 * National Science Foundation, Program in Methodology, Measurement, and 
 Statistics, Grants SES-0350646 and SES-0350613
 
-* Washington University, Department of Political Science and the
+* Washington University, Department of Political Science, the
 Weidenbaum Center on the Economy, Government, and Public Policy
-http://wc.wustl.edu
+(http://wc.wustl.edu), and the Center for Empirical Research in the Law
+(http://cerl.wustl.edu)
 
 * Harvard University, Department of Government and the
-Center for Basic Research in the Social Sciences
-http://cbrss.harvard.edu}
+Institute for Quantitative Social Sciences (http://iq.harvard.edu)
 
 Neither the National Science Foundation, Washington University, or
 Harvard University bear any responsibility for the content of this
@@ -62,15 +44,13 @@ you have any problems or questions.
 
 --
 Andrew D. Martin, Ph.D.
-Department of Political Science
-Washington University
-Campus Box 1063
-One Brookings Drive
-St. Louis, MO 63130
-(314) 935-5863 (Office)
-(314) 753-8377 (Cell)
-(314) 935-5856 (Fax)
+Professor and CERL Director, School of Law
+Professor, Political Science, Arts & Sciences
+Washington University in St. Louis
 
-Office: Eliot Hall 326
+(314) 935-5863 (Office)
+(314) 935-5150 (Fax)
+
+Office: Anheuser-Busch 470
 Email: admartin@wustl.edu
-WWW:   http://adm.wustl.edu
+WWW: http://adm.wustl.edu

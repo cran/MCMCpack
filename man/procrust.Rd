@@ -30,13 +30,13 @@ procrustes(X, Xstar, translation=FALSE, dilation=FALSE)
 }
 
 \details{
-  \code{R}, \code{tt}, and \code{s} are chosen so that
+  \code{R}, \code{tt}, and \code{s} are chosen so that:
 
-  \deqn{s X R + 1 tt' \approx X^*}{s X R + 1 tt' approximately Xstar}.
+  \deqn{s X R + 1 tt' \approx X^*}{s X R + 1 tt' approximately Xstar}
 
   \code{X.new} is given by:
 
-  \deqn{X_{new} = s X R + 1 tt'}{X.new = s X R + 1 tt'}.
+  \deqn{X_{new} = s X R + 1 tt'}{X.new = s X R + 1 tt'}
   }
 
 
