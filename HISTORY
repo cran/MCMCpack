@@ -2,9 +2,25 @@
 // Changes and Bug Fixes
 //
 
+0.7-4 to 0.8-1
+  * added MCMCPoissonChangepoint() model (authored by Jong Hee Park)
+  * added two plot methods for changepoint models:
+       plotPostChangepoint() and plotPostState() (authored by Jong Hee Park)
+  * package cleaned up prior to submission of piece to JStatSoft, including
+    major edit of documentation
+ 
 0.7-3 to 0.7-4
   * fixed minor bug in MCMCpoisson() that was causing the function to 
     not work on Windows machines.
+  * changed 
+      test <- grep("\.nonconst$", c.names)
+    to 
+      test <- grep("\\.nonconst$", c.names)
+    and
+      c.names <- sub("\.nonconst$", "", c.names)
+    to 
+    c.names <- sub("\\.nonconst$", "", c.names)
+    in automate.R. [Thanks to Kurt Hornik for noticing this.]
 
 0.7-2 to 0.7-3
   * following posting by Radford Neal at:  

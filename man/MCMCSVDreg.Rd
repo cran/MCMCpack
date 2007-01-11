@@ -100,7 +100,7 @@ MCMCSVDreg(formula, data=parent.frame(), burnin = 1000, mcmc = 10000,
   \deqn{y = X \beta + \varepsilon}{y = X beta + epsilon}
   Where the errors are assumed to be iid Gaussian:
   \deqn{\varepsilon_{i} \sim \mathcal{N}(0, \sigma^2)}{epsilon_i ~ N(0,
-    sigma^2)}.
+    sigma^2)}
 
   Let \eqn{N}{N} denote the number of rows of \eqn{X}{X} and \eqn{P}{P}
   the number of columns of \eqn{X}{X}. Unlike the standard regression
@@ -133,15 +133,15 @@ MCMCSVDreg(formula, data=parent.frame(), burnin = 1000, mcmc = 10000,
   }
   
   \references{
-   West, Mike; Josheph Nevins; Jeffrey Marks; Rainer Spang, and Harry
-   Zuzan. 2000. "DNA MICROARRAY DATA ANALYSIS AND REGRESSION MODELING
-   FOR GENETIC EXPRESSION PROFILING" Duke ISDS working paper.
+    Mike West, Josheph Nevins, Jeffrey Marks, Rainer Spang, and Harry
+   Zuzan. 2000. ``DNA Microarray Data Analysis and Regression Modeling
+   for Genetic Expression Profiling." Duke ISDS working paper.
 
-   Gottardo, Raphael, and Adrian Raftery. 2004. "Markov chain Monte
-   Carlo with mixtures of singular distributions". Statistics
-   department, University of Washington, Technical report 470. 
-    
-   Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.  
+   Gottardo, Raphael, and Adrian Raftery. 2004. ``Markov chain Monte
+   Carlo with mixtures of singular distributions.'' Statistics
+   Department, University of Washington, Technical Report 470. 
+   
+   Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
@@ -149,11 +149,6 @@ MCMCSVDreg(formula, data=parent.frame(), burnin = 1000, mcmc = 10000,
    \url{http://www-fis.iarc.fr/coda/}.
 }
 
-
-\examples{
-\dontrun{
-}
-}
 
 \keyword{models}
 

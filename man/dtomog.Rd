@@ -74,13 +74,14 @@ dtomogplot(r0, r1, c0, c1, time.vec=NA, delay=0,
   Gary King, 1997. \emph{A Solution to the Ecological Inference Problem}.
   Princeton: Princeton University Press.
   
-  Jonathan Wakefield. 2001. ``Ecological Inference for 2 x 2 Tables,''
-  Center for Statistics and the Social Sciences Working Paper 
-  no. 12. University of Washington.
+  Jonathan C. Wakefield. 2004. ``Ecological Inference for 2 x 2 Tables.'' 
+  \emph{Journal of the Royal Statistical Society, Series A}. 167(3): 385Ð445.
 
-  Kevin M. Quinn. 2002. ``Ecological Inference in the Presence of
-  Temporal Dependence.'' Paper prepared for Ecological Inference
-  Conference, Harvard University, June 17-18, 2002.
+Kevin Quinn. 2004. ``Ecological Inference in the Presence of Temporal 
+Dependence." In \emph{Ecological Inference: New Methodological
+Strategies}. Gary King, Ori Rosen, and Martin A. Tanner (eds.). New
+York: Cambridge University Press. 
+
 }
 
 \examples{

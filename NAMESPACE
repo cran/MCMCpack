@@ -1,6 +1,7 @@
 useDynLib(MCMCpack)
 import(coda)
 import(MASS)
+import(stats)
 
 export(
        BayesFactor,
@@ -29,10 +30,13 @@ export(
        MCMCordfactanal,
        MCMCpanel,
        MCMCpoisson,
+       MCMCpoissonChangepoint,
        MCMCprobit,
        MCMCregress,
        MCMCSVDreg,
        MCMCtobit,
+       plotPostState,
+       plotPostChangepoint,
        PostProbMod,
        procrustes,
        rdirichlet,

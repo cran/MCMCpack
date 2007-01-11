@@ -13,6 +13,7 @@
    cat("## (Grants SES-0350646 and SES-0350613)\n##\n")
    require(coda, quietly=TRUE)
    require(MASS, quietly=TRUE)
+   require(stats, quietly=TRUE)
 }
 
 .onUnload <- function(libpath) {

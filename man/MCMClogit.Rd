@@ -115,7 +115,7 @@ MCMClogit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
   Additionally, arbitrary user-defined priors can be specified with the
   \code{user.prior.density} argument. 
 
-  If the default multivariate normal prior is used, the Metropollis
+  If the default multivariate normal prior is used, the Metropolis
   proposal distribution is centered at the current value of
   \eqn{\beta}{beta} and has variance-covariance \eqn{V = T (B_0 +
     C^{-1})^{-1} T }{V = T (B0 + C^{-1})^{-1} T}, where \eqn{T}{T} is a
@@ -124,7 +124,7 @@ MCMClogit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
   sample variance-covariance matrix of the MLEs. This last calculation
   is done via an initial call to \code{glm}.
 
-  If a user-defined prior is used, the Metropollis
+  If a user-defined prior is used, the Metropolis
   proposal distribution is centered at the current value of
   \eqn{\beta}{beta} and has variance-covariance \eqn{V = T
     C T }{V = T C T}, where \eqn{T}{T} is a
@@ -136,7 +136,7 @@ MCMClogit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
   
 \references{
       
-  Andrew D. Martin, Kevin M. Quinn, and Daniel Pemstein.  2004.  
+   Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
