@@ -22,17 +22,7 @@
 
     cl <- match.call()
     
-    ## get marginal likelihood argument
-    marginal.likelihood  <- match.arg(marginal.likelihood)
-    if (max(B0==0) == 1 & is.null(user.prior.density)){
-      if (marginal.likelihood != "none"){
-        warning("Cannot calculate marginal likelihood with improper prior\n")
-        marginal.likelihood <- "none"
-      }
-    }
-    logmarglike <- NULL
-    
-    
+       
     ## seeds
     seeds <- form.seeds(seed) 
     lecuyer <- seeds[[1]]
@@ -52,6 +42,22 @@
     b0 <- mvn.prior[[1]]
     B0 <- mvn.prior[[2]]
 
+
+    ## get marginal likelihood argument
+    marginal.likelihood  <- match.arg(marginal.likelihood)
+    B0.eigenvalues <- eigen(B0)$values
+    if (min(B0.eigenvalues) < 0){
+      stop("B0 is not positive semi-definite.\nPlease respecify and call again.\n")
+    }
+    if (isTRUE(all.equal(min(B0.eigenvalues), 0))){
+      if (marginal.likelihood != "none"){
+        warning("Cannot calculate marginal likelihood with improper prior\n")
+        marginal.likelihood <- "none"
+      }
+    }
+    logmarglike <- NULL
+
+    
     ## setup the environment so that fun can see the things passed as ...
     userfun <- function(ttt) user.prior.density(ttt, ...)
     my.env <- environment(fun = userfun)

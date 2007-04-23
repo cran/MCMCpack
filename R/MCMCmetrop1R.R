@@ -70,7 +70,7 @@
     hess.new <- opt.out$hessian
     hess.flag <- 0
     if (force.samp==TRUE){
-      if (max(diag(optim.out$hessian)==0)){
+      if (max(diag(opt.out$hessian)==0)){
         for (i in 1:nrow(hess.new)){
           if (hess.new[i,i] == 0){
             hess.new[i,i] <- -1e-6

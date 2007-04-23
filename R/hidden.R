@@ -593,6 +593,9 @@
      
      # prior precision
      if(is.null(dim(B0))) {
+       if (length(B0) > K){
+         stop("B0 was passed as a vector longer than K.\nB0 must be either a scalar or a matrix.\nPlease respecify and call ", calling.function(), " again.\n", call.=FALSE)
+       }
        B0 <- B0 * diag(K)    
      }
      if((dim(B0)[1] != K) || (dim(B0)[2] != K)) {
@@ -600,6 +603,22 @@
        stop("Please respecify and call ", calling.function(), " again.\n",
          call.=FALSE)
      }
+
+     ## check B0 for symmetry
+     symproblem <- FALSE
+     for (i in 1:K){
+       for (j in i:K){
+         if (B0[i,j] != B0[j,i]){
+           symproblem <- TRUE
+         }
+       }
+     }
+     if (symproblem){
+       cat("B0 is not symmetric.\n")
+       stop("Please respecify and call ", calling.function(), " again.\n",
+         call.=FALSE)       
+     }
+     
      return(list(b0,B0))
    }
 
