@@ -21,19 +21,6 @@
     cl <- match.call()
     
 
-    ## get marginal likelihood argument
-    marginal.likelihood  <- match.arg(marginal.likelihood)
-    if (max(B0==0) == 1){
-      if (marginal.likelihood != "none"){
-        warning("Cannot calculate marginal likelihood with improper prior\n")
-        marginal.likelihood <- "none"
-      }
-    }
-    logmarglike <- NULL
-    chib <- 0
-    if (marginal.likelihood == "Chib95"){
-      chib <- 1
-    }
     
     ## seeds
     seeds <- form.seeds(seed) 
@@ -54,7 +41,27 @@
     b0 <- mvn.prior[[1]]
     B0 <- mvn.prior[[2]]
     check.ig.prior(c0, d0)
-   
+
+
+    ## get marginal likelihood argument
+    marginal.likelihood  <- match.arg(marginal.likelihood)
+    B0.eigenvalues <- eigen(B0)$values
+    if (min(B0.eigenvalues) < 0){
+      stop("B0 is not positive semi-definite.\nPlease respecify and call again.\n")
+    }
+    if (isTRUE(all.equal(min(B0.eigenvalues), 0))){
+      if (marginal.likelihood != "none"){
+        warning("Cannot calculate marginal likelihood with improper prior\n")
+        marginal.likelihood <- "none"
+      }
+    }
+    logmarglike <- NULL
+    chib <- 0
+    if (marginal.likelihood == "Chib95"){
+      chib <- 1
+    }
+
+    
     ## define holder for posterior sample
     sample <- matrix(data=0, mcmc/thin, K+1)
 

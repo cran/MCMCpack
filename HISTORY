@@ -2,6 +2,14 @@
 // Changes and Bug Fixes
 //
 
+0.8-1 to 0.8-2
+  * models with multivariate normal priors now check for symmetry and positive
+    semi-definiteness of precision matrix
+  * fixed bug in how models with marginal likelihood calculations check for
+    prior propriety [thanks to Gary Rosner for spotting this]
+  * fixed bug in how MCMCmetrop1R handled a singular Hessian 
+    [thanks to Piers  Dunstan for spotting this] 
+
 0.7-4 to 0.8-1
   * added MCMCPoissonChangepoint() model (authored by Jong Hee Park)
   * added two plot methods for changepoint models:
