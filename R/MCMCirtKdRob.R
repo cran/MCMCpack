@@ -367,7 +367,7 @@
     
     ## put together matrix and build MCMC object to return
     sample <- matrix(posterior$samdata, posterior$samrow, posterior$samcol,
-                     byrow=TRUE)
+                     byrow=FALSE)
     output <- mcmc(data=sample,start=1, end=mcmc, thin=thin)
     
     par.names <- NULL

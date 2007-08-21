@@ -27,170 +27,170 @@
 // ADM 6/2/04 [re-written using template]
 // KQ 6/18/04 [modified to meet new developer specification]
 // ADM 7/22/04 [modified to work with new Scythe and rngs]
+// DBP 7/1/07 [ported to scythe 1.0.x]
+//
+#ifndef MCMCREGRESS_CC
+#define MCMCREGRESS_CC
 
+#include "MCMCrng.h"
+#include "MCMCfcds.h"
 #include "matrix.h"
 #include "distributions.h"
 #include "stat.h"
 #include "la.h"
 #include "ide.h"
 #include "smath.h"
-#include "MCMCrng.h"
-#include "MCMCfcds.h"
+#include "rng.h"
 
 #include <R.h>           // needed to use Rprintf()
 #include <R_ext/Utils.h> // needed to allow user interrupts
 
-using namespace SCYTHE;
 using namespace std;
+using namespace scythe;
 
-
-static double digamma(const double& theta, const double& a, const double& b){
-  double logf =  a * log(b) - lngammafn(a) + -(a+1) * log(theta) + -b/theta;
-  
+static double digamma(double theta, double a, double b) {
+  double logf =  a * log(b) - lngammafn(a) + -(a+1) * log(theta) + 
+                 -b/theta;
   return exp(logf);
   //pow(b, a) / gammafn(a) * pow(theta, -(a+1)) * exp(-b/theta);
 }
 
 
-extern "C" {
+/* MCMCregress implementation.  Takes Matrix<> reference which it
+ * fills with the posterior.  The logmarklike double reference is
+ * filled with the log marginal likelihood if asked for.
+ */
+template <typename RNGTYPE>
+void MCMCregress_impl (rng<RNGTYPE>& stream, const Matrix<>& Y,
+    const Matrix<>& X, Matrix<>& beta, const Matrix<>& b0,
+    const Matrix<>& B0, double c0, double d0,
+    unsigned int burnin, unsigned int mcmc, unsigned int thin, 
+    unsigned int verbose, bool chib, 
+    Matrix<>& result, double& logmarglike)
+{
+   // define constants and form cross-product matrices
+   const unsigned int tot_iter = burnin + mcmc; //total iterations
+   const unsigned int nstore = mcmc / thin; // number of draws to store
+   const unsigned int k = X.cols ();
+   const Matrix<> XpX = crossprod(X);
+   const Matrix<> XpY = t(X) * Y;
 
-   // simulate from posterior density and return an mcmc by parameters
-   // matrix of the posterior density sample
+   // storage matrices
+   Matrix<> betamatrix (k, nstore);
+   Matrix<> sigmamatrix (1, nstore);
+
+   // Gibbs sampler
+   unsigned int count = 0;
+   for (unsigned int iter = 0; iter < tot_iter; ++iter) {
+     double sigma2 = NormIGregress_sigma2_draw (X, Y, beta, c0, d0, 
+                                                stream);
+     beta = NormNormregress_beta_draw (XpX, XpY, b0, B0, sigma2, stream);  
+
+     // store draws in storage matrix (or matrices)
+     if (iter >= burnin && (iter % thin == 0)) {
+       sigmamatrix (0, count) = sigma2;
+       betamatrix(_, count) = beta;
+       ++count;
+     }
+     
+     // print output to stdout
+     if(verbose > 0 && iter % verbose == 0) {
+       Rprintf("\n\nMCMCregress iteration %i of %i \n",
+         (iter+1), tot_iter);
+       Rprintf("beta = \n");
+       for (unsigned int j=0; j<k; ++j)
+         Rprintf("%10.5f\n", beta(j));
+       Rprintf("sigma2 = %10.5f\n", sigma2);
+     }
+
+     R_CheckUserInterrupt(); // allow user interrupts
+
+   } // end MCMC loop
+
+   if (chib == 1) {
+     // marginal likelihood calculation stuff starts here
+     const double sigma2star = meanc(t(sigmamatrix))(0);
+     double sigma2fcdsum = 0.0;
+     
+     // second set of Gibbs scans
+     for (unsigned int iter = 0; iter < tot_iter; ++iter) {
+       double sigma2 = NormIGregress_sigma2_draw (X, Y, beta, c0, d0, 
+                                                  stream);
+       beta = NormNormregress_beta_draw (XpX, XpY, b0, B0, sigma2, 
+                                         stream);  
+       const Matrix<> e = gaxpy(X, (-1*beta), Y);
+       const Matrix<> SSE = crossprod (e); 
+       const double c_post = (c0 + X.rows ()) * 0.5;
+       const double d_post = (d0 + SSE[0]) * 0.5;
+       sigma2fcdsum += digamma(sigma2star, c_post, d_post);
+ 
+       // print output to stdout
+       if(verbose > 0 && iter % verbose == 0) {
+         Rprintf("\n\nMCMCregress (reduced) iteration %i of %i \n",
+                 (iter+1), tot_iter);
+       }
+ 
+       R_CheckUserInterrupt(); // allow user interrupts
+     } // end MCMC loop
+     
+     double sigma2fcdmean = sigma2fcdsum / static_cast<double>(tot_iter);
+     
+     const Matrix<> betastar = t(meanc(t(betamatrix)));
+     const double sig2_inv = 1.0 / sigma2star;
+     const Matrix<> sig_beta = invpd (B0 + XpX * sig2_inv);
+     const Matrix<> betahat = sig_beta * gaxpy(B0, b0, XpY*sig2_inv);
+     const double logbetafcd = lndmvn(betastar, betahat, sig_beta);
+     
+     // calculate loglikelihood at (betastar, sigma2star)
+     double sigmastar = sqrt(sigma2star); 
+     Matrix<> eta = X * betastar;
+     double loglike = 0.0;
+     for (unsigned int i = 0; i < X.rows(); ++i) {
+      loglike += lndnorm(Y(i), eta(i), sigmastar);
+     }
+     
+     // calculate log prior ordinate
+     double logprior = log(digamma(sigma2star, c0/2.0, d0/2.0)) + 
+                           lndmvn(betastar, b0, invpd(B0));
+     
+     // put pieces together and print the marginal likelihood
+     logmarglike = loglike + logprior - logbetafcd - log(sigma2fcdmean);
+   }
+
+   result = cbind(t(betamatrix), t(sigmamatrix));
+ } // end MCMCregress 
+
+extern "C" {
    void MCMCregress(double *sampledata, const int *samplerow,
 		    const int *samplecol, const double *Ydata, const int *Yrow,
 		    const int *Ycol, const double *Xdata, const int *Xrow,
 		    const int *Xcol, const int *burnin, const int *mcmc,
-		    const int *thin, const int *lecuyer, const int *seedarray,
+		    const int *thin, const int *uselecuyer, const int *seedarray,
 		    const int *lecuyerstream, const int *verbose,
 		    const double *betastartdata, const int *betastartrow,
 		    const int *betastartcol, const double *b0data, 
 		    const int *b0row, const int *b0col, 
 		    const double *B0data, const int *B0row,
 		    const int *B0col, const double *c0, const double *d0,
-		    double* logmarglikeholder, const int* chib) {
-     
+		    double* logmarglikeholder, const int* chib)
+   {
      // pull together Matrix objects
-     Matrix <double> Y = r2scythe(*Yrow, *Ycol, Ydata);
-     Matrix <double> X = r2scythe(*Xrow, *Xcol, Xdata);
-     Matrix <double> betastart = r2scythe(*betastartrow,
-       *betastartcol, betastartdata);
-     Matrix <double> b0 = r2scythe(*b0row, *b0col, b0data);
-     Matrix <double> B0 = r2scythe(*B0row, *B0col, B0data);
+     Matrix<> Y(*Yrow, *Ycol, Ydata);
+     Matrix<> X(*Xrow, *Xcol, Xdata);
+     Matrix<> betastart(*betastartrow, *betastartcol, betastartdata);
+     Matrix<> b0(*b0row, *b0col, b0data);
+     Matrix<> B0(*B0row, *B0col, B0data);
 
-     // define constants and form cross-product matrices
-     const int tot_iter = *burnin + *mcmc; // total number of mcmc iterations
-     const int nstore = *mcmc / *thin; // number of draws to store
-     const int k = X.cols ();
-     const Matrix <double> XpX = crossprod(X);
-     const Matrix <double> XpY = t(X) * Y;
+     double logmarglike;
+     Matrix<> storagematrix;
+     MCMCPACK_PASSRNG2MODEL(MCMCregress_impl, Y, X, betastart, b0, B0, 
+                            *c0, *d0, *burnin, *mcmc, *thin, *verbose,
+                            *chib, storagematrix, logmarglike);
+     logmarglikeholder[0] = logmarglike;
+     const unsigned int size = *samplerow * *samplecol;
+     for (unsigned int i = 0; i < size; ++i)
+       sampledata[i] = storagematrix(i);
+   }
+}
 
-     // storage matrices
-     Matrix <double> betamatrix (k, nstore);
-     Matrix <double> sigmamatrix (1, nstore);
-
-     // initialize rng stream
-     rng *stream = MCMCpack_get_rng(*lecuyer, seedarray, *lecuyerstream);
-
-     // set starting values
-     Matrix <double> beta = betastart;
-
-     // Gibbs sampler
-     int count = 0;
-     for (int iter = 0; iter < tot_iter; ++iter) {
-       double sigma2 = NormIGregress_sigma2_draw (X, Y, beta, *c0,
-         *d0, stream);
-       beta = NormNormregress_beta_draw (XpX, XpY, b0, B0, sigma2,
-         stream);  
-         
-       // store draws in storage matrix (or matrices)
-       if (iter >= *burnin && (iter % *thin == 0)) {
-         sigmamatrix (0, count) = sigma2;
-         for (int j = 0; j < k; j++)
-           betamatrix (j, count) = beta[j];
-         ++count;
-       }
-       
-       // print output to stdout
-       if(*verbose > 0 && iter % *verbose == 0) {
-         Rprintf("\n\nMCMCregress iteration %i of %i \n",
-           (iter+1), tot_iter);
-         Rprintf("beta = \n");
-         for (int j=0; j<k; ++j)
-           Rprintf("%10.5f\n", beta[j]);
-         Rprintf("sigma2 = %10.5f\n", sigma2);
-       }
-
-       R_CheckUserInterrupt(); // allow user interrupts
-
-     } // end MCMC loop
-
-     if (*chib == 1){
-       // marginal likelihood calculation stuff starts here
-       const double sigma2star = meanc(t(sigmamatrix))[0];
-       double sigma2fcdsum = 0.0;
-       // second set of Gibbs scans
-       for (int iter = 0; iter < tot_iter; ++iter) {
-	 double sigma2 = NormIGregress_sigma2_draw (X, Y, beta, *c0,
-						    *d0, stream);
-	 beta = NormNormregress_beta_draw (XpX, XpY, b0, B0, sigma2,
-					   stream);  
-	 const Matrix <double> e = gaxpy(X, (-1*beta), Y);
-	 const Matrix <double> SSE = crossprod (e); 
-	 const double c_post = (*c0 + X.rows ()) * 0.5;
-	 const double d_post = (*d0 + SSE[0]) * 0.5;
-	 sigma2fcdsum += digamma(sigma2star, c_post, d_post);
-	 
-	 // print output to stdout
-	 if(*verbose > 0 && iter % *verbose == 0) {
-	   Rprintf("\n\nMCMCregress (reduced) iteration %i of %i \n",
-		   (iter+1), tot_iter);
-	 }
-	 
-	 R_CheckUserInterrupt(); // allow user interrupts
-	 
-       } // end MCMC loop
-       double sigma2fcdmean = sigma2fcdsum / static_cast<double>(tot_iter);
-       
-       
-       const Matrix<double> betastar = t(meanc(t(betamatrix)));
-       const double sig2_inv = 1.0 / sigma2star;
-       const Matrix <double> sig_beta = invpd (B0 + XpX * sig2_inv);
-       const Matrix <double> betahat = sig_beta * 
-	 gaxpy(B0, b0, XpY*sig2_inv);
-       const double logbetafcd = lndmvn(betastar, betahat, sig_beta);
-       
-       
-       
-       // calculate loglikelihood at (betastar, sigma2star)
-       double sigmastar = sqrt(sigma2star); 
-       Matrix<double> eta = X * betastar;
-       double loglike = 0.0;
-       for (int i=0; i<X.rows(); ++i){
-	 loglike += lndnorm(Y[i], eta[i], sigmastar);
-       }
-       
-       // calculate log prior ordinate
-       double logprior = log(digamma(sigma2star, *c0/2.0, *d0/2.0)) + 
-	 lndmvn(betastar, b0, invpd(B0));
-       
-       
-       // put pieces together and print the marginal likelihood
-       double logmarglike = loglike + logprior - logbetafcd - 
-	 log(sigma2fcdmean);
-       
-
-       logmarglikeholder[0] = logmarglike;
-              
-     }     
-
-     delete stream; // clean up random number stream
-     
-     // load draws into sample array
-     Matrix <double> storeagematrix = cbind (t (betamatrix), t (sigmamatrix));     
-     const int size = *samplerow * *samplecol;
-     for(int i = 0; i < size; ++i)
-	 sampledata[i] = storeagematrix[i];
-     
-     
-   } // end MCMCregress 
-} // end extern "C"
+#endif

@@ -140,8 +140,8 @@
     output <- form.mcmc.object(posterior, par.names, title)
     ## get rid of columns for constrained parameters
     output.df <- as.data.frame(as.matrix(output))
-    output.var <- diag(var(output.df))
-    output.df <- output.df[,output.var != 0]
+    output.sd <- apply(output.df, 2, sd)
+    output.df <- output.df[,output.sd != 0]
     
     output <- mcmc(as.matrix(output.df), start=burnin+1, end=mcmc+burnin,
                    thin=thin)

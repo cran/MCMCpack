@@ -2,6 +2,12 @@
 // Changes and Bug Fixes
 //
 
+0.8-2 to 0.9-1
+  * first release of JStatSoft version
+  * full port to Scythe 1.0.2 (nearly all C++ has been radically changed)
+  * MCMCpanel() deprecated
+  * a number of minor fixes [thanks to anonymous reviewers]
+
 0.8-1 to 0.8-2
   * models with multivariate normal priors now check for symmetry and positive
     semi-definiteness of precision matrix

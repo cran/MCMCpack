@@ -18,9 +18,12 @@
 // Copyright (C) 2004 Andrew D. Martin and Kevin M. Quinn
 // 
 // 2/18/2005 KQ
+// 8/1/2007  ported to Scythe 1.0.2 KQ
 //
 
-#include <iostream>
+
+#ifndef MCMCIRTKDROB_CC
+#define MCMCIRTKDROB_CC
 
 #include "matrix.h"
 #include "distributions.h"
@@ -30,12 +33,16 @@
 #include "smath.h"
 #include "MCMCrng.h"
 #include "MCMCfcds.h"
+#include "MCMCmnl.h"
 
 #include <R.h>           // needed to use Rprintf()
 #include <R_ext/Utils.h> // needed to allow user interrupts
 
-using namespace SCYTHE;
+
+typedef Matrix<double,Row,View> rmview;
+
 using namespace std;
+using namespace scythe;
 
 
 /* Equal probability sampling; without-replacement case */
@@ -45,13 +52,14 @@ using namespace std;
 // y: k array of samled indices
 // k: length of y (must be <= n)
 // n: length of x (must be >= k)
+template <typename RNGTYPE>
 static void SampleNoReplace(const int k, int n, int *y, int *x, 
-			    rng* stream){
+			    rng<RNGTYPE>& stream){
   
   for (int i = 0; i < n; i++)
     x[i] = i;
   for (int i = 0; i < k; i++) {
-    int j = static_cast<int>(n * stream->runif());
+    int j = static_cast<int>(n * stream.runif());
     y[i] = x[j];
     x[j] = x[--n];
   }
@@ -63,14 +71,14 @@ static void SampleNoReplace(const int k, int n, int *y, int *x,
 // this single element is Lambda(rowindex, colindex)
 static double Lambda_logfcd(const double& lam_ij,
 			    const Matrix<int>& X,
-			    const Matrix<double>& Lambda,
-			    const Matrix<double>& theta, 
+			    const Matrix<>& Lambda,
+			    const Matrix<>& theta, 
 			    const double& delta0,
 			    const double& delta1, 
-			    const Matrix<double>& Lambda_prior_mean, 
-			    const Matrix<double>& Lambda_prior_prec,
-			    const Matrix<double>& Lambda_ineq,
-			    const Matrix<double>& theta_ineq,
+			    const Matrix<>& Lambda_prior_mean, 
+			    const Matrix<>& Lambda_prior_prec,
+			    const Matrix<>& Lambda_ineq,
+			    const Matrix<>& theta_ineq,
 			    const double& k0,
 			    const double& k1,
 			    const double& c0,
@@ -98,22 +106,22 @@ static double Lambda_logfcd(const double& lam_ij,
   
   // prior is uniform on hypersphere with radius 10
   /*
-  if (Lambda_ineq(rowindex,colindex) * lam_ij < 0){
+    if (Lambda_ineq(rowindex,colindex) * lam_ij < 0){
     return log(0.0);
-  } 
-  double absqdist = 0.0;
-  for (int i=0; i<D; ++i){
+    } 
+    double absqdist = 0.0;
+    for (int i=0; i<D; ++i){
     if (i==colindex){
-      absqdist += ::pow(lam_ij, 2);
+    absqdist += ::pow(lam_ij, 2);
     }
     else{
-      absqdist += ::pow(Lambda(rowindex,i), 2);
+    absqdist += ::pow(Lambda(rowindex,i), 2);
     }
-  }
-  if (absqdist > 100.0){
+    }
+    if (absqdist > 100.0){
     return log(0.0);
-  }
-  const double logprior = 0.0;
+    }
+    const double logprior = 0.0;
   */
 
   // likelihood
@@ -145,14 +153,14 @@ static double Lambda_logfcd(const double& lam_ij,
 // this single element is theta(rowindex, colindex)
 static double theta_logfcd(const double& t_ij,
 			   const Matrix<int>& X, 
-			   const Matrix<double>& Lambda,
-			   const Matrix<double>& theta, 
+			   const Matrix<>& Lambda,
+			   const Matrix<>& theta, 
 			   const double& delta0,
 			   const double& delta1, 
-			   const Matrix<double>& Lambda_prior_mean, 
-			   const Matrix<double>& Lambda_prior_prec,
-			   const Matrix<double>& Lambda_ineq,
-			   const Matrix<double>& theta_ineq,
+			   const Matrix<>& Lambda_prior_mean, 
+			   const Matrix<>& Lambda_prior_prec,
+			   const Matrix<>& Lambda_ineq,
+			   const Matrix<>& theta_ineq,
 			   const double& k0,
 			   const double& k1,
 			   const double& c0,
@@ -171,22 +179,22 @@ static double theta_logfcd(const double& t_ij,
   
   // prior is uniform on unit circle
   /*
-  if (theta_ineq(rowindex,colindex-1) * t_ij < 0){
+    if (theta_ineq(rowindex,colindex-1) * t_ij < 0){
     return log(0.0);
-  } 
-  double tsqdist = 0.0;
-  for (int i=0; i<(D-1); ++i){
+    } 
+    double tsqdist = 0.0;
+    for (int i=0; i<(D-1); ++i){
     if (i==(colindex-1)){
-      tsqdist += ::pow(t_ij, 2);
+    tsqdist += ::pow(t_ij, 2);
     }
     else{
-      tsqdist += ::pow(theta(rowindex,(i-1)), 2);
+    tsqdist += ::pow(theta(rowindex,(i-1)), 2);
     }
-  }
-  if (tsqdist > 1.0){
+    }
+    if (tsqdist > 1.0){
     return log(0.0);
-  }
-  const double logprior = 1.0;
+    }
+    const double logprior = 1.0;
   */
 
   // likelihood
@@ -217,14 +225,14 @@ static double theta_logfcd(const double& t_ij,
 // full conditional for delta0
 static double delta0_logfcd(const double& delta0,
 			    const Matrix<int>& X, 
-			    const Matrix<double>& Lambda,
-			    const Matrix<double>& theta, 
+			    const Matrix<>& Lambda,
+			    const Matrix<>& theta, 
 			    const double& junk,
 			    const double& delta1, 
-			    const Matrix<double>& Lambda_prior_mean, 
-			    const Matrix<double>& Lambda_prior_prec,
-			    const Matrix<double>& Lambda_ineq,
-			    const Matrix<double>& theta_ineq,
+			    const Matrix<>& Lambda_prior_mean, 
+			    const Matrix<>& Lambda_prior_prec,
+			    const Matrix<>& Lambda_ineq,
+			    const Matrix<>& theta_ineq,
 			    const double& k0,
 			    const double& k1,
 			    const double& c0,
@@ -267,14 +275,14 @@ static double delta0_logfcd(const double& delta0,
 // full conditional for delta1
 static double delta1_logfcd(const double& delta1, 
 			    const Matrix<int>& X, 
-			    const Matrix<double>& Lambda,
-			    const Matrix<double>& theta, 
+			    const Matrix<>& Lambda,
+			    const Matrix<>& theta, 
 			    const double& delta0,
 			    const double& junk, 
-			    const Matrix<double>& Lambda_prior_mean, 
-			    const Matrix<double>& Lambda_prior_prec,
-			    const Matrix<double>& Lambda_ineq,
-			    const Matrix<double>& theta_ineq,
+			    const Matrix<>& Lambda_prior_mean, 
+			    const Matrix<>& Lambda_prior_prec,
+			    const Matrix<>& Lambda_ineq,
+			    const Matrix<>& theta_ineq,
 			    const double& k0,
 			    const double& k1,
 			    const double& c0,
@@ -313,17 +321,21 @@ static double delta1_logfcd(const double& delta1,
 }
 
 
+
+
+
 // Radford Neal's (2000) doubling procedure coded for a logdensity
+template<typename RNGTYPE>
 static void doubling(double (*logfun)(const double&,
 				      const Matrix<int>&,
-				      const Matrix<double>&,
-				      const Matrix<double>&,
+				      const Matrix<>&,
+				      const Matrix<>&,
 				      const double&, 
 				      const double&,
-				      const Matrix<double>&,
-				      const Matrix<double>&,
-				      const Matrix<double>&,
-				      const Matrix<double>&,
+				      const Matrix<>&,
+				      const Matrix<>&,
+				      const Matrix<>&,
+				      const Matrix<>&,
 				      const double&, 
 				      const double&,
 				      const double&, 
@@ -333,14 +345,14 @@ static void doubling(double (*logfun)(const double&,
 				      const int&,
 				      const int&), 
 		     const Matrix<int>& X,
-		     const Matrix<double>& Lambda,
-		     const Matrix<double>& theta,
+		     const Matrix<>& Lambda,
+		     const Matrix<>& theta,
 		     const double& delta0,
 		     const double& delta1, 
-		     const Matrix<double>& Lambda_prior_mean, 
-		     const Matrix<double>& Lambda_prior_prec,
-		     const Matrix<double>& Lambda_ineq,
-		     const Matrix<double>& theta_ineq,
+		     const Matrix<>& Lambda_prior_mean, 
+		     const Matrix<>& Lambda_prior_prec,
+		     const Matrix<>& Lambda_ineq,
+		     const Matrix<>& theta_ineq,
 		     const double& k0,
 		     const double& k1,
 		     const double& c0,
@@ -351,10 +363,10 @@ static void doubling(double (*logfun)(const double&,
 		     const int& colindex,
 		     const double& z, 
 		     const double& w, const int& p, 
-		     rng* stream, double& L, double& R, 
+		     rng<RNGTYPE>& stream, double& L, double& R, 
 		     const int& param){
   
-  const double U = stream->runif();
+  const double U = stream.runif();
   double x0;
   if (param==0){ // Lambda
     x0 = Lambda(rowindex, colindex);
@@ -383,7 +395,7 @@ static void doubling(double (*logfun)(const double&,
 	  z < logfun(R, X, Lambda, theta, delta0, delta1, Lambda_prior_mean,
 		     Lambda_prior_prec, Lambda_ineq, theta_ineq, 
 		     k0, k1, c0, d0, c1, d1, rowindex, colindex))){
-    double V = stream->runif();
+    double V = stream.runif();
     if (V < 0.5){
       L = L - (R - L);
     }
@@ -397,47 +409,48 @@ static void doubling(double (*logfun)(const double&,
 
 
 // Radford Neal's (2000) stepping out procedure coded for a logdensity
+template<typename RNGTYPE>
 static void StepOut(double (*logfun)(const double&,
-				      const Matrix<int>&,
-				      const Matrix<double>&,
-				      const Matrix<double>&,
-				      const double&, 
-				      const double&,
-				      const Matrix<double>&,
-				      const Matrix<double>&,
-				      const Matrix<double>&,
-				      const Matrix<double>&,
-				      const double&, 
-				      const double&,
-				      const double&, 
-				      const double&,
-				      const double&, 
-				      const double&,
-				      const int&,
-				      const int&), 
-		     const Matrix<int>& X,
-		     const Matrix<double>& Lambda,
-		     const Matrix<double>& theta,
-		     const double& delta0,
-		     const double& delta1, 
-		     const Matrix<double>& Lambda_prior_mean, 
-		     const Matrix<double>& Lambda_prior_prec,
-		     const Matrix<double>& Lambda_ineq,
-		     const Matrix<double>& theta_ineq,
-		     const double& k0,
-		     const double& k1,
-		     const double& c0,
-		     const double& d0,
-		     const double& c1, 
-		     const double& d1,
-		     const int& rowindex,
-		     const int& colindex,
-		     const double& z, 
-		     const double& w, const int& m, 
-		     rng* stream, double& L, double& R, 
-		     const int& param){
+				     const Matrix<int>&,
+				     const Matrix<>&,
+				     const Matrix<>&,
+				     const double&, 
+				     const double&,
+				     const Matrix<>&,
+				     const Matrix<>&,
+				     const Matrix<>&,
+				     const Matrix<>&,
+				     const double&, 
+				     const double&,
+				     const double&, 
+				     const double&,
+				     const double&, 
+				     const double&,
+				     const int&,
+				     const int&), 
+		    const Matrix<int>& X,
+		    const Matrix<>& Lambda,
+		    const Matrix<>& theta,
+		    const double& delta0,
+		    const double& delta1, 
+		    const Matrix<>& Lambda_prior_mean, 
+		    const Matrix<>& Lambda_prior_prec,
+		    const Matrix<>& Lambda_ineq,
+		    const Matrix<>& theta_ineq,
+		    const double& k0,
+		    const double& k1,
+		    const double& c0,
+		    const double& d0,
+		    const double& c1, 
+		    const double& d1,
+		    const int& rowindex,
+		    const int& colindex,
+		    const double& z, 
+		    const double& w, const int& m, 
+		    rng<RNGTYPE>& stream, double& L, double& R, 
+		    const int& param){
   
-  const double U = stream->runif();
+  const double U = stream.runif();
   double x0;
   if (param==0){ // Lambda
     x0 = Lambda(rowindex, colindex);
@@ -459,7 +472,7 @@ static void StepOut(double (*logfun)(const double&,
 
   L = x0 - w*U;
   R = L + w;
-  const double V = stream->runif();
+  const double V = stream.runif();
   int J = static_cast<int>(m*V);
   int K = (m-1) - J; 
   while (J > 0 && 
@@ -485,14 +498,14 @@ static void StepOut(double (*logfun)(const double&,
 // Radford Neal's (2000) Accept procedure coded for a logdensity  
 static const bool Accept(double (*logfun)(const double&,
 					  const Matrix<int>&,
-					  const Matrix<double>&,
-					  const Matrix<double>&,
+					  const Matrix<>&,
+					  const Matrix<>&,
 					  const double&, 
 					  const double&,
-					  const Matrix<double>&,
-					  const Matrix<double>&,
-					  const Matrix<double>&,
-					  const Matrix<double>&,
+					  const Matrix<>&,
+					  const Matrix<>&,
+					  const Matrix<>&,
+					  const Matrix<>&,
 					  const double&, 
 					  const double&,
 					  const double&, 
@@ -502,14 +515,14 @@ static const bool Accept(double (*logfun)(const double&,
 					  const int&,
 					  const int&), 
 			 const Matrix<int>& X,
-			 const Matrix<double>& Lambda,
-			 const Matrix<double>& theta,
+			 const Matrix<>& Lambda,
+			 const Matrix<>& theta,
 			 const double& delta0,
 			 const double& delta1, 
-			 const Matrix<double>& Lambda_prior_mean, 
-			 const Matrix<double>& Lambda_prior_prec,
-			 const Matrix<double>& Lambda_ineq,
-			 const Matrix<double>& theta_ineq,
+			 const Matrix<>& Lambda_prior_mean, 
+			 const Matrix<>& Lambda_prior_prec,
+			 const Matrix<>& Lambda_ineq,
+			 const Matrix<>& theta_ineq,
 			 const double& k0,
 			 const double& k1,
 			 const double& c0,
@@ -554,16 +567,17 @@ static const bool Accept(double (*logfun)(const double&,
 
 // Radford Neal's (2000) shrinkage procedure coded for a log density
 // assumes the doubling procedure has been used to find L and R
+template <typename RNGTYPE>
 static double shrinkageDoubling(double (*logfun)(const double&,
 						 const Matrix<int>&,
-						 const Matrix<double>&,
-						 const Matrix<double>&,
+						 const Matrix<>&,
+						 const Matrix<>&,
 						 const double&, 
 						 const double&,
-						 const Matrix<double>&,
-						 const Matrix<double>&,
-						 const Matrix<double>&,
-						 const Matrix<double>&,
+						 const Matrix<>&,
+						 const Matrix<>&,
+						 const Matrix<>&,
+						 const Matrix<>&,
 						 const double&, 
 						 const double&,
 						 const double&, 
@@ -573,14 +587,14 @@ static double shrinkageDoubling(double (*logfun)(const double&,
 						 const int&,
 						 const int&), 
 				const Matrix<int>& X,
-				const Matrix<double>& Lambda,
-				const Matrix<double>& theta,
+				const Matrix<>& Lambda,
+				const Matrix<>& theta,
 				const double& delta0,
 				const double& delta1, 
-				const Matrix<double>& Lambda_prior_mean, 
-				const Matrix<double>& Lambda_prior_prec,
-				const Matrix<double>& Lambda_ineq,
-				const Matrix<double>& theta_ineq,
+				const Matrix<>& Lambda_prior_mean, 
+				const Matrix<>& Lambda_prior_prec,
+				const Matrix<>& Lambda_ineq,
+				const Matrix<>& theta_ineq,
 				const double& k0,
 				const double& k1,
 				const double& c0,
@@ -590,7 +604,8 @@ static double shrinkageDoubling(double (*logfun)(const double&,
 				const int& rowindex,
 				const int& colindex,
 				const double& z, const double& w, 
-				rng* stream, const double& L, const double& R,
+				rng<RNGTYPE>& stream, const double& L, 
+				const double& R,
 				const int& param){
   
   double Lbar = L;
@@ -614,11 +629,11 @@ static double shrinkageDoubling(double (*logfun)(const double&,
   }
 
   for (;;){
-    const double U = stream->runif();
+    const double U = stream.runif();
     const double x1 = Lbar + U*(Rbar - Lbar);
     if (z <= logfun(x1, X, Lambda, theta, delta0, delta1, Lambda_prior_mean,
-		   Lambda_prior_prec, Lambda_ineq, theta_ineq, 
-		   k0, k1, c0, d0, c1, d1, rowindex, colindex) &&
+		    Lambda_prior_prec, Lambda_ineq, theta_ineq, 
+		    k0, k1, c0, d0, c1, d1, rowindex, colindex) &&
 	Accept(logfun, X, Lambda, theta, delta0, delta1, Lambda_prior_mean, 
 	       Lambda_prior_prec, Lambda_ineq, theta_ineq, 
 	       k0, k1, c0, d0, c1, d1, rowindex, colindex, z, w, 
@@ -638,16 +653,17 @@ static double shrinkageDoubling(double (*logfun)(const double&,
 
 // Radford Neal's (2000) shrinkage procedure coded for a log density
 // assumes the stepping out procedure has been used to find L and R
+template <typename RNGTYPE>
 static double shrinkageStep(double (*logfun)(const double&,
 					     const Matrix<int>&,
-					     const Matrix<double>&,
-					     const Matrix<double>&,
+					     const Matrix<>&,
+					     const Matrix<>&,
 					     const double&, 
 					     const double&,
-					     const Matrix<double>&,
-					     const Matrix<double>&,
-					     const Matrix<double>&,
-					     const Matrix<double>&,
+					     const Matrix<>&,
+					     const Matrix<>&,
+					     const Matrix<>&,
+					     const Matrix<>&,
 					     const double&, 
 					     const double&,
 					     const double&, 
@@ -657,14 +673,14 @@ static double shrinkageStep(double (*logfun)(const double&,
 					     const int&,
 					     const int&), 
 			    const Matrix<int>& X,
-			    const Matrix<double>& Lambda,
-			    const Matrix<double>& theta,
+			    const Matrix<>& Lambda,
+			    const Matrix<>& theta,
 			    const double& delta0,
 			    const double& delta1, 
-			    const Matrix<double>& Lambda_prior_mean, 
-			    const Matrix<double>& Lambda_prior_prec,
-			    const Matrix<double>& Lambda_ineq,
-			    const Matrix<double>& theta_ineq,
+			    const Matrix<>& Lambda_prior_mean, 
+			    const Matrix<>& Lambda_prior_prec,
+			    const Matrix<>& Lambda_ineq,
+			    const Matrix<>& theta_ineq,
 			    const double& k0,
 			    const double& k1,
 			    const double& c0,
@@ -674,7 +690,8 @@ static double shrinkageStep(double (*logfun)(const double&,
 			    const int& rowindex,
 			    const int& colindex,
 			    const double& z, const double& w, 
-			    rng* stream, const double& L, const double& R,
+			    rng<RNGTYPE>& stream, const double& L, 
+			    const double& R,
 			    const int& param){
   
   double Lbar = L;
@@ -698,11 +715,11 @@ static double shrinkageStep(double (*logfun)(const double&,
   }
 
   for (;;){
-    const double U = stream->runif();
+    const double U = stream.runif();
     const double x1 = Lbar + U*(Rbar - Lbar);
     if (z <= logfun(x1, X, Lambda, theta, delta0, delta1, Lambda_prior_mean,
-		   Lambda_prior_prec, Lambda_ineq, theta_ineq, 
-		   k0, k1, c0, d0, c1, d1, rowindex, colindex) ){
+		    Lambda_prior_prec, Lambda_ineq, theta_ineq, 
+		    k0, k1, c0, d0, c1, d1, rowindex, colindex) ){
       return(x1);
     }
     if (x1 < x0){
@@ -717,15 +734,367 @@ static double shrinkageStep(double (*logfun)(const double&,
 
 
 
+
+
+
+
+
+
+
+
+
+template <typename RNGTYPE>
+void MCMCirtKdRob_impl(rng<RNGTYPE>& stream,
+		       const Matrix<int>& X, 
+		       Matrix<>& Lambda,
+		       Matrix<>& theta,
+		       const Matrix<>& Lambda_eq, const Matrix<>& Lambda_ineq,
+		       const Matrix<>& theta_eq, const Matrix<>& theta_ineq,
+		       const Matrix<>& Lambda_prior_mean,
+		       const Matrix<>& Lambda_prior_prec,
+		       const int* burnin, const int* mcmc,  const int* thin,
+		       const int* verbose, 
+		       const int* method_step,
+		       const double* theta_w, const int* theta_p,
+		       const double* lambda_w, const int* lambda_p,
+		       const double* delta0_w, const int* delta0_p,
+		       const double* delta1_w, const int* delta1_p, 
+		       const double * delta0start, const double* delta1start,
+		       const double* k0, const double* k1,
+		       const double* c0, const double* c1,
+		       const double* d0, const double* d1,
+		       const int* storeitem,
+		       const int* storeability,
+		       double* sampledata, const int* samplerow, 
+		       const int* samplecol
+		       ){
+
+
+
+    // constants 
+    const int K = X.cols();  // number of items
+    const int N = X.rows();  // number of subjects
+    const int D = Lambda.cols();  // number of dimensions + 1
+    const int tot_iter = *burnin + *mcmc;  
+    const int nsamp = *mcmc / *thin;
+    // const Matrix<double> Lambda_free_indic = Matrix<double>(K, D);
+    //for (int i=0; i<(K*D); ++i){
+    //  if (Lambda_eq[i] == -999) Lambda_free_indic[i] = 1.0;
+    //}
+
+    // starting values
+    //  Matrix<double> theta = Matrix<double>(N, D-1);
+    Matrix<> onesvec = ones<double>(N, 1);
+    onesvec = onesvec * -1.0;
+    theta = cbind(onesvec, theta);
+    double delta0 = *delta0start;
+    double delta1 = *delta1start;
+
+    // index arrays (used for the random order of the sampling)
+    // OLD
+    //int K_array[K];
+    //int N_array[N];
+    //int D_array[D];
+    //int Dm1_array[D-1];
+    //int K_inds_perm[K];
+    //int N_inds_perm[N];
+    //int D_inds_perm[D];
+    //int Dm1_inds_perm[D-1];
+    // NEW
+    int* K_array = new int[K];
+    int* N_array = new int[N];
+    int* D_array = new int[D];
+    int* Dm1_array = new int[D-1];
+    int* K_inds_perm = new int[K];
+    int* N_inds_perm = new int[N];
+    int* D_inds_perm = new int[D];
+    int* Dm1_inds_perm = new int[D-1];
+
+
+    // storage matrices (row major order)
+    Matrix<> Lambda_store;
+    if (storeitem[0]==1){
+      Lambda_store = Matrix<double>(nsamp, K*D);
+    }
+    Matrix<> theta_store;
+    if (*storeability==1){
+      theta_store = Matrix<double>(nsamp, N*D);
+    }
+    Matrix<> delta0_store(nsamp, 1);
+    Matrix<> delta1_store(nsamp, 1);
+
+    ///////////////////
+    // Slice Sampler //
+    ///////////////////
+    int count = 0;  
+    for (int iter=0; iter < tot_iter; ++iter){
+
+      double L, R, w, funval, z;
+      int p;
+
+      // sample theta
+      int param = 1;    
+      SampleNoReplace(N, N, N_inds_perm, N_array, stream);   
+      for (int ii=0; ii<N; ++ii){
+	int i = N_inds_perm[ii];
+	SampleNoReplace(D-1, D-1, Dm1_inds_perm, Dm1_array, stream);    
+	for (int jj=0; jj<(D-1); ++jj){
+	  int j = Dm1_inds_perm[jj]+1;
+	  if (theta_eq(i,j-1) == -999){
+	    w = *theta_w;
+	    p = *theta_p;
+	    L = -1.0;
+	    R = 1.0;
+	    funval = theta_logfcd(theta(i,j), X, Lambda, 
+				  theta, delta0,
+				  delta1, Lambda_prior_mean, 
+				  Lambda_prior_prec,
+				  Lambda_ineq, theta_ineq, 
+				  *k0, *k1, *c0, *d0,
+				  *c1, *d1, i, j);
+	    z = funval - stream.rexp(1.0);
+
+	    if (*method_step == 1){
+	      StepOut(&theta_logfcd, X, Lambda, theta, delta0, delta1, 
+		      Lambda_prior_mean, Lambda_prior_prec, Lambda_ineq,
+		      theta_ineq, *k0, *k1, *c0, *d0, *c1, *d1, i, j, z, 
+		      w, p, stream, L, R, param);
+	    
+	      theta(i,j) = shrinkageStep(&theta_logfcd, X, Lambda, theta,
+					 delta0, delta1, Lambda_prior_mean, 
+					 Lambda_prior_prec, Lambda_ineq,
+					 theta_ineq, *k0, *k1, 
+					 *c0, *d0, *c1, 
+					 *d1, i, j, z, w, stream, 
+					 L, R, param);
+	    }
+	    else{
+	      doubling(&theta_logfcd, X, Lambda, theta, delta0, delta1, 
+		       Lambda_prior_mean, Lambda_prior_prec, Lambda_ineq,
+		       theta_ineq, *k0, *k1, *c0, *d0, *c1, *d1, i, j, z, 
+		       w, p, stream, L, R, param);
+	      theta(i,j) = shrinkageDoubling(&theta_logfcd, X, Lambda, theta,
+					     delta0, delta1, Lambda_prior_mean, 
+					     Lambda_prior_prec, Lambda_ineq,
+					     theta_ineq, *k0, *k1, 
+					     *c0, *d0, *c1, 
+					     *d1, i, j, z, w, stream, 
+					     L, R, param);
+	    }
+	  }
+	}
+      }
+    
+    
+
+      // sample Lambda
+      param = 0;
+      SampleNoReplace(K, K, K_inds_perm, K_array, stream);   
+      for (int ii=0; ii<K; ++ii){
+	int i = K_inds_perm[ii];
+	SampleNoReplace(D, D, D_inds_perm, D_array, stream);   
+	for (int jj=0; jj<D; ++jj){
+	  int j = D_inds_perm[jj];
+	  if (Lambda_eq(i,j) == -999){
+	    w = *lambda_w;
+	    p = *lambda_p;
+	    L = -1.0;
+	    R = 1.0;
+	    funval = Lambda_logfcd(Lambda(i,j), X, Lambda, 
+				   theta, delta0,
+				   delta1, Lambda_prior_mean, 
+				   Lambda_prior_prec,
+				   Lambda_ineq, theta_ineq, *k0, *k1, *c0, *d0,
+				   *c1, *d1, i, j);
+	    z = funval - stream.rexp(1.0);
+	    if (*method_step == 1){
+	      StepOut(&Lambda_logfcd, X, Lambda, theta, delta0, delta1, 
+		      Lambda_prior_mean, Lambda_prior_prec, Lambda_ineq,
+		      theta_ineq, *k0, *k1, *c0, *d0, *c1, *d1, i, j, z, 
+		      w, p, stream, L, R, param);
+	      Lambda(i,j) = shrinkageStep(&Lambda_logfcd, X, Lambda, theta,
+					  delta0, delta1, Lambda_prior_mean, 
+					  Lambda_prior_prec, Lambda_ineq,
+					  theta_ineq, *k0, *k1, *c0, *d0, 
+					  *c1, *d1, i, j, z, w, stream, 
+					  L, R, param);
+	    }
+	    else{
+	      doubling(&Lambda_logfcd, X, Lambda, theta, delta0, delta1, 
+		       Lambda_prior_mean, Lambda_prior_prec, Lambda_ineq,
+		       theta_ineq, *k0, *k1, *c0, *d0, *c1, *d1, i, j, z, 
+		       w, p, stream, L, R, param);
+	      Lambda(i,j) = shrinkageDoubling(&Lambda_logfcd, X, Lambda, theta,
+					      delta0, delta1, Lambda_prior_mean, 
+					      Lambda_prior_prec, Lambda_ineq,
+					      theta_ineq, *k0, *k1, *c0, *d0, 
+					      *c1, *d1, i, j, z, w, stream, 
+					      L, R, param);
+	    }
+	  }
+	}
+      }
+    
+
+    
+      // sample delta0
+      param = 2;
+      w = *delta0_w;
+      p = *delta0_p;
+      L = -1.0;
+      R =  1.0;    
+      funval = delta0_logfcd(delta0, X, Lambda, 
+			     theta, delta0,
+			     delta1, Lambda_prior_mean, 
+			     Lambda_prior_prec,
+			     Lambda_ineq, theta_ineq, 
+			     *k0, *k1, *c0, *d0,
+			     *c1, *d1, 0, 0);
+      z = funval - stream.rexp(1.0);
+      if (*method_step == 1){
+	StepOut(&delta0_logfcd, X, Lambda, theta, delta0, delta1, 
+		Lambda_prior_mean, Lambda_prior_prec, Lambda_ineq,
+		theta_ineq, *k0, *k1, *c0, *d0, *c1, *d1, 0, 0, z, 
+		w, p, stream, L, R, param);
+	delta0 = shrinkageStep(&delta0_logfcd, X, Lambda, theta,
+			       delta0, delta1, Lambda_prior_mean, 
+			       Lambda_prior_prec, Lambda_ineq, theta_ineq,
+			       *k0, *k1, *c0, *d0, *c1, *d1, 0, 0,
+			       z, w, stream, L, R, param);    
+      }
+      else{
+	doubling(&delta0_logfcd, X, Lambda, theta, delta0, delta1, 
+		 Lambda_prior_mean, Lambda_prior_prec, Lambda_ineq,
+		 theta_ineq, *k0, *k1, *c0, *d0, *c1, *d1, 0, 0, z, 
+		 w, p, stream, L, R, param);
+	delta0 = shrinkageDoubling(&delta0_logfcd, X, Lambda, theta,
+				   delta0, delta1, Lambda_prior_mean, 
+				   Lambda_prior_prec, Lambda_ineq, theta_ineq,
+				   *k0, *k1, *c0, *d0, *c1, *d1, 0, 0,
+				   z, w, stream, L, R, param);
+      }
+
+
+
+      // sample delta1
+      param = 3;
+      w = *delta1_w;
+      p = *delta1_p;
+      L = -1.0;
+      R = 1.0; 
+      funval = delta1_logfcd(delta1, X, Lambda, 
+			     theta, delta0,
+			     delta1, Lambda_prior_mean, 
+			     Lambda_prior_prec,
+			     Lambda_ineq, theta_ineq, *k0, *k1, *c0, *d0,
+			     *c1, *d1, 0, 0);
+      z = funval - stream.rexp(1.0);
+      if (*method_step == 1){
+	StepOut(&delta1_logfcd, X, Lambda, theta, delta0, delta1, 
+		Lambda_prior_mean, Lambda_prior_prec, Lambda_ineq,
+		theta_ineq, *k0, *k1, *c0, *d0, *c1, *d1, 0, 0, z, 
+		w, p, stream, L, R, param);
+	delta1 = shrinkageStep(&delta1_logfcd, X, Lambda, theta,
+			       delta0, delta1, Lambda_prior_mean, 
+			       Lambda_prior_prec, Lambda_ineq, theta_ineq,
+			       *k0, *k1, *c0, *d0, *c1, *d1, 0, 0,
+			       z, w, stream, L, R, param);
+      }
+      else{
+	doubling(&delta1_logfcd, X, Lambda, theta, delta0, delta1, 
+		 Lambda_prior_mean, Lambda_prior_prec, Lambda_ineq,
+		 theta_ineq, *k0, *k1, *c0, *d0, *c1, *d1, 0, 0, z, 
+		 w, p, stream, L, R, param);
+	delta1 = shrinkageDoubling(&delta1_logfcd, X, Lambda, theta,
+				   delta0, delta1, Lambda_prior_mean, 
+				   Lambda_prior_prec, Lambda_ineq, theta_ineq,
+				   *k0, *k1, *c0, *d0, *c1, *d1, 0, 0,
+				   z, w, stream, L, R, param);
+      }
+    
+      // print results to screen
+      if (verbose[0] > 0 && iter % verbose[0] == 0){
+	Rprintf("\n\nMCMCirtKdRob iteration %i of %i \n", (iter+1), tot_iter);
+      }
+        
+      // store results
+      if ((iter >= burnin[0]) && ((iter % thin[0]==0))) {      
+      
+	// store Lambda
+	if (storeitem[0]==1){
+	  //Matrix<double> Lambda_store_vec = reshape(Lambda,1,K*D);
+	  //for (int l=0; l<K*D; ++l)
+	  //  Lambda_store(count, l) = Lambda_store_vec[l];
+	  rmview(Lambda_store(count, _)) = Lambda;
+	}
+      
+	// store theta
+	if (storeability[0]==1){
+	  //Matrix<double> theta_store_vec = reshape(theta, 1, N*D);
+	  //for (int l=0; l<N*D; ++l)
+	  //  theta_store(count, l) = theta_store_vec[l];
+	  rmview(theta_store(count, _)) = theta;
+	}
+      
+	// store delta0 and delta1
+	delta0_store[count] = delta0;
+	delta1_store[count] = delta1;
+
+	count++;
+      }
+    
+      // allow user interrupts
+      R_CheckUserInterrupt();    
+    } // end MCMC loop
+  
+ 
+
+
+
+    delete [] K_array;
+    delete [] N_array;
+    delete [] D_array;
+    delete [] Dm1_array;
+    delete [] K_inds_perm;
+    delete [] N_inds_perm;
+    delete [] D_inds_perm;
+    delete [] Dm1_inds_perm;
+
+
+
+  
+    // return output
+    Matrix<double> output = delta0_store;
+    output = cbind(output, delta1_store);  
+    if (*storeitem == 1){
+      output = cbind(output, Lambda_store);
+    }
+    if(*storeability == 1) {
+      output = cbind(output, theta_store);
+    }
+
+    int size = *samplerow * *samplecol;
+    for (int i=0; i<size; ++i)
+      sampledata[i] = output[i];
+    
+
+}
+
+
+
+
+
+
+
 extern "C"{
 
-// function called by R to fit model
+  // function called by R to fit model
   void
   irtKdRobpost (double* sampledata, const int* samplerow, 
 		const int* samplecol,
 		const int* Xdata, const int* Xrow, const int* Xcol,
 		const int* burnin, const int* mcmc,  const int* thin,
-		const int *lecuyer, const int *seedarray,
+		const int *uselecuyer, const int *seedarray,
 		const int *lecuyerstream, const int* verbose, 
 		const int* method_step,
 		const double* theta_w, const int* theta_p,
@@ -756,308 +1125,49 @@ extern "C"{
 		const int* storeability
 		) {
     
-  // put together matrices
-  const Matrix<int> X = r2scythe(*Xrow, *Xcol, Xdata);
-  Matrix<double> Lambda = r2scythe(*Lamstartrow, *Lamstartcol, Lamstartdata);
-  Matrix<double> theta = r2scythe(*thetstartrow, *thetstartcol, thetstartdata);
-  const Matrix<double> Lambda_eq = r2scythe(*Lameqrow, *Lameqcol, Lameqdata);
-  const Matrix<double> Lambda_ineq = r2scythe(*Lamineqrow, *Lamineqcol, 
-					      Lamineqdata);
-  const Matrix<double> theta_eq = r2scythe(*theteqrow, *theteqcol, 
-					   theteqdata);
-  const Matrix<double> theta_ineq = r2scythe(*thetineqrow, *thetineqcol, 
-					      thetineqdata);
-  const Matrix<double> Lambda_prior_mean = r2scythe(*Lampmeanrow, 
-						    *Lampmeancol, 
-						    Lampmeandata);
-  const Matrix<double> Lambda_prior_prec = r2scythe(*Lampprecrow, 
-						    *Lamppreccol, 
-						    Lampprecdata);  
+    // put together matrices
+    const Matrix<int> X(*Xrow, *Xcol, Xdata);
+    Matrix<double> Lambda(*Lamstartrow, *Lamstartcol, Lamstartdata);
+    Matrix<double> theta(*thetstartrow, *thetstartcol, thetstartdata);
+    const Matrix<double> Lambda_eq(*Lameqrow, *Lameqcol, Lameqdata);
+    const Matrix<double> Lambda_ineq(*Lamineqrow, *Lamineqcol, 
+				     Lamineqdata);
+    const Matrix<double> theta_eq(*theteqrow, *theteqcol, 
+				  theteqdata);
+    const Matrix<double> theta_ineq(*thetineqrow, *thetineqcol, 
+				    thetineqdata);
+    const Matrix<double> Lambda_prior_mean(*Lampmeanrow, 
+					   *Lampmeancol, 
+					   Lampmeandata);
+    const Matrix<double> Lambda_prior_prec(*Lampprecrow, 
+					   *Lamppreccol, 
+					   Lampprecdata);  
+    
+  
+   
+
+    MCMCPACK_PASSRNG2MODEL(MCMCirtKdRob_impl, X, Lambda, theta, 
+			   Lambda_eq, Lambda_ineq, theta_eq,
+			   theta_ineq, Lambda_prior_mean,
+			   Lambda_prior_prec, burnin, mcmc, thin,
+			   verbose, 
+			   method_step,
+			   theta_w, theta_p,
+			   lambda_w, lambda_p,
+			   delta0_w, delta0_p,
+			   delta1_w, delta1_p,
+			   delta0start, delta1start,
+			   k0,  k1,
+			   c0,  c1,
+			   d0,  d1,
+			   storeitem,
+			   storeability,
+			   sampledata, samplerow, 
+			   samplecol			  
+			   );
 
   
-  // initialize rng stream
-  rng *stream = MCMCpack_get_rng(*lecuyer, seedarray, *lecuyerstream);
-  
-  // constants 
-  const int K = X.cols();  // number of items
-  const int N = X.rows();  // number of subjects
-  const int D = Lambda.cols();  // number of dimensions + 1
-  const int tot_iter = *burnin + *mcmc;  
-  const int nsamp = *mcmc / *thin;
-  // const Matrix<double> Lambda_free_indic = Matrix<double>(K, D);
-  //for (int i=0; i<(K*D); ++i){
-  //  if (Lambda_eq[i] == -999) Lambda_free_indic[i] = 1.0;
-  //}
-
-  // starting values
-  //  Matrix<double> theta = Matrix<double>(N, D-1);
-  theta = cbind(-1*ones<double>(N,1), theta);
-  double delta0 = *delta0start;
-  double delta1 = *delta1start;
-
-  // index arrays (used for the random order of the sampling)
-  int K_array[K];
-  int N_array[N];
-  int D_array[D];
-  int Dm1_array[D-1];
-  int K_inds_perm[K];
-  int N_inds_perm[N];
-  int D_inds_perm[D];
-  int Dm1_inds_perm[D-1];
-
-
-  // storage matrices (row major order)
-  Matrix<double> Lambda_store;
-  if (storeitem[0]==1){
-    Lambda_store = Matrix<double>(nsamp, K*D);
   }
-  Matrix<double> theta_store;
-  if (*storeability==1){
-    theta_store = Matrix<double>(nsamp, N*D);
-  }
-  Matrix<double> delta0_store = Matrix<double>(nsamp, 1);
-  Matrix<double> delta1_store = Matrix<double>(nsamp, 1);
-
-  ///////////////////
-  // Slice Sampler //
-  ///////////////////
-  int count = 0;  
-  for (int iter=0; iter < tot_iter; ++iter){
-
-    double L, R, w, funval, z;
-    int p;
-
-    // sample theta
-    int param = 1;    
-    SampleNoReplace(N, N, N_inds_perm, N_array, stream);   
-    for (int ii=0; ii<N; ++ii){
-      int i = N_inds_perm[ii];
-      SampleNoReplace(D-1, D-1, Dm1_inds_perm, Dm1_array, stream);    
-      for (int jj=0; jj<(D-1); ++jj){
-	int j = Dm1_inds_perm[jj]+1;
-	if (theta_eq(i,j-1) == -999){
-	  w = *theta_w;
-	  p = *theta_p;
-	  L = -1.0;
-	  R = 1.0;
-	  funval = theta_logfcd(theta(i,j), X, Lambda, 
-			      theta, delta0,
-				delta1, Lambda_prior_mean, 
-				Lambda_prior_prec,
-				Lambda_ineq, theta_ineq, 
-				*k0, *k1, *c0, *d0,
-				*c1, *d1, i, j);
-	  z = funval - stream->rexp(1.0);
-
-	  if (*method_step == 1){
-	    StepOut(&theta_logfcd, X, Lambda, theta, delta0, delta1, 
-		    Lambda_prior_mean, Lambda_prior_prec, Lambda_ineq,
-		    theta_ineq, *k0, *k1, *c0, *d0, *c1, *d1, i, j, z, 
-		    w, p, stream, L, R, param);
-	    
-	    theta(i,j) = shrinkageStep(&theta_logfcd, X, Lambda, theta,
-				       delta0, delta1, Lambda_prior_mean, 
-				       Lambda_prior_prec, Lambda_ineq,
-				       theta_ineq, *k0, *k1, 
-				       *c0, *d0, *c1, 
-				       *d1, i, j, z, w, stream, 
-				       L, R, param);
-	  }
-	  else{
-	    doubling(&theta_logfcd, X, Lambda, theta, delta0, delta1, 
-		     Lambda_prior_mean, Lambda_prior_prec, Lambda_ineq,
-		     theta_ineq, *k0, *k1, *c0, *d0, *c1, *d1, i, j, z, 
-		     w, p, stream, L, R, param);
-	    theta(i,j) = shrinkageDoubling(&theta_logfcd, X, Lambda, theta,
-					   delta0, delta1, Lambda_prior_mean, 
-					   Lambda_prior_prec, Lambda_ineq,
-					   theta_ineq, *k0, *k1, 
-					   *c0, *d0, *c1, 
-					   *d1, i, j, z, w, stream, 
-					   L, R, param);
-	  }
-	}
-      }
-    }
-    
-    
-
-    // sample Lambda
-    param = 0;
-    SampleNoReplace(K, K, K_inds_perm, K_array, stream);   
-    for (int ii=0; ii<K; ++ii){
-      int i = K_inds_perm[ii];
-      SampleNoReplace(D, D, D_inds_perm, D_array, stream);   
-      for (int jj=0; jj<D; ++jj){
-	int j = D_inds_perm[jj];
-	if (Lambda_eq(i,j) == -999){
-	  w = *lambda_w;
-	  p = *lambda_p;
-	  L = -1.0;
-	  R = 1.0;
-	  funval = Lambda_logfcd(Lambda(i,j), X, Lambda, 
-				 theta, delta0,
-				 delta1, Lambda_prior_mean, 
-				 Lambda_prior_prec,
-				 Lambda_ineq, theta_ineq, *k0, *k1, *c0, *d0,
-				 *c1, *d1, i, j);
-	  z = funval - stream->rexp(1.0);
-	  if (*method_step == 1){
-	    StepOut(&Lambda_logfcd, X, Lambda, theta, delta0, delta1, 
-		    Lambda_prior_mean, Lambda_prior_prec, Lambda_ineq,
-		    theta_ineq, *k0, *k1, *c0, *d0, *c1, *d1, i, j, z, 
-		    w, p, stream, L, R, param);
-	    Lambda(i,j) = shrinkageStep(&Lambda_logfcd, X, Lambda, theta,
-					delta0, delta1, Lambda_prior_mean, 
-					Lambda_prior_prec, Lambda_ineq,
-					theta_ineq, *k0, *k1, *c0, *d0, 
-					*c1, *d1, i, j, z, w, stream, 
-					L, R, param);
-	  }
-	  else{
-	    doubling(&Lambda_logfcd, X, Lambda, theta, delta0, delta1, 
-		     Lambda_prior_mean, Lambda_prior_prec, Lambda_ineq,
-		     theta_ineq, *k0, *k1, *c0, *d0, *c1, *d1, i, j, z, 
-		     w, p, stream, L, R, param);
-	    Lambda(i,j) = shrinkageDoubling(&Lambda_logfcd, X, Lambda, theta,
-					    delta0, delta1, Lambda_prior_mean, 
-					    Lambda_prior_prec, Lambda_ineq,
-					    theta_ineq, *k0, *k1, *c0, *d0, 
-					    *c1, *d1, i, j, z, w, stream, 
-					    L, R, param);
-	  }
-	}
-      }
-    }
-    
-
-    
-    // sample delta0
-    param = 2;
-    w = *delta0_w;
-    p = *delta0_p;
-    L = -1.0;
-    R =  1.0;    
-    funval = delta0_logfcd(delta0, X, Lambda, 
-			   theta, delta0,
-			   delta1, Lambda_prior_mean, 
-			   Lambda_prior_prec,
-			   Lambda_ineq, theta_ineq, 
-			   *k0, *k1, *c0, *d0,
-			   *c1, *d1, 0, 0);
-    z = funval - stream->rexp(1.0);
-    if (*method_step == 1){
-      StepOut(&delta0_logfcd, X, Lambda, theta, delta0, delta1, 
-	       Lambda_prior_mean, Lambda_prior_prec, Lambda_ineq,
-	       theta_ineq, *k0, *k1, *c0, *d0, *c1, *d1, 0, 0, z, 
-	       w, p, stream, L, R, param);
-      delta0 = shrinkageStep(&delta0_logfcd, X, Lambda, theta,
-				 delta0, delta1, Lambda_prior_mean, 
-				 Lambda_prior_prec, Lambda_ineq, theta_ineq,
-				 *k0, *k1, *c0, *d0, *c1, *d1, 0, 0,
-				 z, w, stream, L, R, param);    
-    }
-    else{
-      doubling(&delta0_logfcd, X, Lambda, theta, delta0, delta1, 
-	       Lambda_prior_mean, Lambda_prior_prec, Lambda_ineq,
-	       theta_ineq, *k0, *k1, *c0, *d0, *c1, *d1, 0, 0, z, 
-	       w, p, stream, L, R, param);
-      delta0 = shrinkageDoubling(&delta0_logfcd, X, Lambda, theta,
-				 delta0, delta1, Lambda_prior_mean, 
-				 Lambda_prior_prec, Lambda_ineq, theta_ineq,
-				 *k0, *k1, *c0, *d0, *c1, *d1, 0, 0,
-				 z, w, stream, L, R, param);
-    }
-
-
-
-    // sample delta1
-    param = 3;
-    w = *delta1_w;
-    p = *delta1_p;
-    L = -1.0;
-    R = 1.0; 
-    funval = delta1_logfcd(delta1, X, Lambda, 
-			   theta, delta0,
-			   delta1, Lambda_prior_mean, 
-			   Lambda_prior_prec,
-			   Lambda_ineq, theta_ineq, *k0, *k1, *c0, *d0,
-			   *c1, *d1, 0, 0);
-    z = funval - stream->rexp(1.0);
-    if (*method_step == 1){
-      StepOut(&delta1_logfcd, X, Lambda, theta, delta0, delta1, 
-	       Lambda_prior_mean, Lambda_prior_prec, Lambda_ineq,
-	       theta_ineq, *k0, *k1, *c0, *d0, *c1, *d1, 0, 0, z, 
-	       w, p, stream, L, R, param);
-      delta1 = shrinkageStep(&delta1_logfcd, X, Lambda, theta,
-				 delta0, delta1, Lambda_prior_mean, 
-				 Lambda_prior_prec, Lambda_ineq, theta_ineq,
-				 *k0, *k1, *c0, *d0, *c1, *d1, 0, 0,
-				 z, w, stream, L, R, param);
-    }
-    else{
-      doubling(&delta1_logfcd, X, Lambda, theta, delta0, delta1, 
-	       Lambda_prior_mean, Lambda_prior_prec, Lambda_ineq,
-	       theta_ineq, *k0, *k1, *c0, *d0, *c1, *d1, 0, 0, z, 
-	       w, p, stream, L, R, param);
-      delta1 = shrinkageDoubling(&delta1_logfcd, X, Lambda, theta,
-				 delta0, delta1, Lambda_prior_mean, 
-				 Lambda_prior_prec, Lambda_ineq, theta_ineq,
-				 *k0, *k1, *c0, *d0, *c1, *d1, 0, 0,
-				 z, w, stream, L, R, param);
-    }
-    
-    // print results to screen
-    if (verbose[0] > 0 && iter % verbose[0] == 0){
-      Rprintf("\n\nMCMCirtKdRob iteration %i of %i \n", (iter+1), tot_iter);
-    }
-        
-    // store results
-    if ((iter >= burnin[0]) && ((iter % thin[0]==0))) {      
-      
-      // store Lambda
-      if (storeitem[0]==1){
-	Matrix<double> Lambda_store_vec = reshape(Lambda,1,K*D);
-	for (int l=0; l<K*D; ++l)
-	  Lambda_store(count, l) = Lambda_store_vec[l];
-      }
-      
-      // store theta
-      if (storeability[0]==1){
-	Matrix<double> theta_store_vec = reshape(theta, 1, N*D);
-	for (int l=0; l<N*D; ++l)
-	  theta_store(count, l) = theta_store_vec[l];
-      }
-      
-      // store delta0 and delta1
-      delta0_store[count] = delta0;
-      delta1_store[count] = delta1;
-
-      count++;
-    }
-    
-    // allow user interrupts
-    R_CheckUserInterrupt();    
-  } // end MCMC loop
-  
-  delete stream; // clean up random number stream  
-  
-  // return output
-  Matrix<double> output = delta0_store;
-  output = cbind(output, delta1_store);  
-  if (*storeitem == 1){
-    output = cbind(output, Lambda_store);
-  }
-  if(*storeability == 1) {
-    output = cbind(output, theta_store);
-  }
-
-  int size = *samplerow * *samplecol;
-  for (int i=0; i<size; ++i)
-    sampledata[i] = output[i];
-
-  
-}
 
 }
 
@@ -1065,6 +1175,6 @@ extern "C"{
 
 
 
-
+#endif
 
 

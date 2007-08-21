@@ -290,7 +290,7 @@
                     )
     if(case.switch==1) {
       accepts <- matrix(posterior$accepts, posterior$acceptsrow,
-                        posterior$acceptscol, byrow=TRUE)
+                        posterior$acceptscol, byrow=FALSE)
       rownames(accepts) <- X.names
       colnames(accepts) <- ""
       cat("\n\nAcceptance rates:\n")
@@ -300,7 +300,7 @@
     
     # put together matrix and build MCMC object to return
     sample <- matrix(posterior$samdata, posterior$samrow, posterior$samcol,
-                     byrow=TRUE)
+                     byrow=FALSE)
     output <- mcmc(data=sample,start=1, end=mcmc, thin=thin)
     
     par.names <- NULL

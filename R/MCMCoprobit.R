@@ -126,7 +126,7 @@
     
     ## put together matrix and build MCMC object to return
     sample <- matrix(posterior$sampledata, posterior$samplerow,
-                     posterior$samplecol, byrow=TRUE)
+                     posterior$samplecol, byrow=FALSE)
     sample <- sample[,c(1:K, (K+3):(K+ncat))]
     output <- mcmc(data=sample, start=burnin+1, end=burnin+mcmc, thin=thin)
     xnames <- c(X.names, paste("gamma", 2:(ncat-1), sep=""))
