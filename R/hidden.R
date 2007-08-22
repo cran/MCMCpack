@@ -556,7 +556,7 @@
     holder <- matrix(posterior.object$sampledata,
                      posterior.object$samplerow,
                      posterior.object$samplecol,
-                     byrow=TRUE)
+                     byrow=FALSE)
       
     output <- mcmc(data=holder, start=(posterior.object$burnin+1),
                    end=(posterior.object$burnin+posterior.object$mcmc),

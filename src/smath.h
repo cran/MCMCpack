@@ -1,21 +1,31 @@
 /* 
- * Scythe Statistical Library
- * Copyright (C) 2000-2002 Andrew D. Martin and Kevin M. Quinn;
- * 2002-2004 Andrew D. Martin, Kevin M. Quinn, and Daniel
- * Pemstein.  All Rights Reserved.
+ * Scythe Statistical Library Copyright (C) 2000-2002 Andrew D. Martin
+ * and Kevin M. Quinn; 2002-present Andrew D. Martin, Kevin M. Quinn,
+ * and Daniel Pemstein.  All Rights Reserved.
  *
- * This program is free software; you can redistribute it and/or modify
- * under the terms of the GNU General Public License as published by
- * Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.  See the text files COPYING
- * and LICENSE, distributed with this source code, for further
+ * This program is free software; you can redistribute it and/or
+ * modify under the terms of the GNU General Public License as
+ * published by Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.  See the text files
+ * COPYING and LICENSE, distributed with this source code, for further
  * information.
  * --------------------------------------------------------------------
- * scythestat/math.h
+ *  scythestat/smath.h
  *
- * Provides definitions for the template wrapper functions
- * that allow common math.h operations to be performed on
- * Scythe matrices.
+ */
+
+/*!
+ * \file smath.h
+ * \brief Definitions for functions that perform common mathematical
+ * operations on every element of a Matrix.
+ * 
+ * \note As is the case throughout the library, we provide both
+ * general and default template definitions of the Matrix-returning
+ * functions in this file, explicitly providing documentation for only
+ * the general template versions. As is also often the case, Doxygen
+ * does not always correctly add the default template definition to
+ * the function list below; there is always a default template
+ * definition available for every function.
  *
  */
 
@@ -24,225 +34,922 @@
 
 #ifdef SCYTHE_COMPILE_DIRECT
 #include "matrix.h"
+#include "algorithm.h"
+#include "error.h"
 #else
 #include "scythestat/matrix.h"
+#include "scythestat/algorithm.h"
+#include "scythestat/error.h"
 #endif
 
-/* This portion of the library mimics math.h for Matrix<T> objects.  T
- * should be a floating point type of either float, double or long
- * double.  Using ints or other objects will cause warnings or errors.
- * You'll also need a sufficiently modern c++ compiler.  Note that the
- * f and l versions of these functions do not exist in c++ (you can
- * use the c calls if you wish) because type promotion takes care of
- * these functions.
- *
- * NOTE:  When I refer to x and y in the documentation below it means
- * the first and second matrix arguements respectively.  Also, I will
- * typically just write x when I mean forall elements in x
+#include <cmath>
+#include <numeric>
+#include <set>
+
+namespace scythe {
+
+  namespace {
+    typedef unsigned int uint;
+  }
+
+/* Almost every function in this file follows one of the two patterns
+ * described by these macros.  The first macro handles single-argument
+ * functions.  The second handles two-matrix-argument functions (or
+ * scalar-matrix, matrix-scalar.  The second macro also permits
+ * cross-type operations (these are limited only by the capabilities
+ * of the underlying functions).
  */
+#define SCYTHE_MATH_OP(NAME, OP)                                      \
+  template <matrix_order RO, matrix_style RS, typename T,             \
+            matrix_order PO, matrix_style PS>                         \
+  Matrix<T,RO,RS>                                                     \
+  NAME (const Matrix<T,PO,PS>& A)                                     \
+  {                                                                   \
+    Matrix<T,RO,RS> res(A.rows(), A.cols(), false);                   \
+    std::transform(A.begin_f(), A.end_f(), res.begin_f(), OP);        \
+    return res;                                                       \
+  }                                                                   \
+                                                                      \
+  template <typename T, matrix_order O, matrix_style S>               \
+  Matrix<T,O,Concrete>                                                \
+  NAME (const Matrix<T,O,S>& A)                                       \
+  {                                                                   \
+    return NAME<O,Concrete>(A);                                       \
+  }
 
-namespace SCYTHE {
+#define SCYTHE_MATH_OP_2ARG(NAME, OP)                                 \
+  template <matrix_order RO, matrix_style RS, typename T,             \
+            matrix_order PO1, matrix_style PS1,                       \
+            matrix_order PO2, matrix_style PS2, typename S>           \
+  Matrix<T,RO,RS>                                                     \
+  NAME (const Matrix<T,PO1,PS1>& A, const Matrix<S,PO2,PS2>& B)       \
+  {                                                                   \
+    SCYTHE_CHECK_10 (A.size() != 1 && B.size() != 1 &&                \
+        A.size() != B.size(), scythe_conformation_error,              \
+        "Matrices with dimensions (" << A.rows()                      \
+        << ", " << A.cols()                                           \
+        << ") and (" << B.rows() << ", " << B.cols()                  \
+        << ") are not conformable");                                  \
+                                                                      \
+    Matrix<T,RO,RS> res;                                              \
+                                                                      \
+    if (A.size() == 1) {                                              \
+      res.resize2Match(B);                                            \
+      std::transform(B.template begin_f<RO>(), B.template end_f<RO>(),\
+          res.begin_f(), std::bind1st(OP, A(0)));                     \
+    } else if (B.size() == 1) {                                       \
+      res.resize2Match(A);                                            \
+      std::transform(A.template begin_f<RO>(), A.template end_f<RO>(),\
+                     res.begin_f(), std::bind2nd(OP, B(0)));          \
+    } else {                                                          \
+      res.resize2Match(A);                                            \
+      std::transform(A.template begin_f<RO>(), A.template end_f<RO>(),\
+                     B.template begin_f<RO>(), res.begin_f(), OP);    \
+    }                                                                 \
+                                                                      \
+    return res;                                                       \
+  }                                                                   \
+                                                                      \
+  template <typename T, matrix_order PO1, matrix_style PS1,           \
+                        matrix_order PO2, matrix_style PS2,           \
+                        typename S>                                   \
+  Matrix<T,PO1,Concrete>                                              \
+  NAME (const Matrix<T,PO1,PS1>& A, const Matrix<S,PO2,PS2>& B)       \
+  {                                                                   \
+    return NAME<PO1,Concrete>(A, B);                                  \
+  }                                                                   \
+                                                                      \
+  template<matrix_order RO, matrix_style RS, typename T,              \
+           matrix_order PO, matrix_style PS, typename S>              \
+  Matrix<T,RO,RS>                                                     \
+  NAME (const Matrix<T,PO,PS>& A, S b)                                \
+  {                                                                   \
+    return NAME<RO,RS>(A, Matrix<S,RO,Concrete>(b));                  \
+  }                                                                   \
+                                                                      \
+  template <typename T, typename S, matrix_order PO, matrix_style PS> \
+  Matrix<T,PO,Concrete>                                               \
+  NAME (const Matrix<T,PO,PS>& A, S b)                                \
+  {                                                                   \
+    return NAME<PO,Concrete>(A, Matrix<S,PO,Concrete>(b));            \
+  }                                                                   \
+                                                                      \
+  template<matrix_order RO, matrix_style RS, typename T,              \
+           matrix_order PO, matrix_style PS, typename S>              \
+  Matrix<T,RO,RS>                                                     \
+  NAME (T a, const Matrix<S,PO,PS>& B)                                \
+  {                                                                   \
+    return NAME<RO,RS>(Matrix<S, RO,Concrete>(a), B);                 \
+  }                                                                   \
+                                                                      \
+  template <typename T, typename S, matrix_order PO, matrix_style PS> \
+  Matrix<T,PO,Concrete>                                               \
+  NAME (T a, const Matrix<S,PO,PS>& B)                                \
+  {                                                                   \
+    return NAME<PO,Concrete>(Matrix<S,PO,Concrete>(a), B);            \
+  }
 
-  /* acos - inverse cosine function */
-  template <class T>
-  Matrix<T> acos (Matrix<T>);
+
+  /* calc the inverse cosine of each element of a Matrix */
   
-//  /* acosh - inverse hyperbolic cosine function */
-//  template <class T>
-//  Matrix<T> acosh (Matrix<T>);
+ /*! 
+	* \brief Calculate the inverse cosine of each element of a Matrix
+	*
+	* This function calculates the inverse cosine of each element in a Matrix
+	*
+	* \param A The matrix whose inverse cosines are of interest.
+	*
+	* \see tan()
+	* \see tanh()
+	* \see sin()
+	* \see sinh()
+	* \see cos()
+	* \see cosh()
+	* \see acosh()
+	* \see asin()
+	* \see asinh()
+	* \see atan()
+	* \see atanh()
+	* \see atan2()
+	*/
 
-  /* asin - inverse sine function */
-  template <class T>
-  Matrix <T> asin (Matrix<T>);
-
-//  /* asinh - inverse hyperbolic sine function */
-//  template <class T>
-//  Matrix<T> asinh (Matrix<T>);
-
-  /* atan - inverse tangent function */
-  template <class T>
-  Matrix<T> atan (Matrix<T>);
+  SCYTHE_MATH_OP(acos, ::acos)
   
-//  /* atanh - inverse hyperbolic tangent function */
-//  template <class T>
-//  Matrix<T> atanh (Matrix<T>);
+  /* calc the inverse hyperbolic cosine of each element of a Matrix */
+   /*! 
+	* \brief Calculate the inverse hyperbolic cosine of each element of a Matrix
+	*
+	* This function calculates the inverse hyperbolic cosine of each element
+	* in a Matrix
+	*
+	* \param A The matrix whose inverse hyperbolic cosines are of interest.
+	*
+	* \see tan()
+	* \see tanh()
+	* \see sin()
+	* \see sinh()
+	* \see cos()
+	* \see cosh()
+	* \see acos()
+	* \see asin()
+	* \see asinh()
+	* \see atan()
+	* \see atanh()
+	* \see atan2()
+	*/
+
+  SCYTHE_MATH_OP(acosh, ::acosh)
+
+  /* calc the inverse sine of each element of a Matrix */
   
-  /* atan2 - returns angle whose tangent is y/x in the full angular
-   * range [-pit,+pi].  Domain error if both x and y zero
-   * The two matrices must have equal dimensions or one of the two
-   * matrices must be scalar
+   /*! 
+	* \brief Calculate the inverse sine of each element of a Matrix
+	*
+	* This function calculates the inverse sine of each element
+	* in a Matrix
+	*
+	* \param A The matrix whose inverse sines are of interest.
+	*
+	* \see tan()
+	* \see tanh()
+	* \see sin()
+	* \see sinh()
+	* \see cos()
+	* \see cosh()
+	* \see acos()
+	* \see acosh()
+	* \see asinh()
+	* \see atan()
+	* \see atanh()
+	* \see atan2()
+	*/
+
+  SCYTHE_MATH_OP(asin, ::asin)
+  
+  /* calc the inverse hyperbolic sine of each element of a Matrix */
+  
+  /*! 
+	* \brief Calculate the inverse hyperbolic sine of each element of a Matrix
+	*
+	* This function calculates the inverse hyperbolic sine of each element
+	* in a Matrix
+	*
+	* \param A The matrix whose inverse hyperbolic sines are of interest.
+	*
+	* \see tan()
+	* \see tanh()
+	* \see sin()
+	* \see sinh()
+	* \see cos()
+	* \see cosh()
+	* \see acos()
+	* \see acosh()
+	* \see asin()
+	* \see atan()
+	* \see atanh()
+	* \see atan2()
+	*/
+	
+  SCYTHE_MATH_OP(asinh, ::asinh)
+  
+  /* calc the inverse tangent of each element of a Matrix */
+  
+   /*! 
+	* \brief Calculate the inverse tangent of each element of a Matrix
+	*
+	* This function calculates the inverse tangent of each element
+	* in a Matrix
+	*
+	* \param A The matrix whose inverse tangents are of interest.
+	*
+	* \see tan()
+	* \see tanh()
+	* \see sin()
+	* \see sinh()
+	* \see cos()
+	* \see cosh()
+	* \see acos()
+	* \see acosh()
+	* \see asin()
+	* \see asin()
+	* \see atanh()
+	* \see atan2()
+	*/
+	
+  SCYTHE_MATH_OP(atan, ::atan)
+  
+  /* calc the inverse hyperbolic tangent of each element of a Matrix */
+   /*! 
+	* \brief Calculate the inverse hyperbolic tangent of each element of a Matrix
+	*
+	* This function calculates the inverse hyperbolic tangent of each element
+	* in a Matrix
+	*
+	* \param A The matrix whose inverse hyperbolic tangents are of interest.
+	*
+	* \see tan()
+	* \see tanh()
+	* \see sin()
+	* \see sinh()
+	* \see cos()
+	* \see cosh()
+	* \see acos()
+	* \see acosh()
+	* \see asin()
+	* \see asinh()
+	* \see atan()
+	* \see atan2()
+	*/
+	
+  SCYTHE_MATH_OP(atanh, ::atanh)
+  
+  /* calc the angle whose tangent is y/x  */
+  
+   /*! 
+	* \brief Calculate the angle whose tangent is y/x
+	*
+	* This function calculates the angle whose tangent is y/x, given two 
+	* matrices A and B (where y is the ith element of A, and x is the jth element
+	* of matrix B).
+	*
+	* \param A The matrix of y values 
+	* \param B The matrix of x values
+	*
+	* \see tan()
+	* \see tanh()
+	* \see sin()
+	* \see sinh()
+	* \see cos()
+	* \see cosh()
+	* \see acos()
+	* \see acosh()
+	* \see asin()
+	* \see asinh()
+	* \see atan()
+	* \see atanh()
+	*/
+
+  SCYTHE_MATH_OP_2ARG(atan2, std::ptr_fun(::atan2))
+
+  /* calc the cube root of each element of a Matrix */
+   /*! 
+	* \brief Calculate the cube root of each element of a Matrix
+	*
+	* This function calculates the cube root of each element
+	* in a Matrix
+	*
+	* \param A The matrix whose cube roots are of interest.
+	*
+	* \see sqrt()
+	*/
+
+  SCYTHE_MATH_OP(cbrt, ::cbrt)
+  
+  /* calc the ceil of each element of a Matrix */
+  /*! 
+	* \brief Calculate the ceiling of each element of a Matrix
+	*
+	* This function calculates the ceiling of each element
+	* in a Matrix
+	*
+	* \param A The matrix whose ceilings are of interest.
+	*
+	* \see floor()
+	*/
+
+  SCYTHE_MATH_OP(ceil, ::ceil)
+  
+  /* create a matrix containing the absval of the first input and the
+   * sign of the second
    */
-  template <class T>
-  Matrix<T> atan2 (const Matrix<T> &, const Matrix<T> &);
+    /*! 
+	* \brief Create a matrix containing the absolute value of the first input
+	* and the sign of the second input
+	*
+	* This function creates a matrix containing the absolute value of the first
+	* input, a matrix called A, and the sign of the second input, matrix B.
+	*
+	* \param A The matrix whose absolute values will comprise the resultant matrix.
+	* \param B The matrix whose signs will comprise the resultant matrix
+	*/
+
+  SCYTHE_MATH_OP_2ARG(copysign, std::ptr_fun(::copysign))
   
-  /* cbrt - cube root */
-  template <class T>
-  Matrix<T> cbrt (Matrix<T>);
+  /* calc the cosine of each element of a Matrix */
+    
+ /*! 
+	* \brief Calculate the cosine of each element of a Matrix
+	*
+	* This function calculates the cosine of each element in a Matrix
+	*
+	* \param A The matrix whose cosines are of interest.
+	*
+	* \see tan()
+	* \see tanh()
+	* \see sin()
+	* \see sinh()
+	* \see cosh()
+	* \see acos()
+	* \see acosh()
+	* \see asin()
+	* \see asinh()
+	* \see atan()
+	* \see atanh()
+	* \see atan2()
+	*/
+
+  SCYTHE_MATH_OP(cos, ::cos)
   
-  /* ceil - ceiling of a floating point number */
-  template <class T>
-  Matrix<T> ceil (Matrix<T>);
+  /* calc the hyperbolic cosine of each element of a Matrix */
+   /*! 
+	* \brief Calculate the hyperbolic cosine of each element of a Matrix
+	*
+	* This function calculates the hyperbolic cosine of each element in a Matrix
+	*
+	* \param A The matrix whose hyperbolic cosines are of interest.
+	*
+	* \see tan()
+	* \see tanh()
+	* \see sin()
+	* \see sinh()
+	* \see cos()
+	* \see acos()
+	* \see acosh()
+	* \see asin()
+	* \see asinh()
+	* \see atan()
+	* \see atanh()
+	* \see atan2()
+	*/
+
+  SCYTHE_MATH_OP(cosh, ::cosh)
   
-  /* copysign - return values with absval of 1st arg but sign of 2nd
-   * The two matrices must have equal dimensions or one of the two
-   * matrices must be scalar
-   */
-  template <class T>
-  Matrix<T> copysign (const Matrix<T> &, const Matrix<T> &);
+  /* calc the error function of each element of a Matrix */
+   /*! 
+	* \brief Calculate the error function of each element of a Matrix
+	*
+	* This function calculates the error function of each element in a Matrix
+	*
+	* \param A The matrix whose error functions are of interest.
+	*
+	* \see erfc()
+	*/
 
-  /* cos - cosine function */
-  template <class T>
-  Matrix<T> cos (Matrix<T>);
-
-  /* cosh - hyperbolic cosine function */
-  template <class T>
-  Matrix<T> cosh (Matrix<T>);
-
-  /* erf - error function */
-  template <class T>
-  Matrix<T> erf (Matrix<T>);
-
-  /* erfc - complementary error function */
-  template <class T>
-  Matrix<T> erfc (Matrix<T>);
-
-  /* exp - Calculate the value of e^x for each  individual */
-  template <class T>
-  Matrix<T> exp (Matrix<T>);
-
-//  /* expm1 - exponent minus 1 */
-//  template <class T>
-//  Matrix<T> expm1 (Matrix<T>);
+  SCYTHE_MATH_OP(erf, ::erf)
   
-  /* fabs - Calculate the absolute value of each Matrix element */
-  template <class T>
-  Matrix<T> fabs (Matrix<T>);
+  /* calc the complementary error function of each element of a Matrix */
+   /*! 
+	* \brief Calculate the complementary error function of each element of a Matrix
+	*
+	* This function calculates the complemenatry error function of each 
+	* element in a Matrix
+	*
+	* \param A The matrix whose complementary error functions are of interest.
+	*
+	* \see erf()
+	*/
 
-  /* floor - floor of floating point number */
-  template <class T>
-  Matrix<T> floor (Matrix<T>);
-
-  /* fmod - return the remainder */
-  template <class T>
-  Matrix<T> fmod (const Matrix<T> &, const Matrix<T> &);
-
-  /* frexp - returns fractional value of input, and fills int matrix
-   * with exponent ex.  Frac on interval [1/2,1) x == frac * 2^ex
-   */
-  template <class T>
-  Matrix<T> frexp(Matrix<T>, Matrix<int> &);
-
-  /* hypot - euclidean distance function */
-  template <class T>
-  Matrix<T> hypot (const Matrix<T> &, const Matrix<T> &);
+  SCYTHE_MATH_OP(erfc, ::erfc)
   
-  /* ilogb - returns int verison of logb */
-  template <class T>
-  Matrix<int> ilogb (const Matrix<T> &);
+  /* calc the vaue e^x of each element of a Matrix */
+   /*! 
+	* \brief Calculate the value e^x for each element of a Matrix
+	*
+	* This function calculates the value e^x for each element of a matrix, where
+	* x is the ith element of the matrix A
+	*
+	* \param A The matrix whose elements are to be exponentiated.
+	*
+	* \see expm1()
+	*/
 
-  /* j0, j1, jn - bessel functions of the first kind of order
-   * (May only support doubles, consult standard)
-   */
-  template <class T>
-  Matrix<T> j0 (Matrix<T>);
-
-  template <class T>
-  Matrix<T> j1 (Matrix<T>);
-
-  template <class T>
-  Matrix<T> jn (const int &n, Matrix<T>);
-
-  /* ldexp - returns x * 2^ex */
-  template <class T>
-  Matrix<T> ldexp(Matrix<T>, const int &);
-
-  /* lgamma - returns natural log of the absval of the gamma function */
-  template <class T>
-  Matrix<T> lgamma (Matrix<T>);
-
-  /* Log - Calculate the natural log of each Matrix element */
-  template <class T>
-  Matrix<T> log(Matrix<T>);
+  SCYTHE_MATH_OP(exp, ::exp)
   
-  /* Log10 - Calculate the Base 10 Log of each Matrix element */
-  template <class T> 
-  Matrix<T> log10(Matrix<T>);
+  /* calc the exponent - 1 of each element of a Matrix */
+  /*! 
+	* \brief Calculate the value e^(x-1) for each element of a Matrix
+	*
+	* This function calculates the value e^(x-1) for each element of a matrix, where
+	* x is the ith element of the matrix A
+	*
+	* \param A The matrix whose elements are to be exponentiated.
+	*
+	* \see exp()
+	*/
 
-  /* log1p - returns natrual log of 1 + x, domain error if x < -1 */
-  template <class T>
-  Matrix<T> log1p (Matrix<T>);
-
-  /* logb - returns ex s.t. x == frac * ex^FLT_RADIX where frac is on
-   * the interval [1,FLT_RADIX].  Domain error if x is 0.
-   */
-  template <class T>
-  Matrix<T> logb (Matrix<T>);
-
-  /* modf - x == frac + i where |frac| on [0,1) and both frac and i
-   * have the same sign as x.  I is stored in the second matrix.
-   */
-  template <class T>
-  Matrix<T> modf (Matrix<T>, Matrix<double> &);
+  SCYTHE_MATH_OP(expm1, ::expm1)
   
-  /* Pow - Raise each Matrix element to the power of the 2nd arg
-   */
-  template <class T, class S> 
-  Matrix<T> pow(Matrix<T>, const S &);
+  /* calc the absval of each element of a Matrix */
+   /*! 
+	* \brief Calculate the absolute value of each element of a Matrix
+	*
+	* This function calculates the absolute value of each element in a Matrix
+	*
+	* \param A The matrix whose absolute values are to be taken.
+	*/
 
-  /* return the remainder of dividing */
-  template <class T>
-  Matrix<T> remainder (const Matrix<T> &, const Matrix<T> &);
+  SCYTHE_MATH_OP(fabs, ::fabs)
 
-  /* rint - returns x round to the nearest int using the current
-   * rounding mode.  May rais and inexact floating-point exception if
-   * the return value does not equal x???
-   */
-  template <class T>
-  Matrix<T> rint (Matrix<T>);
+  /* calc the floor of each element of a Matrix */
+  /*! 
+	* \brief Calculate the floor of each element of a Matrix
+	*
+	* This function calculates the floor of each element
+	* in a Matrix
+	*
+	* \param A The matrix whose floors are of interest.
+	*
+	* \see ceil()
+	*/
 
-  /* scalbn - returns x * FLT_RADIX^ex (ex is 2nd arg) */
-  template <class T>
-  Matrix<T> scalbn (Matrix<T>, const int &);
-
-  /* sin - return the sine of x */
-  template <class T>
-  Matrix<T> sin (Matrix<T>);
-
-  /* sinh - return the hyperbolic sine of x */
-  template <class T>
-  Matrix<T> sinh (Matrix<T>);
-
-  /* Sqrt - Calculate the sqrt of each element of a Matrix */
-  template <class T> 
-  Matrix<T> sqrt (Matrix<T>);
-
-  /* tan - return the tangent of x */
-  template <class T>
-  Matrix<T> tan (Matrix<T>);
+  SCYTHE_MATH_OP(floor, ::floor)
   
-  /* tanh - return the hyperbolic tangent of x */
-  template <class T>
-  Matrix<T> tanh (Matrix<T>);
+  /* calc the remainder of the division of each matrix element */
+   /*! 
+	* \brief Calculate the remainder of the division of each matrix element
+	*
+	* This function calculates the remainder when the elements of Matrix A are
+	* divided by the elements of Matrix B.  
+	*
+	* \param A The matrix to serve as dividend
+	* \param B the matrix to serve as divisor
+	*/
 
-  /* y0, y1, yn - bessel functions of the second kind of order
-   * (May only support doubles, consult standard)
+  SCYTHE_MATH_OP_2ARG(fmod, std::ptr_fun(::fmod))
+
+  /* calc the fractional val of input and return exponents in int
+   * matrix reference
    */
-  template <class T>
-  Matrix<T> y0 (Matrix<T>);
+   
+   /*! 
+	*/
+  template <matrix_order RO, matrix_style RS, typename T,
+	    matrix_order PO1, matrix_style PS1,
+	    matrix_order PO2, matrix_style PS2>
+  Matrix<T,RO,RS>
+  frexp (const Matrix<T,PO1,PS1>& A, Matrix<int,PO2,PS2>& ex)
+  {
+    SCYTHE_CHECK_10(A.size() != ex.size(), scythe_conformation_error,
+        "The input matrix sizes do not match");
+    Matrix<T,PO1,Concrete> res(A.rows(), A.cols());
+    
+    typename Matrix<T,PO1,PS1>::const_forward_iterator it;
+    typename Matrix<T,PO1,Concrete>::forward_iterator rit 
+      = res.begin_f();
+    typename Matrix<int,PO2,PS2>::const_forward_iterator it2
+      = ex.begin_f();
+    for (it = A.begin_f(); it != A.end_f(); ++it) {
+      *rit = ::frexp(*it, &(*it2));
+      ++it2; ++rit;
+    }
 
-  template <class T>
-  Matrix<T> y1 (Matrix<T>);
+    return res;
+  }
+  
+  template <typename T, matrix_order PO1, matrix_style PS1,
+	    matrix_order PO2, matrix_style PS2>
+  Matrix<T,PO1,Concrete>
+  frexp (Matrix<T,PO1,PS1>& A, Matrix<int,PO2,PS2>& ex)
+  {
+    return frexp<PO1,Concrete>(A,ex);
+  }
 
-  template <class T>
-  Matrix<T> yn (const int &, Matrix<T>);
+  /* calc the euclidean distance between the two inputs */
+  /*! 
+	* \brief Calculate the euclidean distance between two inputs
+	*
+	* This function calculates the euclidean distance between the elements of Matrix
+	* A and the elements of Matrix B.
+	*
+	* \param A Input matrix
+	* \param B Input matrix
+	*/
 
+  SCYTHE_MATH_OP_2ARG(hypot, std::ptr_fun(::hypot))
 
-} // end namespace SCYTHE
+  /*  return (int) logb */
+  SCYTHE_MATH_OP(ilogb, ::ilogb)
+  
+  /* compute the bessel func of the first kind of the order 0 */
+   /*! 
+	* \brief Compute the Bessel function of the first kind of the order 0
+	*
+	* This function computes the Bessel function of the first kind of order 0
+	* for each element in the input matrix, A.
+	* 
+	* \param A Matrix for which the Bessel function is of interest
+	*
+	* \see j1()
+	* \see jn()
+	* \see y0()
+	* \see y1()
+	* \see yn()
+	*/
+  
+  SCYTHE_MATH_OP(j0, ::j0)
+  
+  /* compute the bessel func of the first kind of the order 1 */
+  /*! 
+	* \brief Compute the Bessel function of the first kind of the order 1
+	*
+	* This function computes the Bessel function of the first kind of order 1
+	* for each element in the input matrix, A.
+	* 
+	* \param A Matrix for which the Bessel function is of interest
+	*
+	* \see j0()
+	* \see jn()
+	* \see y0()
+	* \see y1()
+	* \see yn()
+	*/
 
-#if defined (SCYTHE_COMPILE_DIRECT) && \
-	  (defined (__GNUG__) || defined (__MWERKS__) || \
-		 defined (_MSC_VER) || defined (EXPLICIT_TEMPLATE_INSTANTIATION))
-#include "smath.cc"
-#endif  /* EXPLICIT_TEMPLATE_INSTANTIATION */
+  SCYTHE_MATH_OP(j1, ::j1)
+  
+  /* compute the bessel func of the first kind of the order n 
+   * TODO: This definition causes the compiler to issue some warnings.
+   * Fix
+   */
+   /*!
+	* \brief Compute the Bessel function of the first kind of the order n
+	*
+	* This function computes the Bessel function of the first kind of order n
+	* for each element in the input matrix, A.
+	* 
+	* \param n Order of the Bessel function
+	* \param A Matrix for which the Bessel function is of interest
+	*
+	* \see j0()
+	* \see j1()
+	* \see y0()
+	* \see y1()
+	* \see yn()
+	*/
+
+  SCYTHE_MATH_OP_2ARG(jn, std::ptr_fun(::jn))
+
+  /* calc x * 2 ^ex */
+   /*!
+	* \brief Compute x * 2^ex
+	*
+	* This function computes the value of x * 2^ex, where x is the ith element of
+	* the input matrix A, and ex is the desired value of the exponent.
+	* 
+	* \param A Matrix whose elements are to be multiplied
+	* \param ex Matrix of powers to which 2 will be raised.
+	*/
+  SCYTHE_MATH_OP_2ARG(ldexp, std::ptr_fun(::ldexp))
+  
+  /*  compute the natural log of the absval of gamma function */
+  
+   /*!
+	* \brief Compute the natural log of the absolute value of the gamma function
+	*
+	* This function computes the absolute value of the Gamma Function, evaluated at
+	* each element of the input matrix A.
+	* 
+	* \param A Matrix whose elements will serve as inputs for the Gamma Function
+	*
+	* \see log()
+	*/
+
+  SCYTHE_MATH_OP(lgamma, ::lgamma)
+  
+  /* calc the natural log of each element of a Matrix */
+   /*!
+	* \brief Compute the natural log of each element of a Matrix
+	*
+	* This function computes the natural log of each element in a matrix, A.
+	* 
+	* \param A Matrix whose natural logs are of interest
+	*
+	* \see log10()
+	* \see log1p()
+	* \see logb()
+	*/
+
+  SCYTHE_MATH_OP(log, ::log)
+  
+  /* calc the base-10 log of each element of a Matrix */
+   /*!
+	* \brief Compute the log base 10 of each element of a Matrix
+	*
+	* This function computes the log base 10 of each element in a matrix, A.
+	* 
+	* \param A Matrix whose logs are of interest
+	*
+	* \see log()
+	* \see log1p()
+	* \see logb()
+	*/
+
+  SCYTHE_MATH_OP(log10, ::log10)
+  
+  /* calc the natural log of 1 + each element of a Matrix */
+  /*!
+	* \brief Compute the natural log of 1 + each element of a Matrix
+	*
+	* This function computes the natural log of 1 + each element of a Matrix.
+	* 
+	* \param A Matrix whose logs are of interest
+	*
+	* \see log()
+	* \see log10()
+	* \see logb()
+	*/
+  
+  SCYTHE_MATH_OP(log1p, ::log1p)
+  
+  /* calc the logb of each element of a Matrix */
+  /*!
+	* \brief Compute the logb each element of a Matrix
+	*
+	* This function computes the log base b of each element of a Matrix.
+	* 
+	* \param A Matrix whose logs are of interest
+	*
+	* \see log()
+	* \see log10()
+	* \see log1p()
+	*/
+
+  SCYTHE_MATH_OP(logb, ::logb)
+  
+  /* x = frac + i, return matrix of frac and place i in 2nd matrix
+   */
+  template <matrix_order RO, matrix_style RS, typename T,
+	    matrix_order PO1, matrix_style PS1,
+	    matrix_order PO2, matrix_style PS2>
+  Matrix<T,RO,RS>
+  modf (const Matrix<T,PO1,PS1>& A, Matrix<double,PO2,PS2>& ipart)
+  {
+    SCYTHE_CHECK_10(A.size() != ipart.size(), scythe_conformation_error,
+        "The input matrix sizes do not match");
+    Matrix<T,PO1,Concrete> res(A.rows(), A.cols());
+    
+    typename Matrix<T,PO1,PS1>::const_forward_iterator it;
+    typename Matrix<T,PO1,Concrete>::forward_iterator rit 
+      = res.begin_f();
+    typename Matrix<double,PO2,PS2>::const_forward_iterator it2
+      = ipart.begin_f();
+    for (it = A.begin_f(); it != A.end_f(); ++it) {
+      *rit = ::modf(*it, &(*it2));
+      ++it2; ++rit;
+    }
+
+    return res;
+  }
+  
+  template <typename T, matrix_order PO1, matrix_style PS1,
+	    matrix_order PO2, matrix_style PS2>
+  Matrix<T,PO1,Concrete>
+  modf (Matrix<T,PO1,PS1>& A, Matrix<double,PO2,PS2>& ipart)
+  {
+    return modf<PO1,Concrete>(A,ipart);
+  }
+
+  /* calc x^ex of each element of a Matrix */
+  
+   /*!
+	* \brief Compute x^ex for each element of a matrix
+	*
+	* This function computes x^ex, where x is the ith element of the matrix A, 
+	* and ex is the desired exponent.
+	* 
+	* \param A Matrix to be exponentiated
+	* \param ex Desired exponent
+	*/
+  SCYTHE_MATH_OP_2ARG(pow, std::ptr_fun(::pow))
+
+  /* calc rem == x - n * y */
+  SCYTHE_MATH_OP_2ARG(remainder, std::ptr_fun(::remainder))
+
+  /* return x rounded to nearest int */
+  
+  /*!
+	* \brief Return x rounded to the nearest integer
+	*
+	* This function returns x, where x is the ith element of the Matrix A, 
+	* rounded to the nearest integer.
+	* 
+	* \param A Matrix whose elements are to be rounded
+	*/
+
+  SCYTHE_MATH_OP(rint, ::rint)
+
+  /* returns x * FLT_RADIX^ex */
+  SCYTHE_MATH_OP_2ARG(scalbn, std::ptr_fun(::scalbn))
+
+  /*  calc the sine of x */
+  
+  /*! 
+	* \brief Calculate the sine of each element of a Matrix
+	*
+	* This function calculates the sine of each element in a Matrix
+	*
+	* \param A The matrix whose sines are of interest.
+	*
+	* \see tan()
+	* \see tanh()
+	* \see sinh()
+	* \see cos()
+	* \see cosh()
+	* \see acos()
+	* \see acosh()
+	* \see asin()
+	* \see asinh()
+	* \see atan()
+	* \see atanh()
+	* \see atan2()
+	*/
+
+  SCYTHE_MATH_OP(sin, ::sin)
+
+  /* calc the hyperbolic sine of x */
+   /*! 
+	* \brief Calculate the hyperbolic sine of each element of a Matrix
+	*
+	* This function calculates the hyperbolic sine of each element in a Matrix
+	*
+	* \param A The matrix whose hyperbolic sines are of interest.
+	*
+	* \see tan()
+	* \see tanh()
+	* \see sin()
+	* \see cos()
+	* \see cosh()
+	* \see acos()
+	* \see acosh()
+	* \see asin()
+	* \see asinh()
+	* \see atan()
+	* \see atanh()
+	* \see atan2()
+	*/
+
+  SCYTHE_MATH_OP(sinh, ::sinh)
+  
+  /* calc the sqrt of x */
+  /*! 
+	* \brief Calculate the square root of each element in a matrix
+	*
+	* This function calculates the square root of each element in a Matrix
+	*
+	* \param A The matrix whose roots are of interest.
+	*
+	* \see cbrt()
+
+	*/
+	
+  SCYTHE_MATH_OP(sqrt, ::sqrt)
+
+  /* calc the tangent of x */
+  
+  /*! 
+	* \brief Calculate the tangent of each element of a Matrix
+	*
+	* This function calculates the tangent of each element in a Matrix
+	*
+	* \param A The matrix whose tangents are of interest.
+	*
+	* \see sinh()
+	* \see tanh()
+	* \see sin()
+	* \see cos()
+	* \see cosh()
+	* \see acos()
+	* \see acosh()
+	* \see asin()
+	* \see asinh()
+	* \see atan()
+	* \see atanh()
+	* \see atan2()
+	*/
+
+  SCYTHE_MATH_OP(tan, ::tan)
+
+  /* calc the hyperbolic tangent of x */
+  /*! 
+	* \brief Calculate the hyperbolic tangent of each element of a Matrix
+	*
+	* This function calculates the hyperbolic tangent of each element in a Matrix
+	*
+	* \param A The matrix whose hyperbolic tangents are of interest.
+	*
+	* \see sinh()
+	* \see tan()
+	* \see sin()
+	* \see cos()
+	* \see cosh()
+	* \see acos()
+	* \see acosh()
+	* \see asin()
+	* \see asinh()
+	* \see atan()
+	* \see atanh()
+	* \see atan2()
+	*/
+
+  SCYTHE_MATH_OP(tanh, ::tanh)
+
+  /* bessel function of the second kind of order 0*/
+   /*! 
+	* \brief Compute the Bessel function of the second kind of order 0
+	*
+	* This function computes the Bessel function of the second kind of order 0
+	* for each element in the input matrix, A.
+	* 
+	* \param A Matrix for which the Bessel function is of interest
+	*
+	* \see j0()
+	* \see j1()
+	* \see jn()
+	* \see y1()
+	* \see yn()
+	*/
+
+  SCYTHE_MATH_OP(y0, ::y0)
+
+  /* bessel function of the second kind of order 1*/
+   /*! 
+	* \brief Compute the Bessel function of the second kind of order 1
+	*
+	* This function computes the Bessel function of the second kind of order 1
+	* for each element in the input matrix, A.
+	* 
+	* \param A Matrix for which the Bessel function is of interest
+	*
+	* \see j0()
+	* \see j1()
+	* \see jn()
+	* \see y0()
+	* \see yn()
+	*/
+
+  SCYTHE_MATH_OP(y1, ::y1)
+
+  /* bessel function of the second kind of order n
+   * TODO: This definition causes the compiler to issue some warnings.
+   * Fix
+   */
+  /*!
+	* \brief Compute the Bessel function of the second kind of order n
+	*
+	* This function computes the Bessel function of the second kind of order n
+	* for each element in the input matrix, A.
+	* 
+	* \param n Order of the Bessel function
+	* \param A Matrix for which the Bessel function is of interest
+	*
+	* \see j0()
+	* \see j1()
+	* \see jn()
+	* \see y0()
+	* \see y1()
+	*/
+
+  SCYTHE_MATH_OP_2ARG(yn, std::ptr_fun(::yn))
+  
+} // end namespace scythe
 
 #endif /* SCYTHE_MATH_H */

@@ -28,7 +28,6 @@ export(
        MCMCmnl,
        MCMCoprobit,
        MCMCordfactanal,
-       MCMCpanel,
        MCMCpoisson,
        MCMCpoissonChangepoint,
        MCMCprobit,

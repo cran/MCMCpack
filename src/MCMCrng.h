@@ -22,21 +22,41 @@
 #ifndef MCMCRNG_H
 #define MCMCRNG_H
 
-#include "rng.h"
 #include "mersenne.h"
 #include "lecuyer.h"
 
-//#include <R.h>           // needed to use Rprintf()
+/* This allows model handles to efficiently pass the appropriate rng
+ * to object a model's implementation.  The first arg is the name of
+ * the model implementation function.  The remaining arguments are the
+ * arguments to the model implementation function.  
+ *
+ * The macro assumes that the function it is called in contains an int
+ * pointer named uselecuyer holding a boolean indication of whether or
+ * not to use the lecuyer rng.  Secondly, it assumes the function
+ * contains a pointer to an array of integers called seedarray that
+ * contains six random number seeds (or just one if using mersenne).
+ * Finally, it assumes it contains a pointer to an integer called
+ * lecuyerstream that indicates which of the lecuyer generator's
+ * streams to use.
+ */
 
-using namespace std;
-//using namespace SCYTHE;
-
-namespace SCYTHE {
-
-   // function that sets rng streams
-   rng *MCMCpack_get_rng(const int, const int [], const int);
-
-}// end namespace SCYTHE
-
+#define MCMCPACK_PASSRNG2MODEL(MODEL_IMPL, ...)                           \
+{                                                                         \
+  unsigned long u_seed_array[6];                                          \
+  for (int i = 0; i < 6; ++i)                                             \
+    u_seed_array[i] = static_cast<unsigned long>(seedarray[i]);           \
+                                                                          \
+  if (*uselecuyer == 0) {                                                 \
+    mersenne the_rng;                                                     \
+    the_rng.initialize(u_seed_array[0]);                                  \
+    MODEL_IMPL(the_rng, __VA_ARGS__);                                     \
+  } else {                                                                \
+    lecuyer::SetPackageSeed(u_seed_array);                                \
+    for (int i = 0; i < (*lecuyerstream - 1); ++i)                        \
+      lecuyer skip_rng;                                                   \
+    lecuyer the_rng;                                                      \
+    MODEL_IMPL(the_rng, __VA_ARGS__);                                     \
+  }                                                                       \
+}
 
 #endif

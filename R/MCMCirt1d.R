@@ -183,7 +183,7 @@
     # put together matrix and build MCMC object to return
     sample <- matrix(posterior$sampledata, posterior$samplerow,
                      posterior$samplecol,
-                     byrow=TRUE)
+                     byrow=FALSE)
     output <- mcmc(data=sample, start=burnin+1, end=burnin+mcmc, thin=thin)
 
     names <- NULL
