@@ -87,7 +87,7 @@
           logpost.poisson(theta.tilde, Y, X, b0, B0)
       
     }
-
+    posterior <- NULL
     
     ## call C++ code to draw sample
     auto.Scythe.call(output.object="posterior", cc.fun.name="MCMCpoisson",

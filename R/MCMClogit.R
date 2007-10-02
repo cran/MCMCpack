@@ -116,7 +116,7 @@
 
     propvar <- tune %*% V %*% tune
 
-    
+    posterior <- NULL    
     ## call C++ code to draw sample
     if (is.null(user.prior.density)){
       ## define holder for posterior density sample

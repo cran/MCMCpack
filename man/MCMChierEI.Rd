@@ -140,7 +140,7 @@ MCMChierEI(r0, r1, c0, c1, burnin=5000, mcmc=50000, thin=1,
   
 \references{
   Jonathan C. Wakefield. 2004. ``Ecological Inference for 2 x 2 Tables.'' \emph{Journal 
-   of the Royal Statistical Society, Series A}. 167(3): 385Ð445.
+   of the Royal Statistical Society, Series A}. 167(3): 385445.
 
    Radford Neal. 2003. ``Slice Sampling" (with discussion). \emph{Annals of
    Statistics}, 31: 705-767. 
@@ -186,4 +186,6 @@ pairs(cbind(p0.true, p0meanHier, p1.true, p1meanHier))
 
 \seealso{\code{\link{MCMCdynamicEI}},
   \code{\link[coda]{plot.mcmc}},\code{\link[coda]{summary.mcmc}}}
+
+
 

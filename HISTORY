@@ -2,6 +2,14 @@
 // Changes and Bug Fixes
 //
 
+0.9-1 to 0.9-2
+  * fixed Makevars per Ripley's email [PKG_CXXFLAGS to PKG_CPPFLAGS]
+  * fixed encoding on some documentation files [thanks to Kurt Hornik]
+  * added other estimation algorithms for MCMCoprobit
+  * added other estimation algorithms for MCMCmnl
+  * added MCMCpoissonChangepoint with estimation in compiled C++
+  * a variety of other minor fixes
+  
 0.8-2 to 0.9-1
   * first release of JStatSoft version
   * full port to Scythe 1.0.2 (nearly all C++ has been radically changed)

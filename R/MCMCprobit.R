@@ -92,6 +92,7 @@
           logpost.probit(theta.tilde, Y, X, b0, B0)
       
     }
+    posterior <- NULL
 
     if (is.null(resvec)){
       ## define holder for posterior density sample

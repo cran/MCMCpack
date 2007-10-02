@@ -1,148 +1,102 @@
-"MCMCpoissonChangepoint" <- 
-        function (data, m = 1, burnin = 1000, mcmc = 1000, thin = 1, verbose = 0,
-        seed = NA, c0, d0, a = NULL, b = NULL, marginal.likelihood = c("none", "Chib95"), ...)
-{
+## sample from the posterior distribution
+## of a Poisson model with multiple changepoints
+## using linked C++ code in Scythe 1.0
+##
+## JHP 07/01/2007
+##
+## Revised on 09/12/2007 JHP	  
+
+"MCMCpoissonChangepoint"<-
+    function(data,  m = 1, c0 = NA, d0 = NA, a = NULL, b = NULL,
+            burnin = 10000, mcmc = 10000, thin = 1, verbose = 0,
+            seed = NA, lambda.start = NA, P.start = NA,
+            marginal.likelihood = c("none", "Chib95"), ...) {
+
+    ## check iteration parameters
     check.mcmc.parameters(burnin, mcmc, thin)
     totiter <- mcmc + burnin
     cl <- match.call()
-    if (!is.na(seed))
-        set.seed(seed)
-    y <- data
-    n <- length(y)
-    A0 <- trans.mat.prior(m = m, n = n, a = a, b = b)
-    marginal.likelihood <- match.arg(marginal.likelihood)
-    lambda.store <- matrix(NA, mcmc/thin, m + 1)
-    P.store <- matrix(NA, mcmc/thin, (m + 1)^2)
-    ps.store <- matrix(0, n, m + 1)
-    s1.store <- matrix(NA, mcmc/thin, n)
-    py <- rep(0, m + 1)
-    pdf.P.store <- matrix(NA, mcmc/thin, m + 1)
-    lambda1 <- rep(NA, m + 1)
-    P1 <- matrix(NA, m + 1, m + 1)
-    lambda0 <- runif(m + 1)
-    P0 <- trans.mat.prior(m = m, n = n, a = 0.9, b = 0.1)
-    for (iter in 1:totiter) {
-        state.out <- Poisson.state.sampler(m = m, y = y, lambda = lambda0,
-            P = P0)
-        s1 <- state.out$s1
-        ps1 <- state.out$ps1
-        for (j in 1:(m + 1)) {
-            ej <- as.numeric(s1 == j)
-            yj <- y[ej == 1]
-            nj <- length(yj)
-            c1 <- sum(yj) + c0
-            d1 <- nj + d0
-            lambda1[j] <- rgamma(1, c1, d1)
-        }
-        switch <- switchg(s1)
-        for (j in 1:(m + 1)) {
-            switch1 <- A0[j, ] + switch[j, ]
-            pj <- rdirichlet.cp(1, switch1)
-            P1[j, ] <- pj
-        }
-        lambda0 <- lambda1
-        P0 <- P1
-        if (iter > burnin && (iter%%thin == 0)) {
-            lambda.store[(iter - burnin)/thin, ] <- lambda1
-            P.store[(iter - burnin)/thin, ] <- as.vector(t(P1))
-            s1.store[(iter - burnin)/thin, ] <- s1
-            ps.store <- ps.store + ps1
-        }
-        if (verbose > 0 && iter%%verbose == 0) {
-            cat("----------------------------------------------",
-                "\n")
-            cat("iteration = ", iter, "\n")
-            cat("lambda = ", lambda1, "\n")
-            cat("Transition Matrix", "\n")
-            for (i in 1:(m + 1)) cat(paste("", P1[i, ]), fill = TRUE,
-                labels = paste("{", i, "}:", sep = ""), sep = ",")
-        }
+
+    ## ## seeds
+    seeds <- form.seeds(seed)
+    lecuyer <- seeds[[1]]
+    seed.array <- seeds[[2]]
+    lecuyer.stream <- seeds[[3]]
+   
+    ## sample size
+    y <- as.matrix(data)
+    n <- nrow(y)
+    ns <- m+1
+
+    ## prior 
+    A0 <- trans.mat.prior(m=m, n=n, a=a, b=b)
+    if (is.na(c0)||is.na(d0))
+        stop("Please specify prior for lambda (c0 and d0) and call MCMCpoissonChangepoint again.\n")
+    
+    ## get marginal likelihood argument
+    marginal.likelihood  <- match.arg(marginal.likelihood)
+
+    ## following MCMCregress, set chib as binary
+    logmarglike <- NULL
+    chib <- 0
+    if (marginal.likelihood == "Chib95"){
+      chib <- 1
     }
-    if (marginal.likelihood == "Chib95") {
-        lambda.st <- apply(lambda.store, 2, mean)
-        P.vec.st <- apply(P.store, 2, mean)
-        P.st <- t(matrix(P.vec.st, m + 1, m + 1))
-        density.lambda <- matrix(NA, (mcmc/thin), m + 1)
-        for (i in 1:(mcmc/thin)) {
-            for (j in 1:(m + 1)) {
-                ej <- as.numeric(s1.store[i, ] == j)
-                yj <- y[ej == 1]
-                nj <- length(yj)
-                c1 <- sum(yj) + c0
-                d1 <- nj + d0
-                density.lambda[i, j] <- dgamma(lambda.st[j],
-                  c1, d1)
-            }
-        }
-        pdf.lambda <- log(prod(apply(density.lambda, 2, mean)))
-        for (g in 1:(mcmc/thin)) {
-            state.out <- Poisson.state.sampler(m = m, y = y,
-                lambda = lambda.st, P = P0)
-            s1 <- state.out$s1
-            ps1 <- state.out$ps1
-            switch <- switchg(s1)
-            for (j in 1:(m + 1)) {
-                switch1 <- A0[j, ] + switch[j, ]
-                pj <- rdirichlet.cp(1, switch1)
-                P1[j, ] <- pj
-                pdf.P.store[g, j] <- ddirichlet.cp(P.st[j, ],
-                  switch1)
-            }
-            P0 <- P1
-        }
-        pdf.P <- log(prod(apply(pdf.P.store, 2, mean)))
-        F <- matrix(NA, n, m + 1)
-        like <- rep(NA, n)
-        pr1 <- c(1, rep(0, m))
-        for (t in 1:n) {
-            py <- sapply(c(1:(m + 1)), function(i) {
-                poisson.pdf(y[t], lambda.st[i])
-            })
-            if (t == 1) {
-                pstyt1 = pr1
-            }
-            else {
-                pstyt1 <- F[t - 1, ] %*% P.st
-            }
-            unnorm.pstyt <- pstyt1 * py
-            pstyt <- unnorm.pstyt/sum(unnorm.pstyt)
-            F[t, ] <- pstyt
-            like[t] <- sum(unnorm.pstyt)
-        }
-        loglik <- sum(log(like))
-        nprior.lambda <- nprior.P <- rep(NA, m + 1)
-        nprior.lambda <- sapply(c(1:(m + 1)), function(i) {
-            dgamma(lambda.st[i], c0, d0, log = TRUE)
-        })
-        nprior.P <- sapply(c(1:(m + 1)), function(i) {
-            log(ddirichlet.cp(P.st[i, ], A0[i, ]))
-        })
-        prior.lambda <- sum(nprior.lambda)
-        prior.P <- sum(nprior.P)
-        numerator <- loglik + prior.lambda + prior.P
-        denominator <- pdf.lambda + pdf.P
-        logmarglike <- numerator - denominator
-        if (verbose > 0) {
-            cat("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
-            cat("Log Marginal Likelihood\n")
-            cat("-------------------------------------------------",
-                "\n")
-            cat("log(marglike)= ", logmarglike, "\n")
-            cat("log(likelihood)= ", loglik, "\n")
-            cat("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
-        }
+
+    Pstart <- check.P(P.start, m=m, n=n, a=a, b=b)
+    lambdastart <- check.theta(lambda.start, ns, y, min=range(y)[1], max=range(y)[2])
+
+    nstore <- mcmc/thin
+
+    ## call C++ code to draw sample
+    posterior <- .C("MCMCpoissonChangepoint",
+                    lambdaout = as.double(rep(0.0, nstore*ns)),
+                    Pout = as.double(rep(0.0, nstore*ns*ns)),
+                    psout = as.double(rep(0.0, n*ns)),
+                    sout = as.double(rep(0.0, nstore*n)),
+                    Ydata = as.double(y),
+                    Yrow = as.integer(nrow(y)),
+                    Ycol = as.integer(ncol(y)),
+                    m = as.integer(m),
+                    burnin = as.integer(burnin),
+                    mcmc = as.integer(mcmc),
+                    thin = as.integer(thin),
+					lecuyer=as.integer(lecuyer), 
+					seedarray=as.integer(seed.array),
+					lecuyerstream=as.integer(lecuyer.stream),
+                    verbose = as.integer(verbose),
+                    lambdastart = as.double(lambdastart),
+                    Pstart = as.double(Pstart),
+                    a = as.double(a),
+                    b = as.double(b),
+                    c0 = as.double(c0),
+                    d0 = as.double(d0),
+                    A0data = as.double(A0),
+                    logmarglikeholder = as.double(0.0),
+                    chib = as.integer(chib))
+
+    ## get marginal likelihood if Chib95
+    if (marginal.likelihood == "Chib95"){
+      logmarglike <- posterior$logmarglikeholder
+	  ##loglike <- posterior$loglikeholder
     }
-    else {
-        logmarglike <- marginal <- loglik <- NULL
-    }
-    output <- as.mcmc(lambda.store)
-    varnames(output) <- paste("lambda.", 1:(m + 1), sep = "")
-    attr(output, "title") <- "MCMCpoissonChangepoint Posterior Sample"
-    attr(output, "y") <- data
+
+    ## pull together matrix and build MCMC object to return
+    lambda.holder <- matrix(posterior$lambdaout, mcmc/thin)
+    P.holder    <- matrix(posterior$Pout, mcmc/thin)
+    s.holder    <- matrix(posterior$sout, mcmc/thin)
+    ps.holder   <- matrix(posterior$psout, n)
+
+    output <- mcmc(data=lambda.holder, start=burnin+1, end=burnin + mcmc, thin=thin)
+    varnames(output)  <- paste("lambda.", 1:ns, sep = "")
+    attr(output,"title") <- "MCMCpoissonChangepoint Posterior Sample"
+    attr(output, "y")    <- y
+    attr(output, "m")    <- m
     attr(output, "call") <- cl
     attr(output, "logmarglike") <- logmarglike
-    attr(output, "loglik") <- loglik
-    attr(output, "prob.state") <- ps.store/(mcmc/thin)
+    attr(output, "prob.state") <- ps.holder/(mcmc/thin)
+    attr(output, "s.store") <- s.holder
     return(output)
-}
+
+ }## end of MCMC function
 

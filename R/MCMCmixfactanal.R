@@ -36,6 +36,7 @@
            std.mean=TRUE, std.var=TRUE, ... ) {
     
     call <- match.call()
+    echo.name <- NULL
     mt <- terms(x, data=data)
     if (attr(mt, "response") > 0) 
       stop("Response not allowed in formula in MCMCmixfactanal().\n")
@@ -261,6 +262,7 @@
     accepts <- matrix(0, K, 1)
 
     # Call the C++ code to do the real work
+    posterior <- NULL
     posterior <- .C("mixfactanalpost",
                     samdata = as.double(sample),
                     samrow = as.integer(nrow(sample)),

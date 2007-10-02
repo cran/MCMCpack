@@ -167,20 +167,42 @@
 }
 
 
+## MNL log-posterior function (used to get starting values)
+## vector Y without NAs
+"mnl.logpost.noNA" <- function(beta, new.Y, X, b0, B0){
+  nobs <- length(new.Y)
+  ncat <- nrow(X) / nobs
+  Xb <- X %*% beta
+  Xb <- matrix(Xb, byrow=TRUE, ncol=ncat)
+  indices <- cbind(1:nobs, new.Y)
+  Xb.reform <- Xb[indices]
+  eXb <- exp(Xb)
+  #denom <- log(apply(eXb, 1, sum))
+  z <- rep(1, ncat)
+  denom <- log(eXb %*% z)
 
-## MNL log-likelihood function (used to get starting values)
-"mnl.loglike" <- function(beta, Y, X){
-  k <- ncol(X)
-  numer <- exp(X %*% beta)
-  numer[Y== -999] <- NA
-  numer.mat <- matrix(numer, nrow(Y), ncol(Y), byrow=TRUE)
-  denom <- apply(numer.mat, 1, sum, na.rm=TRUE)
-  choice.probs <- numer.mat / denom
-  Yna <- Y
-  Yna[Y == -999] <- NA  
-  log.like.mat <- log(choice.probs) * Yna
-  log.like <- sum(apply(log.like.mat, 1, sum, na.rm=TRUE))
-  return(log.like)   
+  log.prior <- 0.5 * t(beta - b0) %*% B0 %*% (beta - b0)
+  
+  return(sum(Xb.reform - denom) + log.prior)
+}
+
+## MNL log-posterior function (used to get starting values)
+## matrix Y with NAs
+"mnl.logpost.NA" <- function(beta, Y, X, b0, B0){
+    k <- ncol(X)
+    numer <- exp(X %*% beta)
+    numer[Y== -999] <- NA
+    numer.mat <- matrix(numer, nrow(Y), ncol(Y), byrow=TRUE)
+    denom <- apply(numer.mat, 1, sum, na.rm=TRUE)
+    choice.probs <- numer.mat / denom
+    Yna <- Y
+    Yna[Y == -999] <- NA  
+    log.like.mat <- log(choice.probs) * Yna
+    log.like <- sum(apply(log.like.mat, 1, sum, na.rm=TRUE))
+
+    log.prior <- 0.5 * t(beta - b0) %*% B0 %*% (beta - b0)
+
+    return(log.like + log.prior)
 }
 
 
@@ -189,12 +211,16 @@
 "MCMCmnl" <-
   function(formula, baseline=NULL, data = parent.frame(), 
            burnin = 1000, mcmc = 10000, thin=1,
-           mcmc.method = "MH", tune = 1.1, verbose = 0, seed = NA,
+           mcmc.method = c("IndMH", "RWM", "slice"),
+           tune = 1.0, tdf=6, verbose = 0, seed = NA,
            beta.start = NA, b0 = 0, B0 = 0, ...) {
 
     ## checks
     check.offset(list(...))
     check.mcmc.parameters(burnin, mcmc, thin)
+    if (tdf <= 0){
+      stop("degrees of freedom for multivariate-t proposal must be positive.\n Respecify tdf and try again.\n") 
+    }
     
     ## seeds
     seeds <- form.seeds(seed) 
@@ -225,15 +251,32 @@
     
     ## form the tuning parameter
     tune <- vector.tune(tune, K)
+
+    ## priors and starting values 
+    mvn.prior <- form.mvn.prior(b0, B0, K)
+    b0 <- mvn.prior[[1]]
+    B0 <- mvn.prior[[2]]
+
     beta.init <- rep(0, K)
     cat("Calculating MLEs and large sample var-cov matrix.\n")
     cat("This may take a moment...\n")
-    optim.out <- optim(beta.init, mnl.loglike, method="BFGS",
-                       control=list(fnscale=-1),
-                       hessian=TRUE, Y=Y, X=X)
-    V <- solve(-1*optim.out$hessian)
-
-    ## starting values and priors
+    if (max(is.na(Y))){
+      optim.out <- optim(beta.init, mnl.logpost.NA, method="BFGS",
+                         control=list(fnscale=-1),
+                         hessian=TRUE, Y=Y, X=X, b0=b0, B0=B0)
+    }
+    else{
+      new.Y <- apply(Y==1, 1, which)
+      optim.out <- optim(beta.init, mnl.logpost.noNA, method="BFGS",
+                         control=list(fnscale=-1),
+                         hessian=TRUE, new.Y=new.Y, X=X, b0=b0, B0=B0)      
+    }
+    cat("Inverting Hessian to get large sample var-cov matrix.\n")
+    ##V <- solve(-1*optim.out$hessian)
+    V <- chol2inv(chol(-1*optim.out$hessian))
+    beta.mode <- matrix(optim.out$par, K, 1)
+    
+    
     if (is.na(beta.start) || is.null(beta.start)){
       beta.start <- matrix(optim.out$par, K, 1)
     }
@@ -243,14 +286,12 @@
     else if (length(beta.start != K)){
       stop("beta.start not of appropriate dimension\n")
     }
-    mvn.prior <- form.mvn.prior(b0, B0, K)
-    b0 <- mvn.prior[[1]]
-    B0 <- mvn.prior[[2]]
       
     ## define holder for posterior sample
     sample <- matrix(data=0, mcmc/thin, dim(X)[2] )
+    posterior <- NULL    
 
-    if (mcmc.method=="MH"){
+    if (mcmc.method=="RWM"){
       ## call C++ code to draw sample
       auto.Scythe.call(output.object="posterior", cc.fun.name="MCMCmnlMH",
                        sample.nonconst=sample, Y=Y, X=X,
@@ -260,13 +301,31 @@
                        seedarray=as.integer(seed.array),
                        lecuyerstream=as.integer(lecuyer.stream),
                        verbose=as.integer(verbose),
-                       betastart=beta.start,
+                       betastart=beta.start, betamode=beta.mode,
                        b0=b0, B0=B0,
-                       V=V) 
+                       V=V, RW=as.integer(1), tdf=as.double(tdf)) 
       
       ## put together matrix and build MCMC object to return
       output <- form.mcmc.object(posterior, names=xnames,
                                  title="MCMCmnl Posterior Sample")
+    }
+    else if (mcmc.method=="IndMH"){
+      auto.Scythe.call(output.object="posterior", cc.fun.name="MCMCmnlMH",
+                       sample.nonconst=sample, Y=Y, X=X,
+                       burnin=as.integer(burnin),
+                       mcmc=as.integer(mcmc), thin=as.integer(thin),
+                       tune=tune, lecuyer=as.integer(lecuyer),
+                       seedarray=as.integer(seed.array),
+                       lecuyerstream=as.integer(lecuyer.stream),
+                       verbose=as.integer(verbose),
+                       betastart=beta.start, betamode=beta.mode,
+                       b0=b0, B0=B0,
+                       V=V, RW=as.integer(0), tdf=as.double(tdf)) 
+
+      ## put together matrix and build MCMC object to return
+      output <- form.mcmc.object(posterior, names=xnames,
+                                 title="MCMCmnl Posterior Sample")
+      
     }
     else if (mcmc.method=="slice"){
       ## call C++ code to draw sample
