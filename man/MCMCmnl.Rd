@@ -14,8 +14,8 @@
 \usage{
 MCMCmnl(formula, baseline = NULL, data = parent.frame(),
         burnin = 1000, mcmc = 10000, thin = 1,
-        mcmc.method = "MH", tune = 1.1, verbose = 0,
-        seed = NA, beta.start = NA, b0 = 0, B0 = 0, ...)  } 
+        mcmc.method = c("IndMH", "RWM", "slice"), tune = 1, tdf=6, 
+        verbose = 0, seed = NA, beta.start = NA, b0 = 0, B0 = 0, ...)  } 
 
 \arguments{
   \item{formula}{Model formula.
@@ -66,10 +66,15 @@ MCMCmnl(formula, baseline = NULL, data = parent.frame(),
   \item{thin}{The thinning interval used in the simulation.  The number of
     mcmc iterations must be divisible by this value. }
   
-  \item{mcmc.method}{Can be set to either "MH" (default) or "slice" to
-    perform random walk Metropolis sampling or slice sampling
+  \item{mcmc.method}{Can be set to either "IndMH" (default), "RWM", 
+    or "slice" to perform independent Metropolis-Hastings sampling, 
+    random walk Metropolis sampling or slice sampling
     respectively.}
   
+  \item{tdf}{Degrees of freedom for the multivariate-t proposal 
+    distribution when \code{mcmc.method} is set to "IndMH". Must be
+    positive. }
+
   \item{tune}{Metropolis tuning parameter. Can be either a positive
     scalar or a \eqn{k}{k}-vector, where \eqn{k}{k} is the length of
     \eqn{\beta}{beta}. Make sure that the

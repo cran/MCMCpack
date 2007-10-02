@@ -152,7 +152,7 @@ York: Cambridge University Press.
   \url{http://www-fis.iarc.fr/coda/}.
 
 Jonathan C. Wakefield. 2004. ``Ecological Inference for 2 x 2 Tables.'' \emph{Journal 
-   of the Royal Statistical Society, Series A}. 167(3): 385Ð445.
+   of the Royal Statistical Society, Series A}. 167(3): 385445.
 
 }
 
@@ -227,3 +227,5 @@ pairs(cbind(p0.true, p0meanDyn, p0meanHier, p1.true, p1meanDyn, p1meanHier))
 
 \seealso{\code{\link{MCMChierEI}},
   \code{\link[coda]{plot.mcmc}},\code{\link[coda]{summary.mcmc}}}
+
+

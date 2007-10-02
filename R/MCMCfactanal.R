@@ -110,7 +110,8 @@
     else {
       sample <- matrix(data=0, mcmc/thin, K*factors+K+factors*N)
     }
-   
+    posterior <- NULL 
+    
     ## call C++ code to do the sampling
     auto.Scythe.call(output.object="posterior", cc.fun.name="MCMCfactanal",
                      sample.nonconst=sample, X=X, burnin=as.integer(burnin),

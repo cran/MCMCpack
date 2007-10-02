@@ -6,19 +6,17 @@
 
 Andrew D. Martin <admartin@wustl.edu>
 Kevin M. Quinn <kevin_quinn@harvard.edu>
+Jong Hee Park <jhp@uchicago.edu>
 
 // Compilation
 
 This package (along with Scythe) uses C++ and the Standard Template
 Library (STL).  We suggest using of the GCC compiler 4.0 or greater.  The
-current package has been tested on GCC 3.1, 3.2, 3.3, 3.4, and 4.0 on Linux
-and MacOS X. 
+current package has been tested using GCC 4.0 on Linux and MacOS X. 
 
-We have also successfully compiled this package for Windows using a
-MinGW cross-compiler using the setup described by Yan and Rossini
-(2006).  Many thanks to Dan Pemstein for helping with the
-cross-compilation, and to Kurt Hornik and Fritz Leisch for their help
-with debugging as well as their service to the R community.
+Many thanks to Dan Pemstein for helping with all sorts of C++ issues,
+and to Kurt Hornik and Fritz Leisch for their help with debugging as
+well as their service to the R community.
 
 // Acknowledgments
 

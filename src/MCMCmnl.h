@@ -34,13 +34,13 @@ using namespace scythe;
 
 inline double 
 mnl_logpost(const Matrix<>& Y, const Matrix<>& X, const Matrix<>& beta,
-						const Matrix<>& beta_prior_mean, 
-						const Matrix<>& beta_prior_prec)
+	    const Matrix<>& beta_prior_mean, 
+	    const Matrix<>& beta_prior_prec)
 {
-
+  
   //  likelihood
   double loglike = 0.0;
-  Matrix<double,Row> numera = exp(X * beta);
+  const Matrix<double,Row> numera = exp(X * beta);
   //numer = reshape(numer, Y.rows(), Y.cols());
   //numer.resize(Y.rows(), Y.cols(), true);
   Matrix<double,Row> numer(Y.rows(), Y.cols(), false);
@@ -50,23 +50,30 @@ mnl_logpost(const Matrix<>& Y, const Matrix<>& X, const Matrix<>& beta,
     denom[i] = 0.0;
     for (unsigned int j = 0; j < Y.cols(); ++j) {
       if (Y(i,j) != -999){
-				denom[i] += numer(i,j);
+	denom[i] += numer(i,j);
       }
     }
     for (unsigned int j = 0; j < Y.cols(); ++j) {
       if (Y(i,j) == 1.0){
-				loglike += std::log(numer(i,j) / denom[i]);
+	loglike += std::log(numer(i,j) / denom[i]);
       }
     }
   }
   
   delete [] denom;
-
+  
   // prior
-  double logprior = 0.0;
-  if (beta_prior_prec(0,0) != 0) {
-    logprior = lndmvn(beta, beta_prior_mean, invpd(beta_prior_prec));
-  }
+  //  double logprior = 0.0;
+  //if (beta_prior_prec(0,0) != 0) {
+  //  logprior = lndmvn(beta, beta_prior_mean, invpd(beta_prior_prec));
+  // }
+  //
+  // the following is only up to proportionality
+  const double logprior = -0.5 *(t(beta - beta_prior_mean) * 
+                          beta_prior_prec * 
+  			   (beta - beta_prior_mean))(0);
+   
+  
 
   return (loglike + logprior);
 }

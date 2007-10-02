@@ -12,14 +12,29 @@
   provided in the coda package.
 }
 
-\usage{MCMCpoissonChangepoint(data,  m = 1, burnin = 1000, mcmc = 1000,
-        thin = 1, verbose = 0, seed = NA, c0, d0, a = NULL, b = NULL,
-        marginal.likelihood = c("none", "Chib95"), ...) }
+\usage{MCMCpoissonChangepoint(data,  m = 1, c0 = NA, d0 = NA, a = NULL, b = NULL,
+            burnin = 10000, mcmc = 10000, thin = 1, verbose = 0, seed = NA,
+            lambda.start = NA, P.start = NA,
+            marginal.likelihood = c("none", "Chib95"), ...)  }
 
 \arguments{
     \item{data}{The data.}
 
     \item{m}{The number of changepoints.}
+
+     \item{c0}{\eqn{c_0}{c0} is the shape parameter for Gamma prior on \eqn{\lambda}{lambda}
+    (the mean). No default value is provided.}
+
+    \item{d0}{\eqn{d_0}{d0} is the scale parameter for Gamma prior on \eqn{\lambda}{lambda}
+    (the mean). No default value is provided.}
+
+    \item{a}{\eqn{a}{a} is the shape1 beta prior for transition probabilities. By default,
+    the expected duration is computed and corresponding a and b values are assigned. The expected
+    duration is the sample period divided by the number of states.}
+
+    \item{b}{\eqn{b}{b} is the shape2 beta prior for transition probabilities. By default,
+    the expected duration is computed and corresponding a and b values are assigned. The expected
+    duration is the sample period divided by the number of states.}
 
     \item{burnin}{The number of burn-in iterations for the sampler.}
 
@@ -32,22 +47,12 @@
     the sampler is printed to the screen.  If \code{verbose} is greater
     than 0, the iteration number and the posterior density samples are printed to the screen every \code{verbose}th iteration.}
 
-    \item{seed}{The seed for the random number generator.  If NA, current R 
+    \item{seed}{The seed for the random number generator.  If NA, current R
     system seed is used.}
+	
+    \item{lambda.start}{The starting values for the lambda vector. This can either be a scalar or a column vector with dimension equal to the number of lambdas. The default value of NA will use draws from the Uniform distribution with the same boundary with the data as the starting value. If this is a scalar, that value will serve as the starting value mean for all of the lambdas.}	
 
-    \item{c0}{\eqn{c_0}{c0} is the shape parameter for Gamma prior on \eqn{\lambda}{lambda} 
-    (the mean).}
-
-    \item{d0}{\eqn{d_0}{d0} is the scale parameter for Gamma prior on \eqn{\lambda}{lambda} 
-    (the mean).}
-
-    \item{a}{\eqn{a}{a} is the shape1 beta prior for transition probabilities. By default, 
-    the expected duration is computed and corresponding a and b values are assigned. The expected
-    duration is the sample period divided by the number of states.}
-
-    \item{b}{\eqn{b}{b} is the shape2 beta prior for transition probabilities. By default, 
-    the expected duration is computed and corresponding a and b values are assigned. The expected
-    duration is the sample period divided by the number of states.}
+    \item{P.start}{The starting values for the transition matrix. A user should provide a square matrix with dimension equal to the number of states. By default, draws from the \code{Beta(0.9, 0.1)} are used to construct a proper transition matrix for each raw except the last raw.}	
 
     \item{marginal.likelihood}{How should the marginal likelihood be
     calculated? Options are: \code{none} in which case the marginal
@@ -58,16 +63,17 @@
 }
 
 \value{
-   An mcmc object that contains the posterior sample.  This 
-   object can be summarized by functions provided by the coda package.  The object contains an attribute \code{prob.state} storage matrix that contains the probability of \eqn{state_i}{state_i} for each period, and the 
-   log-likelihood of the model (\code{log.like}).
+   An mcmc object that contains the posterior sample. This
+   object can be summarized by functions provided by the coda package.
+   The object contains an attribute \code{prob.state} storage matrix that contains the probability of \eqn{state_i}{state_i} for each period, and
+   the log-marginal likelihood of the model (\code{logmarglike}).
 }
 
 \details{
   \code{MCMCpoissonChangepoint} simulates from the posterior distribution of
   a Poisson model with multiple changepoints.
 
-  The model takes the following form:         
+  The model takes the following form:
   \deqn{Y_t \sim \mathcal{P}oisson(\lambda_i),\;\; i = 1, \ldots, k}{Y_t ~ Poisson(lambda_i), i = 1,...,k.}
   Where \eqn{k}{k} is the number of states.
 
@@ -75,10 +81,8 @@
   \deqn{\lambda_i \sim \mathcal{G}amma(c_0, d_0)}{lambda_i ~ Gamma(c0, d0)}
   \deqn{p_{ii} \sim \mathcal{B}eta{a}{b},\;\; i = 1, \ldots, k}{p_ii ~ Beta(a, b), i = 1,...,k.}
   Where \eqn{k}{k} is the number of states.
-  
-  Note that no default value is provided for Gamma priors.
-  
-  The simulation in this model-fitting is performed in R.
+
+  The simulation is done in compiled C++ code to maximize efficiency.
   }
 
 \author{Jong Hee Park, \email{jhp@uchicago.edu}, \url{http://home.uchicago.edu/~jhp/}.}
@@ -90,48 +94,31 @@
 
  Siddhartha Chib. 1998. "Estimation and comparison of multiple change-point models."
    \emph{Journal of Econometrics}. 86: 221-241.
-
-
- Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
-   \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
-   \url{http://www-fis.iarc.fr/coda/}.
 }
 
 \examples{
     \dontrun{
-    ## generate event count time series data with two breakpoints at 100 and 200
     set.seed(1973)
-    n           <-  300
-    true.lambda <-  c(3, 2, 4)
-    y1          <-  rpois(100, true.lambda[1]) 
-    y2          <-  rpois(100, true.lambda[2]) 
-    y3          <-  rpois(100, true.lambda[3]) 
-    y           <-  c(y1, y2, y3)
-   
-    ## run the example   
-    model1 <-  MCMCpoissonChangepoint(y, m=1, burnin = 100, mcmc = 100, 
-                thin=1,  verbose=5, c0=3, d0=1,  marginal.likelihood =
-                c("Chib95"))  
-    model2 <-  MCMCpoissonChangepoint(y, m=2, burnin = 100, mcmc = 100, 
-                thin=1, verbose=5, c0=3, d0=1,  marginal.likelihood =
-                c("Chib95"))
-    model3 <-  MCMCpoissonChangepoint(y, m=3, burnin = 100, mcmc = 100,
-                thin=1, verbose=5, c0=3, d0=1,  marginal.likelihood =
-                c("Chib95"))
-    model4 <-  MCMCpoissonChangepoint(y, m=4, burnin = 100, mcmc = 100,
-                thin=1, verbose=5, c0=3, d0=1,  marginal.likelihood = 
-                c("Chib95"))
-                
-    ## perform model comparison  
-    BayesFactor(model1, model2, model3, model4)
-       
+    n           <-  100
+    true.lambda <-  c(5, 8)
+    y1          <-  rpois(n/2, true.lambda[1])
+    y2          <-  rpois(n/2, true.lambda[2])
+    y           <-  c(y1, y2)
+
+    model1 <-  MCMCpoissonChangepoint(y, m=1, c0=6.85, d0=1, verbose = 10000, marginal.likelihood = "Chib95")
+    model2 <-  MCMCpoissonChangepoint(y, m=2, c0=6.85, d0=1, verbose = 10000, marginal.likelihood = "Chib95")
+    model3 <-  MCMCpoissonChangepoint(y, m=3, c0=6.85, d0=1, verbose = 10000, marginal.likelihood = "Chib95")
+    model4 <-  MCMCpoissonChangepoint(y, m=4, c0=6.85, d0=1, verbose = 10000, marginal.likelihood = "Chib95")
+    model5 <-  MCMCpoissonChangepoint(y, m=5, c0=6.85, d0=1, verbose = 10000, marginal.likelihood = "Chib95")
+
+    print(BayesFactor(model1, model2, model3, model4, model5))
+
     ## Draw plots using the "right" model
-    plotPostState(model2, y, m=2, legend.control=NULL) 
-    plotPostChangepoint(model2, y, m=2)    
+    plotState(model1)
+    plotChangepoint(model1)
     }
 }
 
 \keyword{models}
 
-\seealso{\code{\link{plotPostState}}, \code{\link{plotPostChangepoint}}}
-
+\seealso{\code{\link{plotState}}, \code{\link{plotChangepoint}}}

@@ -62,7 +62,7 @@ tomogplot(r0, r1, c0, c1, xlab="fraction of r0 in c0 (p0)",
     Princeton: Princeton University Press.
     
   Jonathan C. Wakefield. 2004. ``Ecological Inference for 2 x 2 Tables.'' 
-  \emph{Journal of the Royal Statistical Society, Series A}. 167(3): 385Ð445.
+  \emph{Journal of the Royal Statistical Society, Series A}. 167(3): 385445.
 }
 
 \examples{
@@ -76,5 +76,7 @@ tomogplot(r0, r1, c0, c1)
 \seealso{\code{\link{MCMChierEI}},
   \code{\link{MCMCdynamicEI}}, \code{\link{dtomogplot}}
 }
+
+
 
 

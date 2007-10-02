@@ -64,7 +64,8 @@
     
     ## define holder for posterior sample
     sample <- matrix(data=0, mcmc/thin, K+1)
-
+    posterior <- NULL 
+    
     ## call C++ code to draw sample
     auto.Scythe.call(output.object="posterior", cc.fun.name="MCMCregress", 
                      sample.nonconst=sample, Y=Y, X=X, 

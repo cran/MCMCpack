@@ -12,8 +12,8 @@
   
 \usage{
 MCMCoprobit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
-   thin=1, tune = NA, verbose = 0, seed = NA, beta.start = NA,
-   b0 = 0, B0 = 0, ...) }
+   thin=1, tune = NA, tdf = 1, verbose = 0, seed = NA, beta.start = NA,
+   b0 = 0, B0 = 0, a0 = 0, A0 = 0, mcmc.method = c("Cowles", "AC"), ...) }
 
 \arguments{
     \item{formula}{Model formula.}
@@ -30,6 +30,10 @@ MCMCoprobit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
     \item{tune}{The tuning parameter for the Metropolis-Hastings
       step. Default of NA corresponds to a choice of 0.05 divided by the
       number of categories in the response variable.}
+
+    \item{tdf}{Degrees of freedom for the multivariate-t proposal 
+     distribution when \code{mcmc.method} is set to "IndMH". Must be
+     positive. }
 
     \item{verbose}{A switch which determines whether or not the progress of
     the sampler is printed to the screen.  If \code{verbose} is greater
@@ -65,6 +69,21 @@ MCMCoprobit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
     identity matrix serves as the prior precision of \eqn{\beta}{beta}.
     Default value of 0 is equivalent to  an improper uniform prior on
     \eqn{\beta}{beta}. } 
+
+    \item{a0}{The prior mean of \eqn{\alpha}{alpha}.  This can either be a 
+    scalar or a column vector with dimension equal to the number of
+    betas. If this takes a scalar value, then that value will serve as
+    the prior mean for all of the betas.}
+    
+    \item{A0}{The prior precision of \eqn{\alpha}{alpha}.  This can either be a 
+    scalar or a square matrix with dimensions equal to the number of
+    betas.  If this takes a scalar value, then that value times an
+    identity matrix serves as the prior precision of \eqn{\beta}{beta}.
+    Default value of 0 is equivalent to  an improper uniform prior on
+    \eqn{\beta}{beta}. } 
+
+   \item{mcmc.method}{Can be set to either "Cowles" (default) or "AC" to perform
+posterior sampling of cutpoints based on Cowles (1996) or Albert and Chib (2001) respectively.}
     
     \item{...}{further arguments to be passed}       
 }
@@ -98,13 +117,12 @@ that can be used to analyze the posterior sample.
    These probabilities are used to form the multinomial distribution
    that defines the likelihoods.
    
-   The algorithm employed is discussed in depth by Cowles (1996).  Note that 
-   the model does include a constant in the data matrix.  Thus, the first
-   element  \eqn{\gamma_1}{gamma_1} is normalized to zero, and is not 
-   returned in the mcmc object.
+   \code{MCMCoprobit} provides two ways to sample the cutpoints. Cowles (1996) proposes a sampling scheme that groups sampling of a latent variable with cutpoints.  In this case, for identification the first element  \eqn{\gamma_1}{gamma_1} is normalized to zero. Albert and Chib (2001) show that we can sample cutpoints indirectly without constraints by transforming cutpoints into real-valued parameters (\eqn{\alpha}{alpha}).	
 }
   
 \references{
+  Albert, James and Siddhartha Chib. 2001. ``Sequential Ordinal Modeling with Applications to Survival Data." \emph{Biometrics.} 57: 829-836. 
+  
   M. K. Cowles. 1996. ``Accelerating Monte Carlo Markov Chain Convergence for
   Cumulative-link Generalized Linear Models." \emph{Statistics and Computing.}
   6: 101-110.
@@ -127,9 +145,12 @@ that can be used to analyze the posterior sample.
    z <- 1.0 + x1*0.1 - x2*0.5 + rnorm(100);
    y <- z; y[z < 0] <- 0; y[z >= 0 & z < 1] <- 1;
    y[z >= 1 & z < 1.5] <- 2; y[z >= 1.5] <- 3;
-   posterior <- MCMCoprobit(y ~ x1 + x2, tune=0.3, mcmc=20000)
-   plot(posterior)
-   summary(posterior)
+   out1 <- MCMCoprobit(y ~ x1 + x2, tune=0.3)
+   out2 <- MCMCoprobit(y ~ x1 + x2, tune=0.3, tdf=3, verbose=1000, mcmc.method="AC")
+   summary(out1)
+   summary(out2)
+   plot(out1)
+   plot(out2)
    }
 }
 

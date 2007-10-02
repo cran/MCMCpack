@@ -75,7 +75,7 @@ dtomogplot(r0, r1, c0, c1, time.vec=NA, delay=0,
   Princeton: Princeton University Press.
   
   Jonathan C. Wakefield. 2004. ``Ecological Inference for 2 x 2 Tables.'' 
-  \emph{Journal of the Royal Statistical Society, Series A}. 167(3): 385Ð445.
+  \emph{Journal of the Royal Statistical Society, Series A}. 167(3): 385445.
 
 Kevin Quinn. 2004. ``Ecological Inference in the Presence of Temporal 
 Dependence." In \emph{Ecological Inference: New Methodological
@@ -121,3 +121,4 @@ dtomogplot(r0, r1, c0, c1, delay=0.1)
 \seealso{\code{\link{MCMChierEI}},
   \code{\link{MCMCdynamicEI}},\code{\link{tomogplot}}
 }
+

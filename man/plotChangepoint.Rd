@@ -1,19 +1,15 @@
-\name{plotPostChangepoint}
-\alias{plotPostChangepoint}
+\name{plotChangepoint}
+\alias{plotChangepoint}
 \title{Changepoint Location Plots}
 \description{Plot the posterior distribution over the location of the changepoints.}
 
 \usage{
-   plotPostChangepoint(mcmcout, y, m, xlab="Time", ylab="")
+   plotChangepoint(mcmcout, xlab="Time", ylab="")
 }
 
 \arguments{
 
 \item{mcmcout}{The \code{mcmc} object containing the posterior density sample from a changepoint model.  Note that this must have a \code{prob.state} attribute.}
-
-\item{y}{The data.}
-
-\item{m}{The number of changepoints.}
 
 \item{xlab}{Label for the x-axis.}
 
