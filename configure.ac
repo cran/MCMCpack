@@ -14,8 +14,8 @@ if test "${GXX}" = yes; then
   gxx_version=`${CXX} -v 2>&1 | grep "^.*g.. version" | \
      sed -e 's/^.*g.. version *//'`
   case ${gxx_version} in
-    1.*|2.*)
-      AC_MSG_WARN([Only g++ version 3.0 or greater can be used with MCMCpack.])
+    1.*|2.*|3.*)
+      AC_MSG_WARN([Only g++ version 4.0 or greater can be used with MCMCpack.])
       AC_MSG_ERROR([Please use a different compiler.])   
    ;;
   esac

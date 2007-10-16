@@ -4,7 +4,7 @@
 \description{Plot the posterior distribution over the location of the changepoints.}
 
 \usage{
-   plotChangepoint(mcmcout, xlab="Time", ylab="")
+   plotChangepoint(mcmcout, xlab="Time", ylab="", verbose = FALSE)
 }
 
 \arguments{
@@ -14,6 +14,8 @@
 \item{xlab}{Label for the x-axis.}
 
 \item{ylab}{Label for the y-axis.}
+
+\item{verbose}{If verbose=TRUE, expected changepoints are printed.}
 
 }
 

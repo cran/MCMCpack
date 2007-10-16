@@ -73,7 +73,7 @@
 
     ## "plotChangepoint" draws a plot of posterior changepoint probability
     "plotChangepoint" <-
-    function (mcmcout, xlab = "Time", ylab = "")
+    function (mcmcout, xlab = "Time", ylab = "", verbose = FALSE)
     {
     out <- attr(mcmcout, "prob.state")
     y <- attr(mcmcout, "y")
@@ -109,11 +109,13 @@
     cp.means <- rep(NA, m + 1)
     cp.start <- c(1, cp + 1)
     cp.end <- c(cp, length(y))
-    cat("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
-    cat("Expected changepoint(s) ", cp + time.frame[1], "\n")
-    for (i in 1:(m + 1)) cp.means[i] <- mean(y[cp.start[i]:cp.end[i]])
-    cat("Local means for each regime are ", cp.means, "\n")
-    cat("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
+	if (verbose == TRUE){
+		cat("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
+		cat("Expected changepoint(s) ", cp + time.frame[1], "\n")
+		for (i in 1:(m + 1)) cp.means[i] <- mean(y[cp.start[i]:cp.end[i]])
+			cat("Local means for each regime are ", cp.means, "\n")
+			cat("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
+	}
 }
     ## prior check for transition matrix
     "check.P" <-
