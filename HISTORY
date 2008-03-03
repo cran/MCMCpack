@@ -2,6 +2,10 @@
 // Changes and Bug Fixes
 //
 
+0.9-3 to 0.9-4
+  * fixed issue with MCMCmetrop1R.R [thanks to Jim Albert]
+  * fixed Linux compilation issue [thanks to Chris Lawrence]
+
 0.9-2 to 0.9-3
   * added gcc 4.0 check in configure.ac and SystemRequirements
   * added verbose option to plotChangepoint()
@@ -26,7 +30,7 @@
   * fixed bug in how models with marginal likelihood calculations check for
     prior propriety [thanks to Gary Rosner for spotting this]
   * fixed bug in how MCMCmetrop1R handled a singular Hessian 
-    [thanks to Piers  Dunstan for spotting this] 
+    [thanks to Piers Dunstan for spotting this] 
 
 0.7-4 to 0.8-1
   * added MCMCPoissonChangepoint() model (authored by Jong Hee Park)

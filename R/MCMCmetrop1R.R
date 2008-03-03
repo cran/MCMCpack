@@ -113,6 +113,7 @@
       stop("Check V and call MCMCmetrop1R() again. \n",
            call.=FALSE)     
     }
+	V <- tune %*% V %*% tune
   }
   
   ## Call the C++ function to do the MCMC sampling 

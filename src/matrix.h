@@ -44,7 +44,7 @@
 #ifndef SCYTHE_MATRIX_H
 #define SCYTHE_MATRIX_H
 
-//#include <climits>
+#include <climits>
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -5052,7 +5052,7 @@ namespace scythe {
    */
 
   template<>
-  Matrix<>
+  inline Matrix<>
   operator*<double,Col,Concrete,Col,Concrete>
   (const Matrix<>& lhs, const Matrix<>& rhs)
   {
