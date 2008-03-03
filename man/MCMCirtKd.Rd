@@ -110,7 +110,7 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
 
   \item{drop.constant.items}{A switch that determines whether or not
         items that have no variation
-	should be deleted before fitting the model. Default = TRUE.}
+    should be deleted before fitting the model. Default = TRUE.}
   
     \item{...}{further arguments to be passed}       
 }
@@ -150,7 +150,7 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
   \eqn{j}{j} on item \eqn{i}{i} is the observed data matrix which
   is \eqn{(I \times J)}{(I * J)}.  We assume that the choice is
   dictated by an unobserved utility: \deqn{z_{i,j} = - \alpha_i +
-  \beta_i' \theta_j + \varepsilon_{i,j}}{z_ij = alpha_i +
+  \beta_i' \theta_j + \varepsilon_{i,j}}{z_ij = - alpha_i +
   beta_i'*theta_j + epsilon_ij} Where the
   \eqn{\varepsilon_{i,j}}{epsilon_ij}s are assumed to be
   distributed standard normal.  The parameters of interest are

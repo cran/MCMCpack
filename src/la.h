@@ -924,7 +924,7 @@ namespace scythe {
    */
 
   template<>
-  Matrix<>
+  inline Matrix<>
   gaxpy<Col,Concrete,double,Col,Concrete,Col,Concrete,Col,Concrete>
   (const Matrix<>& A, const Matrix<>& B, const Matrix<>& C)
   {
@@ -960,7 +960,7 @@ namespace scythe {
   }
 
   template<>
-  Matrix<>
+  inline Matrix<>
   crossprod(const Matrix<>& A)
   {
     SCYTHE_DEBUG_MSG("Using lapack/blas for crossprod");
