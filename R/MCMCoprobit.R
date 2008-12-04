@@ -1,9 +1,19 @@
+##########################################################################
 ## sample from the posterior distribution of an ordered probit model
 ## via the data augmentation approach of Cowles (1996)
+##
+## This software is distributed under the terms of the GNU GENERAL
+## PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
+## file for more information.
 ##
 ## KQ 1/25/2003
 ## Modified to meet new developer specification 7/26/2004 KQ
 ## Modified for new Scythe and rngs 7/26/2004 KQ
+##
+## Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+## Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+##    and Jong Hee Park
+##########################################################################
 
 
 "MCMCoprobit" <-

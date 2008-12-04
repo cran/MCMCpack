@@ -205,7 +205,7 @@
 #       or for another model by passing default starting values to
 #       the function   
 "coef.start" <-
-   function(beta.start, K, formula, family, data, defaults=NA) {
+   function(beta.start, K, formula, family, data=NULL, defaults=NA) {
           
      if (is.na(beta.start)[1] & is.na(defaults)[1]){ # use GLM estimates
        beta.start <- matrix(coef(glm(formula, family=family, data=data)), K, 1)
@@ -719,16 +719,15 @@
 # parse formula and return a list that contains the model response
 # matrix as element one, and the model matrix as element two
 "parse.formula" <- 
-   function(formula, data, intercept=TRUE, justX=FALSE) {
+   function(formula, data=NULL, intercept=TRUE, justX=FALSE) {
 
     # extract Y, X, and variable names for model formula and frame
-    mt <- terms(formula, data=data)
-    if(missing(data)) data <- sys.frame(sys.parent())
     mf <- match.call(expand.dots = FALSE)
     mf$intercept <- mf$justX <- NULL
     mf$drop.unused.levels <- TRUE
     mf[[1]] <- as.name("model.frame")
     mf <- eval(mf, sys.frame(sys.parent()))
+    mt <- attr(mf, "terms")
     if (!intercept){
       attributes(mt)$intercept <- 0
     }

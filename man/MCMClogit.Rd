@@ -11,7 +11,7 @@
   }
   
 \usage{
-MCMClogit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
+MCMClogit(formula, data=NULL, burnin = 1000, mcmc = 10000,
    thin=1, tune=1.1, verbose = 0, seed = NA,  beta.start = NA,
    b0 = 0, B0 = 0, user.prior.density=NULL, logfun=TRUE,
    marginal.likelihood=c("none", "Laplace"), ...) }

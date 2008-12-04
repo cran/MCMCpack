@@ -1,3 +1,4 @@
+//////////////////////////////////////////////////////////////////////////
 // MCMCregress.cc is a program that simualates draws from the posterior
 // density of a linear regression model with Gaussian errors.
 //
@@ -19,8 +20,6 @@
 // PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
 // file for more information.
 //
-// Copyright (C) 2004 Andrew D. Martin and Kevin M. Quinn
-// 
 // This file was initially generated on Fri Jul 23 15:07:21 2004
 //
 // ADM and KQ 10/10/2002 [ported to Scythe0.3]
@@ -29,6 +28,11 @@
 // ADM 7/22/04 [modified to work with new Scythe and rngs]
 // DBP 7/1/07 [ported to scythe 1.0.x]
 //
+// Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+// Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+//    and Jong Hee Park
+//////////////////////////////////////////////////////////////////////////
+
 #ifndef MCMCREGRESS_CC
 #define MCMCREGRESS_CC
 

@@ -1,7 +1,17 @@
+##########################################################################
 ## MCMCmnl.R samples from the posterior distribution of a multinomial
 ## logit model using Metropolis-Hastings.
 ##
+## This software is distributed under the terms of the GNU GENERAL
+## PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
+## file for more information.
+##
 ## KQ 12/22/2004
+##
+## Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+## Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+##    and Jong Hee Park
+##########################################################################
 
 ## parse formula and return a list that contains the model response
 ## matrix as element one, the model matrix as element two,
@@ -209,7 +219,7 @@
 
 
 "MCMCmnl" <-
-  function(formula, baseline=NULL, data = parent.frame(), 
+  function(formula, baseline=NULL, data=NULL, 
            burnin = 1000, mcmc = 10000, thin=1,
            mcmc.method = c("IndMH", "RWM", "slice"),
            tune = 1.0, tdf=6, verbose = 0, seed = NA,

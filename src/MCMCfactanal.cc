@@ -1,3 +1,4 @@
+//////////////////////////////////////////////////////////////////////////
 // MCMCfactanal.cc is C++ code to estimate a factor analysis model
 //
 // Andrew D. Martin
@@ -14,13 +15,16 @@
 // PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
 // file for more information.
 //
-// Copyright (C) 2004 Andrew D. Martin and Kevin M. Quinn
-// 
 // revised version of older MCMCfactanal 5/11/2004 KQ
 // updated to new verion of scythe 7/25/2004 ADM
 // updated to Scythe 1.0.X 7/10/2007 ADM
 // finished update to Scythe 1.0.X 7/30/2007 KQ
 //
+// Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+// Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+//    and Jong Hee Park
+//////////////////////////////////////////////////////////////////////////
+
 
 #ifndef MCMCFACTANAL_CC
 #define MCMCFACTANAL_CC

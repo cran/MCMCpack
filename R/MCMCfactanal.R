@@ -19,14 +19,21 @@
 ## Kevin M. Quinn
 ## Harvard University
 ##
+## This software is distributed under the terms of the GNU GENERAL
+## PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
+## file for more information.
+##
 ## May 7, 2003
 ## revised to accomodate new spec 7/5/2004 KQ
 ##
+## Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+## Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+##    and Jong Hee Park
 ##########################################################################
 
 "MCMCfactanal" <-
   function(x, factors, lambda.constraints=list(),
-           data=parent.frame(), burnin = 1000, mcmc = 20000,
+           data=NULL, burnin = 1000, mcmc = 20000,
            thin=1, verbose = 0, seed = NA,
            lambda.start = NA, psi.start = NA,
            l0=0, L0=0, a0=0.001, b0=0.001,

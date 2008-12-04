@@ -1,3 +1,4 @@
+//////////////////////////////////////////////////////////////////////////
 // MCMCmetrop1R.cc samples from a user-written posterior code in R using a
 // random walk Metropolis algorithm
 //
@@ -15,10 +16,13 @@
 // PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
 // file for more information.
 //
-// Copyright (C) 2004 Andrew D. Martin and Kevin M. Quinn
-//
 // KQ 6/24/2004
 // updated to work with new Scythe and RNGs ADM 7/24/2004
+//
+// Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+// Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+//    and Jong Hee Park
+//////////////////////////////////////////////////////////////////////////
 
 #ifndef MCMCMETROP1R_CC
 #define MCMCMETROP1R_CC

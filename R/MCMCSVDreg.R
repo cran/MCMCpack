@@ -1,3 +1,4 @@
+##########################################################################
 ## MCMCSVDreg.R samples from the posterior distribution of a Gaussian
 ## linear regression model in which the X matrix has been decomposed
 ## with an SVD. Useful for prediction when number of columns of X
@@ -6,8 +7,16 @@
 ## See West, Mike. 2000. "Bayesian Regression in the 'Large p, Small n'
 ##      Paradigm." Duke ISDS Discussion Paper 2000-22.
 ##
+## This software is distributed under the terms of the GNU GENERAL
+## PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
+## file for more information.
+##
 ## KQ 9/9/2005
 ##
+## Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+## Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+##    and Jong Hee Park
+##########################################################################
 
 parse.formula.SVDreg <- function(formula, data, intercept){
   
@@ -47,7 +56,7 @@ parse.formula.SVDreg <- function(formula, data, intercept){
 
 
 "MCMCSVDreg" <-
-  function(formula, data=parent.frame(), burnin = 1000, mcmc = 10000,
+  function(formula, data=NULL, burnin = 1000, mcmc = 10000,
            thin=1, verbose = 0, seed = NA, tau2.start = 1,
            g0 = 0, a0 = 0.001, b0 = 0.001, c0=2, d0=2, w0=1,
            beta.samp=FALSE, intercept=TRUE, ...) {

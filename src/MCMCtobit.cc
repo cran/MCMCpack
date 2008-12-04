@@ -1,3 +1,4 @@
+//////////////////////////////////////////////////////////////////////////
 // MCMCtobit.cc is a program that simualates draws from the posterior
 // density of a linear regression model with Gaussian errors when the 
 // dependent variable is censored from below and/or above.
@@ -20,12 +21,16 @@
 // PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
 // file for more information.
 //
-// Copyright (C) 2004 Andrew D. Martin and Kevin M. Quinn
-// 
 // This file was initially generated on Tue Sep 14 00:50:08 2004
 // ADM and KQ 10/10/2002 [ported to Scythe0.3]
 // BG 09/18/2004 [updated to new specification, added above censoring]
 // ADM 7/7/2007 [updated to Scythe 1.0.X]
+//
+// Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+// Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+//    and Jong Hee Park
+//////////////////////////////////////////////////////////////////////////
+
 
 #ifndef MCMCTOBIT_CC
 #define MCMCTOBIT_CC

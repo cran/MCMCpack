@@ -1,3 +1,4 @@
+##########################################################################
 ## sample from the posterior distribution
 ## of a Poisson model with multiple changepoints
 ## using linked C++ code in Scythe 1.0
@@ -5,6 +6,15 @@
 ## JHP 07/01/2007
 ##
 ## Revised on 09/12/2007 JHP	  
+##
+## This software is distributed under the terms of the GNU GENERAL
+## PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
+## file for more information.
+##
+## Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+## Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+##    and Jong Hee Park
+##########################################################################
 
 "MCMCpoissonChangepoint"<-
     function(data,  m = 1, c0 = NA, d0 = NA, a = NULL, b = NULL,

@@ -11,7 +11,7 @@
   }
   
 \usage{
-MCMCprobit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
+MCMCprobit(formula, data = NULL, burnin = 1000, mcmc = 10000,
    thin = 1, verbose = 0, seed = NA, beta.start = NA,
    b0 = 0, B0 = 0, bayes.resid = FALSE,
    marginal.likelihood=c("none", "Laplace"), ...) }

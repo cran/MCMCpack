@@ -1,5 +1,19 @@
+##########################################################################
+## tobit regression model
+##
+## This software is distributed under the terms of the GNU GENERAL
+## PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
+## file for more information.
+##
+## Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+## Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+##    and Jong Hee Park
+##########################################################################
+
+
+
 "MCMCtobit" <-
-function(formula, data=parent.frame(), below = 0.0, above = Inf,
+function(formula, data=NULL, below = 0.0, above = Inf,
            burnin = 1000, mcmc = 10000,
            thin=1, verbose = 0, seed = NA, beta.start = NA,
            b0 = 0, B0 = 0, c0 = 0.001, d0 = 0.001, ...) {
@@ -29,7 +43,7 @@ function(formula, data=parent.frame(), below = 0.0, above = Inf,
     lecuyer.stream <- seeds[[3]]
 
     # form response and model matrices
-    holder <- parse.formula(formula, data)
+    holder <- parse.formula(formula, data=data)
     Y <- holder[[1]]
     X <- holder[[2]]
     xnames <- holder[[3]]    

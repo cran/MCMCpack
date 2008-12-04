@@ -4,7 +4,7 @@
    Model}
 \description{
   This function generates a sample from the posterior distribution of a one
-  dimentional item response theory (IRT) model, with Normal
+  dimensional item response theory (IRT) model, with Normal
   priors on the subject abilities (ideal points), and
   multivariate Normal priors on the item parameters.  The user
   supplies data and priors, and a sample from the posterior

@@ -1,8 +1,18 @@
+##########################################################################
 ## BayesFactor.R contains functions useful for calculating and comparing
 ## marginal likelihoods
 ##
+## This software is distributed under the terms of the GNU GENERAL
+## PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
+## file for more information.
+##
 ## Originally written by KQ 1/26/2006
 ##
+## Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+## Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+##    and Jong Hee Park
+##########################################################################
+
 
 ## log densities
 "logdinvgamma" <- function(sigma2, a, b){
@@ -151,6 +161,9 @@
         BF.log.mat[i,j] <- attr(model.list[[i]], "logmarglike") -
           attr(model.list[[j]], "logmarglike")
         BF.mat[i,j] <- exp(BF.log.mat[i,j])
+      }
+      else{
+        warning(paste(model.names[i], " and ", model.names[j], " do not have exactly identical y data.\nBayes factors are not defined.\n", sep=""))
       }
     }
   }

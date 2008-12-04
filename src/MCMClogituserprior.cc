@@ -1,3 +1,4 @@
+//////////////////////////////////////////////////////////////////////////
 // MCMClogituserprior.cc samples from the posterior distribution of a 
 // logistic regression model with user-written prior coded in R using a
 // random walk Metropolis algorithm
@@ -16,11 +17,13 @@
 // PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
 // file for more information.
 //
-// Copyright (C) 2004 Andrew D. Martin and Kevin M. Quinn
-//
 // KQ 8/17/2005 (based on current version of MCMCmetrop1R.cc)
 //
-//
+// Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+// Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+//    and Jong Hee Park
+//////////////////////////////////////////////////////////////////////////
+
 
 
 #ifndef MCMCLOGITUSERPRIOR_CC
