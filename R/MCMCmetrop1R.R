@@ -1,7 +1,12 @@
+##########################################################################
 ## samples from a user-written posterior coded in R using a
 ## random walk Metropolis algorithm
 ##
 ## KQ 6/24/2004
+##
+## This software is distributed under the terms of the GNU GENERAL
+## PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
+## file for more information.
 ##
 ## modified to work with non-invertible Hessian  KQ 6/28/2005
 ##
@@ -10,6 +15,11 @@
 ##
 ## changed to allow more user control of optim KQ 6/18/2006
 ##
+## Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+## Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+##    and Jong Hee Park
+##########################################################################
+
 
 "MCMCmetrop1R" <- function(fun, theta.init,
                            burnin=500, mcmc=20000, thin=1,

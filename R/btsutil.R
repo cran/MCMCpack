@@ -1,15 +1,27 @@
-########## Utility Functions for Bayesian Times Series Models ##########
-
+##########################################################################
+## Utility Functions for Bayesian Times Series Models
+##
 ## written and maintained by:
 ##    Jong Hee Park
 ##    Department of Political Science
 ##    University of Chicago
 ##    jhp@uchicago.edu
-
+##
 ## Revised on 09/12/2007 JHP	  
-
+##
 ## NOTE: only the plot functions are documented and exported in the
 ## NAMESPACE.
+##
+## This software is distributed under the terms of the GNU GENERAL
+## PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
+## file for more information.
+##
+## Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+## Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+##    and Jong Hee Park
+##########################################################################
+
+
 
 ##############################################################
 ## Helper functions for MCMCPoissonChangepoint()

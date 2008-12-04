@@ -1,3 +1,4 @@
+//////////////////////////////////////////////////////////////////////////
 // MCMCirtKdRob.cc is C++ code to estimate a robust K-dimensional
 // item response model 
 //
@@ -15,11 +16,14 @@
 // PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
 // file for more information.
 //
-// Copyright (C) 2004 Andrew D. Martin and Kevin M. Quinn
-// 
 // 2/18/2005 KQ
 // 8/1/2007  ported to Scythe 1.0.2 KQ
 //
+// Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+// Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+//    and Jong Hee Park
+//////////////////////////////////////////////////////////////////////////
+
 
 
 #ifndef MCMCIRTKDROB_CC

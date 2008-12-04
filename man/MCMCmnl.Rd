@@ -12,7 +12,7 @@
 }
 
 \usage{
-MCMCmnl(formula, baseline = NULL, data = parent.frame(),
+MCMCmnl(formula, baseline=NULL, data=NULL,
         burnin = 1000, mcmc = 10000, thin = 1,
         mcmc.method = c("IndMH", "RWM", "slice"), tune = 1, tdf=6, 
         verbose = 0, seed = NA, beta.start = NA, b0 = 0, B0 = 0, ...)  } 
@@ -175,7 +175,7 @@ that can be used to analyze the posterior sample.
                 choicevar(distPvdA, "sqdist", "PvdA") +
                 choicevar(distVVD, "sqdist", "VVD") +
                 choicevar(distCDA, "sqdist", "CDA"),
-                baseline="D66", mcmc.method="MH", B0=0,
+                baseline="D66", mcmc.method="IndMH", B0=0,
                 verbose=500, mcmc=100000, thin=10, tune=1.0,
                 data=Nethvote)
 
@@ -187,7 +187,7 @@ that can be used to analyze the posterior sample.
   ## just individual-specific X vars
   post2<- MCMCmnl(vote ~  
                 relig + class + income + educ + age + urban,
-                baseline="D66", mcmc.method="MH", B0=0,
+                baseline="D66", mcmc.method="IndMH", B0=0,
                 verbose=500, mcmc=100000, thin=10, tune=0.5,
                 data=Nethvote)
 
@@ -203,7 +203,7 @@ that can be used to analyze the posterior sample.
                 choicevar(distVVD, "sqdist", "VVD") +
                 choicevar(distCDA, "sqdist", "CDA") +
                 relig + class + income + educ + age + urban,
-                baseline="D66", mcmc.method="MH", B0=0,
+                baseline="D66", mcmc.method="IndMH", B0=0,
                 verbose=500, mcmc=100000, thin=10, tune=0.5,
                 data=Nethvote)
 
@@ -219,7 +219,7 @@ that can be used to analyze the posterior sample.
                 choicevar(distVVD, "sqdist", "4") +
                 choicevar(distCDA, "sqdist", "1") +
                 relig + class + income + educ + age + urban,
-                baseline="2", mcmc.method="MH", B0=0,
+                baseline="2", mcmc.method="IndMH", B0=0,
                 verbose=500, mcmc=100000, thin=10, tune=0.5,
                 data=Nethvote)
 

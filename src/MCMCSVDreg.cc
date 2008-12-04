@@ -1,3 +1,4 @@
+//////////////////////////////////////////////////////////////////////////
 // MCMCSVDreg.R samples from the posterior distribution of a Gaussian
 // linear regression model in which the X matrix has been decomposed
 // with an SVD. Useful for prediction when number of columns of X
@@ -20,10 +21,13 @@
 // PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
 // file for more information.
 //
-// Copyright (C) 2004 Andrew D. Martin and Kevin M. Quinn
-// 
 // KQ 9/9/2005
 // KQ 8/1/2007 ported to Scythe 1.0.2
+//
+// Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+// Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+//    and Jong Hee Park
+//////////////////////////////////////////////////////////////////////////
 
 
 #ifndef MCMCSVDREG_CC

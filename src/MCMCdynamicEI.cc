@@ -1,3 +1,4 @@
+//////////////////////////////////////////////////////////////////////////
 // fits a model derived from Wakefield's baseline model for 
 // ecological inference in which logit(p_i) follows a random walk in time
 // a priori. The model is fit using Wakefield's normal approximation 
@@ -11,6 +12,13 @@
 // KQ 7/20/2004 [minor changes regarding output and user interrupts]
 // ADM 7/24/2004 [updated to new Scythe version]
 // KQ 7/30/2007 [updated to Scythe 1.0.X]
+//
+//
+// Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+// Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+//    and Jong Hee Park
+//////////////////////////////////////////////////////////////////////////
+
 
  
 #ifndef MCMCDYNAMICEI_CC

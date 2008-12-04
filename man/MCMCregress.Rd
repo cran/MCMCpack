@@ -13,7 +13,7 @@
   }
   
 \usage{
-MCMCregress(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
+MCMCregress(formula, data = NULL, burnin = 1000, mcmc = 10000,
    thin = 1, verbose = 0, seed = NA, beta.start = NA, 
    b0 = 0, B0 = 0, c0 = 0.001, d0 = 0.001,
    marginal.likelihood = c("none", "Laplace", "Chib95"), ...) }

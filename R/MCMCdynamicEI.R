@@ -1,7 +1,18 @@
-# sample from the posterior of Quinn's dynamic ecological inference model
-# in R using linked C++ code in Scythe
-#
-# KQ 10/25/2002
+##########################################################################
+## sample from the posterior of Quinn's dynamic ecological inference model
+## in R using linked C++ code in Scythe
+##
+## This software is distributed under the terms of the GNU GENERAL
+## PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
+## file for more information.
+##
+## KQ 10/25/2002
+##
+## Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+## Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+##    and Jong Hee Park
+##########################################################################
+
 
 "MCMCdynamicEI" <-
   function(r0, r1, c0, c1, burnin=5000, mcmc=50000,

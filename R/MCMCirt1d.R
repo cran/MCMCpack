@@ -1,9 +1,19 @@
+##########################################################################
 ## sample from the posterior distribution of a one-dimensional item
 ## response theory model in R using linked C++ code in Scythe.
+##
+## This software is distributed under the terms of the GNU GENERAL
+## PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
+## file for more information.
 ##
 ## ADM and KQ 1/23/2003
 ## updated extensively ADM & KQ 7/28/2004
 ## store.ability arg added KQ 1/27/2006
+##
+## Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+## Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+##    and Jong Hee Park
+##########################################################################
 
 "MCMCirt1d" <-
   function(datamatrix, theta.constraints=list(), burnin = 1000,

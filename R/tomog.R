@@ -1,11 +1,22 @@
-########## Tomography Plots for Ecological Inference ##########
-
+##########################################################################
+## Tomography Plots for Ecological Inference 
+##
 ## produces tomography plots (see King, 1997, A Solution to the
 ## Ecological Inference Problem, Princeton University Press)
+##
+## This software is distributed under the terms of the GNU GENERAL
+## PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
+## file for more information.
 ##
 ## KQ 11/9/2002
 ##
 ## Modification added suggested by David Hugh-Jones 6/10/2006
+##
+## Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+## Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+##    and Jong Hee Park
+##########################################################################
+
 
 "tomogplot" <-
   function(r0, r1, c0, c1, 

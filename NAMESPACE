@@ -17,10 +17,10 @@ export(
        MCnormalnormal,
        MCmultinomdirichlet,
        MCMCdynamicEI,
-##      MCMCdynamicIRT1d,
        MCMCfactanal,
        MCMChierEI,
        MCMCirt1d,
+       MCMCirtHier1d,
        MCMCirtKd,
        MCMCirtKdRob,
        MCMClogit,
@@ -50,7 +50,6 @@ export(
        write.Scythe,
        xpnd
        )
-
 
 S3method(print, BayesFactor)
 S3method(summary, BayesFactor)

@@ -20,10 +20,17 @@
 ## Kevin M. Quinn
 ## Harvard University
 ##
+## This software is distributed under the terms of the GNU GENERAL
+## PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
+## file for more information.
+##
 ## 12/2/2003
 ## Revised to accommodate new spec 7/20/2004
 ## Minor bug fix regarding std.mean 6/25/2004
 ##
+## Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+## Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+##    and Jong Hee Park
 ##########################################################################
 
 "MCMCmixfactanal" <-

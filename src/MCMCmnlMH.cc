@@ -1,3 +1,4 @@
+//////////////////////////////////////////////////////////////////////////
 // MCMCmnlMH.cc samples from the posterior distribution of a multinomial
 // logit model using a random walk Metropolis algorithm.
 //
@@ -19,11 +20,15 @@
 // PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
 // file for more information.
 //
-// Copyright (C) 2004 Andrew D. Martin and Kevin M. Quinn
-// 
 // This file was initially generated on Wed Dec 29 15:27:08 2004
 // 12/31/2004 filled out template and got it initial version working (KQ)
 // 7/27/2007 DBP ported to scythe 1.0
+//
+// Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+// Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+//    and Jong Hee Park
+//////////////////////////////////////////////////////////////////////////
+
 
 #ifndef MCMCMNLMH_CC
 #define MCMCMNLMH_CC

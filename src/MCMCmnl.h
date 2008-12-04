@@ -1,3 +1,4 @@
+//////////////////////////////////////////////////////////////////////////
 // MCMCmnl.h contains multinomial logit functions called by both the
 // metropolis hastings and slice sampling implemenetation of MCMCmnl,
 // such as a function that returns the log posterior.
@@ -16,9 +17,13 @@
 // PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
 // file for more information.
 //
-// Copyright (C) 2007 Andrew D. Martin and Kevin M. Quinn
-// 
 // DBP 7/27/2007
+//
+// Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+// Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+//    and Jong Hee Park
+//////////////////////////////////////////////////////////////////////////
+
 
 #ifndef MCMCMNL_H
 #define MCMCMNL_H

@@ -1,3 +1,4 @@
+//////////////////////////////////////////////////////////////////////////
 // MCMCoprobit.cc is C++ code to estimate a ordinalprobit regression 
 //   model with a multivariate normal prior
 //
@@ -15,12 +16,16 @@
 // PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
 // file for more information.
 //
-// Copyright (C) 2004 Andrew D. Martin and Kevin M. Quinn
-// 
 // updated to the new version of Scythe 7/26/2004 KQ
 // fixed a bug pointed out by Alexander Raach 1/16/2005 KQ
 // updated to Scythe 1.0.X 7/10/2007 ADM 
 // Albert and Chib method added 9/20/2007 JHP
+//
+// Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+// Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+//    and Jong Hee Park
+//////////////////////////////////////////////////////////////////////////
+
 
 #ifndef MCMCOPROBIT_CC
 #define MCMCOPROBIT_CC

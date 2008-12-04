@@ -1,3 +1,4 @@
+//////////////////////////////////////////////////////////////////////////
 // MCMCfcds.h is the header file for MCMCfcds.cc. It contains declarations 
 // for a number of functions that produce draws from full conditional 
 // distributions. 
@@ -16,10 +17,14 @@
 // PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
 // file for more information.
 //
-// Copyright (C) 2004 Andrew D. Martin and Kevin M. Quinn
-// 
 // KQ 6/10/2004
 // DBP 7/01/2007 [ported to scythe 1.0.x (partial)]
+//
+// Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+// Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+//    and Jong Hee Park
+//////////////////////////////////////////////////////////////////////////
+
 
 
 #ifndef MCMCFCDS_H
@@ -402,14 +407,96 @@ NormNormfactanal_Lambda_draw(Matrix<>& Lambda,
 }
 
 
+// update ability parameters (ideal points) for one dimensional 
+// Hierarchical item response model.
+// 2008-11-18 now deals with PX alpha and holds on to thetahat
+template <typename RNGTYPE>
+void hirt_theta_update1 (Matrix<>& theta, Matrix<>& thetahat, 
+			 const Matrix<>& Z, 
+			 const Matrix<>& eta, 
+			 const Matrix<>& beta, const Matrix<>& Xj,
+			 const double& sigma2,
+			 const double& alpha,
+			 rng<RNGTYPE>& stream)
+{
+  
+  const unsigned int J = Z.rows();
+  const unsigned int K = Z.cols();
+  // Get level1 prior mean
+  const Matrix<double> Xbeta = (Xj * beta);
+  
+  // a and b are backwards here, different parameterizations
+  // common for edu people and us.
+  const Matrix<> b = eta(_, 0); // location
+  const Matrix<> a = eta(_, 1); // relevance
+
+  // calculate the posterior variance outside the justice specific loop
+  const double sig2_inv = 1.0 / sigma2;
+  const Matrix<double> apa = crossprod(a);
+  const Matrix<double> theta_post_var = scythe::invpd(apa + sig2_inv);
+  const double theta_post_sd = std::sqrt(theta_post_var[0]);
+  // sample for each justice
+  for (unsigned int j = 0; j < J; ++j) {
+    thetahat(j) = 0.0;
+    for (unsigned int k = 0; k < K; ++k) {
+      thetahat(j) += a[k] * ( Z(j,k) + b[k]); // bill contribution
+    }
+    thetahat(j) += (Xbeta[j] / sigma2); // j prior level1 contribution
+    
+    thetahat(j) *= theta_post_var[0];
+    const double t = thetahat(j) / alpha;
+    theta(j) = stream.rnorm( t , theta_post_sd );
+  }
+}
 
 
+// update item (case, roll call)  parameters for item response model
+// note: works only for one-dimensional case
+// updated for PX (alpha) and hold on to etahat 2008-11-18
+template <typename RNGTYPE>
+void hirt_eta_update1 (Matrix<>& eta, Matrix<>& etahat, const Matrix<>& Z,
+			  const Matrix<>& theta, const Matrix<>& AB0, 
+			  const Matrix<>& AB0ab0, 
+			  const double& alpha,
+			  rng<RNGTYPE>& stream)
+{
+  
+  // define constants
+  const unsigned int J = theta.rows();
+  const unsigned int K = Z.cols();
 
+  // perform update 
+  //const Matrix<double> Ttheta_star = t(cbind(-1.0*ones<double>(J,1),theta)); // only needed for option 2
+  const Matrix<> tpt(2,2);
+  for (unsigned int i = 0; i < J; ++i) {
+    const double theta_i = theta(i);
+    tpt(0,1) -= theta_i;
+    tpt(1,1) += std::pow(theta_i, 2.0);
+  }
+  tpt(1,0) = tpt(0,1);
+  tpt(0,0) = J;
+  const Matrix<> eta_post_var = invpd(tpt + AB0);
+  const Matrix<> eta_post_C = cholesky(eta_post_var);
 
+  for (unsigned int k = 0; k < K; ++k) {    
+    const Matrix<> TZ(2, 1);
+    for (unsigned int j = 0; j < J; ++j) {
+      TZ[0] -= Z(j,k);
+      TZ[1] += Z(j,k) * theta[j];
+    }
+    Matrix<> eta_post_mean = eta_post_var * (TZ + AB0ab0);
+    etahat(k,0) = eta_post_mean(0);
+    etahat(k,1) = eta_post_mean(1);
+    eta_post_mean /= alpha;    
+    const Matrix<> new_eta = gaxpy(eta_post_C, stream.rnorm(2, 1, 0, 1), 
+                                   (eta_post_mean) );
+     eta(k,0) = new_eta(0);
+     eta(k,1) = new_eta(1);
 
+     //Rprintf("\n\a: %3.1f,b:%3.1f ",eta(k,0),eta(k,1)); 
 
-
-
+  }
+}
 
 
 

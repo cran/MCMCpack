@@ -1,3 +1,4 @@
+##########################################################################
 ## function that performs procrustes transformation on X with target Xstar
 ##
 ## returns the rotation matrix R, translation vector tt,
@@ -10,10 +11,19 @@
 ## Based on Borg and Groenen 1997. Modern Multidimensional
 ##   Scaling. New York: Springer. pp. 340-342.
 ##
+## This software is distributed under the terms of the GNU GENERAL
+## PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
+## file for more information.
+##
 ## Kevin Quinn
 ## Harvard University
 ## 6/13/2005
 ##
+## Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+## Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+##    and Jong Hee Park
+##########################################################################
+
 procrustes <- function(X, Xstar, translation=FALSE, dilation=FALSE){
   if (nrow(X) != nrow(Xstar)){
     cat("X and Xstar do not have same number of rows.\n")

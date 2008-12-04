@@ -1,3 +1,4 @@
+//////////////////////////////////////////////////////////////////////////
 // MCMCprobit.cc is C++ code to estimate a probit regression model with
 //   a multivariate normal prior
 //
@@ -15,11 +16,14 @@
 // PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
 // file for more information.
 //
-// Copyright (C) 2004 Andrew D. Martin and Kevin M. Quinn
-// 
 // updated to the new version of Scythe 7/26/2004 KQ
 // updated to Scythe 1.0.X 7/7/2007 ADM
 //
+// Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+// Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+//    and Jong Hee Park
+//////////////////////////////////////////////////////////////////////////
+
 #ifndef MCMCPROBIT_CC
 #define MCMCPROBIT_CC
 

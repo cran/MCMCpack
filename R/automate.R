@@ -1,3 +1,4 @@
+##########################################################################
 ## this function automates the Scythe C++ call making book-keeping
 ## much easier
 ##
@@ -42,7 +43,17 @@
 ##       This also build a skeleton C++ template and clean R template
 ##       for MCMCpack if developer=TRUE.
 ##
+## This software is distributed under the terms of the GNU GENERAL
+## PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
+## file for more information.
+##
 ## Updated by ADM and KQ 1/25/2006 (to allow for multiple nonconsts)
+##
+## Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+## Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+##    and Jong Hee Park
+##########################################################################
+
 
 "auto.Scythe.call" <-
   function(output.object, cc.fun.name, package="MCMCpack",

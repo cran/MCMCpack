@@ -1,7 +1,12 @@
+##########################################################################
 ## sample from the posterior distribution of a logistic regression
 ## model in R using linked C++ code in Scythe
 ##
 ## KQ 1/23/2003
+##
+## This software is distributed under the terms of the GNU GENERAL
+## PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
+## file for more information.
 ##
 ## Modified to meet new developer specification 7/15/2004 KQ
 ## Modified for new Scythe and rngs 7/25/2004 KQ
@@ -9,9 +14,14 @@
 ## Modified to allow user-specified prior density 8/17/2005 KQ
 ## Modified to handle marginal likelihood calculation 1/27/2006 KQ
 ##
+## Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+## Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+##    and Jong Hee Park
+##########################################################################
+
 
 "MCMClogit" <-
-  function(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
+  function(formula, data=NULL, burnin = 1000, mcmc = 10000,
            thin=1, tune=1.1, verbose = 0, seed = NA, beta.start = NA,
            b0 = 0, B0 = 0, user.prior.density=NULL, logfun=TRUE,
            marginal.likelihood = c("none", "Laplace"), ...) {
@@ -30,7 +40,7 @@
     lecuyer.stream <- seeds[[3]]
 
     ## form response and model matrices
-    holder <- parse.formula(formula, data)
+    holder <- parse.formula(formula, data=data)
     Y <- holder[[1]]
     X <- holder[[2]]
     xnames <- holder[[3]]    

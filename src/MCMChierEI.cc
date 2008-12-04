@@ -1,3 +1,4 @@
+//////////////////////////////////////////////////////////////////////////
 // fits Wakefield's hierarchical model for ecological inference using
 // Wakefield's normal approximation to the binomial convolution likelihood
 // and slice sampling and Gibbs sampling to sample from the posterior
@@ -9,6 +10,11 @@
 // KQ 8/10/2004 bug fix and major overhaul of sampling scheme
 // ADM 7/??/2007 ported to Scythe 1.0.X
 // KQ 7/29/2007 some minor fixes (still not fully tested)
+//
+// Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+// Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+//    and Jong Hee Park
+//////////////////////////////////////////////////////////////////////////
 
 
 #ifndef MCMCHIEREI_CC

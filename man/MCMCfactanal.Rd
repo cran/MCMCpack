@@ -13,7 +13,7 @@
   
 \usage{
 MCMCfactanal(x, factors, lambda.constraints=list(),
-             data=parent.frame(), burnin = 1000, mcmc = 20000,
+             data=NULL, burnin = 1000, mcmc = 20000,
              thin=1, verbose = 0, seed = NA,
              lambda.start = NA, psi.start = NA,
              l0=0, L0=0, a0=0.001, b0=0.001,

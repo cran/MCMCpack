@@ -1,3 +1,4 @@
+//////////////////////////////////////////////////////////////////////////
 // MCMCirt1d.cc is C++ code to estimate a one-dimensional item response
 // theory model. 
 //
@@ -6,6 +7,11 @@
 // completely rewritten and optimized for the 1-d case 8/2/2004 KQ
 // storage changed to save memory KQ 1/27/2006
 // DBP 7/3/07 [ported to scythe 1.0.x]
+//
+// Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
+// Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
+//    and Jong Hee Park
+//////////////////////////////////////////////////////////////////////////
 
 #ifndef MCMCIRT1D_CC
 #define MCMCIRT1D_CC
