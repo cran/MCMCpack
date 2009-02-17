@@ -10,7 +10,7 @@ Political Economic Risk Data from 62 Countries in 1987.
   A data frame with 62 observations on the following 9 variables. All
   data points are from 1987. See Quinn (2004) for more details. 
   \describe{
-    \item{country}{a factor with levels \code{Argentina} \code{Australia} \code{Austria} \code{Bangladesh} \code{Belgium} \code{Bolivia} \code{Botswana} \code{Brazil} \code{Burma} \code{Cameroon} \code{Canada} \code{Chile} \code{Colombia} \code{Congo-Kinshasa} \code{Costa Rica} \code{Cote d'Ivoire} \code{Denmark} \code{Dominican Republic} \code{Ecuador} \code{Finland} \code{Gambia, The} \code{Ghana} \code{Greece} \code{Hungary} \code{India} \code{Indonesia} \code{Iran} \code{Ireland} \code{Israel} \code{Italy} \code{Japan} \code{Kenya} \code{Korea, South} \code{Malawi} \code{Malaysia} \code{Mexico} \code{Morocco} \code{New Zealand} \code{Nigeria} \code{Norway} \code{Papua New Guinea} \code{Paraguay} \code{Philippines} \code{Poland} \code{Portugal} \code{Sierra Leone} \code{Singapore} \code{South Africa} \code{Spain} \code{Sri Lanka} \code{Sweden} \code{Switzerland} \code{Syria} \code{Thailand} \code{Togo} \code{Tunisia} \code{Turkey} \code{United Kingdom} \code{Uruguay} \code{Venezuela} \code{Zambia} \code{Zimbabwe}}
+    \item{country}{a factor with levels \code{Argentina} through \code{Zimbabwe}}
     \item{courts}{an ordered factor with levels \code{0} <
       \code{1}.\code{courts} is an indicator of whether the country in
       question is judged to have an independent judiciary. From Henisz

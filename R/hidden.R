@@ -663,7 +663,7 @@
            stop("Please respecify and call ", calling.function(), " again.",
                 call.=FALSE)          
          }
-         if( all(lec.seed[1:3]) == 0 ){
+         if( all(lec.seed[1:3] == 0 )){
            cat("Error: first three L'Ecuyer seeds == 0\n")
            stop("Please respecify and call ", calling.function(), " again.",
                 call.=FALSE)          
@@ -674,7 +674,7 @@
            stop("Please respecify and call ", calling.function(), " again.",
                 call.=FALSE)          
          }         
-         if( all(lec.seed[4:6]) == 0 ){
+         if( all(lec.seed[4:6] == 0 )){
            cat("Error: last three L'Ecuyer seeds == 0\n")
            stop("Please respecify and call ", calling.function(), " again.",
                 call.=FALSE)          

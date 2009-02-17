@@ -2,6 +2,13 @@
 // Changes and Bug Fixes
 //
 
+0.9-6 to 1.0-1
+   * added one-dimensional dynamic IRT model 
+
+0.9-5 to 0.9-6
+   * fixed bug in MCMCmetrop1R.R [thanks to many for spotting memory issue]
+   * fixed by in Lecuyer seeds [thanks to Eduardo Leoni]
+
 0.9-4 to 0.9-5
   * changed how missing values are handled when calculating agreement scores
     for starting values in factor analysis and IRT models
@@ -9,7 +16,6 @@
   * fixed bug with MCMCmnl example [thanks to Duncan Murdoch]
   * fixed formula interface bug for all models [thanks to Duncan Murdoch]
   * added hierarchical IRT code [written by Mike Malecki]
-  * [FIXED BUG WITH MCMCmetrop1R.R]
 
 0.9-3 to 0.9-4
   * fixed issue with MCMCmetrop1R.R [thanks to Jim Albert]
