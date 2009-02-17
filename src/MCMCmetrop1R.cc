@@ -54,16 +54,20 @@ double user_fun_eval(SEXP fun, SEXP theta, SEXP myframe) {
   if(!isEnvironment(myframe)) error("myframe must be an environment");
   PROTECT(R_fcall = lang2(fun, R_NilValue));
   SETCADR(R_fcall, theta);
-  SEXP funval = eval(R_fcall, myframe);
+  SEXP funval;
+  PROTECT(funval = eval(R_fcall, myframe));
+
   if (!isReal(funval)) error("`fun' must return a double");
   double fv = REAL(funval)[0];
-  UNPROTECT(1);
+  if (fv == R_PosInf) error("`fun' returned +Inf");
+  if (R_IsNaN(fv) || R_IsNA(fv)) error("`fun' returned NaN or NA");
+  UNPROTECT(2);
   return fv;
 }
 
 template <typename RNGTYPE>
-void MCMCmetrop1R_impl (rng<RNGTYPE>& stream, SEXP fun, 
-                        SEXP theta, SEXP myframe,
+void MCMCmetrop1R_impl (rng<RNGTYPE>& stream, SEXP& fun, 
+                        SEXP& theta, SEXP& myframe,
                         unsigned int burnin,
                         unsigned int mcmc, unsigned int thin,
                         unsigned int verbose, bool logfun,
@@ -101,7 +105,7 @@ void MCMCmetrop1R_impl (rng<RNGTYPE>& stream, SEXP fun,
     
     // put theta_can_M into a SEXP
     SEXP theta_can;
-    theta_can = PROTECT(allocVector(REALSXP, npar));
+    PROTECT(theta_can = allocVector(REALSXP, npar));
     for (unsigned int i = 0; i < npar; ++i) {
       REAL(theta_can)[i] = theta_can_M(i);
     }
@@ -113,11 +117,15 @@ void MCMCmetrop1R_impl (rng<RNGTYPE>& stream, SEXP fun,
     const double ratio = std::exp(userfun_can - userfun_cur);
     
     if (stream() < ratio) {
-      theta = theta_can;
+      for (unsigned int i = 0; i < npar; ++i) {
+	REAL(theta)[i] = theta_can_M(i);
+      }      
+      //      theta = theta_can;
       theta_M = theta_can_M;
       userfun_cur = userfun_can;
       ++accepts;
     }
+    UNPROTECT(1);      
 
     // store values in matrices
     if ((iter%thin) == 0 && iter >= burnin) {
@@ -128,27 +136,27 @@ void MCMCmetrop1R_impl (rng<RNGTYPE>& stream, SEXP fun,
           
     if (verbose && iter % verbose == 0) {
       Rprintf("MCMCmetrop1R iteration %i of %i \n", (iter+1), tot_iter);
+      Rprintf("function value = %10.5f\n", userfun_cur);
       Rprintf("theta = \n");
       for (unsigned int i = 0; i < npar; ++i)
         Rprintf("%10.5f\n", REAL(theta)[i]);
-      Rprintf("function value = %10.5f\n", userfun_cur);
       Rprintf("Metropolis acceptance rate = %3.5f\n\n", 
           static_cast<double>(accepts) / static_cast<double>(iter+1));	
     } 
 
     
-    UNPROTECT(1);      
     R_CheckUserInterrupt(); // allow user interrupts
   }
 
   // put the sample into a SEXP and return it   
-  sample_SEXP = PROTECT(allocMatrix(REALSXP, nsamp, npar));
+  //sample_SEXP = PROTECT(allocMatrix(REALSXP, nsamp, npar));
   for (unsigned int i = 0; i < nsamp; ++i) {
     for (unsigned int j = 0; j < npar; ++j) {
       REAL(sample_SEXP)[i + nsamp * j] = sample(i,j);
     }
   }
-  UNPROTECT(1);
+  //UNPROTECT(1);
+
 
   // print the the acceptance rate to the console in a way that 
   // everyone (even Windows users) can see
@@ -183,13 +191,16 @@ extern "C" {
     Matrix <> propvar (propvar_nc, propvar_nr, propvar_data);
     propvar = t(propvar);
 
+    const unsigned int npar = length(theta);
+    const unsigned int nsamp = INTEGER(mcmc_R)[0] / INTEGER(thin_R)[0];
     SEXP sample_SEXP;
+    PROTECT(sample_SEXP = allocMatrix(REALSXP, nsamp, npar));
     MCMCPACK_PASSRNG2MODEL(MCMCmetrop1R_impl, fun, theta, myframe, 
 			   INTEGER(burnin_R)[0], INTEGER(mcmc_R)[0], 
 			   INTEGER(thin_R)[0],
 			   INTEGER(verbose)[0], INTEGER(logfun)[0], 
-			   propvar, sample_SEXP)
-
+			   propvar, sample_SEXP);
+    UNPROTECT(1);
       
     // return the sample
     return sample_SEXP;
