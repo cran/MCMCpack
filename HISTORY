@@ -2,6 +2,14 @@
 // Changes and Bug Fixes
 //
 
+
+1.0-5 to 1.0-6
+  * added SSVSquantreg [written by Craig Reed]
+  * added functions to handle SSVSquantreg output [written by Craig Reed]
+  * revisions to the MCMCquantreg function [written by Craig Reed]
+  * revisions to the MCMCquantreg function [written by Craig Reed]
+  * fixed parameterization issue with rinvgamma [thanks to Julian Stander]
+
 1.0-4 to 1.0-5
   * added heteroskedastic IRT model [written by Ben Lauderdale]
   * minor changes to error status in hierarchical IRT [written by Mike Malecki]

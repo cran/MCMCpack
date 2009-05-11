@@ -156,7 +156,7 @@ Modified from \code{\link[MCMCpack]{MCMCirtKd}} and \code{\link[MCMCpack]{MCMCor
 }
 
 \examples{
-
+\dontrun{
 data(Senate)
 Y <- as.matrix(Senate[,6:677])
 
@@ -184,7 +184,7 @@ legend(x="topleft",legend=c("Point sizes proportional to estimated legislator",
 "variance under heteroskedastic model.","Some legislators with large variance have",
 "more extreme estimated ideal points under the","heteroskedastic model because their",
 "deviations from the party line are attributable","to idiosyncrasy rather than moderation."),cex=0.5)
-
+}
 }
 
 \keyword{models}

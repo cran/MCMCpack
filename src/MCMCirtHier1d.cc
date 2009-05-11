@@ -86,7 +86,7 @@ double irt_W_update(Matrix<>& Z, const Matrix<>& X, const Matrix<>& theta,
   //Rprintf("\nRSS: %5f alpha0: %5f alpha1: %5f\n",RSS,alpha,alpha1);
   return(std::sqrt(alpha1/alpha));
 }
-
+/*
 template <typename RNGTYPE>
 void hirt_level0_metrop (Matrix<>& theta, Matrix<>& thetahat, 
 			 const Matrix<>& Z, 
@@ -101,7 +101,8 @@ void hirt_level0_metrop (Matrix<>& theta, Matrix<>& thetahat,
   //exp( prop - cur)
   //runif & accept if > ratio
   //note the acceptance
-}
+  } 
+*/
 
 
 /* MCMCirt1d implementation. */
@@ -267,9 +268,11 @@ void MCMCirtHier1d_impl (rng<RNGTYPE>& stream,
      double sigma2fcdmean = sigma2fcdsum / static_cast<double>(tot_iter);
      const double sig2_inv = 1.0 / sigma2star;
      const Matrix<> sig_beta = invpd (B0 + XpX * sig2_inv);
-     const Matrix<> betahat = sig_beta * gaxpy(B0, b0, XpY*sig2_inv);
-     double logbetafcd = lndmvn(betastar, betahat, sig_beta);
-     if(L==1) { logbetafcd = lndnorm(betastar[0], betahat[0],sig_beta[0]);} 
+     Matrix<> betahat = sig_beta * gaxpy(B0, b0, XpY*sig2_inv);
+     double logbetafcd = 0.0;
+     for (unsigned int i=0; i<L; ++i) {
+       logbetafcd += lndnorm(betastar[i], betahat[i], sig_beta[i]);
+     }
      Rprintf("logPost: beta %10.5f sigma2 %10.5f\n",logbetafcd,sigma2fcdmean);
      // calculate loglikelihood at (betastar, sigma2star)
      double sigmastar = sqrt(sigma2star); 

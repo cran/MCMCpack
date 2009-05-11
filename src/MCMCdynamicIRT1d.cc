@@ -92,8 +92,10 @@ void MCMCdynamicIRT1d_impl(rng<RNGTYPE>& stream,
   const int tot_iter = *burnin + *mcmc;
   const int nsamp = *mcmc / *thin;
   //sparse matrix of latent outcome variables
-  double Z[*nsubj][*nitems]; 
+  double** Z;
+  Z = new double*[*nsubj];
   for (int s=0; s<*nsubj; ++s){
+    Z[s] = new double[*nitems];
     for (int i=0; i<*nitems; ++i){
       Z[s][i] = -999;
     }
@@ -612,8 +614,10 @@ void MCMCdynamicIRT1d_impl(rng<RNGTYPE>& stream,
 
   } // end iter loop
 
-
-
+  for (int s=0; s<*nsubj; ++s)
+    delete[] Z[s];
+  delete[] Z;
+  
 } // end  MCMCdynamicIRT1d_impl function
 
 

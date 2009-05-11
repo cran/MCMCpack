@@ -7,26 +7,24 @@
 \description{
   This function fits quantile regression models under Bayesian inference.  
   The function samples from the posterior distribution using Gibbs sampling with data augmentation. 
- A multivariate normal prior is assumed for \eqn{\beta}{beta} and an inverse Gamma prior 
- is assumed for \eqn{\sigma}{sigma}. The user supplies the prior parameters.
+ A multivariate normal prior is assumed for \eqn{\beta}{beta}. The user supplies the prior parameters.
  A sample of the posterior distribution is returned as an mcmc object, 
  which can then be analysed by functions in the coda package.
 }
 
 \usage{
-MCMCquantreg(formula, tau=0.5, data = NULL, burnin = 1000,
-   mcmc = 10000, thin = 1, verbose = 0, seed = NA,
-   beta.start = NA, b0 = 0, B0 = 0, c0 = 0.001, d0 = 0.001, ...)
+MCMCquantreg(formula, data = NULL, tau=0.5, burnin = 1000,
+   mcmc = 10000, thin = 1, verbose = 0, seed = sample(1:1000000,1),
+   beta.start = NA, b0 = 0, B0 = 0, ...)
 }
 
 \arguments{
 
   \item{formula}{ Model formula. }
 
-  \item{tau}{The quantile of interest. Must be between 0 and 1. The default value of 0.5 corresponds to median regression.}
-
-
   \item{data}{ Data frame. }
+
+  \item{tau}{The quantile of interest. Must be between 0 and 1. The default value of 0.5 corresponds to median regression.}
 
   \item{burnin}{ The number of burn-in iterations for the sampler. }
 
@@ -41,9 +39,9 @@ MCMCquantreg(formula, tau=0.5, data = NULL, burnin = 1000,
     \eqn{\beta}{beta} and \eqn{\sigma}{sigma} are printed to 
     the screen every \code{verbose}th iteration. }
 
-  \item{seed}{ The seed for the random number generator.  If NA, the Mersenne
+  \item{seed}{ The seed for the random number generator. If NA, the Mersenne
     Twister generator is used with default seed 12345; if an integer is 
-    passed it is used to seed the Mersenne twister.  The user can also
+    passed it is used to seed the Mersenne twister. The default value for this argument is a random integer between 1 and 1,000,000. This default value ensures that if the function is used again with a different value of \eqn{\tau}{tau}, it is extremely unlikely that the seed will be identical. The user can also
     pass a list of length two to use the L'Ecuyer random number generator,
     which is suitable for parallel computation.  The first element of the
     list is the L'Ecuyer seed, which is a vector of length six or NA (if NA 
@@ -78,40 +76,7 @@ MCMCquantreg(formula, tau=0.5, data = NULL, burnin = 1000,
     as the prior precision of \eqn{\beta}{beta}. Default value of 0 is equivalent to
     an improper uniform prior for \eqn{\beta}{beta}. }
 
-  \item{c0}{ \eqn{c_0/2}{c0/2} is the shape parameter for the inverse
-    Gamma prior on \eqn{\sigma}{sigma}. }
-
-  \item{d0}{ \eqn{d_0/2}{d0/2} is the scale parameter for the
-    inverse Gamma prior on \eqn{\sigma}{sigma}.}
-
-    \item{\dots}{ further arguments to be passed }
-}
-
-\details{
-  \code{MCMCquantreg} simulates from the posterior distribution using 
-  a partially collapsed Gibbs sampler with data augmentation (see \url{http://people.brunel.ac.uk/~mastkky/}). 
-  This involves a multivariate Normal draw for \eqn{\beta}{beta}, and an
-  inverse Gamma draw for \eqn{\sigma}{sigma}. 
-  The augmented data are drawn conditionally from the inverse Gaussian distribution. The simulation
-  is carried out in compiled C++ code to maximise efficiency.  Please consult
-  the coda documentation for a comprehensive list of functions that can be
-  used to analyse the posterior sample. 
-  
-  The model takes the following form:
-  \deqn{y_i = x_i ' \beta + \varepsilon_i}{y_i = x_i'beta + epsilon_i}
-  The errors are assumed to have an Asymmetric Laplace distribution with \eqn{\tau}{tau}th quantile equal to zero 
-  and shape parameter equal to \eqn{\sigma}{sigma}:
-  \deqn{\varepsilon_i(\tau) \sim \mathcal{AL}(0, \sigma, \tau)}{epsilon_i(tau) ~ AL(0,
-    sigma, tau),}
-  where \eqn{\beta}{beta} and \eqn{\sigma}{sigma} depend on \eqn{\tau}{tau}. 
-  We assume standard, semi-conjugate priors:
-  \deqn{\beta \sim \mathcal{N}(b_0,B_0^{-1})}{beta ~ N(b0,B0^(-1)),}
-  and
-  \deqn{\sigma^{-1} \sim \mathcal{G}amma(c_0/2, d_0/2)}{sigma^(-1) ~
-    Gamma(c0/2, d0/2),}
-  where \eqn{\beta}{beta} and \eqn{\sigma^{-1}}{sigma^(-1)} are assumed 
-  \emph{a priori} independent of each other and the parameters associated with the other quantiles. Only starting values for
-  \eqn{\beta}{beta} are allowed for this sampler.
+  \item{\dots}{ further arguments to be passed }
 }
 
 \value{
@@ -119,10 +84,29 @@ MCMCquantreg(formula, tau=0.5, data = NULL, burnin = 1000,
    object can be summarised by functions provided by the coda package.
 }
 
+\details{
+  \code{MCMCquantreg} simulates from the posterior distribution using 
+  Gibbs sampling with data augmentation (see \url{http://people.brunel.ac.uk/~mastkky/}). 
+  \eqn{\beta}{beta} are drawn from a multivariate normal distribution. The augmented data are drawn conditionally from the inverse Gaussian distribution. The simulation
+  is carried out in compiled C++ code to maximise efficiency.  Please consult
+  the coda documentation for a comprehensive list of functions that can be
+  used to analyse the posterior sample. 
+  
+  We assume the model
+\deqn{Q_{\tau}(y_i|x_i) = x_i'\beta}{Q_tau(y_i|x_i) = x_i'beta}, where \eqn{Q_{\tau}(y_i|x_i)}{Q_tau(y_i|x_i)} denotes the conditional \eqn{\tau}{tau}th quantile of \eqn{y_i}{y_i} given \eqn{x_i}{x_i}, and \eqn{\beta=\beta(\tau)}{beta=beta(tau)} are the regression parameters possibly dependent on \eqn{\tau}{tau}.
+The likelihood is formed based on assuming independent Asymmetric Laplace distributions on the \eqn{y_i}{y_i} with skewness parameter \eqn{\tau}{tau} and location parameters \eqn{x_i'\beta}{x_i'beta}. This assumption ensures that the likelihood function is maximised by the \eqn{\tau}{tau}th conditional quantile of the response variable.
+  We assume standard, semi-conjugate priors on \eqn{\beta}{beta}:
+  \deqn{\beta \sim \mathcal{N}(b_0,B_0^{-1})}{beta ~ N(b0,B0^(-1))}.
+  Only starting values for
+  \eqn{\beta}{beta} are allowed for this sampler.
+}
+
+\author{ Craig Reed}
+
 \references{ Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.2.} \url{http://scythe.wustl.edu}.
    
-   Craig Reed and Keming Yu. 2009. "A Partially Collapsed Gibbs Sampler for Bayesian Quantile Regression." Technical Report.
+   Craig Reed and Keming Yu. 2009. "An Efficient Gibbs Sampler for Bayesian Quantile Regression." Technical Report.
    
    Keming Yu and Jin Zhang. 2005. "A Three Parameter Asymmetric Laplace Distribution and it's extensions."
 \emph{Communications in Statistics - Theory and Methods}, 34, 1867-1879.
@@ -130,11 +114,6 @@ MCMCquantreg(formula, tau=0.5, data = NULL, burnin = 1000,
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
    \url{http://www-fis.iarc.fr/coda/}.}
-     
-\author{ Craig Reed}
-
-\seealso{ \code{\link[MCMCpack]{MCMCregress}}, \code{\link[coda]{plot.mcmc}},
-  \code{\link[coda]{summary.mcmc}}, \code{\link[stats]{lm}}, \code{\link[quantreg]{rq}} }
 
 \examples{
 \dontrun{
@@ -154,3 +133,10 @@ summary(posterior_95)
 }
 
 \keyword{models}
+     
+\seealso{ 
+\code{\link[MCMCpack]{MCMCregress}},
+\code{\link[coda]{plot.mcmc}},
+\code{\link[coda]{summary.mcmc}},
+\code{\link[stats]{lm}},
+\code{\link[quantreg]{rq}}}

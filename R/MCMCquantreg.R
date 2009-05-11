@@ -1,7 +1,7 @@
 "MCMCquantreg" <-
-  function(formula, tau=0.5, data=NULL, burnin = 1000, mcmc = 10000,
-           thin=1, verbose = 0, seed = NA, beta.start = NA,
-           b0 = 0, B0 = 0, c0 = 0.001, d0 = 0.001,
+  function(formula, data=NULL, tau=0.5, burnin = 1000, mcmc = 10000,
+           thin=1, verbose = 0, seed = sample(1:1000000,1), beta.start = NA,
+           b0 = 0, B0 = 0, 
            ...) {
     
     ## checks
@@ -10,7 +10,7 @@
 
     cl <- match.call()
     if (tau<=0 || tau>=1){
-	stop("tau must be in (0,1).\n Please respecify and call again.\n")
+	stop("tau must be in (0,1). \nPlease respecify and call again.\n")
 	}
     
     ## seeds
@@ -27,15 +27,14 @@
     K <- ncol(X)  # number of covariates
         
     ## starting values and priors
-    ols.fit <- lm(formula)
+    ols.fit <- lm(formula, data=data)
     defaults <- matrix(coef(ols.fit),K,1)
     defaults[1] <- defaults[1]+summary(ols.fit)$sigma*qnorm(tau)
     beta.start <- coef.start(beta.start, K, formula, family=gaussian, data, defaults=defaults)
     mvn.prior <- form.mvn.prior(b0, B0, K)
     b0 <- mvn.prior[[1]]
     B0 <- mvn.prior[[2]]
-    check.ig.prior(c0, d0)
-
+    
 
     B0.eigenvalues <- eigen(B0)$values
     if (min(B0.eigenvalues) < 0){
@@ -45,24 +44,10 @@
 
     
     ## define holder for posterior sample
-    sample <- matrix(data=0, mcmc/thin, K+1)
+    sample <- matrix(data=0, mcmc/thin, K)
     posterior <- NULL 
     
-    if (tau==0.5) {
-     ## call C++/Scythe function "MCMCmedreg" to draw samples
-    auto.Scythe.call(output.object="posterior", cc.fun.name="MCMCmedreg", 
-                     sample.nonconst=sample, Y=Y, X=X,                      burnin=as.integer(burnin),
-                     mcmc=as.integer(mcmc), thin=as.integer(thin),
-                     lecuyer=as.integer(lecuyer), 
-                     seedarray=as.integer(seed.array),
-                     lecuyerstream=as.integer(lecuyer.stream),
-                     verbose=as.integer(verbose), betastart=beta.start,
-                     b0=b0, B0=B0, c0=as.double(c0), d0=as.double(d0), package="MCMCpack")
-}
-
-    else{    
-
-    ## call C++/Scythe function "MCMCquantreg" to draw samples
+    ## call C++ code to draw samples
     auto.Scythe.call(output.object="posterior", cc.fun.name="MCMCquantreg", 
                      sample.nonconst=sample, tau=as.double(tau), Y=Y, X=X, 
                      burnin=as.integer(burnin),
@@ -71,12 +56,12 @@
                      seedarray=as.integer(seed.array),
                      lecuyerstream=as.integer(lecuyer.stream),
                      verbose=as.integer(verbose), betastart=beta.start,
-                     b0=b0, B0=B0, c0=as.double(c0), d0=as.double(d0), package="MCMCpack")
-}
+                     b0=b0, B0=B0, package="MCMCpack")
+
     
 ## pull together matrix and build MCMC object to return
     output <- form.mcmc.object(posterior,
-                               names=c(xnames,"sigma"),
+                               names=xnames,
                                title="MCMCquantreg Posterior Sample",
                                y=Y, call=cl)
     

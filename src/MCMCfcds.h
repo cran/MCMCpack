@@ -87,87 +87,24 @@ NormIGregress_sigma2_draw (const Matrix <> &X, const Matrix <> &Y,
   return  stream.rigamma (c_post, d_post);   
 }
 
-// linear regression with Laplace errors beta draw 
+// Bayesian quantile (including median) regression beta draw 
 // (multivariate Normal prior)
-// regression model is y = X * beta + epsilon,  epsilon ~ Laplace(0,sigma)
-// b0 is the prior mean of beta
-// B0 is the prior precision (the inverse variance) of beta
-template <typename RNGTYPE>
-Matrix<double> 
-LaplaceNormregress_beta_draw (const Matrix<>& X, const Matrix<>& Y, const Matrix<>& weights,
-         const Matrix<>& b0, const Matrix<>& B0, double sigma,
-         rng<RNGTYPE>& stream)
-{
-
-	const unsigned int k = X.cols();
-	const unsigned int n_obs = X.rows(); 
-	const double one_over_two_sigma = 1.0/(2.0*sigma);
-	Matrix<> XtwX(k,k,false);
-	Matrix<> XtwY(k,1,false);
-	double temp_x = 0.0;
-	double temp_y = 0.0;
-
-//Calculate XtwY, where w denotes a diagonal matrix with the augmented data (weights) on the diagonal   
-  for (unsigned int i=0; i<k; ++i){
-    for (unsigned int m=0; m<n_obs; ++m){
-       temp_y = temp_y + weights(m)*X(m,i)*Y(m);
-    }
-    XtwY(i) = temp_y;
-    temp_y = 0.0;
-  }
-//Calculate XtwX
-  for (unsigned int i=0; i<k; ++i){
-    for (unsigned int j=0; j<(i+1); ++j){
-      for (unsigned int m=0; m<n_obs; ++m){
-	temp_x = temp_x + weights(m)*X(m,i)*X(m,j);
-      }
-      XtwX(i,j) = temp_x;
-      XtwX(j,i) = temp_x;
-      temp_x = 0.0;
-    }
-  }
-
-	const Matrix<> var_matrix_beta = invpd(B0+one_over_two_sigma*XtwX);
- 	const Matrix<> C = cholesky(var_matrix_beta);
-	const Matrix<> betahat = var_matrix_beta*gaxpy(B0,b0,one_over_two_sigma*XtwY);
-
-	return( gaxpy(C, stream.rnorm(k,1, 0, 1), betahat) );
-}
-
-// linear regression with Laplace errors sigma draw 
-// (inverse-Gamma  prior)
-// regression model is y = X * beta + epsilon,  epsilon ~ Laplace(0,sigma)
-// c0/2 is the prior shape parameter for sigma
-// d0/2 is the prior scale parameter for sigma 
-template <typename RNGTYPE>
-double
-LaplaceIGammaregress_sigma_draw (const Matrix <> &abse, double c0, double d0,
-         rng<RNGTYPE>& stream)
-
-{
-	const double c_post = 0.5*c0 + abse.rows();
-	const double d_post = 0.5*(d0 + sum(abse));
-
-	return  stream.rigamma (c_post, d_post); 
-
-}
-
-// linear regression with Asymmetric Laplace errors beta draw 
-// (multivariate Normal prior)
-// regression model is y = X * beta + epsilon,  epsilon ~ ALaplace(0,sigma,tau)
-// b0 is the prior mean of beta
-// B0 is the prior precision (the inverse variance) of beta
+// 
+// b0 is the prior mean of beta(tau)
+// B0 is the prior precision (the inverse variance) of beta(tau)
 template <typename RNGTYPE>
 Matrix<double> 
 ALaplaceNormregress_beta_draw (double tau, const Matrix<>& X, const Matrix<>& Y, const Matrix<>& weights,
-         const Matrix<>& b0, const Matrix<>& B0, double sigma,
+         const Matrix<>& b0, const Matrix<>& B0,
          rng<RNGTYPE>& stream)
 {
 
 	const unsigned int k = X.cols();
 	const unsigned int n_obs = X.rows();
-	const double one_over_two_sigma = 1.0/(2.0*sigma);
-	const Matrix<> U = Y - (1.0-2.0*tau)*pow(weights,-1.0); 
+	Matrix<> U(Y);
+if (tau!=0.5){
+	U -= (1.0-2.0*tau)*weights;
+} 
 	Matrix<> XtwX(k,k,false);
 	Matrix<> XtwU(k,1,false);
 	double temp_x = 0.0;
@@ -176,16 +113,17 @@ ALaplaceNormregress_beta_draw (double tau, const Matrix<>& X, const Matrix<>& Y,
 //Calculate XtwU where w denotes a diagonal matrix with the augmented data (weights) on the diagonal   
   for (unsigned int i=0; i<k; ++i){
     for (unsigned int m=0; m<n_obs; ++m){
-       temp_u = temp_u + weights(m)*X(m,i)*U(m);
+       temp_u += X(m,i)*U(m)/weights(m);
     }
     XtwU(i) = temp_u;
     temp_u = 0.0;
   }
+
 //Calculate XtwX
   for (unsigned int i=0; i<k; ++i){
     for (unsigned int j=0; j<(i+1); ++j){
       for (unsigned int m=0; m<n_obs; ++m){
-	temp_x = temp_x + weights(m)*X(m,i)*X(m,j);
+	temp_x += X(m,i)*X(m,j)/weights(m);
       }
       XtwX(i,j) = temp_x;
       XtwX(j,i) = temp_x;
@@ -193,50 +131,31 @@ ALaplaceNormregress_beta_draw (double tau, const Matrix<>& X, const Matrix<>& Y,
     }
   }
 
-	const Matrix<> var_matrix_beta = invpd(B0+one_over_two_sigma*XtwX);
+	const Matrix<> var_matrix_beta = invpd(B0+0.5*XtwX);
  	const Matrix<> C = cholesky(var_matrix_beta);
-	const Matrix<> betahat = var_matrix_beta*gaxpy(B0,b0,one_over_two_sigma*XtwU);
+	const Matrix<> betahat = var_matrix_beta*gaxpy(B0,b0,0.5*XtwU);
 
 	return( gaxpy(C, stream.rnorm(k,1, 0, 1), betahat) );
-}
-
-// linear regression with Asymmetric Laplace errors sigma draw 
-// (inverse-Gamma  prior)
-// regression model is y = X * beta + epsilon,  epsilon ~ ALaplace(0,sigma,tau)
-// c0/2 is the prior shape parameter for sigma
-// d0/2 is the prior scale parameter for sigma 
-template <typename RNGTYPE>
-double
-ALaplaceIGammaregress_sigma_draw (double tau, const Matrix<> &e, const Matrix <> &abse, double c0, double d0,
-         rng<RNGTYPE>& stream)
-
-{
-	const double c_post = 0.5*c0 + abse.rows();
-	const double d_post = 0.5*(d0 + sum(abse)+(2.0*tau-1.0)*sum(e));
-
-	return  stream.rigamma (c_post, d_post); 
-
 }
 
 // This function draws from the full conditional distribution of the latent random variables (weights) under quantile regression (including median regression) and returns a column vector of those weights.
 
 template <typename RNGTYPE>
 Matrix<double>
-ALaplaceIGaussregress_weights_draw (const Matrix <> &abse, double sigma,
+ALaplaceIGaussregress_weights_draw (const Matrix <> &abse,
          rng<RNGTYPE>& stream)
 
 {
-        const double lambda = 1.0/(2.0*sigma);
-	const Matrix<double> nu_params = pow(abse,-1.0);
+        const Matrix<double> nu_params = pow(abse,-1.0);
 	Matrix<> w(abse);
-        unsigned int n_obs = abse.rows();
+        const unsigned int n_obs = abse.rows();
 
 	// The inverse Gaussian distribution
 
 	for (unsigned int i=0; i<n_obs; ++i){
             double chisq = stream.rchisq(1);
             double nu = nu_params(i);
-	    double smallroot = nu/(2.0*lambda)*(nu*chisq+2.0*lambda-std::sqrt(nu*nu*chisq*chisq+4.0*nu*lambda*chisq));
+	    double smallroot = nu*(nu*chisq+1.0-std::sqrt(nu*nu*chisq*chisq+2.0*nu*chisq));
 	    unsigned int q = stream.rbern(nu/(nu+smallroot));
 	    if (q == 1){
 		w(i) = smallroot;
@@ -245,8 +164,266 @@ ALaplaceIGaussregress_weights_draw (const Matrix <> &abse, double sigma,
 		w(i) = nu*nu/smallroot;
 	    }
 	  }
-	return w;
+	return(pow(w,-1.0));
 }
+
+/////////////////////////////////////////////////////
+
+// Functions for the quantile regression stochastic search variable selection
+
+struct COV_TRIAL{
+Matrix<> Cnew;
+bool newtrial;
+double logdetminhalf;
+};
+
+// updating the indicator variable corresponding to whether a 
+// covariate is included in the model, given that it was
+// previously absent
+template <typename RNGTYPE>
+COV_TRIAL
+QR_SSVS_covariate_trials_draw_absent(const Matrix<>& C, const Matrix<>& X_gamma, const Matrix<>& U,
+const Matrix<>& newXcol, unsigned int row_index, const Matrix<>& weights, double pi0, double newlambda, double logolddetminhalf, rng<RNGTYPE>& stream){
+	const unsigned int n_obs = U.rows();
+	const unsigned int k = C.rows();
+
+//Calculate new row required to update the Cholesky decomposition
+  Matrix<> XUXnewtXnew(k+1,1,false);
+  double temp_xux1 = 0.0;
+  double temp_xux2 = 0.0;
+  double temp_xux3 = 0.0;
+
+//Calculate XUXnewtXnew
+  for (unsigned int i=0; i<k-1; ++i){
+   for (unsigned int m=0; m<n_obs; ++m){
+	temp_xux1 += X_gamma(m,i)*newXcol(m)/weights(m);
+      }
+      XUXnewtXnew(i) = 0.5*temp_xux1;
+      temp_xux1 = 0.0;
+    }
+  for (unsigned int m=0; m<n_obs; ++m){
+temp_xux2 += U(m)*newXcol(m)/weights(m);
+temp_xux3 += newXcol(m)*newXcol(m)/weights(m);
+}
+XUXnewtXnew(k-1) = 0.5*temp_xux2;
+XUXnewtXnew(k) = 0.5*temp_xux3+newlambda;
+
+//Obtain the Cholesky Decomposition of the new matrix formed by adding newXcol onto the right hand side
+
+Matrix<> z(k,1,false);
+for (unsigned int i = 0; i < k; ++i) {
+        double sum = 0;
+        for (unsigned int j = 0; j < i; ++j) {
+          sum += C(i,j) * z(j);
+        }
+        z(i) = (XUXnewtXnew(i) - sum) / C(i, i);
+      }
+double rho = std::sqrt(XUXnewtXnew(k)-crossprod(z)(0));
+
+Matrix<> Cnew(k+1, k+1, true, 0.0);
+Cnew(0,0,k-1,k-1) = C;
+Cnew(k,0,k,k-1) = z;
+Cnew(k,k) = rho;
+
+// Permuting the Cholesky decomposition so that it corresponds to what would be obtained if the X matrix included the covariate
+
+    Matrix<> temp(Cnew);
+if (row_index != 0){
+    temp(0,0,row_index-1,k) = Cnew(0,0,row_index-1,k);
+}
+    temp(row_index,_) = Cnew(k,_);
+    temp(row_index+1,0,k,k) = Cnew(row_index,0,k-1,k);
+
+// Givens rotations
+
+    Matrix<> Q(2,2,false);
+ for (unsigned int i=k; i>row_index; --i)
+     {
+    double two_norm = std::sqrt(temp(row_index,i)*temp(row_index,i)
+  +temp(row_index,i-1)*temp(row_index,i-1));
+    Q(0,0) = temp(row_index,i-1)/two_norm;
+    Q(1,0) = temp(row_index,i)/two_norm;
+    Q(1,1) = Q(0,0);
+    Q(0,1) = -1.0*Q(1,0);
+      if (i!=k){
+         temp(i+1,i-1,k,i) = temp(i+1,i-1,k,i) * Q;
+      }
+    double temp2 = temp(i,i-1);
+    temp(i,i-1) = Q(0,0)*temp2;
+    temp(i,i) = Q(0,1)*temp2;
+    if (temp(i,i) < 0){
+	temp(i,i,k,i) = -1.0*temp(i,i,k,i);
+	}
+    temp(row_index,i-1) = two_norm;
+    temp(row_index,i) = 0.0;
+    }
+  Cnew=temp;
+
+//Work out -0.5*log(det(Cnew'Cnew))
+  double lognewdetminhalf = 0.0;
+ for (unsigned int i=0; i<k; ++i){
+  lognewdetminhalf -= std::log(Cnew(i,i));
+}
+
+  
+    
+double log_g0 = logolddetminhalf-0.5*C(k-1,k-1)*C(k-1,k-1);
+double log_g1 = 0.5*std::log(newlambda)+lognewdetminhalf-0.5*Cnew(k,k)*Cnew(k,k);
+         
+  double log_ratio = log_g0+std::log(1.0-pi0)-log_g1-std::log(pi0);
+  double success_prob = 1.0/(1.0+std::exp(log_ratio));
+  bool new_covariate_trial = stream.rbern(success_prob);
+COV_TRIAL result;
+result.newtrial = new_covariate_trial;
+  if (new_covariate_trial == false){
+  result.Cnew = C;
+  result.logdetminhalf = logolddetminhalf;
+  }
+  else {
+  result.Cnew = Cnew;
+  result.logdetminhalf = lognewdetminhalf;
+  }  
+return result;
+}
+
+// updating the indicator variable corresponding to whether a 
+// covariate is included in the model, given that it was
+// previously present in the model
+
+template <typename RNGTYPE>
+COV_TRIAL
+QR_SSVS_covariate_trials_draw_present(const Matrix<>& C, unsigned int row_index, unsigned int n_obs, double pi0, double oldlambda, double logolddetminhalf, rng<RNGTYPE>& stream){
+  unsigned int k = C.rows();
+ 
+// Permuting the Cholesky decomposition so that it corresponds to what would be obtained if the X matrix had the covariate in the final column
+
+    Matrix<> temp(C);
+if (row_index != 0){
+    temp(0,0,row_index-1,k-1) = C(0,0,row_index-1,k-1);
+}
+    temp(k-1,_) = C(row_index,_);
+    temp(row_index,0,k-2,k-1) = C(row_index+1,0,k-1,k-1);
+
+// Givens rotations
+
+    Matrix<> Q(2,2,false);
+ for (unsigned int i=row_index; i<k-1; ++i)
+     {
+    double two_norm = std::sqrt(temp(i,i)*temp(i,i)
+  +temp(i,i+1)*temp(i,i+1));
+    Q(0,0) = temp(i,i)/two_norm;
+    Q(1,0) = temp(i,i+1)/two_norm;
+    Q(1,1) = Q(0,0);
+    Q(0,1) = -1.0*Q(1,0);
+      if (i!=k-2){
+         temp(i+1,i,k-2,i+1) = temp(i+1,i,k-2,i+1) * Q;
+      }
+    double temp2 = temp(k-1,i);
+    temp(k-1,i) = Q(0,0)*temp2;
+    temp(k-1,i+1) = Q(0,1)*temp2;
+    temp(i,i) = two_norm;
+    temp(i,i+1) = 0.0;
+    }
+ if (temp(k-1,k-1) < 0){
+ temp(k-1,k-1) = -1.0*temp(k-1,k-1);
+}
+
+Matrix<> Cnew = temp(0,0,k-2,k-2);
+
+// Work out -1/2*log(det(Cnew'Cnew))
+ double lognewdetminhalf = 0.0;
+ for (unsigned int i=0; i<k-2; ++i){
+  lognewdetminhalf -= std::log(Cnew(i,i));
+}
+  
+ 
+      double log_g0 = lognewdetminhalf-0.5*Cnew(k-2,k-2)*Cnew(k-2,k-2);
+      double log_g1 = 0.5*std::log(oldlambda)+logolddetminhalf-0.5*C(k-1,k-1)*C(k-1,k-1);
+
+
+double log_ratio = log_g0+std::log(1.0-pi0)-log_g1-std::log(pi0);
+  double success_prob = 1.0/(1.0+std::exp(log_ratio));
+  bool new_covariate_trial = stream.rbern(success_prob);
+COV_TRIAL result;
+result.newtrial = new_covariate_trial;
+  if (new_covariate_trial == false){
+  result.Cnew = Cnew;
+  result.logdetminhalf = lognewdetminhalf;
+  }
+  else {
+  result.Cnew = C;
+  result.logdetminhalf = logolddetminhalf;
+  }  
+return result;
+}
+
+// update betas using Cholesky decomposition
+template <typename RNGTYPE>
+Matrix<>
+QR_SSVS_beta_draw(const Matrix<>& C, rng<RNGTYPE>& stream){
+  unsigned int k = C.rows();
+  Matrix<> standnorm = stream.rnorm(k-1,1,0,1);
+  Matrix<> z(k-1,1,false);
+  z = t(C(k-1,0,k-1,k-2));
+  Matrix<> Q = z+standnorm*std::sqrt(2.0);
+  Matrix<> result(k-1,1,false);
+ for (int i = k-2; i >= 0; --i) {
+        double sum = 0;
+        for (unsigned int j = i+1; j < k-1; ++j) {
+          sum += C(j,i) * result(j);
+        }
+        result(i) = (Q(i) - sum) / C(i, i);
+      }
+  return result; 
+}
+
+//hyperparameter pi0 updating
+
+template <typename RNGTYPE>
+double
+QR_SSVS_pi0_draw(unsigned int n_uncert_cov, unsigned int tot_n_uncert_cov, 
+double pi0a0, double pi0b0, rng<RNGTYPE>& stream){
+    double pi0a1 = pi0a0 + n_uncert_cov;
+    double pi0b1 = pi0b0 + tot_n_uncert_cov - n_uncert_cov;
+	return(stream.rbeta(pi0a1,pi0b1));	
+}
+
+//update latent lambdas
+
+template<typename RNGTYPE>
+Matrix<double>
+QR_SSVS_lambda_draw(const Matrix<>& beta_red, const Matrix<>& gamma, unsigned int tot_n_cov, unsigned int n_cert_cov, rng<RNGTYPE>& stream)
+    {
+unsigned int n_uncert_cov = tot_n_cov - n_cert_cov;
+Matrix<> newlambda(n_uncert_cov,1,false);
+
+for (unsigned int i=n_cert_cov; i<tot_n_cov; ++i){
+
+unsigned int j = i-n_cert_cov;
+
+if (gamma(i) == true){
+
+        unsigned int col_index = n_cert_cov;
+	//obtain column index of betas
+	for (unsigned int m=n_cert_cov; m<i; ++m){
+	if (gamma(m) == true){
+	++col_index;
+	}
+	}
+
+newlambda(j) = stream.rexp(0.5*(1.0+beta_red(col_index)*beta_red(col_index)));
+}
+
+else {
+newlambda(j) = stream.rexp(0.5);
+}
+
+}
+    return newlambda;
+    }
+
+
+/////////////////////////////////////////////////////
 
 // update latent data for standard item response models
 // only works for 1 dimensional case
