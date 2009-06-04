@@ -218,10 +218,11 @@
 ##
 ## Kevin Rompala 5/6/2003
 ## fixed KQ 3/8/2005
+## shape and rate made explicit 5/25/2010 (KQ)
 
 "rinvgamma" <-
   function(n, shape, scale = 1) {
-    return(1 / rgamma(n, shape, scale=scale))
+    return(1 / rgamma(n=n, shape=shape, rate=scale))
   }
 
 ##

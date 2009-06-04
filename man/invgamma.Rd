@@ -32,6 +32,10 @@ variance \eqn{\frac{b^2}{(a-1)^2(a-2)}}{(b^2)/((a-1)^2 (a-2))} (assuming
 \eqn{a>2}{a>2}).
 }
 
+\references{
+Andrew Gelman, John B. Carlin, Hal S. Stern, and Donald B. Rubin. 2004. \emph{Bayesian Data Analysis}. 2nd Edition. Boca Raton: Chapman & Hall. 
+}
+
 \examples{
 density <- dinvgamma(4.2, 1.1)
 draws <- rinvgamma(10, 3.2)

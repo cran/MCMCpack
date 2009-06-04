@@ -16,15 +16,12 @@ export(
        MCpoissongamma,
        MCnormalnormal,
        MCmultinomdirichlet,
-       MCMCbinaryChange,
        MCMCdynamicEI,
-       MCMCdynamicIRT1d,
        MCMCfactanal,
        MCMChierEI,
        MCMCirt1d,
        MCMCirtHier1d,
        MCMCirtKd,
-       MCMCirtKdHet,
        MCMCirtKdRob,
        MCMClogit,
        MCMCmetrop1R,
@@ -39,6 +36,7 @@ export(
        MCMCregress,
        MCMCSVDreg,
        MCMCtobit,
+       mptable,
        plotState,
        plotChangepoint,
        PostProbMod,
@@ -49,7 +47,9 @@ export(
        riwish,
        rnoncenhypergeom,
        rwish,
+       SSVSquantreg,
        tomogplot,
+       topmodels,
        vech,
        write.Scythe,
        xpnd
@@ -57,3 +57,8 @@ export(
 
 S3method(print, BayesFactor)
 S3method(summary, BayesFactor)
+S3method(plot, qrssvs)
+S3method(print, qrssvs)
+S3method(print, summary.qrssvs)
+S3method(summary, qrssvs)
+
