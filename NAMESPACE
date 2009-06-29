@@ -17,6 +17,7 @@ export(
        MCnormalnormal,
        MCmultinomdirichlet,
        MCMCdynamicEI,
+       MCMCdynamicIRT1d,
        MCMCfactanal,
        MCMChierEI,
        MCMCirt1d,

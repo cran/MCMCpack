@@ -4,6 +4,7 @@
 
 0.9-6 to 1.0-1
    * added one-dimensional dynamic IRT model 
+   * added Rehnquist Court data to illustrate dynamic IRT model
 
 0.9-5 to 0.9-6
    * fixed bug in MCMCmetrop1R.R [thanks to many for spotting memory issue]
