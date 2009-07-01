@@ -168,7 +168,7 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
   for each item parameter.
   
   The model is identified by the constraints on the item parameters
-  (see Jackman 2001).  The user cannot place constraints on the subect
+  (see Jackman 2001).  The user cannot place constraints on the subject
   abilities.  This identification scheme differs from that in
   \code{MCMCirt1d}, which uses constraints on
   the subject abilities to identify the model.
