@@ -2,6 +2,16 @@
 // Changes and Bug Fixes
 //
 
+1.0-1 to 1.0-2
+  * Added Poisson regression changepoint analysis MCMCpoissonChange() [JHP]
+  * Old MCMCpoissonChangepoint() is deprecated [JHP]
+  * Added binary data changepoint model MCMCbinaryChange() [JHP]
+  * plotState() function modified to support new models [JHP]
+  * plotChangepoint() function modified to support new models
+  * Added a number of new helper functions in btsutil.R [JHP]
+
+
+
 0.9-6 to 1.0-1
    * added one-dimensional dynamic IRT model 
    * added Rehnquist Court data to illustrate dynamic IRT model
