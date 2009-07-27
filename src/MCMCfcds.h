@@ -19,13 +19,13 @@
 //
 // KQ 6/10/2004
 // DBP 7/01/2007 [ported to scythe 1.0.x (partial)]
+// ADM 7/28/2009 [added some functions from Craig Reed for quantile
+//                regression]
 //
 // Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
 // Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
 //    and Jong Hee Park
 //////////////////////////////////////////////////////////////////////////
-
-
 
 #ifndef MCMCFCDS_H
 #define MCMCFCDS_H
@@ -39,8 +39,8 @@
 #include "distributions.h"
 
 #include <iostream>
-using namespace std;
 
+using namespace std;
 using namespace scythe;
 
 // linear regression with Gaussian errors beta draw 
@@ -86,6 +86,172 @@ NormIGregress_sigma2_draw (const Matrix <> &X, const Matrix <> &Y,
 
   return  stream.rigamma (c_post, d_post);   
 }
+
+////////////// New Additions ////////////////////////
+
+// linear regression with Laplace errors beta draw 
+// (multivariate Normal prior)
+// regression model is y = X * beta + epsilon,  epsilon ~ Laplace(0,sigma)
+// b0 is the prior mean of beta
+// B0 is the prior precision (the inverse variance) of beta
+template <typename RNGTYPE>
+Matrix<double> 
+LaplaceNormregress_beta_draw (const Matrix<>& X, const Matrix<>& Y, const Matrix<>& weights,
+         const Matrix<>& b0, const Matrix<>& B0, double sigma,
+         rng<RNGTYPE>& stream)
+{
+
+	const unsigned int k = X.cols();
+	const unsigned int n_obs = X.rows(); 
+	const double one_over_two_sigma = 1.0/(2.0*sigma);
+	Matrix<> XtwX(k,k,false);
+	Matrix<> XtwY(k,1,false);
+	double temp_x = 0.0;
+	double temp_y = 0.0;
+
+//Calculate XtwY, where w denotes a diagonal matrix with the augmented data (weights) on the diagonal   
+  for (unsigned int i=0; i<k; ++i){
+    for (unsigned int m=0; m<n_obs; ++m){
+       temp_y = temp_y + weights(m)*X(m,i)*Y(m);
+    }
+    XtwY(i) = temp_y;
+    temp_y = 0.0;
+  }
+//Calculate XtwX
+  for (unsigned int i=0; i<k; ++i){
+    for (unsigned int j=0; j<(i+1); ++j){
+      for (unsigned int m=0; m<n_obs; ++m){
+	temp_x = temp_x + weights(m)*X(m,i)*X(m,j);
+      }
+      XtwX(i,j) = temp_x;
+      XtwX(j,i) = temp_x;
+      temp_x = 0.0;
+    }
+  }
+
+	const Matrix<> var_matrix_beta = invpd(B0+one_over_two_sigma*XtwX);
+ 	const Matrix<> C = cholesky(var_matrix_beta);
+	const Matrix<> betahat = var_matrix_beta*gaxpy(B0,b0,one_over_two_sigma*XtwY);
+
+	return( gaxpy(C, stream.rnorm(k,1, 0, 1), betahat) );
+}
+  
+
+// linear regression with Laplace errors sigma draw 
+// (inverse-Gamma  prior)
+// regression model is y = X * beta + epsilon,  epsilon ~ Laplace(0,sigma)
+// c0/2 is the prior shape parameter for sigma
+// d0/2 is the prior scale parameter for sigma 
+template <typename RNGTYPE>
+double
+LaplaceIGammaregress_sigma_draw (const Matrix <> &abse, double c0, double d0,
+         rng<RNGTYPE>& stream)
+
+{
+	const double c_post = 0.5*c0 + abse.rows();
+	const double d_post = 0.5*(d0 + sum(abse));
+
+	return  stream.rigamma (c_post, d_post); 
+
+}
+
+// linear regression with Asymmetric Laplace errors beta draw 
+// (multivariate Normal prior)
+// regression model is y = X * beta + epsilon,  epsilon ~ ALaplace(0,sigma,p)
+// b0 is the prior mean of beta
+// B0 is the prior precision (the inverse variance) of beta
+template <typename RNGTYPE>
+Matrix<double> 
+ALaplaceNormregress_beta_draw (double p, const Matrix<>& X, const Matrix<>& Y, const Matrix<>& weights,
+         const Matrix<>& b0, const Matrix<>& B0, double sigma,
+         rng<RNGTYPE>& stream)
+{
+
+	const unsigned int k = X.cols();
+	const unsigned int n_obs = X.rows();
+	const double one_over_two_sigma = 1.0/(2.0*sigma);
+	const Matrix<> U = Y - (1.0-2.0*p)*pow(weights,-1.0); 
+	Matrix<> XtwX(k,k,false);
+	Matrix<> XtwU(k,1,false);
+	double temp_x = 0.0;
+	double temp_u = 0.0;
+
+//Calculate XtwU where w denotes a diagonal matrix with the augmented data (weights) on the diagonal   
+  for (unsigned int i=0; i<k; ++i){
+    for (unsigned int m=0; m<n_obs; ++m){
+       temp_u = temp_u + weights(m)*X(m,i)*U(m);
+    }
+    XtwU(i) = temp_u;
+    temp_u = 0.0;
+  }
+//Calculate XtwX
+  for (unsigned int i=0; i<k; ++i){
+    for (unsigned int j=0; j<(i+1); ++j){
+      for (unsigned int m=0; m<n_obs; ++m){
+	temp_x = temp_x + weights(m)*X(m,i)*X(m,j);
+      }
+      XtwX(i,j) = temp_x;
+      XtwX(j,i) = temp_x;
+      temp_x = 0.0;
+    }
+  }
+
+	const Matrix<> var_matrix_beta = invpd(B0+one_over_two_sigma*XtwX);
+ 	const Matrix<> C = cholesky(var_matrix_beta);
+	const Matrix<> betahat = var_matrix_beta*gaxpy(B0,b0,one_over_two_sigma*XtwU);
+
+	return( gaxpy(C, stream.rnorm(k,1, 0, 1), betahat) );
+}
+
+// linear regression with Asymmetric Laplace errors sigma draw 
+// (inverse-Gamma  prior)
+// regression model is y = X * beta + epsilon,  epsilon ~ ALaplace(0,sigma, p)
+// c0/2 is the prior shape parameter for sigma
+// d0/2 is the prior scale parameter for sigma 
+template <typename RNGTYPE>
+double
+ALaplaceIGammaregress_sigma_draw (double p, const Matrix<> &e, const Matrix <> &abse, double c0, double d0,
+         rng<RNGTYPE>& stream)
+
+{
+	const double c_post = 0.5*c0 + abse.rows();
+	const double d_post = 0.5*(d0 + sum(abse)+(2.0*p-1.0)*sum(e));
+
+	return  stream.rigamma (c_post, d_post); 
+
+}
+
+// This function draws from the full conditional distribution of the latent random variables (weights) under quantile regression (including median regression) and returns a column vector of those weights.
+
+template <typename RNGTYPE>
+Matrix<double>
+ALaplaceIGaussregress_weights_draw (const Matrix <> &abse, double sigma,
+         rng<RNGTYPE>& stream)
+
+{
+        const double lambda = 1.0/(2.0*sigma);
+	const Matrix<double> nu_params = pow(abse,-1.0);
+	Matrix<> w(abse);
+        unsigned int n_obs = abse.rows();
+
+	// The inverse Gaussian distribution
+
+	for (unsigned int i=0; i<n_obs; ++i){
+            double chisq = stream.rchisq(1);
+            double nu = nu_params(i);
+	    double smallroot = nu/(2.0*lambda)*(nu*chisq+2.0*lambda-std::sqrt(nu*nu*chisq*chisq+4.0*nu*lambda*chisq));
+	    unsigned int q = stream.rbern(nu/(nu+smallroot));
+	    if (q == 1){
+		w(i) = smallroot;
+            }
+	    else{
+		w(i) = nu*nu/smallroot;
+	    }
+	  }
+	return w;
+}
+
+////////////////////////////////////////////////////
 
 // update latent data for standard item response models
 // only works for 1 dimensional case

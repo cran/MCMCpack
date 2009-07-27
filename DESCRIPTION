@@ -1,6 +1,6 @@
 Package: MCMCpack
-Version: 1.0-2
-Date: 2009-7-17
+Version: 1.0-3
+Date: 2009-7-27
 Title: Markov chain Monte Carlo (MCMC) Package
 Author: Andrew D. Martin <admartin@wustl.edu>, Kevin M. Quinn
         <kevin_quinn@harvard.edu>, Jong Hee Park <jhp@uchicago.edu>
@@ -19,6 +19,6 @@ Description: This package contains functions to perform Bayesian
 License: GPL-2
 SystemRequirements: gcc (>= 4.0)
 URL: http://mcmcpack.wustl.edu
-Packaged: 2009-07-17 18:52:45 UTC; adm
+Packaged: 2009-07-28 17:41:00 UTC; adm
 Repository: CRAN
-Date/Publication: 2009-07-18 15:22:20
+Date/Publication: 2009-07-30 12:51:08

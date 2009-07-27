@@ -52,7 +52,7 @@ MCMCirtHier1d(datamatrix, Xjdata,
     Gibbs iterations must be divisible by this value.}
 
     \item{verbose}{A switch which determines whether or not the progress of
-      the sampler is printed to the screen.   If \code{verbose} is greater
+      the sampler is printed to the screen. If \code{verbose} is greater
       than 0 then every \code{verbose}th iteration will be printed to the
       screen.}
     
@@ -286,7 +286,7 @@ Xjdata <- data.frame(presparty= c(1,1,0,1,1,1,1,0,0),
 ## the variance of the (unidentified) latent parameter alpha.
 
 scMiss <- SupremeCourt
-scMiss[matrix(as.logical(rbinom( nrow(SupremeCourt)*ncol(SupremeCourt), 1, .1)), dim(SupremeCourt))] <- NA
+scMiss[matrix(as.logical(rbinom(nrow(SupremeCourt)*ncol(SupremeCourt), 1, .1)), dim(SupremeCourt))] <- NA
 
    posterior1.miss <- MCMCirtHier1d(t(scMiss),
                    burnin=80000, mcmc=10000, thin=20, 
