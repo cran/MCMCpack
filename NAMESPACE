@@ -34,6 +34,7 @@ export(
        MCMCpoisson,
        MCMCpoissonChange,
        MCMCprobit,
+       MCMCquantreg,
        MCMCregress,
        MCMCSVDreg,
        MCMCtobit,
