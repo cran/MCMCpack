@@ -197,5 +197,5 @@ MCMCfactanal(x, factors, lambda.constraints=list(),
 
 \keyword{models}
 
-\seealso{\code{\link[coda]{plot.mcmc}},\code{\link[coda]{summary.mcmc}},\code{\link[mva]{factanal}}}
+\seealso{\code{\link[coda]{plot.mcmc}},\code{\link[coda]{summary.mcmc}},\code{\link[stats]{factanal}}}
 

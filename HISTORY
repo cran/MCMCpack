@@ -2,8 +2,11 @@
 // Changes and Bug Fixes
 //
 
+1.0-3 to 1.0-4
+  * little change to parameterization of BQR [contributed by Craig Reed]
+
 1.0-2 to 1.0-3
-  * Mix fix to hierarchical IRT documentation [written by Mike Malecki]
+  * fix to hierarchical IRT documentation [written by Mike Malecki]
   * added Bayesian quantile regression [contributed by Craig Reed]
 
 1.0-1 to 1.0-2

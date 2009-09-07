@@ -2,7 +2,7 @@
 
 \alias{MCMCquantreg}
 
-\title{Bayesian quantile regression using Gibbs sampling}
+\title{ Bayesian quantile regression using Gibbs sampling }
 
 \description{
   This function fits quantile regression models under Bayesian inference.  
@@ -14,7 +14,7 @@
 }
 
 \usage{
-MCMCquantreg(formula, p=0.5, data = NULL, burnin = 1000,
+MCMCquantreg(formula, tau=0.5, data = NULL, burnin = 1000,
    mcmc = 10000, thin = 1, verbose = 0, seed = NA,
    beta.start = NA, b0 = 0, B0 = 0, c0 = 0.001, d0 = 0.001, ...)
 }
@@ -23,7 +23,7 @@ MCMCquantreg(formula, p=0.5, data = NULL, burnin = 1000,
 
   \item{formula}{ Model formula. }
 
-  \item{p}{The quantile of interest. Must be between 0 and 1. The default value of 0.5 corresponds to median regression.}
+  \item{tau}{The quantile of interest. Must be between 0 and 1. The default value of 0.5 corresponds to median regression.}
 
 
   \item{data}{ Data frame. }
@@ -56,10 +56,10 @@ MCMCquantreg(formula, p=0.5, data = NULL, burnin = 1000,
     column vector with dimension equal to the dimension of \eqn{\beta}{beta}.
     The default value of NA will use the OLS
     estimate \eqn{\hat{\beta}}{beta^hat} with 
-    \eqn{\hat{\sigma}\Phi^{-1}(p)}{sigma^hat*Phi^(-1)(p)} added on to the first element of \eqn{\hat{\beta}}{beta^hat} as the starting value. 
+    \eqn{\hat{\sigma}\Phi^{-1}(\tau)}{sigma^hat*Phi^(-1)(tau)} added on to the first element of \eqn{\hat{\beta}}{beta^hat} as the starting value. 
     (\eqn{\hat{\sigma}^2}{(sigma^hat)^2} denotes the usual unbiased estimator of
     \eqn{\sigma^2}{sigma^2} under ordinary mean regression and 
-    \eqn{\Phi^{-1}(p)}{Phi^(-1)(p)} denotes the inverse of the
+    \eqn{\Phi^{-1}(\tau)}{Phi^(-1)(tau)} denotes the inverse of the
     cumulative density function of the standard normal distribution.)  
      Note that the default value assume that an intercept is included in the model.
     If a scalar is given,  that value will serve as the starting value
@@ -99,11 +99,11 @@ MCMCquantreg(formula, p=0.5, data = NULL, burnin = 1000,
   
   The model takes the following form:
   \deqn{y_i = x_i ' \beta + \varepsilon_i}{y_i = x_i'beta + epsilon_i}
-  The errors are assumed to have an Asymmetric Laplace distribution with pth quantile equal to zero 
+  The errors are assumed to have an Asymmetric Laplace distribution with \eqn{\tau}{tau}th quantile equal to zero 
   and shape parameter equal to \eqn{\sigma}{sigma}:
-  \deqn{\varepsilon_i(p) \sim \mathcal{AL}(0, \sigma, p)}{epsilon_i(p) ~ AL(0,
-    sigma, p),}
-  where \eqn{\beta}{beta} and \eqn{\sigma}{sigma} depend on p. 
+  \deqn{\varepsilon_i(\tau) \sim \mathcal{AL}(0, \sigma, \tau)}{epsilon_i(tau) ~ AL(0,
+    sigma, tau),}
+  where \eqn{\beta}{beta} and \eqn{\sigma}{sigma} depend on \eqn{\tau}{tau}. 
   We assume standard, semi-conjugate priors:
   \deqn{\beta \sim \mathcal{N}(b_0,B_0^{-1})}{beta ~ N(b0,B0^(-1)),}
   and
@@ -122,16 +122,16 @@ MCMCquantreg(formula, p=0.5, data = NULL, burnin = 1000,
 \references{ Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.2.} \url{http://scythe.wustl.edu}.
    
-   Craig Reed and Keming Yu. 2009. ``A Partially Collapsed Gibbs Sampler for Bayesian Quantile Regression." Technical Report.
+   Craig Reed and Keming Yu. 2009. "A Partially Collapsed Gibbs Sampler for Bayesian Quantile Regression." Technical Report.
    
-   Keming Yu and Jin Zhang. 2005. ``A Three Parameter Asymmetric Laplace Distribution and it's extensions."
+   Keming Yu and Jin Zhang. 2005. "A Three Parameter Asymmetric Laplace Distribution and it's extensions."
 \emph{Communications in Statistics - Theory and Methods}, 34, 1867-1879.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
    \url{http://www-fis.iarc.fr/coda/}.}
      
-\author{Craig Reed}
+\author{ Craig Reed}
 
 \seealso{ \code{\link[MCMCpack]{MCMCregress}}, \code{\link[coda]{plot.mcmc}},
   \code{\link[coda]{summary.mcmc}}, \code{\link[stats]{lm}}, \code{\link[quantreg]{rq}} }
@@ -142,7 +142,7 @@ MCMCquantreg(formula, p=0.5, data = NULL, burnin = 1000,
 x<-rep(1:10,5)
 y<-rnorm(50,mean=x)
 posterior_50 <- MCMCquantreg(y~x)
-posterior_95 <- MCMCquantreg(y~x, p=0.95, verbose=10000,
+posterior_95 <- MCMCquantreg(y~x, tau=0.95, verbose=10000,
     mcmc=50000, thin=10, seed=2)
 plot(posterior_50)
 plot(posterior_95)
