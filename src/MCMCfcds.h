@@ -19,13 +19,13 @@
 //
 // KQ 6/10/2004
 // DBP 7/01/2007 [ported to scythe 1.0.x (partial)]
-// ADM 7/28/2009 [added some functions from Craig Reed for quantile
-//                regression]
 //
 // Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
 // Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
 //    and Jong Hee Park
 //////////////////////////////////////////////////////////////////////////
+
+
 
 #ifndef MCMCFCDS_H
 #define MCMCFCDS_H
@@ -87,8 +87,6 @@ NormIGregress_sigma2_draw (const Matrix <> &X, const Matrix <> &Y,
   return  stream.rigamma (c_post, d_post);   
 }
 
-////////////// New Additions ////////////////////////
-
 // linear regression with Laplace errors beta draw 
 // (multivariate Normal prior)
 // regression model is y = X * beta + epsilon,  epsilon ~ Laplace(0,sigma)
@@ -135,7 +133,6 @@ LaplaceNormregress_beta_draw (const Matrix<>& X, const Matrix<>& Y, const Matrix
 
 	return( gaxpy(C, stream.rnorm(k,1, 0, 1), betahat) );
 }
-  
 
 // linear regression with Laplace errors sigma draw 
 // (inverse-Gamma  prior)
@@ -157,12 +154,12 @@ LaplaceIGammaregress_sigma_draw (const Matrix <> &abse, double c0, double d0,
 
 // linear regression with Asymmetric Laplace errors beta draw 
 // (multivariate Normal prior)
-// regression model is y = X * beta + epsilon,  epsilon ~ ALaplace(0,sigma,p)
+// regression model is y = X * beta + epsilon,  epsilon ~ ALaplace(0,sigma,tau)
 // b0 is the prior mean of beta
 // B0 is the prior precision (the inverse variance) of beta
 template <typename RNGTYPE>
 Matrix<double> 
-ALaplaceNormregress_beta_draw (double p, const Matrix<>& X, const Matrix<>& Y, const Matrix<>& weights,
+ALaplaceNormregress_beta_draw (double tau, const Matrix<>& X, const Matrix<>& Y, const Matrix<>& weights,
          const Matrix<>& b0, const Matrix<>& B0, double sigma,
          rng<RNGTYPE>& stream)
 {
@@ -170,7 +167,7 @@ ALaplaceNormregress_beta_draw (double p, const Matrix<>& X, const Matrix<>& Y, c
 	const unsigned int k = X.cols();
 	const unsigned int n_obs = X.rows();
 	const double one_over_two_sigma = 1.0/(2.0*sigma);
-	const Matrix<> U = Y - (1.0-2.0*p)*pow(weights,-1.0); 
+	const Matrix<> U = Y - (1.0-2.0*tau)*pow(weights,-1.0); 
 	Matrix<> XtwX(k,k,false);
 	Matrix<> XtwU(k,1,false);
 	double temp_x = 0.0;
@@ -205,17 +202,17 @@ ALaplaceNormregress_beta_draw (double p, const Matrix<>& X, const Matrix<>& Y, c
 
 // linear regression with Asymmetric Laplace errors sigma draw 
 // (inverse-Gamma  prior)
-// regression model is y = X * beta + epsilon,  epsilon ~ ALaplace(0,sigma, p)
+// regression model is y = X * beta + epsilon,  epsilon ~ ALaplace(0,sigma,tau)
 // c0/2 is the prior shape parameter for sigma
 // d0/2 is the prior scale parameter for sigma 
 template <typename RNGTYPE>
 double
-ALaplaceIGammaregress_sigma_draw (double p, const Matrix<> &e, const Matrix <> &abse, double c0, double d0,
+ALaplaceIGammaregress_sigma_draw (double tau, const Matrix<> &e, const Matrix <> &abse, double c0, double d0,
          rng<RNGTYPE>& stream)
 
 {
 	const double c_post = 0.5*c0 + abse.rows();
-	const double d_post = 0.5*(d0 + sum(abse)+(2.0*p-1.0)*sum(e));
+	const double d_post = 0.5*(d0 + sum(abse)+(2.0*tau-1.0)*sum(e));
 
 	return  stream.rigamma (c_post, d_post); 
 
@@ -250,8 +247,6 @@ ALaplaceIGaussregress_weights_draw (const Matrix <> &abse, double sigma,
 	  }
 	return w;
 }
-
-////////////////////////////////////////////////////
 
 // update latent data for standard item response models
 // only works for 1 dimensional case

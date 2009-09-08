@@ -56,7 +56,7 @@ using namespace scythe;
  * fills with the posterior.  
  */
 template <typename RNGTYPE>
-void MCMCquantreg_impl (rng<RNGTYPE>& stream, double p, const Matrix<>& Y,
+void MCMCquantreg_impl (rng<RNGTYPE>& stream, double tau, const Matrix<>& Y,
     const Matrix<>& X, Matrix<>& beta, const Matrix<>& b0,
     const Matrix<>& B0, double c0, double d0,
     unsigned int burnin, unsigned int mcmc, unsigned int thin, 
@@ -78,9 +78,9 @@ void MCMCquantreg_impl (rng<RNGTYPE>& stream, double p, const Matrix<>& Y,
    for (unsigned int iter = 0; iter < tot_iter; ++iter) {
      Matrix<> e = gaxpy(X, (-1*beta), Y);
      Matrix<> abse = fabs(e);
-     double sigma = ALaplaceIGammaregress_sigma_draw (p, e, abse, c0, d0, stream);
+     double sigma = ALaplaceIGammaregress_sigma_draw (tau, e, abse, c0, d0, stream);
      Matrix<> weights = ALaplaceIGaussregress_weights_draw (abse, sigma, stream);
-     beta = ALaplaceNormregress_beta_draw (p, X, Y, weights, b0, B0, sigma, stream);  
+     beta = ALaplaceNormregress_beta_draw (tau, X, Y, weights, b0, B0, sigma, stream);  
 
      // store draws in storage matrix (or matrices)
      if (iter >= burnin && (iter % thin == 0)) {
@@ -108,7 +108,7 @@ void MCMCquantreg_impl (rng<RNGTYPE>& stream, double p, const Matrix<>& Y,
 
 extern "C" {
    void MCMCquantreg(double *sampledata, const int *samplerow,
-		    const int *samplecol, const double *p, const double *Ydata, const int *Yrow,
+		    const int *samplecol, const double *tau, const double *Ydata, const int *Yrow,
 		    const int *Ycol, const double *Xdata, const int *Xrow,
 		    const int *Xcol, const int *burnin, const int *mcmc,
 		    const int *thin, const int *uselecuyer, const int *seedarray,
@@ -127,7 +127,7 @@ extern "C" {
      Matrix<> B0(*B0row, *B0col, B0data);
 
      Matrix<> storagematrix;
-     MCMCPACK_PASSRNG2MODEL(MCMCquantreg_impl, *p, Y, X, betastart, b0, B0, 
+     MCMCPACK_PASSRNG2MODEL(MCMCquantreg_impl, *tau, Y, X, betastart, b0, B0, 
                             *c0, *d0, *burnin, *mcmc, *thin, *verbose,
                             storagematrix);
      

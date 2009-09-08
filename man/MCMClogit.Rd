@@ -191,5 +191,4 @@ MCMClogit(formula, data=NULL, burnin = 1000, mcmc = 10000,
 
 \keyword{models}
 
-\seealso{\code{\link[coda]{plot.mcmc}},\code{\link[coda]{summary.mcmc}}, \code{\link[base]{glm}}}
-
+\seealso{\code{\link[coda]{plot.mcmc}},\code{\link[coda]{summary.mcmc}}, \code{\link[stats]{glm}}}

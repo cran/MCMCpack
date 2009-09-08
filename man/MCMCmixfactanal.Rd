@@ -298,7 +298,7 @@ summary(post)
 \keyword{models}
 
 \seealso{\code{\link[coda]{plot.mcmc}}, \code{\link[coda]{summary.mcmc}},
-  \code{\link[mva]{factanal}}, \code{\link[MCMCpack]{MCMCfactanal}},
+  \code{\link[stats]{factanal}}, \code{\link[MCMCpack]{MCMCfactanal}},
   \code{\link[MCMCpack]{MCMCordfactanal}},
   \code{\link[MCMCpack]{MCMCirt1d}}, \code{\link[MCMCpack]{MCMCirtKd}}}
 
