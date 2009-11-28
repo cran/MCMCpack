@@ -2,6 +2,10 @@
 // Changes and Bug Fixes
 //
 
+1.0-4 to 1.0-5
+  * added heteroskedastic IRT model [written by Ben Lauderdale]
+  * minor changes to error status in hierarchical IRT [written by Mike Malecki]
+
 1.0-3 to 1.0-4
   * little change to parameterization of BQR [contributed by Craig Reed]
 

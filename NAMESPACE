@@ -24,6 +24,7 @@ export(
        MCMCirt1d,
        MCMCirtHier1d,
        MCMCirtKd,
+       MCMCirtKdHet,
        MCMCirtKdRob,
        MCMClogit,
        MCMCmetrop1R,
