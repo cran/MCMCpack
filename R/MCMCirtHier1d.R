@@ -121,7 +121,7 @@
               call.=FALSE)
     }    
 
-    cat("doing betastart ")
+    cat("Generating starting values (glm) for hierarchical parameters:\n")
     ## starting values are regression of theta.start on Xj
     ## or passed vector, or same value all beta
     if (max(is.na(beta.start))==1) {         # beta.start NA
@@ -238,7 +238,7 @@
 
     beta.names <- paste("beta.",beta.names,sep="")
     theta.names <- paste("theta.", subject.names, sep = "")
-    alpha.beta.names <- paste(rep(c("alpha.","beta."), K),
+    alpha.beta.names <- paste(rep(c("a.","b."), K),
                               rep(item.names, each = 2),
                               sep = "")
    
