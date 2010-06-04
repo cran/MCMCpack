@@ -71,7 +71,7 @@ class(results)<-"summary.qrssvs"
 return(results)
 }
 
-print.summary.qrssvs<-function(x, digits=max(3, .Options$digits-3), ...){
+"print.summary.qrssvs"<-function(x, digits=max(3, .Options$digits-3), ...){
 attr(x, "class")<-"data.frame"
 cat("\nMarginal inclusion probability of each predictor:\n\n")
 print(x, digits=digits, ...)

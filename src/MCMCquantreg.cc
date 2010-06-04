@@ -67,8 +67,7 @@ void MCMCquantreg_impl (rng<RNGTYPE>& stream, double tau, Matrix<>& Y,
    // define constants
    const unsigned int tot_iter = burnin + mcmc; //total iterations
    const unsigned int nstore = mcmc / thin; // number of draws to store
-   const unsigned int k = X.cols ();
-   const unsigned int n_obs = X.rows();
+   const unsigned int k = X.cols ();  
       
    // storage matrices
    Matrix<> betamatrix (k, nstore);

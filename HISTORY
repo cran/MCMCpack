@@ -3,6 +3,12 @@
 //
 
 
+1.0-6 to 1.0-7
+  * slight modifications to internals of rinvgamma to make parameterization 
+    more clear [thanks to Daniel Runcie and Richard Morey]
+  * fixed some NAMESPACE issues with SSVSquantreg and its methods [written by Craig
+    Reed]
+
 1.0-5 to 1.0-6
   * added SSVSquantreg [written by Craig Reed]
   * added functions to handle SSVSquantreg output [written by Craig Reed]
