@@ -3,6 +3,9 @@
 //
 
 
+1.0-7 to 1.0-8
+  * fixed some NAMESPACE issues [thanks to Shawn Treier]
+
 1.0-6 to 1.0-7
   * slight modifications to internals of rinvgamma to make parameterization 
     more clear [thanks to Daniel Runcie and Richard Morey]
