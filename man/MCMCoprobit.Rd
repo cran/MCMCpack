@@ -9,7 +9,9 @@
   object, which can be subsequently analyzed with functions 
   provided in the coda package.
   }
-  
+ 
+
+
 \usage{
 MCMCoprobit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
    thin=1, tune = NA, tdf = 1, verbose = 0, seed = NA, beta.start = NA,
@@ -62,7 +64,7 @@ MCMCoprobit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
     scalar or a column vector with dimension equal to the number of
     betas. If this takes a scalar value, then that value will serve as
     the prior mean for all of the betas.}
-    
+
     \item{B0}{The prior precision of \eqn{\beta}{beta}.  This can either be a 
     scalar or a square matrix with dimensions equal to the number of
     betas.  If this takes a scalar value, then that value times an
@@ -121,7 +123,8 @@ that can be used to analyze the posterior sample.
 }
   
 \references{
-  Albert, James and Siddhartha Chib. 2001. ``Sequential Ordinal Modeling with Applications to Survival Data." \emph{Biometrics.} 57: 829-836. 
+  Albert, J. H. and S. Chib. 1993. ``Bayesian Analysis of Binary and
+  Polychotomous Response Data.'' \emph{J. Amer. Statist. Assoc.} 88, 669-679
   
   M. K. Cowles. 1996. ``Accelerating Monte Carlo Markov Chain Convergence for
   Cumulative-link Generalized Linear Models." \emph{Statistics and Computing.}
@@ -129,6 +132,8 @@ that can be used to analyze the posterior sample.
      
   Valen E. Johnson and James H. Albert. 1999. \emph{Ordinal Data Modeling}. 
   Springer: New York.
+
+  Albert, James and Siddhartha Chib. 2001. ``Sequential Ordinal Modeling with Applications to Survival Data." \emph{Biometrics.} 57: 829-836. 
       
    Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.

@@ -161,6 +161,9 @@ that can be used to analyze the posterior sample.
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
    \url{http://www-fis.iarc.fr/coda/}.
+   
+   Siddhartha Chib, Edward Greenberg, and Yuxin Chen. 1998. 
+   ``MCMC Methods for Fitting and Comparing Multinomial Response Models."
 }
 
 \seealso{\code{\link[coda]{plot.mcmc}},\code{\link[coda]{summary.mcmc}},

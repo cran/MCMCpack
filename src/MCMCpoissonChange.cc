@@ -298,6 +298,7 @@ void MCMCpoissonChangepoint_impl(rng<RNGTYPE>& stream,
 				 const double *b, 
 				 const double *A0data, 
 				 double *logmarglikeholder, 
+				 double *loglikeholder, 
 				 const int *chib)
 
 {
@@ -506,6 +507,7 @@ void MCMCpoissonChangepoint_impl(rng<RNGTYPE>& stream,
     const double logmarglike = (loglike + logprior) - (pdf_lambda + pdf_P); 
     
     logmarglikeholder[0] = logmarglike;
+    loglikeholder[0] = loglike;
   }
   
   R_CheckUserInterrupt();      
@@ -556,6 +558,7 @@ void MCMCpoissonRegChangepoint_impl(rng<RNGTYPE>& stream,
 				    const double *B0data, 
 				    const double *A0data, 
 				    double *logmarglikeholder, 
+				    double *loglikeholder, 
 				    const double* wrin, 
 				    const double* mrin, 
 				    const double* srin, 
@@ -850,7 +853,8 @@ void MCMCpoissonRegChangepoint_impl(rng<RNGTYPE>& stream,
     const double logmarglike = (loglike + logprior) - (pdf_beta + pdf_P);
 
     logmarglikeholder[0] = logmarglike;
-    
+    loglikeholder[0] = loglike;
+   
   }
         
   R_CheckUserInterrupt();      
@@ -901,6 +905,7 @@ extern "C" {
 			  const double *B0data, 
 			  const double *A0data, 
 			  double *logmarglikeholder, 
+			  double *loglikeholder, 
 			  const double *wrin, 
 			  const double *mrin, 
 			  const double *srin, 
@@ -913,7 +918,7 @@ extern "C" {
 			     burnin, mcmc, thin, verbose,  
 			     betastart, Pstart, 
 			     a, b, A0data,
-			     logmarglikeholder, chib)
+			     logmarglikeholder, loglikeholder, chib)
 	}
     else{
       MCMCPACK_PASSRNG2MODEL(MCMCpoissonRegChangepoint_impl, 
@@ -924,7 +929,7 @@ extern "C" {
 			     betastart, Pstart, 
 			     taustart, componentstart,
 			     a, b, b0data, B0data, A0data, 
-			     logmarglikeholder, 
+			     logmarglikeholder, loglikeholder, 
 			     wrin, mrin, srin, chib);
     }
   } // end MCMC
