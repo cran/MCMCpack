@@ -56,8 +56,9 @@ void MCMCprobitres_impl (rng<RNGTYPE>& stream, const Matrix<>& Y,
 			 const Matrix<>& b0,
 			 const Matrix<>& B0,  unsigned int burnin, 
 			 unsigned int mcmc,
-			 unsigned int thin, unsigned int verbose,  
-			 Matrix<>& result) {
+			 unsigned int thin, unsigned int verbose,  bool chib,  
+			 Matrix<>& result, 
+			 double& logmarglike) {
   
   // define constants and from cross-product matrices
   const unsigned int tot_iter = burnin + mcmc;  // total number of mcmc iterations
@@ -65,10 +66,12 @@ void MCMCprobitres_impl (rng<RNGTYPE>& stream, const Matrix<>& Y,
   const unsigned int k = X.cols();
   const unsigned int N = X.rows();
   const Matrix<> XpX = crossprod(X);
+  const Matrix<> B0inv = invpd(B0);
   
-  // holding matrices
-  Matrix<> storemat(nstore, k+resvec.rows());
-  
+  // storage matrix or matrices
+  Matrix<> beta_store(nstore, k);
+  Matrix<> Z_store(nstore, N);
+   
   // initialize Z
   Matrix<> Z(N,1);
   
@@ -91,11 +94,13 @@ void MCMCprobitres_impl (rng<RNGTYPE>& stream, const Matrix<>& Y,
     
     // store values in matrices
     if (iter >= burnin && ((iter % thin)==0)){ 
-      for (unsigned int j = 0; j < k; j++)
-	storemat(count, j) = beta[j];
+      for (unsigned int j = 0; j < k; j++){
+	beta_store(count, j) = beta[j];
+      }
+      Z_store(count,_) = Z;
       for (unsigned int j=0; j<(resvec.rows()); ++j){
 	const int i = static_cast<int>(resvec[j]) - 1;
-	storemat(count, j+k) = Z[i] - Z_mean[i];
+	beta_store(count, j+k) = Z[i] - Z_mean[i];
       }
       ++count;
     }
@@ -112,8 +117,39 @@ void MCMCprobitres_impl (rng<RNGTYPE>& stream, const Matrix<>& Y,
     
   } // end MCMC loop
   
-  result = storemat;
   
+  if(chib==1){
+    Rprintf("\n Marginal Likelihood Computation Starts!\n"); 
+
+    Matrix<double> beta_star = meanc(beta_store); 
+    Matrix<double> density_beta(nstore, 1);      
+    for (int iter = 0; iter<nstore; ++iter){     
+      const Matrix<> Z_reduced = Z_store(iter,_);
+      const Matrix<double> XpZ = (::t(X)*Z_reduced);
+      const Matrix<double> Bn = invpd(B0inv + XpX);
+      const Matrix<double> bn = Bn*gaxpy(B0inv, b0, XpZ);
+      density_beta(iter) = exp(lndmvn(beta_star, bn, Bn));	
+    }
+    double logbeta = log(prod(meanc(density_beta)));
+    
+    double loglike = 0.0;
+    Matrix<> eta = X * beta_star;
+    for (unsigned int i = 0; i < X.rows(); ++i) {
+      double phi = pnorm(eta(i), 0, 1);
+      loglike += log(dbinom(Y(i), 1, phi));
+    }
+     
+    // calculate log prior ordinate
+    double logprior = lndmvn(beta_star, b0, B0inv);
+    
+    logmarglike = loglike + logprior - logbeta;
+    
+    Rprintf("\n logmarglike %10.5f", logmarglike, "\n"); 
+    Rprintf("\n loglike %10.5f", loglike, "\n"); 
+    
+  }// end of marginal likelihood computation
+ 
+  result = beta_store;  
 }
 
 
@@ -133,7 +169,10 @@ extern "C"{
 		     const int *betastartrow, const int *betastartcol, 
 		     const double *b0data, const int *b0row, 
 		     const int *b0col, const double *B0data, 
-		     const int *B0row, const int *B0col) {  
+		     const int *B0row, const int *B0col, 
+		     double *logmarglikeholder, // double *loglikeholder, 
+		     const int *chib) {  
+    
     
     // pull together Matrix objects
     const Matrix <> Y(*Yrow, *Ycol, Ydata);
@@ -144,12 +183,14 @@ extern "C"{
 		   betastartdata);
     const Matrix <> b0(*b0row, *b0col, b0data);
     const Matrix <> B0(*B0row, *B0col, B0data);
-
+    double logmarglike;
+   
     Matrix<> storagematrix;
     MCMCPACK_PASSRNG2MODEL(MCMCprobitres_impl, Y, X, beta, resvec, 
 			   b0, B0, *burnin,
-			   *mcmc, *thin, *verbose, 
-			   storagematrix);
+			   *mcmc, *thin, *verbose, *chib, 
+			   storagematrix, 
+ 			   logmarglike);
     
     // return output
     const unsigned int size = *samplerow * *samplecol;

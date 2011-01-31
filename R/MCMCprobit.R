@@ -21,7 +21,7 @@
   function(formula, data=NULL, burnin = 1000, mcmc = 10000,
            thin = 1, verbose = 0, seed = NA, beta.start = NA,
            b0 = 0, B0 = 0, bayes.resid=FALSE,
-           marginal.likelihood = c("none", "Laplace"), ...) {
+           marginal.likelihood = c("none", "Laplace", "Chib95"), ...) {
     
     ## checks
     check.offset(list(...))
@@ -84,24 +84,12 @@
       stop("Check data and call MCMCprobit() again.\n") 
     }
 
-    
-    ## marginal likelihood calculation if Laplace
-    if (marginal.likelihood == "Laplace"){
-      theta.start <- beta.start
-      optim.out <- optim(theta.start, logpost.probit, method="BFGS",
-                         control=list(fnscale=-1),
-                         hessian=TRUE, y=Y, X=X, b0=b0, B0=B0)
-      
-      theta.tilde <- optim.out$par
-      beta.tilde <- theta.tilde[1:K]
-      
-      Sigma.tilde <- solve(-1*optim.out$hessian)
-      
-      logmarglike <- (length(theta.tilde)/2)*log(2*pi) +
-        log(sqrt(det(Sigma.tilde))) + 
-          logpost.probit(theta.tilde, Y, X, b0, B0)
-      
+    ## if Chib95 is true
+    chib <- 0
+    if (marginal.likelihood == "Chib95"){
+      chib <- 1
     }
+
     posterior <- NULL
 
     if (is.null(resvec)){
@@ -117,18 +105,42 @@
                        seedarray=as.integer(seed.array),
                        lecuyerstream=as.integer(lecuyer.stream),
                        verbose=as.integer(verbose), betastart=beta.start,
-                       b0=b0, B0=B0) 
+                       b0=b0, B0=B0, logmarglikeholder.nonconst = as.double(0.0),
+                       chib = as.integer(chib)) 
+      
+      ## get marginal likelihood if Chib95
+      if (marginal.likelihood == "Chib95"){
+        logmarglike <- posterior$logmarglikeholder
+      }
+      ## marginal likelihood calculation if Laplace
+      if (marginal.likelihood == "Laplace"){
+        theta.start <- beta.start
+        optim.out <- optim(theta.start, logpost.probit, method="BFGS",
+                           control=list(fnscale=-1),
+                           hessian=TRUE, y=Y, X=X, b0=b0, B0=B0)
+        
+        theta.tilde <- optim.out$par
+        beta.tilde <- theta.tilde[1:K]
+        
+        Sigma.tilde <- solve(-1*optim.out$hessian)
+        
+        logmarglike <- (length(theta.tilde)/2)*log(2*pi) +
+          log(sqrt(det(Sigma.tilde))) + 
+            logpost.probit(theta.tilde, Y, X, b0, B0)
+        
+      }
       
       ## put together matrix and build MCMC object to return
       output <- form.mcmc.object(posterior, names=xnames,
                                  title="MCMCprobit Posterior Sample",
-                                 y=Y, call=cl, logmarglike=logmarglike)
+                                 y=Y, call=cl,
+                                 logmarglike=logmarglike)
 
     }
     else{
       # define holder for posterior density sample
       sample <- matrix(data=0, mcmc/thin, dim(X)[2]+length(resvec) )
-
+      
       ## call C++ code to draw sample
       auto.Scythe.call(output.object="posterior", cc.fun.name="MCMCprobitres",
                        sample.nonconst=sample, Y=Y, X=X, resvec=resvec,
@@ -138,7 +150,30 @@
                        seedarray=as.integer(seed.array),
                        lecuyerstream=as.integer(lecuyer.stream),
                        verbose=as.integer(verbose), betastart=beta.start,
-                       b0=b0, B0=B0) 
+                       b0=b0, B0=B0,  logmarglikeholder.nonconst= as.double(0.0),
+                       chib = as.integer(chib)) 
+      
+      ## get marginal likelihood if Chib95
+      if (marginal.likelihood == "Chib95"){
+        logmarglike <- posterior$logmarglikeholder
+      }
+      ## marginal likelihood calculation if Laplace
+      if (marginal.likelihood == "Laplace"){
+        theta.start <- beta.start
+        optim.out <- optim(theta.start, logpost.probit, method="BFGS",
+                           control=list(fnscale=-1),
+                           hessian=TRUE, y=Y, X=X, b0=b0, B0=B0)
+        
+        theta.tilde <- optim.out$par
+        beta.tilde <- theta.tilde[1:K]
+        
+        Sigma.tilde <- solve(-1*optim.out$hessian)
+        
+        logmarglike <- (length(theta.tilde)/2)*log(2*pi) +
+          log(sqrt(det(Sigma.tilde))) + 
+            logpost.probit(theta.tilde, Y, X, b0, B0)
+        
+      }
       
       ## put together matrix and build MCMC object to return
       xnames <- c(xnames, paste("epsilonstar", as.character(resvec), sep="") )

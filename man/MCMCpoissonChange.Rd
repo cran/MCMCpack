@@ -87,7 +87,8 @@
 
 \details{
   \code{MCMCpoissonChange} simulates from the posterior distribution of
-  a Poisson regression model with multiple changepoints.
+  a Poisson regression model with multiple changepoints using the methods of Chib (1998) and Fruhwirth-Schnatter and Wagner (2006).
+  The details of the model are discussed in Park (2010). 
 
   The model takes the following form:
   \deqn{y_t \sim \mathcal{P}oisson(\mu_t)}{y_t ~ Poisson(mu_t)}
@@ -104,13 +105,18 @@
 \author{Jong Hee Park, \email{jhp@uchicago.edu}, \url{http://home.uchicago.edu/~jhp/}.}
 
 \references{
- Siddhartha Chib. 1995. "Marginal Likelihood from the Gibbs Output."
-   \emph{Journal of the American Statistical Association}. 90:
-   1313-1321.
+ Jong Hee Park. 2010. "Structural Change in the U.S. Presidents' Use of Force Abroad." 
+ \emph{American Journal of Political Science} 54: 766-782.
+
+ Sylvia Fruhwirth-Schnatter and Helga Wagner 2006. "Auxiliary Mixture Sampling for Parameter-driven Models of 
+ Time Series of Counts with Applications to State Space Modelling." \emph{Biometrika}. 93:827--841.
 
  Siddhartha Chib. 1998. "Estimation and comparison of multiple change-point models."
    \emph{Journal of Econometrics}. 86: 221-241.
 
+ Siddhartha Chib. 1995. "Marginal Likelihood from the Gibbs Output."
+   \emph{Journal of the American Statistical Association}. 90:
+   1313-1321.
 }
 
 \examples{
@@ -122,7 +128,7 @@
     true.beta2 <- c(1,  -2)
     true.beta3 <- c(1,  2)    
     
-    ## true two breaks at (50, 100)
+    ## set true two breaks at (50, 100)
     true.s <- rep(1:3, each=n/3)
     mu1 <- exp(1 + x1[true.s==1]*1)
     mu2 <- exp(1 + x1[true.s==2]*-2)
@@ -131,6 +137,7 @@
     y <- as.ts(c(rpois(n/3, mu1), rpois(n/3, mu2), rpois(n/3, mu3)))
     formula = y ~ x1
     
+    ## fit multiple models with a varying number of breaks
     model1 <-  MCMCpoissonChange(formula, m=1, 
     	       mcmc = 1000, burnin = 1000, verbose = 500, 
 	       b0 = rep(0, 2), B0 = 5*diag(2), marginal.likelihood = "Chib95")    
@@ -147,14 +154,15 @@
     	       mcmc = 1000, burnin = 1000, verbose = 500, 
 	       b0 = rep(0, 2), B0 = 5*diag(2), marginal.likelihood = "Chib95")    
 
+    ## find the most reasonable one
     print(BayesFactor(model1, model2, model3, model4, model5))
 
-    ## Draw plots using the "right" model
+    ## draw plots using the "right" model
     par(mfrow=c(attr(model2, "m") + 1, 1), mai=c(0.4, 0.6, 0.3, 0.05))
     plotState(model2, legend.control = c(1, 0.6))
     plotChangepoint(model2, verbose = TRUE, ylab="Density", start=1, overlay=TRUE)
     
-    ## No covariate
+    ## No covariate case
     model2.1 <- MCMCpoissonChange(y ~ 1, m = 2, c0 = 2, d0 = 1,
     	       	mcmc = 1000, burnin = 1000, verbose = 500, 
 	       	marginal.likelihood = "Chib95")   

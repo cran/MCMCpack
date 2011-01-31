@@ -104,6 +104,7 @@
                     B0data = as.double(B0), 
                     A0data = as.double(A0), 
                     logmarglikeholder = as.double(0.0),
+                    loglikeholder = as.double(0.0),
                     wrin = as.double(wr),
                     mrin = as.double(mr),
                     srin = as.double(sr),
@@ -114,6 +115,7 @@
     ## get marginal likelihood if Chib95
     if (marginal.likelihood == "Chib95"){
       logmarglike <- posterior$logmarglikeholder
+      loglike <- posterior$loglikeholder
     }
     
     ## pull together matrix and build MCMC object to return
@@ -131,6 +133,7 @@
     attr(output, "m")       <- m
     attr(output, "call")    <- cl
     attr(output, "logmarglike") <- logmarglike
+    attr(output, "loglike") <- loglike
     attr(output, "prob.state") <- ps.holder/nstore
     attr(output, "s.store") <- s.holder
     attr(output, "P.store") <- P.holder

@@ -14,7 +14,7 @@
 MCMCprobit(formula, data = NULL, burnin = 1000, mcmc = 10000,
    thin = 1, verbose = 0, seed = NA, beta.start = NA,
    b0 = 0, B0 = 0, bayes.resid = FALSE,
-   marginal.likelihood=c("none", "Laplace"), ...) }
+   marginal.likelihood=c("none", "Laplace", "Chib95"), ...) }
 
 \arguments{
     \item{formula}{Model formula.}
@@ -75,8 +75,9 @@ MCMCprobit(formula, data = NULL, burnin = 1000, mcmc = 10000,
 
   \item{marginal.likelihood}{How should the marginal likelihood be
     calculated? Options are: \code{none} in which case the marginal
-    likelihood will not be calculated or \code{Laplace} in which case the
-    Laplace approximation (see Kass and Raftery, 1995) is used.}
+    likelihood will not be calculated, \code{Laplace} in which case the
+    Laplace approximation (see Kass and Raftery, 1995) is used, or \code{Chib95}
+    in which case Chib (1995) method is used.}
 
     \item{...}{further arguments to be passed}       
 }
@@ -104,12 +105,16 @@ MCMCprobit(formula, data = NULL, burnin = 1000, mcmc = 10000,
  }
   
 \references{
-  Albert, J. H. and S. Chib. 1993. ``Bayesian Analysis of Binary and
-  Polychotomous Response Data.'' \emph{J. Amer. Statist. Assoc.} 88, 669-679
+   Albert, J. H. and S. Chib. 1993. ``Bayesian Analysis of Binary and
+   Polychotomous Response Data.'' \emph{J. Amer. Statist. Assoc.} 88, 669-679
 
-  Albert, J. H. and S. Chib. 1995. ``Bayesian Residual Analysis for
-  Binary Response Regression Models.'' \emph{Biometrika.} 82, 747-759.
+   Albert, J. H. and S. Chib. 1995. ``Bayesian Residual Analysis for
+   Binary Response Regression Models.'' \emph{Biometrika.} 82, 747-759.
       
+   Siddhartha Chib. 1995. "Marginal Likelihood from the Gibbs Output."
+   \emph{Journal of the American Statistical Association}. 90:
+   1313-1321.
+   
    Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    
@@ -122,9 +127,15 @@ MCMCprobit(formula, data = NULL, burnin = 1000, mcmc = 10000,
 \examples{
    \dontrun{
    data(birthwt)
-   posterior <- MCMCprobit(low~age+as.factor(race)+smoke, data=birthwt)
-   plot(posterior)
-   summary(posterior)
+   out1 <- MCMCprobit(low~as.factor(race)+smoke, data=birthwt,
+   	b0 = 0, B0 = 10, marginal.likelihood="Chib95")
+   out2 <- MCMCprobit(low~age+as.factor(race), data=birthwt,
+   	b0 = 0, B0 = 10,  marginal.likelihood="Chib95")
+   out3 <- MCMCprobit(low~age+as.factor(race)+smoke, data=birthwt,
+   	b0 = 0, B0 = 10,  marginal.likelihood="Chib95")
+   BayesFactor(out1, out2, out3)
+   plot(out3)
+   summary(out3)
    }
 }
 

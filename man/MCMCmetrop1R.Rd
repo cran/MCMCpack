@@ -202,6 +202,9 @@ mode. This last calculation is done via an initial call to
   }
 }
 \references{
+  Siddhartha Chib; Edward Greenberg. 1995. ``Understanding the Metropolis-Hastings Algorithm."
+  \emph{The American Statistician}, 49, 327-335.	
+	
   Andrew Gelman, John B. Carlin, Hal S. Stern, and Donald
   B. Rubin. 2003. \emph{Bayesian Data Analysis}. 2nd Edition. Boca
   Raton: Chapman & Hall/CRC.

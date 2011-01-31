@@ -130,7 +130,10 @@ MCMCtobit(formula, data = NULL, below = 0, above = Inf,
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
    \url{http://www-fis.iarc.fr/coda/}.
-   
+
+   Siddhartha Chib. 1992. ``Bayes inference in the Tobit censored regression model."
+    \emph{Journal of Econometrics}. 51:79-99. 
+
    James Tobin. 1958. ``Estimation of relationships for limited dependent 
    variables." \emph{Econometrica.} 26:24-36.
 }
