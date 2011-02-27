@@ -2,6 +2,10 @@
 // Changes and Bug Fixes
 //
 
+1.0-9 to 1.0-10
+  * added CITATION in inst/ to coincide with JStatSoft publication
+  * compressed two large data files (Senate and Nethvote)
+
 1.0-8 to 1.0-9
   * added MCMCprobitChange() 
   * added MCMCoprobitChange() 
