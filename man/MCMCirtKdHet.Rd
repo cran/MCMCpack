@@ -141,8 +141,8 @@ store.sigma = TRUE, drop.constant.items = TRUE)
    object can be summarized by functions provided by the coda package.
 }
 \references{
- Benjamin E. Lauderdale. ``Unpredictable Voters in Ideal Point Estimation''
-\emph{Political Analysis.} forthcoming.
+ Benjamin E. Lauderdale. 2010. ``Unpredictable Voters in Ideal Point Estimation''
+\emph{Political Analysis.} 18: 151-171.
 }
 \author{
 Benjamin E. Lauderdale, \email{blauderd@princeton.edu},

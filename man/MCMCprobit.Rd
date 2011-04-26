@@ -110,11 +110,16 @@ MCMCprobit(formula, data = NULL, burnin = 1000, mcmc = 10000,
 
    Albert, J. H. and S. Chib. 1995. ``Bayesian Residual Analysis for
    Binary Response Regression Models.'' \emph{Biometrika.} 82, 747-759.
+
+Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
+ ``MCMCpack: Markov Chain Monte Carlo in R.'',
+ \emph{Journal of Statistical Software}. 42(9): 1-21.
+ \url{http://www.jstatsoft.org/v42/i09/}.
       
-   Siddhartha Chib. 1995. "Marginal Likelihood from the Gibbs Output."
+   Siddhartha Chib. 1995. ``Marginal Likelihood from the Gibbs Output.''
    \emph{Journal of the American Statistical Association}. 90:
    1313-1321.
-   
+  
    Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    

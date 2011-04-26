@@ -118,11 +118,16 @@ MCMCregress(formula, data = NULL, burnin = 1000, mcmc = 10000,
   }
   
   \references{
-   Siddhartha Chib. 1995. "Marginal Likelihood from the Gibbs Output."
+Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
+``MCMCpack: Markov Chain Monte Carlo in R.'',
+ \emph{Journal of Statistical Software}. 42(9): 1-21.
+ \url{http://www.jstatsoft.org/v42/i09/}.
+
+   Siddhartha Chib. 1995. ``Marginal Likelihood from the Gibbs Output.''
    \emph{Journal of the American Statistical Association}. 90:
    1313-1321.
 
-   Robert E. Kass and Adrian E. Raftery. 1995. "Bayes Factors."
+   Robert E. Kass and Adrian E. Raftery. 1995. ``Bayes Factors.''
    \emph{Journal of the American Statistical Association}. 90: 773-795.
     
    Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  

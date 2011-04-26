@@ -106,9 +106,9 @@ The likelihood is formed based on assuming independent Asymmetric Laplace distri
 \references{ Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.2.} \url{http://scythe.wustl.edu}.
    
-   Craig Reed and Keming Yu. 2009. "An Efficient Gibbs Sampler for Bayesian Quantile Regression." Technical Report.
+   Craig Reed and Keming Yu. 2009. ``An Efficient Gibbs Sampler for Bayesian Quantile Regression.'' Technical Report.
    
-   Keming Yu and Jin Zhang. 2005. "A Three Parameter Asymmetric Laplace Distribution and it's extensions."
+   Keming Yu and Jin Zhang. 2005. ``A Three Parameter Asymmetric Laplace Distribution and it's extensions.''
 \emph{Communications in Statistics - Theory and Methods}, 34, 1867-1879.
    
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.

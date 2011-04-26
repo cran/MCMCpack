@@ -139,7 +139,10 @@ Dependence." In \emph{Ecological Inference: New Methodological
 Strategies}. Gary King, Ori Rosen, and Martin A. Tanner (eds.). New
 York: Cambridge University Press. 
 
-
+Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
+ ``MCMCpack: Markov Chain Monte Carlo in R.'',
+ \emph{Journal of Statistical Software}. 42(9): 1-21.
+ \url{http://www.jstatsoft.org/v42/i09/}.
 
    Radford Neal. 2003. ``Slice Sampling" (with discussion). \emph{Annals of
    Statistics}, 31: 705-767. 

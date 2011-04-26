@@ -115,7 +115,12 @@
   Jong Hee Park. 2011. ``Changepoint Analysis of Binary and Ordinal Probit Models:
   An Application to Bank Rate Policy Under the Interwar Gold Standard." \emph{Political Analysis}.
 
-  Siddhartha Chib. 1998. "Estimation and comparison of multiple change-point models."
+Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
+ ``MCMCpack: Markov Chain Monte Carlo in R.'',
+ \emph{Journal of Statistical Software}. 42(9): 1-21.
+ \url{http://www.jstatsoft.org/v42/i09/}.
+
+  Siddhartha Chib. 1998. ``Estimation and comparison of multiple change-point models.''
    \emph{Journal of Econometrics}. 86: 221-241.
 
   Albert, J. H. and S. Chib. 1993. ``Bayesian Analysis of Binary and

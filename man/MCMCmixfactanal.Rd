@@ -216,7 +216,14 @@ MCMCmixfactanal(x, factors, lambda.constraints=list(),
 }
 
 \references{
-  
+     Kevin M. Quinn. 2004. ``Bayesian Factor Analysis for Mixed Ordinal and
+  Continuous Responses.'' \emph{Political Analysis}. 12: 338-353.
+ 
+ Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
+  ``MCMCpack: Markov Chain Monte Carlo in R.'',
+  \emph{Journal of Statistical Software}. 42(9): 1-21.
+  \url{http://www.jstatsoft.org/v42/i09/}.
+
   M. K. Cowles. 1996. ``Accelerating Monte Carlo Markov Chain Convergence for
   Cumulative-link Generalized Linear Models." \emph{Statistics and Computing.}
   6: 101-110.
@@ -230,9 +237,7 @@ MCMCmixfactanal(x, factors, lambda.constraints=list(),
    Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
    \url{http://www-fis.iarc.fr/coda/}.
-   
-     Kevin M. Quinn. 2004. ``Bayesian Factor Analysis for Mixed Ordinal and
-  Continuous Responses.'' \emph{Political Analysis}. 12: 338-353.
+
    
 }
 

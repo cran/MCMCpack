@@ -92,7 +92,7 @@
     mar.orig <- (par.orig <- par(c("mar", "las", "mfrow")))$mar
     on.exit(par(par.orig))
     w <- (3 + mar.orig[2]) * par("csi") * 2.54
-    layout(matrix(c(2,1), nc=2), widths=c(1,lcm(w)))
+    layout(matrix(c(2,1), ncol=2), widths=c(1,lcm(w)))
     par(las=1)
     mar <- mar.orig
     mar[4] <- mar[2]

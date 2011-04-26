@@ -195,6 +195,11 @@ MCMCirtKd(datamatrix, dimensions, item.constraints=list(),
    Valen E. Johnson and James H. Albert. 1999. \emph{Ordinal Data Modeling}. 
    Springer: New York.
 
+ Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
+  ``MCMCpack: Markov Chain Monte Carlo in R.'',
+  \emph{Journal of Statistical Software}. 42(9): 1-21.
+  \url{http://www.jstatsoft.org/v42/i09/}.
+
    Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    
