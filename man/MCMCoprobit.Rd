@@ -129,6 +129,11 @@ that can be used to analyze the posterior sample.
   M. K. Cowles. 1996. ``Accelerating Monte Carlo Markov Chain Convergence for
   Cumulative-link Generalized Linear Models." \emph{Statistics and Computing.}
   6: 101-110.
+
+ Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
+  ``MCMCpack: Markov Chain Monte Carlo in R.'',
+  \emph{Journal of Statistical Software}. 42(9): 1-21.
+  \url{http://www.jstatsoft.org/v42/i09/}.
      
   Valen E. Johnson and James H. Albert. 1999. \emph{Ordinal Data Modeling}. 
   Springer: New York.

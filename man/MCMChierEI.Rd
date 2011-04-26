@@ -144,6 +144,11 @@ MCMChierEI(r0, r1, c0, c1, burnin=5000, mcmc=50000, thin=1,
 
    Radford Neal. 2003. ``Slice Sampling" (with discussion). \emph{Annals of
    Statistics}, 31: 705-767. 
+
+ Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
+  ``MCMCpack: Markov Chain Monte Carlo in R.'',
+  \emph{Journal of Statistical Software}. 42(9): 1-21.
+  \url{http://www.jstatsoft.org/v42/i09/}.
    
    Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.

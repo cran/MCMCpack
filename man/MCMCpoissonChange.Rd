@@ -105,16 +105,21 @@
 \author{Jong Hee Park, \email{jhp@uchicago.edu}, \url{http://home.uchicago.edu/~jhp/}.}
 
 \references{
- Jong Hee Park. 2010. "Structural Change in the U.S. Presidents' Use of Force Abroad." 
+ Jong Hee Park. 2010. ``Structural Change in the U.S. Presidents' Use of Force Abroad.''
  \emph{American Journal of Political Science} 54: 766-782.
 
- Sylvia Fruhwirth-Schnatter and Helga Wagner 2006. "Auxiliary Mixture Sampling for Parameter-driven Models of 
- Time Series of Counts with Applications to State Space Modelling." \emph{Biometrika}. 93:827--841.
+ Sylvia Fruhwirth-Schnatter and Helga Wagner 2006. ``Auxiliary Mixture Sampling for Parameter-driven Models of 
+ Time Series of Counts with Applications to State Space Modelling.'' \emph{Biometrika}. 93:827--841.
 
- Siddhartha Chib. 1998. "Estimation and comparison of multiple change-point models."
+ Siddhartha Chib. 1998. ``Estimation and comparison of multiple change-point models.''
    \emph{Journal of Econometrics}. 86: 221-241.
 
- Siddhartha Chib. 1995. "Marginal Likelihood from the Gibbs Output."
+Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
+ ``MCMCpack: Markov Chain Monte Carlo in R.'',
+ \emph{Journal of Statistical Software}. 42(9): 1-21.
+ \url{http://www.jstatsoft.org/v42/i09/}.
+
+ Siddhartha Chib. 1995. ``Marginal Likelihood from the Gibbs Output.''
    \emph{Journal of the American Statistical Association}. 90:
    1313-1321.
 }

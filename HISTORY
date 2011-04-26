@@ -2,6 +2,10 @@
 // Changes and Bug Fixes
 //
 
+1.0-10 to 1.0-11
+  * updated CITATION file in inst/ to coincide with JStatSoft publication
+  * added reference to JStatSoft in references
+
 1.0-9 to 1.0-10
   * added CITATION in inst/ to coincide with JStatSoft publication
   * compressed two large data files (Senate and Nethvote)

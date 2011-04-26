@@ -87,16 +87,22 @@
 \author{Jong Hee Park, \email{jhp@uchicago.edu}, \url{http://home.uchicago.edu/~jhp/}.}
 
 \references{
- Siddhartha Chib. 1995. "Marginal Likelihood from the Gibbs Output."
+ Siddhartha Chib. 1995. ``Marginal Likelihood from the Gibbs Output.''
    \emph{Journal of the American Statistical Association}. 90:
    1313-1321.
 
- Siddhartha Chib. 1998. "Estimation and comparison of multiple change-point models."
+ Siddhartha Chib. 1998. ``Estimation and comparison of multiple change-point models.''
    \emph{Journal of Econometrics}. 86: 221-241.
+
+ Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
+  ``MCMCpack: Markov Chain Monte Carlo in R.'',
+  \emph{Journal of Statistical Software}. 42(9): 1-21.
+  \url{http://www.jstatsoft.org/v42/i09/}.
 
  Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
    \url{http://www-fis.iarc.fr/coda/}.
+
 }
 
 \examples{

@@ -182,8 +182,13 @@ MCMCordfactanal(x, factors, lambda.constraints=list(),
   }
 
 \references{
-  Shawn Treier and Simon Jackman. 2003. ``Democracy as a Latent Variable." 
-  Paper presented at the Midwest Political Science Association Annual Meeting.
+  Shawn Treier and Simon Jackman. 2008. ``Democracy as a Latent Variable." 
+  \emph{American Journal of Political Science}. 52: 201-217.
+
+ Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
+  ``MCMCpack: Markov Chain Monte Carlo in R.'',
+  \emph{Journal of Statistical Software}. 42(9): 1-21.
+  \url{http://www.jstatsoft.org/v42/i09/}.
 
   M. K. Cowles. 1996. ``Accelerating Monte Carlo Markov Chain Convergence for
   Cumulative-link Generalized Linear Models." \emph{Statistics and Computing.}
