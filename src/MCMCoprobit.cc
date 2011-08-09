@@ -390,7 +390,8 @@ extern "C"{
     const Matrix <> b0(*b0row, *b0col, b0data);
     const Matrix <> B0(*B0row, *B0col, B0data);
     const Matrix <> alpha_prior_mean(*a0row, *a0col, a0data);
-    const Matrix <> alpha_prior_var(*A0row, *A0col, A0data);
+    const Matrix <> alpha_prior_prec(*A0row, *A0col, A0data);
+    const Matrix <> alpha_prior_var = invpd(alpha_prior_prec);
     const Matrix<> tune(*tunerow, *tunecol, tunedata);
     
     Matrix<> storagematrix;

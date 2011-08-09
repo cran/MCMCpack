@@ -2,6 +2,14 @@
 // Changes and Bug Fixes
 //
 
+1.0-11 to 1.1-2
+  * fixed an error in MCMCoprobit.R
+  * changed the documentation of MCMCoprobit.
+  * Added m=0 option to all changepoint models. Now all changepoint models allow users
+    to set m=0 for marginal likelihood computation.
+  * Fixed a bug in MCMCbinaryChange. I don't know why but log(dbeta) in Scythe often
+    generates NaN results while lndbeta1() does not.
+
 1.0-10 to 1.0-11
   * updated CITATION file in inst/ to coincide with JStatSoft publication
   * added reference to JStatSoft in references

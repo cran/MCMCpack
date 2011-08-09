@@ -143,6 +143,9 @@ Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
     formula = y ~ x1
     
     ## fit multiple models with a varying number of breaks
+    model0 <-  MCMCpoissonChange(formula, m=0, 
+    	       mcmc = 1000, burnin = 1000, verbose = 500, 
+	       b0 = rep(0, 2), B0 = 5*diag(2), marginal.likelihood = "Chib95")    
     model1 <-  MCMCpoissonChange(formula, m=1, 
     	       mcmc = 1000, burnin = 1000, verbose = 500, 
 	       b0 = rep(0, 2), B0 = 5*diag(2), marginal.likelihood = "Chib95")    
@@ -160,7 +163,7 @@ Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
 	       b0 = rep(0, 2), B0 = 5*diag(2), marginal.likelihood = "Chib95")    
 
     ## find the most reasonable one
-    print(BayesFactor(model1, model2, model3, model4, model5))
+    print(BayesFactor(model0, model1, model2, model3, model4, model5))
 
     ## draw plots using the "right" model
     par(mfrow=c(attr(model2, "m") + 1, 1), mai=c(0.4, 0.6, 0.3, 0.05))

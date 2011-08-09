@@ -146,9 +146,9 @@ y3 <- rbinom(100, 1, true.phi3)
 Y <- as.ts(c(y1, y2, y3))
 
 ## fit multiple models with a varying number of breaks
-out0 <- MCMCprobit(formula=Y~X-1, data=parent.frame(),
-                   mcmc=1000, burnin=1000, thin=1, verbose=1000,
-		   b0 = 0, B0 = 10, marginal.likelihood = c("Laplace"))
+out0 <- MCMCprobitChange(formula=Y~X-1, data=parent.frame(), m=0,
+                         mcmc=1000, burnin=1000, thin=1, verbose=1000, 
+                         b0 = 0, B0 = 10, a = 1, b = 1,  marginal.likelihood = c("Chib95"))	
 out1 <- MCMCprobitChange(formula=Y~X-1, data=parent.frame(), m=1,
                          mcmc=1000, burnin=1000, thin=1, verbose=1000, 
                          b0 = 0, B0 = 10, a = 1, b = 1,  marginal.likelihood = c("Chib95"))

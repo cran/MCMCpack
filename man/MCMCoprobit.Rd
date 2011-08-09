@@ -72,17 +72,17 @@ MCMCoprobit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
     Default value of 0 is equivalent to  an improper uniform prior on
     \eqn{\beta}{beta}. } 
 
-    \item{a0}{The prior mean of \eqn{\alpha}{alpha}.  This can either be a 
+    \item{a0}{The prior mean of \eqn{\gamma}{gamma}.  This can either be a 
     scalar or a column vector with dimension equal to the number of
     betas. If this takes a scalar value, then that value will serve as
     the prior mean for all of the betas.}
     
-    \item{A0}{The prior precision of \eqn{\alpha}{alpha}.  This can either be a 
+    \item{A0}{The prior precision of \eqn{\gamma}{gamma}.  This can either be a 
     scalar or a square matrix with dimensions equal to the number of
     betas.  If this takes a scalar value, then that value times an
-    identity matrix serves as the prior precision of \eqn{\beta}{beta}.
+    identity matrix serves as the prior precision of \eqn{\gamma}{gamma}.
     Default value of 0 is equivalent to  an improper uniform prior on
-    \eqn{\beta}{beta}. } 
+    \eqn{\gamma}{gamma}. } 
 
    \item{mcmc.method}{Can be set to either "Cowles" (default) or "AC" to perform
 posterior sampling of cutpoints based on Cowles (1996) or Albert and Chib (2001) respectively.}
