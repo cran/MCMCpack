@@ -116,13 +116,14 @@
     y3 <- rbinom(120, 1, true.phi[3])
     y  <- as.ts(c(y1, y2, y3))
 
+    model0 <- MCMCbinaryChange(y, m=0, c0=2, d0=2, mcmc=1000, burnin=1000, verbose=500, marginal.likelihood = "Chib95")
     model1 <- MCMCbinaryChange(y, m=1, c0=2, d0=2, mcmc=1000, burnin=1000, verbose=500, marginal.likelihood = "Chib95")
     model2 <- MCMCbinaryChange(y, m=2, c0=2, d0=2, mcmc=1000, burnin=1000, verbose=500, marginal.likelihood = "Chib95")
     model3 <- MCMCbinaryChange(y, m=3, c0=2, d0=2, mcmc=1000, burnin=1000, verbose=500, marginal.likelihood = "Chib95")
     model4 <- MCMCbinaryChange(y, m=4, c0=2, d0=2, mcmc=1000, burnin=1000, verbose=500, marginal.likelihood = "Chib95")
     model5 <- MCMCbinaryChange(y, m=5, c0=2, d0=2, mcmc=1000, burnin=1000, verbose=500, marginal.likelihood = "Chib95")
 
-    print(BayesFactor(model1, model2, model3, model4, model5))
+    print(BayesFactor(model0, model1, model2, model3, model4, model5))
     
     ## plot two plots in one screen
     par(mfrow=c(attr(model2, "m") + 1, 1), mai=c(0.4, 0.6, 0.3, 0.05))

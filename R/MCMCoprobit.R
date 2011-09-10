@@ -36,7 +36,7 @@
     mt <- terms(formula, data=data)
     if(missing(data)) data <- sys.frame(sys.parent())
     mf <- match.call(expand.dots = FALSE)
-    mf$burnin <- mf$mcmc <- mf$b0 <- mf$B0 <- NULL
+    mf$burnin <- mf$mcmc <- mf$b0 <- mf$B0 <- mf$a0 <- mf$A0 <- NULL
     mf$thin <- mf$... <- mf$tune <- mf$tdf <- mf$verbose <- mf$seed <- NULL
     mf$beta.start <- mf$mcmc.method <- NULL
     mf$drop.unused.levels <- TRUE

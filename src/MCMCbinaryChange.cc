@@ -99,7 +99,7 @@ Matrix<> binary_state_sampler(rng<RNGTYPE>& stream,
 template <typename RNGTYPE>
 void MCMCbinaryChange_impl(rng<RNGTYPE>& stream, const Matrix<>& Y,
 			   Matrix<>& phi, Matrix<>& P, const Matrix<>& A0,
-			   double m, double c0, double d0,
+			   const double m, const double c0, const double d0,
 			   unsigned int burnin, unsigned int mcmc, unsigned int thin,
 			   unsigned int verbose, bool chib, 
 			   Matrix<>& phi_store, Matrix<>& P_store, 
@@ -140,9 +140,9 @@ void MCMCbinaryChange_impl(rng<RNGTYPE>& stream, const Matrix<>& Y,
       }
       double c1 = addY[j] + c0;
       double d1 = addN[j] - addY[j] + d0;       
-      phi[j] = stream.rbeta(c1, d1);    
-      
+      phi[j] = stream.rbeta(c1, d1);      
     } 
+    
     //////////////////////
     // 3. Sample P
     //////////////////////        
@@ -169,8 +169,6 @@ void MCMCbinaryChange_impl(rng<RNGTYPE>& stream, const Matrix<>& Y,
       ++count; 
       
     }   
-    
-
     if(verbose > 0 && iter % verbose == 0){
       Rprintf("\n\n MCMCbinaryChange iteration %i of %i", (iter+1), tot_iter);
       for (int j = 0;j<ns; ++j){
@@ -197,6 +195,7 @@ void MCMCbinaryChange_impl(rng<RNGTYPE>& stream, const Matrix<>& Y,
     // phi
     //////////////////////  
     Matrix<> density_phi(nstore, ns);
+    // Matrix<> density_phi_j(ns, 1);
     for (int iter = 0; iter<nstore; ++iter){
 
       Matrix<> addY(ns, 1);
@@ -204,18 +203,17 @@ void MCMCbinaryChange_impl(rng<RNGTYPE>& stream, const Matrix<>& Y,
       
       for (int j = 0; j<ns; ++j){
 	for (int i = 0; i<n; ++i){
-            if (s_store(iter, i) == (j+1)) { 
-	      addN[j] = addN[j] + 1;
-	      addY[j] = addY[j] + Y[i];
-	    }
+	  if (s_store(iter, i) == (j+1)) { 
+	    addN[j] = addN[j] + 1;
+	    addY[j] = addY[j] + Y[i];
+	  }
 	} 
         double c1 = addY[j] + c0;
         double d1 = addN[j] - addY[j] + d0;   
-        density_phi(iter, j) =  dbeta(phi_st[j], c1, d1);
+        density_phi(iter, j) = scythe::lndbeta1(phi_st[j], c1, d1);
       }
-      
     }  
-    double pdf_phi = log(prod(meanc(density_phi)));
+    double pdf_phi = sum(meanc(density_phi));
   
     //////////////////////
     // P
@@ -246,12 +244,12 @@ void MCMCbinaryChange_impl(rng<RNGTYPE>& stream, const Matrix<>& Y,
 	shape2 =  A0(j,j+1) + 1;      
 	P(j,j) = stream.rbeta(shape1, shape2);
 	P(j,j+1) = 1 - P(j,j);
-	density_P(iter, j) = dbeta(P_st(j,j), shape1, shape2); 
+	density_P(iter, j) = scythe::lndbeta1(P_st(j,j), shape1, shape2); 
       } 
       density_P(iter, ns-1) = 1; 
       
     }          
-    double pdf_P = log(prod(meanc(density_P)));
+    double pdf_P = sum(meanc(density_P));
     
     //////////////////////
     // likelihood
@@ -289,16 +287,24 @@ void MCMCbinaryChange_impl(rng<RNGTYPE>& stream, const Matrix<>& Y,
     Matrix<> density_P_prior(ns, 1);
     
     for (int j=0; j<ns ; ++j){
-      density_phi_prior[j] = log(dbeta(phi_st[j], c0, d0));    
+      density_phi_prior[j] = scythe::lndbeta1(phi_st[j], c0, d0);    
     }   
     
     for (int j =0; j< (ns-1); ++j){
-      density_P_prior[j] = log(dbeta(P_st(j,j), A0(j,j), A0(j,j+1))); 
+      density_P_prior[j] = scythe::lndbeta1(P_st(j,j), A0(j,j), A0(j,j+1)); 
     }        
     
     // compute marginal likelihood
     double logprior = sum(density_phi_prior) + sum(density_P_prior);
     logmarglike = (loglike + logprior) - (pdf_phi + pdf_P);
+    if(verbose > 0){
+      Rprintf("\nlogmarglike = %10.5f\n", logmarglike);
+      Rprintf("loglike = %10.5f\n", loglike);
+      Rprintf("logprior = %10.5f\n", logprior);
+      Rprintf("logphi = %10.5f\n", pdf_phi);
+      Rprintf("logP = %10.5f\n", pdf_P);
+    }
+ 
   }
 }
 //////////////////////////////////////////// 

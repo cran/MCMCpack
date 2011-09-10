@@ -117,7 +117,12 @@ void MCMCprobit_impl (rng<RNGTYPE>& stream, const Matrix<>& Y,
       const Matrix<double> XpZ = (::t(X)*Z_reduced);
       const Matrix<double> Bn = invpd(B0inv + XpX);
       const Matrix<double> bn = Bn*gaxpy(B0inv, b0, XpZ);
-      logbeta_sum += lndmvn(beta_star, bn, Bn);	
+      if (k == 1){
+	logbeta_sum += log(dnorm(beta_star(0), bn(0), sqrt(Bn(0))));
+      }
+      else{
+	logbeta_sum += lndmvn(beta_star, bn, Bn);
+      }
     }
     double logbeta = logbeta_sum/nstore;
      
@@ -129,10 +134,21 @@ void MCMCprobit_impl (rng<RNGTYPE>& stream, const Matrix<>& Y,
     }
     
     // calculate log prior ordinate
-    double logprior = lndmvn(beta_star, b0, B0inv);
-    
-    logmarglike = loglike + logprior - logbeta;
-    
+    double logprior = 0.0; 
+    if (k == 1){
+      logprior = log(dnorm(beta_star(0), b0(0), sqrt(B0(0)))); 
+    }
+    else{
+      logprior = lndmvn(beta_star, b0, B0inv);
+    }
+    // 
+      logmarglike = loglike + logprior - logbeta;
+    if(verbose > 0){
+      Rprintf("logmarglike = %10.5f\n", logmarglike);
+      Rprintf("loglike = %10.5f\n", loglike);
+      Rprintf("logprior = %10.5f\n", logprior);
+      Rprintf("logbeta = %10.5f\n", logbeta);
+    }
     // Rprintf("\n logmarglike %10.5f", logmarglike, "\n"); 
     // Rprintf("\n loglike %10.5f", loglike, "\n"); 
     
