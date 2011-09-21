@@ -270,11 +270,11 @@ void MCMCoprobitChange_impl(rng<RNGTYPE>& stream,
       Matrix<> XpX = t(Xj)*Xj;
       Matrix<> XpZ = t(Xj)*Zj;
       Matrix<> XpY = t(Xj)*yj;
-      Matrix<> Bn = invpd(B0inv + XpX/Sigma[0]);
-      Matrix<> bn = Bn*(B0inv*b0 + XpY/Sigma[0]);
+      Matrix<> Bn = invpd(B0 + XpX/Sigma[0]);
+      Matrix<> bn = Bn*(B0*b0 + XpY/Sigma[0]);
       beta_linear(j,_) = stream.rmvnorm(bn, Bn);
-      Matrix<> Bn2 = invpd(B0inv + XpX);
-      Matrix<> bn2 = Bn2*(B0inv*b0 + XpZ);
+      Matrix<> Bn2 = invpd(B0 + XpX);
+      Matrix<> bn2 = Bn2*(B0*b0 + XpZ);
       beta(j,_) = stream.rmvnorm(bn2, Bn2);
       beta_count_storage[j] = beta_count;
     }  
@@ -476,11 +476,11 @@ void MCMCoprobitChange_impl(rng<RNGTYPE>& stream,
 	Matrix<> XpX = t(Xj)*Xj;
 	Matrix<> XpZ = t(Xj)*Zj;
 	Matrix<> XpY = t(Xj)*yj;
-	Matrix<> Bn = invpd(B0inv + XpX/Sigma[0]);
-	Matrix<> bn = Bn*(B0inv*b0 + XpY/Sigma[0]);
+	Matrix<> Bn = invpd(B0 + XpX/Sigma[0]);
+	Matrix<> bn = Bn*(B0*b0 + XpY/Sigma[0]);
 	beta_linear(j,_) = stream.rmvnorm(bn, Bn);
-	Matrix<> Bn2 = invpd(B0inv + XpX);
-	Matrix<> bn2 = Bn2*(B0inv*b0 + XpZ);
+	Matrix<> Bn2 = invpd(B0 + XpX);
+	Matrix<> bn2 = Bn2*(B0*b0 + XpZ);
 	beta(j,_) = stream.rmvnorm(bn2, Bn2);
 	beta_count_storage[j] = beta_count;
      }  
@@ -547,11 +547,11 @@ void MCMCoprobitChange_impl(rng<RNGTYPE>& stream,
 	Matrix<> XpX = t(Xj)*Xj;
 	Matrix<> XpZ = t(Xj)*Zj;
 	Matrix<> XpY = t(Xj)*yj;
-	Matrix<> Bn = invpd(B0inv + XpX/Sigma[0]);
-	Matrix<> bn = Bn*(B0inv*b0 + XpY/Sigma[0]);
+	Matrix<> Bn = invpd(B0 + XpX/Sigma[0]);
+	Matrix<> bn = Bn*(B0*b0 + XpY/Sigma[0]);
 	beta_linear(j,_) = stream.rmvnorm(bn, Bn);	
-	Matrix<> Bn2 = invpd(B0inv + XpX);
-	Matrix<> bn2 = Bn2*(B0inv*b0 + XpZ);
+	Matrix<> Bn2 = invpd(B0 + XpX);
+	Matrix<> bn2 = Bn2*(B0*b0 + XpZ);
 	beta(j,_) = stream.rmvnorm(bn2, Bn2);
 	beta_count_storage[j] = beta_count;
 	density_beta(iter, j) = exp(lndmvn(t(beta_st(j,_)), bn2, Bn2));
@@ -635,7 +635,7 @@ void MCMCoprobitChange_impl(rng<RNGTYPE>& stream,
     density_P[ns-1] = 1; //
     
     for (int j=0; j<ns ; ++j){
-      density_beta_prior[j] = lndmvn(::t(beta_st(j,_)), b0, B0); 
+      density_beta_prior[j] = lndmvn(::t(beta_st(j,_)), b0, B0inv); 
     }   
     
     for (int j =0; j< (ns-1); ++j){
@@ -646,18 +646,14 @@ void MCMCoprobitChange_impl(rng<RNGTYPE>& stream,
     double logprior = sum(density_beta_prior) + sum(density_P_prior) + density_gamma_prior;
     logmarglike = (loglike + logprior) - (pdf_beta + pdf_P + pdf_gamma);
     
-    /*
-    Rprintf("\n ----------------- marginal likelihood outputs ----------------- \n"); 
-    Rprintf("\n logmarglike %10.5f", logmarglike, "\n"); 
-    Rprintf("\n loglike %10.5f", loglike, "\n"); 
-    Rprintf("\n pdf_beta %10.5f", pdf_beta, "\n"); 
-    Rprintf("\n pdf_gamma %10.5f", pdf_gamma, "\n"); 
-    Rprintf("\n pdf_P %10.5f", pdf_P, "\n"); 
-    Rprintf("\n logprior %10.5f", logprior, "\n"); 
-    Rprintf("\n density_beta_prior %10.5f", sum(density_beta_prior), "\n"); 
-    Rprintf("\n density_gamma_prior %10.5f", density_gamma_prior, "\n"); 
-    Rprintf("\n density_P_prior %10.5f", sum(density_P_prior), "\n"); 
-    */
+    if (verbose >0 ){
+      Rprintf("\nlogmarglike = %10.5f\n", logmarglike);
+      Rprintf("loglike = %10.5f\n", loglike);
+      Rprintf("log_prior = %10.5f\n", logprior);
+      Rprintf("log_beta = %10.5f\n", pdf_beta);
+      Rprintf("log_P = %10.5f\n", pdf_P);
+      Rprintf("log_gamma = %10.5f\n", pdf_gamma);
+    }
   } // end of marginal likelihood
 
 }//end 

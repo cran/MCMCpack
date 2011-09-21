@@ -219,8 +219,8 @@ extern "C"{
 
 	    // invVi, sum_V and sum_v
 	    // see http://en.wikipedia.org/wiki/Woodbury_matrix_identity with A=(1/V_run)*Id
-	    Matrix<double> sum_V(NQ,NQ);
-	    Matrix<double> sum_v(NQ,1);
+	    Matrix<double> sum_V(NP,NP);
+	    Matrix<double> sum_v(NP,1);
 	    for (int k=0; k<NGROUP; k++) {
 		sum_V += (1/V_run)*cpXk_arr[k]-pow(1/V_run,2)*tXWk_arr[k]*invpd(invpd(Vb_run)+tWk_arr[k]*(1/V_run)*Wk_arr[k])*tWXk_arr[k];
 	    	sum_v += (1/V_run)*tXYk_arr[k]-pow(1/V_run,2)*tXWk_arr[k]*invpd(invpd(Vb_run)+tWk_arr[k]*(1/V_run)*Wk_arr[k])*tWYk_arr[k];
@@ -349,7 +349,7 @@ extern "C"{
 
             //////////////////////////////////////////////////
 	    // User interrupt
-	    void R_CheckUserInterrupt(void); // allow user interrupts 
+	    R_CheckUserInterrupt(); // allow user interrupts 
 	    
 	} // end MCMC loop
 

@@ -119,11 +119,12 @@ MCMClogit_impl (rng<RNGTYPE>& stream, const Matrix<>& Y,
     R_CheckUserInterrupt(); // allow user interrupts
     
   }// end MCMC loop
-
-  Rprintf("\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-  Rprintf("The Metropolis acceptance rate for beta was %3.5f", 
-    static_cast<double>(accepts) / static_cast<double>(tot_iter));
-  Rprintf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+  if (verbose > 0){
+    Rprintf("\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+    Rprintf("The Metropolis acceptance rate for beta was %3.5f", 
+	    static_cast<double>(accepts) / static_cast<double>(tot_iter));
+    Rprintf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+  }
 }                            
 
 extern "C"{
