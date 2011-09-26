@@ -430,7 +430,7 @@ extern "C"{
 
             //////////////////////////////////////////////////
 	    // User interrupt
-	    void R_CheckUserInterrupt(void); // allow user interrupts     
+	    R_CheckUserInterrupt(); // allow user interrupts     
 	
 	} // end MCMC loop
 

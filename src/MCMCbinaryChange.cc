@@ -210,11 +210,11 @@ void MCMCbinaryChange_impl(rng<RNGTYPE>& stream, const Matrix<>& Y,
 	} 
         double c1 = addY[j] + c0;
         double d1 = addN[j] - addY[j] + d0;   
-        density_phi(iter, j) = scythe::lndbeta1(phi_st[j], c1, d1);
+        density_phi(iter, j) = dbeta(phi_st[j], c1, d1);
       }
     }  
-    double pdf_phi = sum(meanc(density_phi));
-  
+    double pdf_phi = log(prod(meanc(density_phi)));
+    
     //////////////////////
     // P
     //////////////////////
@@ -244,12 +244,12 @@ void MCMCbinaryChange_impl(rng<RNGTYPE>& stream, const Matrix<>& Y,
 	shape2 =  A0(j,j+1) + 1;      
 	P(j,j) = stream.rbeta(shape1, shape2);
 	P(j,j+1) = 1 - P(j,j);
-	density_P(iter, j) = scythe::lndbeta1(P_st(j,j), shape1, shape2); 
+	density_P(iter, j) = dbeta(P_st(j,j), shape1, shape2); 
       } 
       density_P(iter, ns-1) = 1; 
       
     }          
-    double pdf_P = sum(meanc(density_P));
+    double pdf_P = log(prod(meanc(density_P)));
     
     //////////////////////
     // likelihood
@@ -300,9 +300,9 @@ void MCMCbinaryChange_impl(rng<RNGTYPE>& stream, const Matrix<>& Y,
     if(verbose > 0){
       Rprintf("\nlogmarglike = %10.5f\n", logmarglike);
       Rprintf("loglike = %10.5f\n", loglike);
-      Rprintf("logprior = %10.5f\n", logprior);
-      Rprintf("logphi = %10.5f\n", pdf_phi);
-      Rprintf("logP = %10.5f\n", pdf_P);
+      Rprintf("log_prior = %10.5f\n", logprior);
+      Rprintf("log_phi = %10.5f\n", pdf_phi);
+      Rprintf("log_P = %10.5f\n", pdf_P);
     }
  
   }

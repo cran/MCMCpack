@@ -646,8 +646,8 @@ void MCMCpoissonRegChangepoint_impl(rng<RNGTYPE>& stream,
       for (int h = 0; h<nstate[j]; ++h){            
 	Xwj(h, _) = Xj(h,_)*wi[h];
       }
-      Matrix<> Bn = invpd(B0inv + ::t(Xj)*Xwj);
-      Matrix<> bn = Bn*gaxpy(B0inv, b0,  -1*::t(Xj)*yj);
+      Matrix<> Bn = invpd(B0 + ::t(Xj)*Xwj);
+      Matrix<> bn = Bn*gaxpy(B0, b0,  -1*::t(Xj)*yj);
       beta(j,_) = stream.rmvnorm(bn, Bn);
    }
     
@@ -760,8 +760,8 @@ void MCMCpoissonRegChangepoint_impl(rng<RNGTYPE>& stream,
 	for (int h = 0; h<nstate[j]; ++h){            
 	  Xwj(h, _) = Xj(h,_)*wi[h];
 	}
-	  Matrix<> Bn = invpd(B0inv + ::t(Xj)*Xwj);
-	  Matrix<> bn = Bn*gaxpy(B0inv, b0,  -1*::t(Xj)*yj);         
+	  Matrix<> Bn = invpd(B0 + ::t(Xj)*Xwj);
+	  Matrix<> bn = Bn*gaxpy(B0, b0,  -1*::t(Xj)*yj);         
 	  density_beta(iter, j) = exp(lndmvn(::t(beta_st(j,_)), bn, Bn));	  
       }       
     }   
@@ -841,7 +841,7 @@ void MCMCpoissonRegChangepoint_impl(rng<RNGTYPE>& stream,
     density_P[ns-1] = 1; //
     
     for (int j=0; j<ns ; ++j){
-      density_beta_prior[j] = lndmvn(::t(beta_st(j,_)), b0, B0);    
+      density_beta_prior[j] = lndmvn(::t(beta_st(j,_)), b0, B0inv);    
     }   
     
     for (int j =0; j< (ns-1); ++j){
@@ -851,7 +851,13 @@ void MCMCpoissonRegChangepoint_impl(rng<RNGTYPE>& stream,
     // compute marginal likelihood
     const double logprior = sum(density_beta_prior) + sum(density_P_prior);
     const double logmarglike = (loglike + logprior) - (pdf_beta + pdf_P);
-
+    if (verbose >0 ){
+      Rprintf("\nlogmarglike = %10.5f\n", logmarglike);
+      Rprintf("loglike = %10.5f\n", loglike);
+      Rprintf("log_prior = %10.5f\n", logprior);
+      Rprintf("log_beta = %10.5f\n", pdf_beta);
+      Rprintf("log_P = %10.5f\n", pdf_P);
+    }
     logmarglikeholder[0] = logmarglike;
     loglikeholder[0] = loglike;
    

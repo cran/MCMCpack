@@ -1,7 +1,15 @@
 //
 // Changes and Bug Fixes
 //
-
+1.1-3 to 1.1-4
+  * fixed an error in MCMChregress: NQ has to be replaced by NP (line 223)
+  * in MCMChregress, MCMChpoisson, MCMChlogit, R_CheckUserInterrupt(void) is replaced by R_CheckUserInterrupt()
+  * fixed an error in the marginal likelihood computation 
+    in MCMCproit.cc and MCMCregress.cc (thanks to Sid Chib)
+  * changed B0 as prior precision in MCMCprobitChange, MCMCoprobitChange and MCMCpoissonChange
+  * the acceptance rate is reported if verbose > 0
+  * added the reporting of marginal likelihood components if verbose > 0 
+      	
 1.0-11 to 1.1-2
   * fixed an error in MCMCoprobit.R
   * changed the documentation of MCMCoprobit.

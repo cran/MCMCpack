@@ -248,8 +248,8 @@ void MCMCprobitChange_impl(rng<RNGTYPE>& stream,
 	const Matrix<double> Xj = X((beta_count - nstate[j]), 0, (beta_count - 1), k-1);
 	const Matrix<double> XpX = (::t(Xj)*Xj);
 	const Matrix<double> XpZ = (::t(Xj)*Zj);
-	const Matrix<double> Bn = invpd(B0inv + XpX);
-	const Matrix<double> bn = Bn*gaxpy(B0inv, b0, XpZ);
+	const Matrix<double> Bn = invpd(B0 + XpX);
+	const Matrix<double> bn = Bn*gaxpy(B0, b0, XpZ);
 	density_beta(iter, j) = exp(lndmvn(::t(beta_st(j,_)), bn, Bn));	
       }
     }
@@ -325,24 +325,24 @@ void MCMCprobitChange_impl(rng<RNGTYPE>& stream,
     density_P[ns-1] = 1; //
     
     for (int j=0; j<ns ; ++j){
-      density_beta_prior[j] = lndmvn(::t(beta_st(j,_)), b0, B0); 
+      density_beta_prior[j] = lndmvn(::t(beta_st(j,_)), b0, B0inv); 
     }   
     
     for (int j =0; j< (ns-1); ++j){
-      density_P_prior[j] = log(dbeta(P_st(j,j), A0(j,j), A0(j,j+1))); 
+      density_P_prior[j] = scythe::lndbeta1(P_st(j,j), A0(j,j), A0(j,j+1));
     }        
     
     // compute marginal likelihood
     double logprior = sum(density_beta_prior) + sum(density_P_prior);
     logmarglike = (loglike + logprior) - (pdf_beta + pdf_P);
     
-    // Rprintf("\n density_beta_prior %10.5f", density_beta_prior[0], "\n"); 
-    // Rprintf("\n density_P_prior %10.5f", density_P_prior[0], "\n"); 
-    Rprintf("\n logmarglike %10.5f", logmarglike, "\n"); 
-    Rprintf("\n loglike %10.5f", loglike, "\n"); 
-    // Rprintf("\n logprior %10.5f", logprior, "\n"); 
-    // Rprintf("\n pdf_beta %10.5f", pdf_beta, "\n"); 
-    // Rprintf("\n pdf_P %10.5f", pdf_P, "\n"); 
+    if (verbose >0 ){
+      Rprintf("\nlogmarglike = %10.5f\n", logmarglike);
+      Rprintf("loglike = %10.5f\n", loglike);
+      Rprintf("log_prior = %10.5f\n", logprior);
+      Rprintf("log_beta = %10.5f\n", pdf_beta);
+      Rprintf("log_P = %10.5f\n", pdf_P);
+    }
   } // end of marginal likelihood
 }//end extern "C"
   

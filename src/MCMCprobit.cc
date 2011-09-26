@@ -66,8 +66,8 @@ void MCMCprobit_impl (rng<RNGTYPE>& stream, const Matrix<>& Y,
   
   // storage matrix or matrices
   Matrix<> beta_store(nstore, k);
-  Matrix<> Z_store(nstore, N);
-    
+  Matrix<> bn_store(nstore, k);
+  
   // initialize Z
   Matrix<> Z(N,1);
   
@@ -86,12 +86,14 @@ void MCMCprobit_impl (rng<RNGTYPE>& stream, const Matrix<>& Y,
       
       // [beta|Z]
       const Matrix<> XpZ = t(X) * Z;
-      beta = NormNormregress_beta_draw(XpX, XpZ, b0, B0, 1.0, stream);
+      const Matrix<double> Bn = invpd(B0 + XpX);
+      const Matrix<double> bn = Bn*gaxpy(B0, b0, XpZ);
+      beta = stream.rmvnorm(bn, Bn);
       
       // store values in matrices
       if (iter >= burnin && (iter % thin==0)){
 	beta_store(count,_) = beta;
-	Z_store(count,_) = Z;
+	bn_store(count,_) = bn;
 	++count;
       }
       
@@ -109,23 +111,18 @@ void MCMCprobit_impl (rng<RNGTYPE>& stream, const Matrix<>& Y,
   
   if(chib==1){
     // Rprintf("\n Marginal Likelihood Computation Starts!\n"); 
-    Matrix<double> beta_star = meanc(beta_store); 
-    const Matrix<double> Z_reduced(N, 1);
-    double logbeta_sum = 0;    
+    Matrix<double> beta_star(k, 1);
+    beta_star(_ ,0) = meanc(beta_store); 
+    Matrix<double> bn_reduced(k, 1);
+    Matrix<double> density_beta(nstore, 1);  
     for (int iter = 0; iter<nstore; ++iter){     
-      Z_reduced(_,0) = Z_store(iter,_);
-      const Matrix<double> XpZ = (::t(X)*Z_reduced);
-      const Matrix<double> Bn = invpd(B0inv + XpX);
-      const Matrix<double> bn = Bn*gaxpy(B0inv, b0, XpZ);
-      if (k == 1){
-	logbeta_sum += log(dnorm(beta_star(0), bn(0), sqrt(Bn(0))));
-      }
-      else{
-	logbeta_sum += lndmvn(beta_star, bn, Bn);
-      }
+      bn_reduced(_, 0) = bn_store(iter, _);
+      Matrix<double> bn_reduced1 = bn_store(iter, _);
+      const Matrix<double> Bn = invpd(B0 + XpX);
+      density_beta(iter) = ::exp(lndmvn(beta_star, bn_reduced, Bn));	
     }
-    double logbeta = logbeta_sum/nstore;
-     
+    double logbeta = log(mean(density_beta));
+    
     double loglike = 0.0;
     Matrix<> eta = X * beta_star;
     for (unsigned int i = 0; i < N; ++i) {
@@ -136,23 +133,21 @@ void MCMCprobit_impl (rng<RNGTYPE>& stream, const Matrix<>& Y,
     // calculate log prior ordinate
     double logprior = 0.0; 
     if (k == 1){
-      logprior = log(dnorm(beta_star(0), b0(0), sqrt(B0(0)))); 
+      logprior = log(dnorm(beta_star(0), b0(0), sqrt(B0inv(0)))); 
     }
     else{
       logprior = lndmvn(beta_star, b0, B0inv);
     }
     // 
-      logmarglike = loglike + logprior - logbeta;
-    if(verbose > 0){
-      Rprintf("logmarglike = %10.5f\n", logmarglike);
-      Rprintf("loglike = %10.5f\n", loglike);
-      Rprintf("logprior = %10.5f\n", logprior);
-      Rprintf("logbeta = %10.5f\n", logbeta);
-    }
-    // Rprintf("\n logmarglike %10.5f", logmarglike, "\n"); 
-    // Rprintf("\n loglike %10.5f", loglike, "\n"); 
     
-  }// end of marginal likelihood computation
+    logmarglike = loglike + logprior - logbeta;
+    if (verbose > 0){
+      Rprintf("\nlogmarglike = %10.5f\n", logmarglike);
+      Rprintf("loglike = %10.5f\n", loglike);
+      Rprintf("log_prior = %10.5f\n", logprior);
+      Rprintf("log_beta = %10.5f\n", logbeta);
+    }
+   }// end of marginal likelihood computation
   
   result = beta_store;
 }
