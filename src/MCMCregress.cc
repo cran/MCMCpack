@@ -17,7 +17,7 @@
 // kevin_quinn@harvard.edu
 // 
 // This software is distributed under the terms of the GNU GENERAL
-// PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
+// PUBLIC LICENSE Version 3, 29 June 2007.  See the package LICENSE
 // file for more information.
 //
 // This file was initially generated on Fri Jul 23 15:07:21 2004
@@ -70,7 +70,7 @@ void MCMCregress_impl (rng<RNGTYPE>& stream, const Matrix<>& Y,
 		       const Matrix<>& B0, double c0, double d0,
 		       unsigned int burnin, unsigned int mcmc, unsigned int thin, 
 		       unsigned int verbose, bool chib, 
-		       Matrix<>& result, double& logmarglike, double& loglike)
+		       Matrix<>& result, double& logmarglike)
 {
    // define constants and form cross-product matrices
    const unsigned int tot_iter = burnin + mcmc; //total iterations
@@ -151,7 +151,7 @@ void MCMCregress_impl (rng<RNGTYPE>& stream, const Matrix<>& Y,
      for (unsigned int i = 0; i < X.rows(); ++i) {
        loglike_sum += lndnorm(Y(i), eta(i), sigmastar);
      }
-     loglike = loglike_sum;
+     double loglike = loglike_sum;
      
      // calculate log prior ordinate
      double logprior = 0;
@@ -190,7 +190,7 @@ extern "C" {
 		    const int *b0row, const int *b0col, 
 		    const double *B0data, const int *B0row,
 		    const int *B0col, const double *c0, const double *d0,
-		    double* logmarglikeholder, double* loglikeholder, const int* chib)
+		    double* logmarglikeholder, const int* chib)
    {
      // pull together Matrix objects
      Matrix<> Y(*Yrow, *Ycol, Ydata);
@@ -204,9 +204,8 @@ extern "C" {
      Matrix<> storagematrix;
      MCMCPACK_PASSRNG2MODEL(MCMCregress_impl, Y, X, betastart, b0, B0, 
                             *c0, *d0, *burnin, *mcmc, *thin, *verbose,
-                            *chib, storagematrix, logmarglike, loglike);
+                            *chib, storagematrix, logmarglike);
      logmarglikeholder[0] = logmarglike;
-     loglikeholder[0] = loglike;
      const unsigned int size = *samplerow * *samplecol;
      for (unsigned int i = 0; i < size; ++i)
        sampledata[i] = storagematrix(i);
