@@ -87,12 +87,8 @@
 \author{Jong Hee Park, \email{jhp@uchicago.edu}, \url{http://home.uchicago.edu/~jhp/}.}
 
 \references{
- Siddhartha Chib. 1995. ``Marginal Likelihood from the Gibbs Output.''
-   \emph{Journal of the American Statistical Association}. 90:
-   1313-1321.
-
- Siddhartha Chib. 1998. ``Estimation and comparison of multiple change-point models.''
-   \emph{Journal of Econometrics}. 86: 221-241.
+  Jong Hee Park. 2011. ``Changepoint Analysis of Binary and Ordinal Probit Models:
+  An Application to Bank Rate Policy Under the Interwar Gold Standard." \emph{Political Analysis}. 19: 188-204.
 
  Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
   ``MCMCpack: Markov Chain Monte Carlo in R.'',
@@ -102,6 +98,10 @@
  Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
    \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
    \url{http://www-fis.iarc.fr/coda/}.
+
+  Siddhartha Chib. 1995. ``Marginal Likelihood from the Gibbs Output.''
+   \emph{Journal of the American Statistical Association}. 90:
+   1313-1321.
 
 }
 

@@ -118,7 +118,7 @@ MCMCregress(formula, data = NULL, burnin = 1000, mcmc = 10000,
   }
   
   \references{
-Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
+  Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
 ``MCMCpack: Markov Chain Monte Carlo in R.'',
  \emph{Journal of Statistical Software}. 42(9): 1-21.
  \url{http://www.jstatsoft.org/v42/i09/}.
