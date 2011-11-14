@@ -13,7 +13,7 @@
 // kevin_quinn@harvard.edu
 // 
 // This software is distributed under the terms of the GNU GENERAL
-// PUBLIC LICENSE Version 3, 29 June 2007.  See the package LICENSE
+// PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
 // file for more information.
 //
 // 2/18/2005 KQ

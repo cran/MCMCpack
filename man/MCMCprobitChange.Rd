@@ -107,13 +107,22 @@
    Pr(y_t = 1) = Phi(x_i'beta_m)}
   Where \eqn{M}{M} is the number of states, and \eqn{\beta_m}{beta_m} 
   is a parameter when a state is \eqn{m}{m} at \eqn{t}{t}. 
+
+  We assume Gaussian distribution for prior of \eqn{\beta}{beta}:
+  \deqn{\beta_m \sim \mathcal{N}(b_0,B_0^{-1}),\;\; m = 1, \ldots, M}{beta_m ~ N(b0,B0^(-1)), m = 1,...,M.}
+
+  And:
+  \deqn{p_{mm} \sim \mathcal{B}eta(a, b),\;\; m = 1, \ldots, M}{p_mm ~ Beta(a, b), m = 1,...,M.}
+  Where \eqn{M}{M} is the number of states.
+
+
 }
 
 \author{Jong Hee Park, \email{jhp@uchicago.edu}, \url{http://home.uchicago.edu/~jhp/}.}
 
 \references{
   Jong Hee Park. 2011. ``Changepoint Analysis of Binary and Ordinal Probit Models:
-  An Application to Bank Rate Policy Under the Interwar Gold Standard." \emph{Political Analysis}.
+  An Application to Bank Rate Policy Under the Interwar Gold Standard." \emph{Political Analysis}. 19: 188-204.
 
 Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
  ``MCMCpack: Markov Chain Monte Carlo in R.'',
@@ -128,6 +137,7 @@ Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
 }
 
 \examples{
+\dontrun{
 set.seed(1973)
 x1 <- rnorm(300, 0, 1)
 true.beta <- c(-.5, .2, 1)
@@ -165,6 +175,7 @@ BayesFactor(out0, out1, out2, out3)
 ## draw plots using the "right" model
 plotState(out2)
 plotChangepoint(out2)
+}
 }
 
 \keyword{models}

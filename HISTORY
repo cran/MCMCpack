@@ -1,8 +1,17 @@
 //
 // Changes and Bug Fixes
 //
+1.1-5 to 1.2-1
+  * added HMMpanelFE()
+  * added HMMpanelRE()
+  * added testpanelGroupBreak()
+  * added testpanelSubjectBreak()  
+  * added MCMCresidualBreakAnalysis()
+  * deleted #undef DO, #undef DS, #undef SO, #undef SS 
+    due to a symbol clash with Solaris' headers (thanks to Brian Ripley)
+  
 1.1-4 to 1.1-5
-  * fixed an error in MCMCregress: loglike needs to be dropped from auto.Scythe.call()
+  * fixed an error in MCMCregress: loglike should be dropped
 
 1.1-3 to 1.1-4
   * fixed an error in MCMChregress: NQ has to be replaced by NP (line 223)

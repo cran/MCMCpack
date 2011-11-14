@@ -97,8 +97,9 @@
 
   We assume Gaussian distribution for prior of \eqn{\beta}{beta}:
   \deqn{\beta_m \sim \mathcal{N}(b_0,B_0^{-1}),\;\; m = 1, \ldots, M}{beta_m ~ N(b0,B0^(-1)), m = 1,...,M.}
+
   And:
-  \deqn{p_{mm} \sim \mathcal{B}eta{a}{b},\;\; m = 1, \ldots, k}{p_mm ~ Beta(a, b), m = 1,...,M.}
+  \deqn{p_{mm} \sim \mathcal{B}eta(a, b),\;\; m = 1, \ldots, M}{p_mm ~ Beta(a, b), m = 1,...,M.}
   Where \eqn{M}{M} is the number of states.
   }
 
