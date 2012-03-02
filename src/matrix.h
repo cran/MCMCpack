@@ -44,7 +44,7 @@
 #ifndef SCYTHE_MATRIX_H
 #define SCYTHE_MATRIX_H
 
-#include <climits>
+//#include <climits>
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -1888,6 +1888,17 @@ namespace scythe {
             (*this, i, 0, i, Base::cols() - 1));
 			}	
 
+     /*! \brief Returns single element in matrix as scalar type
+      *
+      * This method converts a matrix object to a single scalar
+      * element of whatever type the matrix is composed of.  The
+      * method simply returns the element at position zero; if error
+      * checking is turned on the method with throw an error if the
+      * matrix is not, in fact, 1x1.
+      *
+      * \throw scythe_conformation_error (Level 1)
+      */
+
       /**** ASSIGNMENT OPERATORS ****/
 
        /*
@@ -3166,7 +3177,7 @@ namespace scythe {
        */
       inline void
       save (const std::string& path, const char flag = 'n',
-            const bool header = false)
+            const bool header = false) const
       {
         std::ofstream out;
         if (flag == 'n') {

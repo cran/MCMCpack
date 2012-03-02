@@ -1,6 +1,14 @@
 //
 // Changes and Bug Fixes
 //
+1.2-1 to 1.2-2
+  * fixed bug in dwish() (thanks to Taráz E. Buck)
+  * fixed .onAttach() to no longer require packages and use packageStartupMessage()
+    (thanks to Brian Ripley)
+  * updated to most recent version of Scythe library
+  * cleaned up issues with cout, cerr, abort(), exit(), and pthread.h
+    (thanks to Brian Ripley)
+ 
 1.1-5 to 1.2-1
   * added HMMpanelFE()
   * added HMMpanelRE()

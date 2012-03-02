@@ -42,6 +42,10 @@
 #include <R.h>           // needed to use Rprintf()
 #include <R_ext/Utils.h> // needed to allow user interrupts
 
+#include <Rdefines.h>
+#include <Rinternals.h>
+
+
 
 typedef Matrix<double,Row,View> rmview;
 
@@ -385,8 +389,9 @@ static void doubling(double (*logfun)(const double&,
     x0 = delta1;
   }
   else {
-    Rprintf("\nERROR: param not in {0,1,2,3} in doubling().\n");
-    exit(1);    
+    error("ERROR: param not in {0,1,2,3} in doubling().");
+    //Rprintf("\nERROR: param not in {0,1,2,3} in doubling().\n");
+    //exit(1);    
   }
 
   L = x0 - w*U;
@@ -469,8 +474,9 @@ static void StepOut(double (*logfun)(const double&,
     x0 = delta1;
   }
   else {
-    Rprintf("\nERROR: param not in {0,1,2,3} in StepOut().\n");
-    exit(1);    
+    error("ERROR: param not in {0,1,2,3} in StepOut().");
+    //Rprintf("\nERROR: param not in {0,1,2,3} in StepOut().\n");
+    //exit(1);    
   }
   
 
@@ -628,8 +634,9 @@ static double shrinkageDoubling(double (*logfun)(const double&,
     x0 = delta1;
   }
   else {
-    Rprintf("\nERROR: param not in {0,1,2,3} in shrinkageDoubling().\n");
-    exit(1);    
+    error("ERROR: param not in {0,1,2,3} in shrinkageDoubling().");
+    //Rprintf("\nERROR: param not in {0,1,2,3} in shrinkageDoubling().\n");
+    //exit(1);    
   }
 
   for (;;){
@@ -714,8 +721,9 @@ static double shrinkageStep(double (*logfun)(const double&,
     x0 = delta1;
   }
   else {
-    Rprintf("\nERROR: param not in {0,1,2,3} in shrinkageDoubling().\n");
-    exit(1);    
+    error("ERROR: param not in {0,1,2,3} in shrinkageDoubling().");
+    //Rprintf("\nERROR: param not in {0,1,2,3} in shrinkageDoubling().\n");
+    //exit(1);    
   }
 
   for (;;){

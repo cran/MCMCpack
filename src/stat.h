@@ -224,7 +224,7 @@ namespace scythe {
   T
   median (const Matrix<T,PO,PS> &A)
   {
-    Matrix<T, PO, PS> temp(A);
+    Matrix<T, PO, Concrete> temp(A);
     uint n = temp.size();
 
     sort(temp.begin(), temp.end());
@@ -271,7 +271,7 @@ namespace scythe {
   T
   mode (const Matrix<T,PO,PS> &A)
   {
-    Matrix<T, PO, PS> temp(A);
+    Matrix<T, PO, Concrete> temp(A);
     
     sort(temp.begin(), temp.end());
 
