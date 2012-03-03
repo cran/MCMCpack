@@ -791,13 +791,13 @@ namespace scythe {
       ++count;
 
       if (trace){
-	std::cout << "BFGS iteration = " << count << std::endl;
-	std::cout << "thetamin = " << (t(thetamin)) ;
-	std::cout << "gradient = " << (t(fgrad)) ;
-	std::cout << "t(gradient) * gradient = " << 
-	  (t(fgrad) * fgrad) ;
-	std::cout << "function value = " << fun(thetamin) << 
-	  std::endl << std::endl;
+	// std::cout << "BFGS iteration = " << count << std::endl;
+	// std::cout << "thetamin = " << (t(thetamin)) ;
+	// std::cout << "gradient = " << (t(fgrad)) ;
+	// std::cout << "t(gradient) * gradient = " << 
+    // (t(fgrad) * fgrad) ;
+	//std::cout << "function value = " << fun(thetamin) << 
+	// std::endl << std::endl;
       }
       //std::cout << "Hessian = " << hesscdif(fun, theta) << "\n";
       //std::cout << "H = " << H << "\n";

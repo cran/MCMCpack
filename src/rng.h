@@ -59,6 +59,9 @@
 #include "scythestat/la.h"
 #endif
 
+#include <R.h>           // needed to use Rprintf()
+#include <R_ext/Utils.h> // needed to allow user interrupts
+
 namespace scythe {
 
 /* Shorthand for the matrix versions of the various distributions'
@@ -1040,8 +1043,7 @@ namespace scythe {
         }
 
         if (! finite(x)) {
-          SCYTHE_WARN("Mean extremely far from truncation point. "
-              << "Returning truncation point");
+          Rprintf("Mean extremely far from truncation point. Returning truncation point");
           return below; 
         }
 
@@ -1096,8 +1098,7 @@ namespace scythe {
             + below;
         }
         if (! finite(x)) {
-          SCYTHE_WARN("Mean extremely far from truncation point. "
-              << "Returning truncation point");
+          Rprintf("Mean extremely far from truncation point. Returning truncation point");
           return above; 
         }
         
@@ -1165,8 +1166,7 @@ namespace scythe {
                 - below) + below;
           }
           if (! finite(x)) {
-            SCYTHE_WARN("Mean extremely far from truncation point. "
-                << "Returning truncation point");
+            Rprintf("Mean extremely far from truncation point. Returning truncation point");
             return below; 
           }
           return x;
@@ -1235,8 +1235,7 @@ namespace scythe {
                   - below) + below;
           }
           if (! finite(x)) {
-            SCYTHE_WARN("Mean extremely far from truncation point. "
-                << "Returning truncation point");
+            Rprintf("Mean extremely far from truncation point. Returning truncation point");
             return above; 
           }
           return -1*x;
@@ -1277,7 +1276,7 @@ namespace scythe {
           
         for (unsigned int i = 0; i < v; ++i) {
           alpha = C * rnorm(Sigma.rows(), 1, 0, 1);
-          A = A + (alpha * (t(alpha)));
+          A += (alpha * (t(alpha)));
         }
 
         return A;
@@ -1317,7 +1316,7 @@ namespace scythe {
         for (ait = alpha.begin_f(); ait != alast; ++ait) {
           *yit = rgamma(*ait, 1);
           ysum += *yit;
-          ++ait;
+          ++yit;
         }
 
         y /= ysum;

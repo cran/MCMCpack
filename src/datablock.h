@@ -42,8 +42,13 @@
 
 #ifdef SCYTHE_COMPILE_DIRECT
 #include "error.h"
+#include "pthread.h"
 #else
 #include "scythestat/error.h"
+#endif
+
+#ifdef SCYTHE_PTHREAD
+#include "pthread.h"
 #endif
 
 namespace scythe {
@@ -253,7 +258,13 @@ namespace scythe {
 				:	data_ (0),
 					block_ (&nullBlock_)
 			{
+#ifdef SCYTHE_PTHREAD
+        pthread_mutex_lock (&ndbMutex_);
+#endif
 				block_->addReference();
+#ifdef SCYTHE_PTHREAD
+        pthread_mutex_unlock (&ndbMutex_);
+#endif
 			}
 
 			/* New block constructor: creates a new underlying block of a
@@ -278,7 +289,18 @@ namespace scythe {
 				:	data_ (reference.data_ + offset),
 					block_ (reference.block_)
 			{
+#ifdef SCYTHE_PTHREAD
+        bool lock = false;
+        if (block_ == &nullBlock_) {
+          pthread_mutex_lock (&ndbMutex_);
+          lock = true;
+        }
+#endif
 				block_->addReference();
+#ifdef SCYTHE_PTHREAD
+        if (lock)
+          pthread_mutex_unlock (&ndbMutex_);
+#endif
 			}
 			
 			/**** DESTRUCTOR ****/
@@ -287,7 +309,18 @@ namespace scythe {
 			 */
 			virtual ~DataBlockReference ()
 			{
+#ifdef SCYTHE_PTHREAD
+        bool lock = false;
+        if (block_ == &nullBlock_) {
+          pthread_mutex_lock (&ndbMutex_);
+          lock = true;
+        }
+#endif
 				withdrawReference();
+#ifdef SCYTHE_PTHREAD
+        if (lock)
+          pthread_mutex_unlock (&ndbMutex_);
+#endif
 			}
 
 		protected:
@@ -296,15 +329,33 @@ namespace scythe {
 			void referenceOther (const DataBlockReference<T_type>& ref,
 					uint offset = 0)
 			{
+#ifdef SCYTHE_PTHREAD
+        bool lock = false;
+        if (block_ == &nullBlock_ || ref.block_ == &nullBlock_) {
+          pthread_mutex_lock (&ndbMutex_);
+          lock = true;
+        }
+#endif
 				withdrawReference ();
 				block_ = ref.block_;
 				block_->addReference();
 				data_ = ref.data_ + offset;
+#ifdef SCYTHE_PTHREAD
+        if (lock)
+          pthread_mutex_lock (&ndbMutex_);
+#endif
 			}
 
 			void referenceNew (uint size)
 			{
-				/* If we are the only referent to this data block, resize it.
+#ifdef SCYTHE_PTHREAD
+        bool lock = false;
+        if (block_ == &nullBlock_) {
+          pthread_mutex_lock (&ndbMutex_);
+          lock = true;
+        }
+#endif
+				/* If we are the only referent to this data block, resize it. 
 				 * Otherwise, shift the reference to point to a newly
 				 * constructed block.
 				 */
@@ -322,12 +373,19 @@ namespace scythe {
 					data_ = block_->data();
 					block_->addReference();
 				}
+#ifdef SCYTHE_PTHREAD
+        if (lock)
+          pthread_mutex_unlock (&ndbMutex_);
+#endif
 			}
 
 		private:
 			/**** INTERNAL MEMBERS ****/
 			void withdrawReference ()
 			{
+        // All calls to withdrawReference are mutex protected and protecting
+        // this too can create a race condition.
+
 				if (block_->removeReference() == 0
 						&& block_ != &nullBlock_)
 					delete block_;
@@ -335,10 +393,17 @@ namespace scythe {
 
 			void referenceNull ()
 			{
+#ifdef SCYTHE_PTHREAD
+        pthread_mutex_lock (&ndbMutex_);
+#endif
 				withdrawReference();
 				block_ = &nullBlock_;
 				block_->addReference();
 				data_ = 0;
+
+#ifdef SCYTHE_PTHREAD
+        pthread_mutex_unlock (&ndbMutex_);
+#endif
 			}
 
 
@@ -349,12 +414,20 @@ namespace scythe {
 		private:
 			DataBlock<T_type>* block_;
 			static NullDataBlock<T_type> nullBlock_;
+      static pthread_mutex_t ndbMutex_;
 
 	}; // end class DataBlockReference
 
 	/* Instantiation of the static null memory block */
 	template <typename T>
 	NullDataBlock<T> DataBlockReference<T>::nullBlock_;
+
+#ifdef SCYTHE_PTHREAD
+  // mutex initialization
+  template <typename T>
+  pthread_mutex_t 
+  DataBlockReference<T>::ndbMutex_ = PTHREAD_MUTEX_INITIALIZER;
+#endif
 
 } // end namespace scythe
 

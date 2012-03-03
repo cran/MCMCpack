@@ -57,6 +57,9 @@
 #include <iostream>
 #include <vector>
 
+#include <R.h>           // needed to use Rprintf()
+#include <R_ext/Utils.h> // needed to allow user interrupts
+
 /*! @cond */
 #ifdef SCYTHE_DEBUG_LIB
 #define SCYTHE_DEBUG_MSG(MSG)                             \
@@ -122,12 +125,12 @@
 #define SCYTHE_THROW_30(EXCEP,MSG)
 #endif
 
-#define SCYTHE_WARN(MSG)                                              \
-  {                                                                   \
-  std::cerr << "WARNING in " << __FILE__ << ", "                      \
-    << __func__ << ", " << __LINE__ << ": "                \
-    << MSG << "\n";                                                   \
-  }
+// #define SCYTHE_WARN(MSG)                                              \
+//  {                                                                   \ 
+//  std::cerr << "WARNING in " << __FILE__ << ", "                      \
+//    << __func__ << ", " << __LINE__ << ": "                           \
+//    << MSG << "\n";                                                   \
+//  }
 
 #define SCYTHE_CHECK_WARN(CHECK,MSG)                                  \
   {                                                                   \
@@ -593,9 +596,9 @@ namespace scythe
   // The definition of our terminate handler described above
   inline void scythe_terminate ()
   {
-    std::cerr << serr->what() << std::endl;
-    std::cerr << std::endl;
-    abort ();
+    // std::cerr << serr->what() << std::endl;
+    // std::cerr << std::endl;
+    Rf_error ("scythe error");
   }
 
 }        // end namspace SCYTHE
