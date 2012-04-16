@@ -1,6 +1,13 @@
 //
 // Changes and Bug Fixes
 //
+
+1.2-2 to 1.2-3
+  * fixed extraneous warnings in hidden.R (thanks to Jeffrey Arnold)
+  * added make.breaklist.R
+  * fixed example codes in HMMpanelFE.Rd and testpanelSubjectBreak.Rd
+  * fixed testpanelSubjectBreak() to handle missing values in subject.id
+
 1.2-1 to 1.2-2
   * fixed bug in dwish() (thanks to Taráz E. Buck)
   * fixed .onAttach() to no longer require packages and use packageStartupMessage()
