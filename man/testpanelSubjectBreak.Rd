@@ -10,7 +10,7 @@
 \usage{testpanelSubjectBreak(subject.id, time.id, resid, max.break=2, 
            minimum = 10, mcmc=1000, burnin=1000, thin=1, verbose=0, 
            b0, B0, c0, d0, a = NULL, b = NULL, seed = NA, 
-           Time = NULL, start.id = NULL, end.id = NULL, ps.out = FALSE)}  
+           Time = NULL, ps.out = FALSE)}  
 
 \arguments{
   \item{subject.id}{A numeric vector indicating the group number. It should start from 1.}
@@ -56,11 +56,6 @@
     \item{seed}{The seed for the random number generator.  If NA, current R system seed is used.}
 
     \item{Time}{Times of the observations. This will be used to find the time of the first observations in panel residuals. }
-
-    \item{start.id}{If users want to check the residual breaks within a subset of panel subjects, users can specify the starting subject id and 
-    the ending subject id.}
-
-    \item{end.id}{See start.id.}
 
     \item{ps.out}{If ps.out == TRUE, state probabilities are exported. If the number of panel subjects is huge, users can turn it off to save memory.}
 	
@@ -145,10 +140,10 @@
   ## draw time-varying individual effects and sample y
   j = 1
   true.sigma.alpha <- 30	   
-  true.alpha <- true.alpha1 <- true.alpha2 <- rep(NA, N) 
+  true.alpha1 <- true.alpha2 <- rep(NA, N) 
   for (i in 1:N){
     Xi <- X[j:(j+T-1), ]
-    true.mean <- Xi%*%true.beta
+    true.mean <- Xi  \%*\% true.beta
     weight <- Weight[j:(j+T-1)]
     true.alpha1[i] <- rnorm(1, 0, true.sigma.alpha)
     true.alpha2[i] <- -1*true.alpha1[i]
@@ -170,7 +165,8 @@
          b0=0, B0=1/100, c0=2, d0=2, Time = time.id)
 
   ## estimated break numbers
-  estimated.breaks <- make.breaklist(BF, thresh=3)
+  ## thresho 
+  estimated.breaks <- make.breaklist(BF, threshold=3)
   
   ## print all posterior model probabilities	 
   print(attr(BF, "model.prob")) 

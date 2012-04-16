@@ -7,6 +7,7 @@
 //
 // 07/06/2007
 // 12/20/2007 included in MCMCpack
+// 03/09/2012 fixed a bug in a random uniform draw (thanks to Matt Blackwell)
 
 #ifndef MCMCPOISSONCHANGE_CC
 #define MCMCPOISSONCHANGE_CC
@@ -85,7 +86,12 @@ Matrix<> tau_comp_sampler(rng<RNGTYPE>& stream,
     }
     
     else {
-      Matrix<> ut = stream.runif(yt, 1);                       
+      Matrix<> ut = stream.runif(yt, 1);    
+      // redraw the uniform if there are any repeats
+      // thanks to Matt Blackwell 
+      while (::unique(ut).size() != ut.size()) {
+	ut = stream.runif(yt, 1);
+      }                   
       Matrix<> sort_ut = ::sort(ut);
       Matrix<> tau_tj(yt, 1);
       for(int i=1; i<yt; ++i){

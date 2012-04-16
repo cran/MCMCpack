@@ -230,7 +230,7 @@
            Lambda.ineq.constraints){
 
     Lambda <- matrix(0, K, factors)
-    if (is.na(lambda.start)){# sets Lambda to equality constraints & 0s
+    if (any(is.na(lambda.start))){# sets Lambda to equality constraints & 0s
       for (i in 1:K){
         for (j in 1:factors){
           if (Lambda.eq.constraints[i,j]==-999){
@@ -413,7 +413,7 @@
   function(psi.start, X){
     
     K <- ncol(X)
-    if (is.na(psi.start)){
+    if (any(is.na(psi.start))){
       Psi <- 0.5 * diag(diag(var(X)))
     }
     else if (is.double(psi.start) &&

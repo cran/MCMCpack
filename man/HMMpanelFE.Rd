@@ -162,10 +162,10 @@
   ## draw time-varying individual effects and sample y
   j = 1
   true.sigma.alpha <- 30	   
-  true.alpha <- true.alpha1 <- true.alpha2 <- rep(NA, N) 
+  true.alpha1 <- true.alpha2 <- rep(NA, N) 
   for (i in 1:N){
     Xi <- X[j:(j+T-1), ]
-    true.mean <- Xi%*%true.beta
+    true.mean <- Xi  \%*\% true.beta
     weight <- Weight[j:(j+T-1)]
     true.alpha1[i] <- rnorm(1, 0, true.sigma.alpha)
     true.alpha2[i] <- -1*true.alpha1[i]
@@ -187,7 +187,7 @@
          b0=0, B0=1/100, c0=2, d0=2, Time = time.id)
 
   ## get the estimated break numbers
-  estimated.breaks <- make.breaklist(BF, thresh=3)
+  estimated.breaks <- make.breaklist(BF, threshold=3)
 
   ## model fitting 
   out <- HMMpanelFE(subject.id = id, y, X=X, m =  estimated.breaks,

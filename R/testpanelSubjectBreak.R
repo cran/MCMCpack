@@ -3,13 +3,14 @@
 ## 
 ## written by Jong Hee Park 03/2009
 ## modified and integrated with other codes by JHP 07/2011
+## fixed a starting.id and ending.id
 ######################################################################
 
 "testpanelSubjectBreak" <-
   function(subject.id, time.id, resid, max.break=2, minimum = 10, 
            mcmc=1000, burnin=1000, thin=1, verbose=0, 
            b0, B0, c0, d0, a = NULL, b = NULL, seed = NA, 
-           Time = NULL, start.id = NULL, end.id = NULL, ps.out = FALSE){   
+           Time = NULL, ps.out = FALSE){   
     ## seeds
     seeds <- form.seeds(seed) 
     lecuyer <- seeds[[1]]
@@ -30,12 +31,6 @@
     if (is.null(Time)){
       Time <- rep(N, 1)
     }
-    if (is.null(start.id)){
-      start.id <- min(subject.id)
-    }
-    if (is.null(end.id)){
-      end.id <- max(subject.id)
-    }
     NC <- length(unique(subject.id))
     time.list <- as.numeric(table(subject.id))
     
@@ -55,7 +50,7 @@
     else {
       psout <- array(NA, c(max(time.list), sum(2:(max.break+1)), NC))
     }
-    for (i in start.id:end.id){     
+    for (i in 1:NC){     
       residual <- resid.list[[i]]
       nk <- length(residual)
       out <- as.list(rep(NA, max.break))
