@@ -589,7 +589,7 @@ namespace scythe {
     double
     pnorm1 (double x, bool lower_tail, bool log_p)
     {
-      SCYTHE_CHECK_10(! finite(x), scythe_invalid_arg,
+      SCYTHE_CHECK_10(! R_finite(x), scythe_invalid_arg,
           "Quantile x is inifinte (+/-Inf) or NaN");
 
       double p, cp;

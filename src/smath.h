@@ -66,7 +66,7 @@ namespace scythe {
   NAME (const Matrix<T,PO,PS>& A)                                     \
   {                                                                   \
     Matrix<T,RO,RS> res(A.rows(), A.cols(), false);                   \
-    std::transform(A.begin_f(), A.end_f(), res.begin_f(), OP);        \
+    std::transform(A.begin_f(), A.end_f(), res.begin_f(), (T (*) (T))OP);  \
     return res;                                                       \
   }                                                                   \
                                                                       \
@@ -96,15 +96,15 @@ namespace scythe {
     if (A.size() == 1) {                                              \
       res.resize2Match(B);                                            \
       std::transform(B.template begin_f<RO>(), B.template end_f<RO>(),\
-          res.begin_f(), std::bind1st(OP, A(0)));                     \
+          res.begin_f(), std::bind1st(std::ptr_fun((T (*) (T, S))OP), A(0)));                     \
     } else if (B.size() == 1) {                                       \
       res.resize2Match(A);                                            \
       std::transform(A.template begin_f<RO>(), A.template end_f<RO>(),\
-                     res.begin_f(), std::bind2nd(OP, B(0)));          \
+                     res.begin_f(), std::bind2nd(std::ptr_fun((T (*) (T, S))OP), B(0)));          \
     } else {                                                          \
       res.resize2Match(A);                                            \
       std::transform(A.template begin_f<RO>(), A.template end_f<RO>(),\
-                     B.template begin_f<RO>(), res.begin_f(), OP);    \
+                     B.template begin_f<RO>(), res.begin_f(), (T (*) (T, S))OP);    \
     }                                                                 \
                                                                       \
     return res;                                                       \
@@ -329,7 +329,7 @@ namespace scythe {
 	* \see atanh()
 	*/
 
-  SCYTHE_MATH_OP_2ARG(atan2, std::ptr_fun(::atan2))
+  SCYTHE_MATH_OP_2ARG(atan2, ::atan2)
 
   /* calc the cube root of each element of a Matrix */
    /*! 
@@ -373,7 +373,7 @@ namespace scythe {
 	* \param B The matrix whose signs will comprise the resultant matrix
 	*/
 
-  SCYTHE_MATH_OP_2ARG(copysign, std::ptr_fun(::copysign))
+  SCYTHE_MATH_OP_2ARG(copysign, ::copysign)
   
   /* calc the cosine of each element of a Matrix */
     
@@ -488,7 +488,7 @@ namespace scythe {
 	* \param A The matrix whose absolute values are to be taken.
 	*/
 
-  SCYTHE_MATH_OP(fabs, ::fabs)
+  SCYTHE_MATH_OP(fabs, (T (*) (T))::fabs)
 
   /* calc the floor of each element of a Matrix */
   /*! 
@@ -515,7 +515,7 @@ namespace scythe {
 	* \param B the matrix to serve as divisor
 	*/
 
-  SCYTHE_MATH_OP_2ARG(fmod, std::ptr_fun(::fmod))
+  SCYTHE_MATH_OP_2ARG(fmod, ::fmod)
 
   /* calc the fractional val of input and return exponents in int
    * matrix reference
@@ -565,7 +565,7 @@ namespace scythe {
 	* \param B Input matrix
 	*/
 
-  SCYTHE_MATH_OP_2ARG(hypot, std::ptr_fun(::hypot))
+  SCYTHE_MATH_OP_2ARG(hypot, ::hypot)
 
   /*  return (int) logb */
   SCYTHE_MATH_OP(ilogb, ::ilogb)
@@ -626,7 +626,7 @@ namespace scythe {
 	* \see yn()
 	*/
 
-  SCYTHE_MATH_OP_2ARG(jn, std::ptr_fun(::jn))
+  SCYTHE_MATH_OP_2ARG(jn, ::jn)
 
   /* calc x * 2 ^ex */
    /*!
@@ -638,7 +638,7 @@ namespace scythe {
 	* \param A Matrix whose elements are to be multiplied
 	* \param ex Matrix of powers to which 2 will be raised.
 	*/
-  SCYTHE_MATH_OP_2ARG(ldexp, std::ptr_fun(::ldexp))
+      SCYTHE_MATH_OP_2ARG(ldexp, ::ldexp)
   
   /*  compute the natural log of the absval of gamma function */
   
@@ -668,7 +668,7 @@ namespace scythe {
 	* \see logb()
 	*/
 
-  SCYTHE_MATH_OP(log, ::log)
+      SCYTHE_MATH_OP(log, (T (*)(T))::log)
   
   /* calc the base-10 log of each element of a Matrix */
    /*!
@@ -759,10 +759,10 @@ namespace scythe {
 	* \param A Matrix to be exponentiated
 	* \param ex Desired exponent
 	*/
-  SCYTHE_MATH_OP_2ARG(pow, std::ptr_fun(::pow))
+  SCYTHE_MATH_OP_2ARG(pow, ::pow)
 
   /* calc rem == x - n * y */
-  SCYTHE_MATH_OP_2ARG(remainder, std::ptr_fun(::remainder))
+  SCYTHE_MATH_OP_2ARG(remainder, ::remainder)
 
   /* return x rounded to nearest int */
   
@@ -778,7 +778,7 @@ namespace scythe {
   SCYTHE_MATH_OP(rint, ::rint)
 
   /* returns x * FLT_RADIX^ex */
-  SCYTHE_MATH_OP_2ARG(scalbn, std::ptr_fun(::scalbn))
+  SCYTHE_MATH_OP_2ARG(scalbn, ::scalbn)
 
   /*  calc the sine of x */
   
@@ -841,7 +841,7 @@ namespace scythe {
 
 	*/
 	
-  SCYTHE_MATH_OP(sqrt, ::sqrt)
+  SCYTHE_MATH_OP(sqrt,  (T (*)(T))::sqrt)
 
   /* calc the tangent of x */
   
@@ -948,7 +948,7 @@ namespace scythe {
 	* \see y1()
 	*/
 
-  SCYTHE_MATH_OP_2ARG(yn, std::ptr_fun(::yn))
+  SCYTHE_MATH_OP_2ARG(yn, ::yn)
   
 } // end namespace scythe
 

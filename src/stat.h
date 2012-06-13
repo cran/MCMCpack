@@ -231,7 +231,7 @@ namespace scythe {
     if (n % 2 == 0)
       return ((temp[n / 2] + temp[n / 2 - 1]) / 2);
     else
-      return temp[(uint) ::floor(n / 2)];
+      return temp[n / 2];
   }
 
   /* Calculate the median of each column of a matrix */
