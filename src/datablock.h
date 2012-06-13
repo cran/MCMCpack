@@ -42,13 +42,12 @@
 
 #ifdef SCYTHE_COMPILE_DIRECT
 #include "error.h"
-#include "pthread.h"
 #else
 #include "scythestat/error.h"
 #endif
 
 #ifdef SCYTHE_PTHREAD
-#include "pthread.h"
+#include <pthread.h>
 #endif
 
 namespace scythe {
@@ -414,7 +413,9 @@ namespace scythe {
 		private:
 			DataBlock<T_type>* block_;
 			static NullDataBlock<T_type> nullBlock_;
+#ifdef SCYTHE_PTHREAD
       static pthread_mutex_t ndbMutex_;
+#endif
 
 	}; // end class DataBlockReference
 

@@ -80,13 +80,13 @@
  * directly.  The SCYTHE_VIEW_ASSIGNMENT_FLAG turns on R-style
  * recycling in Matrix::operator=() for view matrices. 
  *
- * The SCYTHE_DEBUG_LEVEL controls the amount of error trapping in
+ * The SCYTHE_DEBUG controls the amount of error trapping in
  * Scythe.  This level ranges from 0 (virtually no checking) to 3 (all
  * checking, including Matrix bounds checking, turned on).  By
  * default, the level is set to 3.  Here's an example of how to
  * compile a program with only basic error checking:
  *
- * \verbatim $ g++ myprog.cc -DSCYTHE_DEBUG_LEVEL=1 \endverbatim
+ * \verbatim $ g++ myprog.cc -DSCYTHE_DEBUG=1 \endverbatim
  *
  * Finally, the SCYTHE_LAPACK flag enables LAPACK/BLAS.  You must have
  * the LAPACK and BLAS libraries installed on your system and compile

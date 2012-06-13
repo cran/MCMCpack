@@ -725,6 +725,14 @@ namespace scythe {
 
   };
 
+#ifndef SCYTHE_RPACK
+  /* Default seed definition */
+  double lecuyer::nextSeed[6] = 
+      {
+         12345.0, 12345.0, 12345.0, 12345.0, 12345.0, 12345.0
+      };
+#endif
+
 }
 
 #endif /* SCYTHE_LECUYER_H */
