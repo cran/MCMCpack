@@ -44,7 +44,7 @@
 #ifndef SCYTHE_MATRIX_H
 #define SCYTHE_MATRIX_H
 
-//#include <climits>
+#include <climits>
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -1276,10 +1276,10 @@ namespace scythe {
 					DBRef ()
 			{
         if (STYLE == Concrete) {
-          referenceNew(M.size());
+          this->referenceNew(M.size());
           scythe::copy<ORDER,ORDER>(M, *this);
         } else // STYLE == View
-          referenceOther(M);
+          this->referenceOther(M);
 			}
 
       /*! \brief Cross order and/or style copy constructor.
@@ -1323,10 +1323,10 @@ namespace scythe {
 					DBRef ()
 			{
         if (STYLE == Concrete) {
-          referenceNew(M.size());
+          this->referenceNew(M.size());
           scythe::copy<ORDER,ORDER> (M, *this);
         } else // STYLE == View
-          referenceOther(M);
+          this->referenceOther(M);
 			}
 
       /*! \brief Cross type copy constructor
@@ -1474,8 +1474,8 @@ namespace scythe {
           SCYTHE_THROW(scythe_style_error, 
               "Concrete matrices cannot reference other matrices");
         } else {
-          referenceOther(M);
-          mimic(M);
+          this->referenceOther(M);
+          this->mimic(M);
         }
 			}
 
@@ -2483,8 +2483,8 @@ namespace scythe {
          * if we're concrete
          */
         Matrix<T_type, ORDER> res = (*this) * M;
-        referenceOther(res);
-        mimic(res);
+        this->referenceOther(res);
+        this->mimic(res);
 
 				return *this;
 			}
@@ -2573,8 +2573,8 @@ namespace scythe {
           }
         }
        
-        referenceOther(res);
-        mimic(res);
+        this->referenceOther(res);
+        this->mimic(res);
 
         return *this;
       }
@@ -2745,7 +2745,7 @@ namespace scythe {
         if (preserve) {
           /* TODO Optimize this case.  It is rather clunky. */
           Matrix<T_type, ORDER, View> tmp(*this);
-          DBRef::referenceNew(rows * cols);
+          this->referenceNew(rows * cols);
           Base::resize(rows, cols);
           uint min_cols = std::min(Base::cols(), tmp.cols());
           uint min_rows = std::min(Base::rows(), tmp.rows());
@@ -2761,7 +2761,7 @@ namespace scythe {
                 (*this)(i, j) = tmp(i, j);
           }
         } else {
-          DBRef::referenceNew(rows * cols);
+          this->referenceNew(rows * cols);
           Base::resize(rows, cols);
         }
       }
@@ -2854,8 +2854,8 @@ namespace scythe {
          * redirected at another block) like here.
          */
 
-        referenceOther(M);
-        mimic(M);
+        this->referenceOther(M);
+        this->mimic(M);
 
         M.referenceOther(tmp);
         M.mimic(tmp);
@@ -2976,6 +2976,8 @@ namespace scythe {
        */
       inline bool isLowerTriangular () const
       {
+        if (! Base::isSquare())
+          return false;
         // TODO view+iterator if optimized
         if (ORDER == Row) {
           for (uint i = 0; i < Base::rows(); ++i)
@@ -3003,6 +3005,8 @@ namespace scythe {
        */
       inline bool isUpperTriangular () const
       {
+        if (! Base::isSquare())
+          return false;
         // TODO view+iterator if optimized
         if (ORDER == Row) {
           for (uint i = 0; i < Base::rows(); ++i)
@@ -3096,9 +3100,9 @@ namespace scythe {
       inline bool
       equals(const Matrix<T_type, O, S>& M) const
       {
-        if (data_ == M.data_ && STYLE == Concrete && S == Concrete)
+        if (data_ == M.getArray() && STYLE == Concrete && S == Concrete)
           return true;
-        else if (data_ == M.data_ && Base::rows() == M.rows() 
+        else if (data_ == M.getArray() && Base::rows() == M.rows() 
                  && Base::cols() == M.cols()) {
           return true;
         } else if (this->isNull() && M.isNull())

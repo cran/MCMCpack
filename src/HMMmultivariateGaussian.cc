@@ -11,8 +11,8 @@
 //
 // Copyright (C) 2008-present Jong Hee Park
 //////////////////////////////////////////////////////////////////////////
-#ifndef HMMGAUSSIANPANELRE_CC
-#define HMMGAUSSIANPANELRE_CC
+#ifndef HMMMULTIVARIATEGAUSSIAN_CC
+#define HMMMULTIVARIATEGAUSSIAN_CC
 
 #include<vector>
 #include<algorithm>
@@ -64,17 +64,17 @@ void MultivariateGaussian_impl(rng<RNGTYPE>& stream,
 			       double& logmarglike, double& loglike, 
 			       unsigned int chib)
 { // redefine constants
-  const unsigned int K = X.cols();; // ncol(X)
+  const int K = X.cols();; // ncol(X)
   const int NOBS = nobs;
   const Matrix<> B0inv = invpd(B0);
 
-  const int tot_iter = burnin + mcmc;
-  const int nstore = mcmc / thin; // number of draws to store
+  const unsigned int tot_iter = burnin + mcmc;
+  const unsigned int nstore = mcmc / thin; // number of draws to store
   
   // generate posk_arr and post_arr
   // Number of observations by group k
   int *nobsk = new int[nsubj];
-  for (int k=0; k<nsubj; k++) {
+  for (unsigned int k=0; k<nsubj; k++) {
     nobsk[k]=0;
     for (int n=0; n<NOBS; n++) {
       if (subjectid[n]==k+1) {
@@ -85,7 +85,7 @@ void MultivariateGaussian_impl(rng<RNGTYPE>& stream,
 
   // Position of each group in the data-set
   int **posk_arr = new int*[nsubj];
-  for (int k=0; k<nsubj; k++) {
+  for (unsigned int k=0; k<nsubj; k++) {
     posk_arr[k] = new int[nobsk[k]];
     int repk=0;
     for (int n=0; n<NOBS; n++) {
@@ -99,7 +99,7 @@ void MultivariateGaussian_impl(rng<RNGTYPE>& stream,
   // Small fixed matrices indexed on k for data access
   Matrix<double> *Yk_arr = new Matrix<double>[nsubj];
   Matrix<double> *Xk_arr = new Matrix<double>[nsubj];
-  for(int k=0; k<nsubj; k++) {
+  for(unsigned int k=0; k<nsubj; k++) {
     Xk_arr[k] = Matrix<double>(nobsk[k], K);
     Yk_arr[k] = Matrix<double>(nobsk[k], 1);
     for (int l=0; l<nobsk[k]; l++) {
@@ -112,7 +112,7 @@ void MultivariateGaussian_impl(rng<RNGTYPE>& stream,
  
   Matrix<double> *cpXk_arr = new Matrix<double>[nsubj];
   Matrix<double> *tXYk_arr = new Matrix<double>[nsubj];
-  for(int k=0; k<nsubj; k++) {
+  for(unsigned int k=0; k<nsubj; k++) {
     cpXk_arr[k] = crossprod(Xk_arr[k]);
     tXYk_arr[k] = t(Xk_arr[k])*Yk_arr[k];
   }
@@ -131,13 +131,13 @@ void MultivariateGaussian_impl(rng<RNGTYPE>& stream,
   /////////////////////////////////////////////////
   // initialize Yhat for the first loop only
   /////////////////////////////////////////////////
-  for (int iter=0; iter < tot_iter; ++iter){
+  for (unsigned int iter=0; iter < tot_iter; ++iter){
     //////////////////////
     // Step 1. Sample beta 
     //////////////////////
     Matrix<> XVX(K, K);
     Matrix<> XVY(K, 1);
-    for(int s = 0; s<nsubj; ++s) {       
+    for(unsigned int s = 0; s<nsubj; ++s) {       
       XVX = XVX + cpXk_arr[s];
       XVY = XVY + tXYk_arr[s];       
     }
@@ -151,7 +151,7 @@ void MultivariateGaussian_impl(rng<RNGTYPE>& stream,
     /////////////////////////////////////////////////
     double SSE = 0;   
     int counter = 0;
-    for(int s=0;s<nsubj; ++s){
+    for(unsigned int s=0;s<nsubj; ++s){
       int ntime_s = subject_groupinfo(s, 2);
       Matrix<> e = t(Yk_arr[s]-Xk_arr[s]*beta)*(Yk_arr[s] - Xk_arr[s]*beta);
       SSE = SSE + e[0];
@@ -198,10 +198,10 @@ void MultivariateGaussian_impl(rng<RNGTYPE>& stream,
     //////////////////////////////////////////////////////////////////
     // 1. pdf.beta | sigma2_g
     //////////////////////////////////////////////////////////////////
-    for (int iter = 0; iter<nstore; ++iter){
+    for (unsigned int iter = 0; iter<nstore; ++iter){
       Matrix<> XVX(K, K);
       Matrix<> XVY(K, 1);
-      for(int s = 0; s<nsubj; ++s) {       
+      for(unsigned int s = 0; s<nsubj; ++s) {       
 	XVX = XVX + cpXk_arr[s];
 	XVY = XVY + tXYk_arr[s];       
       }
@@ -222,9 +222,9 @@ void MultivariateGaussian_impl(rng<RNGTYPE>& stream,
     // 2. pdf.sigma2
     ////////////////////////////////////////////////////////////////// 
     Matrix<> density_sigma2(nstore, 1);  
-    for (int iter = 0; iter<nstore; ++iter){
+    for (unsigned int iter = 0; iter<nstore; ++iter){
       double SSE = 0;   
-      for(int s=0;s<nsubj; ++s){
+      for(unsigned int s=0;s<nsubj; ++s){
 	int ntime_s = subject_groupinfo(s, 2);
 	Matrix<> e = t(Yk_arr[s]-Xk_arr[s]*beta_st)*(Yk_arr[s] - Xk_arr[s]*beta_st);
 	SSE = SSE + e[0];
@@ -240,7 +240,7 @@ void MultivariateGaussian_impl(rng<RNGTYPE>& stream,
     // likelihood f(y|beta_st, D_st, sigma2_st, P_st)
     //////////////////////////////////////////////////////////////////  
     loglike = 0;
-    for(int s = 0; s<nsubj; ++s) {       
+    for(unsigned int s = 0; s<nsubj; ++s) {       
       int ntime_s = subject_groupinfo(s, 2);     
       Matrix<> Sigma = sigma2_st*eye(ntime_s);
       Matrix<> Mu = Xk_arr[s]*beta_st;
@@ -273,7 +273,7 @@ void MultivariateGaussian_impl(rng<RNGTYPE>& stream,
   }
   
   delete[] nobsk;
-  for(int k=0; k<nsubj; k++) {
+  for(unsigned int k=0; k<nsubj; k++) {
     delete[] posk_arr[k];
   }
   delete [] posk_arr;
@@ -305,18 +305,18 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
 				  double& logmarglike, double& loglike, 
 				  unsigned int chib)
 { // redefine constants
-  const unsigned int K = X.cols();; // ncol(X)
+  const int K = X.cols();; // ncol(X)
   const int NOBS = nobs;
   const Matrix<> B0inv = invpd(B0);
 
-  const int tot_iter = burnin + mcmc;
-  const int nstore = mcmc / thin; // number of draws to store
+  const unsigned int tot_iter = burnin + mcmc;
+  const unsigned int nstore = mcmc / thin; // number of draws to store
   const int ns = m + 1; 
   
   // generate posk_arr and post_arr
   // Number of observations by group k
   int *nobsk = new int[nsubj];
-  for (int k=0; k<nsubj; k++) {
+  for (unsigned int k=0; k<nsubj; k++) {
     nobsk[k]=0;
     for (int n=0; n<NOBS; n++) {
       if (subjectid[n]==k+1) {
@@ -327,7 +327,7 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
 
   // Position of each group in the data-set
   int **posk_arr = new int*[nsubj];
-  for (int k=0; k<nsubj; k++) {
+  for (unsigned int k=0; k<nsubj; k++) {
     posk_arr[k] = new int[nobsk[k]];
     int repk=0;
     for (int n=0; n<NOBS; n++) {
@@ -353,7 +353,7 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
   } 
   // number of observations by time t
   int *nobst = new int[ntime];
-  for (int k=0; k<ntime; k++) {
+  for (unsigned int k=0; k<ntime; k++) {
     nobst[k]=0;
     for (int n=0; n<NOBS; n++) {
       if (timeid[n]==k + 1) {
@@ -363,7 +363,7 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
   }
   // Position of each group in the data-set
   int **post_arr = new int*[ntime];
-  for (int k=0; k<ntime; k++) {
+  for (unsigned int k=0; k<ntime; k++) {
     post_arr[k] = new int[nobst[k]];
     int repk=0;
     for (int n=0; n<NOBS; n++) {
@@ -377,7 +377,7 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
   // XTarr is data transformed for multivariate TS analsysi
   Matrix<>* Xt_arr = new Matrix<>[ntime];
   Matrix<>* Yt_arr = new Matrix<>[ntime];
-  for(int k=0; k<ntime; k++) {
+  for(unsigned int k=0; k<ntime; k++) {
     if (nobst[k] > 0){
       Xt_arr[k] = Matrix<double>(nobst[k], K);
       Yt_arr[k] = Matrix<double>(nobst[k], 1);
@@ -393,7 +393,7 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
   Matrix<double> *cpXt_arr = new Matrix<double>[ntime];
   Matrix<double> *tXt_arr = new Matrix<double>[ntime];
   Matrix<double> *tXYt_arr = new Matrix<double>[ntime];
-  for(int k=0; k<ntime; k++) {
+  for(unsigned int k=0; k<ntime; k++) {
     cpXt_arr[k] = crossprod(Xt_arr[k]);
     tXt_arr[k] = t(Xt_arr[k]);
     tXYt_arr[k] = t(Xt_arr[k])*Yt_arr[k];
@@ -414,7 +414,7 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
   /////////////////////////////////////////////////
   // initialize Yhat for the first loop only
   /////////////////////////////////////////////////
-  for (int iter=0; iter < tot_iter; ++iter){
+  for (unsigned int iter=0; iter < tot_iter; ++iter){
     //////////////////////
     // Step 1. Sample state
     //////////////////////  
@@ -423,7 +423,7 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
     pr1[0] = 1;
     Matrix<> py(ns, 1);
     Matrix<> pstyt1(ns, 1);
-    for (int tt=0; tt<ntime ; ++tt) {
+    for (unsigned int tt=0; tt<ntime ; ++tt) {
       if(nobst[tt]>0){
 	int nsubj_s = time_groupinfo(tt, 2);
 	for (int j=0; j<ns;++j){
@@ -478,7 +478,7 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
     Matrix<int> nstate(ns, 1); 
     
     for (int j = 0; j<ns; ++j){
-      for (int i = 0; i<ntime; ++i){
+      for (unsigned int i = 0; i<ntime; ++i){
 	if (state[i] == j + 1) { 
 	  nstate[j] = nstate[j] + 1;
 	}// end of if
@@ -507,7 +507,7 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
     Matrix<> SSE(ns, 1);
     for (int j = 0; j<ns; ++j){
       beta_count = beta_count + nstate[j];        
-      for(int s = 0; s<nsubj; ++ s) {    
+      for(unsigned int s = 0; s<nsubj; ++ s) {    
 	Matrix<> yj = Yk_arr[s]((beta_count - nstate[j]), 0, (beta_count - 1), 0);
 	Matrix<> Xj = Xk_arr[s]((beta_count - nstate[j]), 0, (beta_count - 1), K-1);  	
 	Matrix<> e = ::t(yj - Xj*::t(beta(j,_)))*(yj - Xj*::t(beta(j,_)));
@@ -524,7 +524,7 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
     //////////////////////   
     double shape1 = 0;
     double shape2 = 0;    
-    for (int j =0; j<m; ++j){
+    for (unsigned int j =0; j<m; ++j){
       shape1 =  std::abs(P0(j,j) + nstate[j] - 1);
       shape2 =  P0(j,j+1) + 1; //       
       P(j,j) = stream.rbeta(shape1, shape2);
@@ -547,7 +547,7 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
 	P_store(sampcount,j)= P[j];
       }
       s_store(sampcount,_) = state;
-      for (int l=0; l<ntime ; ++l){           
+      for (unsigned int l=0; l<ntime ; ++l){           
 	ps_store(l,_) = ps_store(l,_) + ps(l,_);          
       }
       ++sampcount;
@@ -603,11 +603,11 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
     //////////////////////////////////////////////////////////////////
     // 1. pdf.beta | sigma2_g, P_g
     //////////////////////////////////////////////////////////////////
-    for (int iter = 0; iter<nstore; ++iter){
+    for (unsigned int iter = 0; iter<nstore; ++iter){
       int beta_count = 0;
       Matrix<int> nstate(ns, 1);    
       for (int j = 0; j<ns; ++j){
-	for (int i = 0; i<ntime; ++i){
+	for (unsigned int i = 0; i<ntime; ++i){
 	  if (s_store(iter, i) == j + 1) { 
 	    nstate[j] = nstate[j] + 1;
 	  }// end of if
@@ -638,14 +638,14 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
     // 2. pdf.sigma2
      ////////////////////////////////////////////////////////////////// 
     Matrix<> density_sigma2(nstore, ns);  
-    for (int iter = 0; iter<nstore; ++iter){
+    for (unsigned int iter = 0; iter<nstore; ++iter){
       Matrix<> F(ntime, ns);
       Matrix<> pr1(ns, 1);
       pr1[0] = 1;
       Matrix<> py(ns, 1);
       Matrix<> pstyt1(ns, 1);
       
-      for (int tt=0; tt<ntime ; ++tt) {
+      for (unsigned int tt=0; tt<ntime ; ++tt) {
 	int nsubj_s = time_groupinfo(tt, 2);
 	for (int j=0; j<ns;++j){
 	  Matrix<> Sigma = eye(nsubj_s)*sigma2[j];
@@ -693,7 +693,7 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
       /////////////////////////////////////////////////
       Matrix<int> nstate(ns, 1); 
       for (int j = 0; j<ns; ++j){
-	for (int i = 0; i<ntime; ++i){
+	for (unsigned int i = 0; i<ntime; ++i){
 	  if (state(i) == j + 1) { 
 	    nstate[j] = nstate[j] + 1;
 	  }// end of if
@@ -705,7 +705,7 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
       Matrix<int> YN(ns, 1); 
       for (int j = 0; j<ns; ++j){
 	beta_count = beta_count + nstate[j];      
-	for(int s = 0; s<nsubj; ++ s) {    
+	for(unsigned int s = 0; s<nsubj; ++ s) {    
 	  Matrix<> yj = Yk_arr[s]((beta_count - nstate[j]), 0, (beta_count - 1), 0);
 	  Matrix<> Xj = Xk_arr[s]((beta_count - nstate[j]), 0, (beta_count - 1), K-1);  
 	  YN[j] = YN[j] + yj.rows();
@@ -724,7 +724,7 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
       /////////////////////////////////////////////////
       double shape1 = 0;
       double shape2 = 0;    
-      for (int j =0; j<m; ++j){
+      for (unsigned int j =0; j<m; ++j){
 	shape1 =  std::abs(P0(j,j) + nstate[j] - 1);
 	shape2 =  P0(j,j+1) + 1; //       
 	P(j,j) = stream.rbeta(shape1, shape2);
@@ -740,13 +740,13 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
     Matrix<> density_P(nstore, ns);  
     //  Matrix<> density_local_P(ns, 1);  
     
-    for (int iter = 0; iter < nstore; ++iter){     
+    for (unsigned int iter = 0; iter < nstore; ++iter){     
       Matrix<> F(ntime, ns);
       Matrix<> pr1(ns, 1);
       pr1[0] = 1;
       Matrix<> py(ns, 1);
       Matrix<> pstyt1(ns, 1);     
-      for (int tt=0; tt<ntime ; ++tt) {
+      for (unsigned int tt=0; tt<ntime ; ++tt) {
 	if(nobst[tt]>0){
 	  int nsubj_s = time_groupinfo(tt, 2);
 	  for (int j=0; j<ns;++j){
@@ -794,7 +794,7 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
       
       Matrix<int> nstate(ns, 1); 
       for (int j = 0; j<ns; ++j){
-	for (int i = 0; i<ntime; ++i){
+	for (unsigned int i = 0; i<ntime; ++i){
 	  if (state(i) == j + 1) { 
 	    nstate[j] = nstate[j] + 1;
 	  }// end of if
@@ -802,7 +802,7 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
       }
       double shape1 = 0;
       double shape2 = 0;    
-      for (int j =0; j<m; ++j){
+      for (unsigned int j =0; j<m; ++j){
 	shape1 =  std::abs(P0(j,j) + nstate[j] - 1);
 	shape2 =  P0(j,j+1) + 1; //       
 	P(j,j) = stream.rbeta(shape1, shape2);
@@ -824,7 +824,7 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
     pr1[0] = 1;
     Matrix<> py(ns, 1);
     Matrix<> pstyt1(ns, 1);
-    for (int tt=0; tt<ntime ; ++tt) {
+    for (unsigned int tt=0; tt<ntime ; ++tt) {
       for (int j=0; j<ns;++j){
 	int nsubj_s = time_groupinfo(tt, 2);
 	Matrix<> Sigma = eye(nsubj)*sigma2_st[j];
@@ -862,7 +862,7 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
       }
       density_sigma2_prior[j] = ln_invgamma(sigma2_st[j], c0/2, d0/2);
     }
-    for (int j=0; j<m ; ++j){
+    for (unsigned int j=0; j<m ; ++j){
       density_P_prior[j] = log(dbeta(P_st(j,j), P0(j,j), P0(j,j+1))); 
     }        
     
@@ -882,11 +882,11 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
   }// end of marginal likelihood computation
   
   delete[] nobst;
-  for(int k=0; k<ntime; k++) {
+  for(unsigned int k=0; k<ntime; k++) {
     delete[] post_arr[k];
   }
   delete[] nobsk;
-  for(int k=0; k<nsubj; k++) {
+  for(unsigned int k=0; k<nsubj; k++) {
     delete[] posk_arr[k];
   }
   delete [] posk_arr;

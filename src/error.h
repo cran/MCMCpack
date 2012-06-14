@@ -56,9 +56,12 @@
 #include <sstream>
 #include <iostream>
 #include <vector>
+#include <cstring>
 
+#ifdef SCYTHE_RPACK
 #include <R.h>           // needed to use Rprintf()
 #include <R_ext/Utils.h> // needed to allow user interrupts
+#endif
 
 /*! @cond */
 #ifdef SCYTHE_DEBUG_LIB
@@ -73,7 +76,7 @@
 	{                                                       \
 		std::stringstream _SCYTHE_DEBUG_ss;                   \
 		_SCYTHE_DEBUG_ss << MSG;                              \
-		throw EXCEP(__FILE__, __func__, __LINE__,  \
+		throw EXCEP(__FILE__, __func__, __LINE__,             \
 				_SCYTHE_DEBUG_ss.str());                          \
 	}
 
@@ -82,6 +85,32 @@
 	if (CHECK)                                              \
 		SCYTHE_THROW(EXCEP,MSG)                               \
 }
+
+#define SCYTHE_WARN_RPACK(MSG)                                        \
+  {                                                                   \
+		std::stringstream _SCYTHE_WARN_ss;                                \
+    _SCYTHE_WARN_ss << "WARNING in " << __FILE__ << ", "              \
+      << __func__ << ", " << __LINE__ << ": "                         \
+      << MSG << "\n";                                                 \
+    Rprintf(_SCYTHE_WARN_ss.str().c_str());                           \
+  }
+
+#define SCYTHE_WARN_STD(MSG)                                          \
+  std::cerr << "WARNING in " << __FILE__ << ", "                      \
+    << __func__ << ", " << __LINE__ << ": "                           \
+    << MSG << "\n";
+
+#ifdef SCYTHE_RPACK
+#define SCYTHE_WARN SCYTHE_WARN_RPACK
+#else
+#define SCYTHE_WARN SCYTHE_WARN_STD
+#endif
+
+#define SCYTHE_CHECK_WARN(CHECK,MSG)                                  \
+  {                                                                   \
+  if (CHECK)                                                          \
+    SCYTHE_WARN(MSG)                                                  \
+  }
 
 /*! @cond */
 #ifndef SCYTHE_DEBUG
@@ -124,20 +153,6 @@
 #else
 #define SCYTHE_THROW_30(EXCEP,MSG)
 #endif
-
-// #define SCYTHE_WARN(MSG)                                              \
-//  {                                                                   \ 
-//  std::cerr << "WARNING in " << __FILE__ << ", "                      \
-//    << __func__ << ", " << __LINE__ << ": "                           \
-//    << MSG << "\n";                                                   \
-//  }
-
-#define SCYTHE_CHECK_WARN(CHECK,MSG)                                  \
-  {                                                                   \
-  if (CHECK)                                                          \
-    SCYTHE_WARN(MSG)                                                  \
-  }
-
 
 namespace scythe
 {
@@ -196,8 +211,13 @@ namespace scythe
 
 			serr = this;
       std::set_terminate (scythe_terminate);
-      if (halt)
+      if (halt) {
+#ifdef SCYTHE_RPACK
+        error("Aborting Scythe C++ execution");
+#else
         std::terminate ();
+#endif
+      }
     }
 
     scythe_exception (const scythe_exception & e) throw ()
@@ -228,6 +248,12 @@ namespace scythe
     {
     }
 
+    /* This function is only called from scythe_terminate, and only
+     * once, so this memory leak is not an issue.  We can't just return
+     * os.str().c_str() because that is a dangling pointer after the
+     * function returns...
+     * TODO: Deal with memory leak issue that might affect R packages
+     */
     virtual const char *what () const throw ()
     {
       std::ostringstream os;
@@ -237,7 +263,9 @@ namespace scythe
 			}
       os << head_ << " in " << file_ << ", " << function_ << ", "
         << line_ << ": " << message_ << "!";
-      return os.str ().c_str ();
+      char *retval = new char[os.str().length()];
+      std::strcpy(retval, os.str().c_str());
+      return retval;
     }
 
     virtual std::string message () const throw ()
@@ -596,9 +624,14 @@ namespace scythe
   // The definition of our terminate handler described above
   inline void scythe_terminate ()
   {
-    // std::cerr << serr->what() << std::endl;
-    // std::cerr << std::endl;
-    Rf_error ("scythe error");
+#ifdef SCYTHE_RPACK
+    Rprintf(serr->what());
+    error("Aborting Scythe C++ execution");
+#else
+    std::cerr << serr->what() << std::endl;
+    std::cerr << std::endl;
+    abort ();
+#endif
   }
 
 }        // end namspace SCYTHE

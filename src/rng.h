@@ -59,9 +59,6 @@
 #include "scythestat/la.h"
 #endif
 
-#include <R.h>           // needed to use Rprintf()
-#include <R_ext/Utils.h> // needed to allow user interrupts
-
 namespace scythe {
 
 /* Shorthand for the matrix versions of the various distributions'
@@ -1043,7 +1040,8 @@ namespace scythe {
         }
 
         if (! finite(x)) {
-          Rprintf("Mean extremely far from truncation point. Returning truncation point");
+          SCYTHE_WARN("Mean extremely far from truncation point. "
+              << "Returning truncation point");
           return below; 
         }
 
@@ -1098,7 +1096,8 @@ namespace scythe {
             + below;
         }
         if (! finite(x)) {
-          Rprintf("Mean extremely far from truncation point. Returning truncation point");
+          SCYTHE_WARN("Mean extremely far from truncation point. "
+              << "Returning truncation point");
           return above; 
         }
         
@@ -1166,7 +1165,8 @@ namespace scythe {
                 - below) + below;
           }
           if (! finite(x)) {
-            Rprintf("Mean extremely far from truncation point. Returning truncation point");
+            SCYTHE_WARN("Mean extremely far from truncation point. "
+                << "Returning truncation point");
             return below; 
           }
           return x;
@@ -1235,7 +1235,8 @@ namespace scythe {
                   - below) + below;
           }
           if (! finite(x)) {
-            Rprintf("Mean extremely far from truncation point. Returning truncation point");
+            SCYTHE_WARN("Mean extremely far from truncation point. "
+                << "Returning truncation point");
             return above; 
           }
           return -1*x;

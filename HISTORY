@@ -1,6 +1,9 @@
 //
 // Changes and Bug Fixes
 //
+1.2-3 to 1.2-4
+  * fixed a bug in HMMmultivariateGaussian.cc (comparison of unsigned and singed integers)
+  * cleaned up g++ 4.7 compatibility issues (thanks to Dan Pemstein and Chris Lawrence)
 
 1.2-2 to 1.2-3
   * fixed extraneous warnings in hidden.R (thanks to Jeffrey Arnold)

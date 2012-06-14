@@ -590,7 +590,7 @@ namespace scythe {
   Matrix<T, RO, RS>
   vech (const Matrix<T, PO, PS>& M)
   {
-    SCYTHE_CHECK_20(! M.isSymmetric(), scythe_dimension_error,
+    SCYTHE_CHECK_30(! M.isSymmetric(), scythe_dimension_error,
         "Matrix not symmetric");
 
     Matrix<T,RO,Concrete> 
@@ -632,7 +632,7 @@ namespace scythe {
    *
    * \see vech(const Matrix<T,PO,PS>& M)
    *
-   * \throw scythe_dimensions_error (Level 1)
+   * \throw scythe_dimension_error (Level 1)
    * \throw scythe_alloc_error (Level 1)
    */
   template <matrix_order RO, matrix_style RS, typename T,
@@ -640,7 +640,7 @@ namespace scythe {
   Matrix<T, RO, RS>
   xpnd (const Matrix<T, PO, PS>& v)
   {
-    double size_d = -.5 + .5 * ::sqrt(1 + 8 * v.size());
+    double size_d = -.5 + .5 * std::sqrt(1. + 8 * v.size());
     SCYTHE_CHECK_10(std::fmod(size_d, 1.) != 0., 
         scythe_dimension_error, 
         "Input vector can't generate square matrix");

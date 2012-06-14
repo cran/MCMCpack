@@ -90,6 +90,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <complex>
 
 namespace scythe {
 
@@ -1750,8 +1751,76 @@ namespace scythe {
     return resobj;
   }
 
+ 
+  struct GeneralEigen {
+    Matrix<std::complex<double> > values;
+    Matrix<> vectors;
+  };
+
+  inline GeneralEigen
+  geneigen (const Matrix<>& A, bool vectors=true)
+  {
+    SCYTHE_CHECK_10 (! A.isSquare(), scythe_dimension_error,
+        "Matrix not square");
+    SCYTHE_CHECK_10 (A.isNull(), scythe_null_error, "Matrix is NULL");
+
+    Matrix<> AA = A; // Copy A
+
+    // Get a point to the internal array and set up some vars
+    double* Aarray = AA.getArray(); // internal array points
+    int order = (int) AA.rows();    // input matrix is order x order
+    
+    GeneralEigen result;
+
+    int info, lwork;
+    double *left, *right, *valreal, *valimag, *work, tmp;
+    valreal = new double[order];
+    valimag = new double[order];
+    left = right = (double *) 0;
+    char leftvecs[1], rightvecs[1];
+    leftvecs[0] = rightvecs[0] = 'N';
+    if (vectors) {
+      rightvecs[0] = 'V';
+      result.vectors = Matrix<>(order, order, false);
+      right = result.vectors.getArray();
+    }
+
+    // Get working are size
+    lwork = -1;
+    lapack::dgeev_ (leftvecs, rightvecs, &order, Aarray, &order,
+                    valreal, valimag, left, &order, right, &order,
+                    &tmp, &lwork, &info);
+
+    SCYTHE_CHECK_10(info != 0, scythe_lapack_internal_error,
+        "Internal error in LAPACK routine dgeev");
+    lwork = (int) tmp;
+    work = new double[lwork];
+
+    // Run for real
+    lapack::dgeev_ (leftvecs, rightvecs, &order, Aarray, &order,
+                    valreal, valimag, left, &order, right, &order,
+                    work, &lwork, &info);
+    SCYTHE_CHECK_10(info != 0, scythe_lapack_internal_error,
+        "Internal error in LAPACK routine dgeev");
+
+    // Pack value into result
+    result.values = Matrix<std::complex<double> > (order, 1, false);
+    for (unsigned int i = 0; i < result.values.size(); ++i)
+      result.values(i) = std::complex<double> (valreal[i], valimag[i]);
+
+    // Clean up
+    delete[] valreal;
+    delete[] valimag;
+    delete[] work;
+
+
+    return result;
+  }
+
+
+
 #endif
 
-} // end namespace scythe
+  } // end namespace scythe
 
 #endif /* SCYTHE_IDE_H */
