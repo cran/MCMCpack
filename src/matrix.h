@@ -2176,13 +2176,13 @@ namespace scythe {
 				if (Base::size() == 1) { // 1x1 += nXm
 					T_type tmp = (*this)(0);
 					resize2Match(M);
-          std::transform(M.begin_f<ORDER>(), M.end_f<ORDER>(), 
+          std::transform(M.template begin_f<ORDER>(), M.template end_f<ORDER>(),
               begin_f(), std::bind1st(op, tmp));
 				} else if (M.size() == 1) { // nXm += 1x1
 					std::transform(begin_f(), end_f(), begin_f(),
 							std::bind2nd(op, M(0)));
 				} else { // nXm += nXm
-            std::transform(begin_f(), end_f(), M.begin_f<ORDER>(), 
+            std::transform(begin_f(), end_f(), M.template begin_f<ORDER>(),
                 begin_f(), op);
         }
 
@@ -3745,7 +3745,7 @@ namespace scythe {
       const_matrix_bidirectional_iterator<T_type, I_ORDER, ORDER, STYLE>
       end_bd () const
       {
-        return (begin_bd<I_ORDER>.set_end());
+        return (begin_bd<I_ORDER>().set_end());
       }
 
       /*! \brief Get a reverse iterator pointing to the end of a Matrix.

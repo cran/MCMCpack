@@ -1039,7 +1039,7 @@ namespace scythe {
             ((mean + std::sqrt(-2*variance*std::log(z))) - below) + below;
         }
 
-        if (! finite(x)) {
+        if (! R_finite(x)) {
           SCYTHE_WARN("Mean extremely far from truncation point. "
               << "Returning truncation point");
           return below; 
@@ -1095,7 +1095,7 @@ namespace scythe {
             *( (newmu + std::sqrt(-2*variance*std::log(z))) - below) 
             + below;
         }
-        if (! finite(x)) {
+        if (! R_finite(x)) {
           SCYTHE_WARN("Mean extremely far from truncation point. "
               << "Returning truncation point");
           return above; 
@@ -1164,7 +1164,7 @@ namespace scythe {
               * ((mean + std::sqrt(-2 * variance * std::log(z))) 
                 - below) + below;
           }
-          if (! finite(x)) {
+          if (! R_finite(x)) {
             SCYTHE_WARN("Mean extremely far from truncation point. "
                 << "Returning truncation point");
             return below; 
@@ -1234,7 +1234,7 @@ namespace scythe {
               * ((newmu + std::sqrt(-2 * variance * std::log(z)))
                   - below) + below;
           }
-          if (! finite(x)) {
+          if (! R_finite(x)) {
             SCYTHE_WARN("Mean extremely far from truncation point. "
                 << "Returning truncation point");
             return above; 
