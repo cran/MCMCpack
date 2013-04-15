@@ -16,7 +16,9 @@ current package has been tested using GCC 4.0 on Linux and MacOS X.
 
 Many thanks to Dan Pemstein for helping with all sorts of C++ issues,
 and to Kurt Hornik and Fritz Leisch for their help with debugging as
-well as their service to the R community.
+well as their service to the R community.  We are also very grateful to
+Brian Ripley who provided C++ patches to fix a number of clang and Solaris
+issues. 
 
 // Acknowledgments
 
@@ -42,12 +44,13 @@ you have any problems or questions.
 
 --
 Andrew D. Martin, Ph.D.
-Professor and Chair, Political Science, Arts & Sciences
-Professor and CERL Director, School of Law
+Charles Nagel Chair of Constitutional Law and Political Science	
+Vice Dean and CERL Director, School of Law	
 Washington University in St. Louis
 
 (314) 935-5863 (Office)
-(314) 935-5856 (Fax)
+(314) 935-3836 (Fax)
 
 Email: admartin@wustl.edu
 WWW: http://adm.wustl.edu
+
