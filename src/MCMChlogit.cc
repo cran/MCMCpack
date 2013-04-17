@@ -391,7 +391,7 @@ extern "C"{
 	    	for (int k=0;k<NGROUP;k++){
 	    	    for (int m=0; m<nobsk[k]; m++) {
 	    		int w=posk_arr[k][m];
-			const double C=pow(16*sqrt(3)/(15*M_PI),2);
+			const double C=pow(16*sqrt(3.0)/(15*M_PI),2);
 			Matrix<double> logit_theta_hat=Xk_arr[k](m,_)*beta_run+Wk_arr[k](m,_)*bk_run[k];
 	    		theta_pred[w]+=invlogit(logit_theta_hat(0)/sqrt(1+C*V_run))/(NSAMP); // We compute the mean of NSAMP values
 	    	    }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Scythe Statistical Library Copyright (C) 2000-2002 Andrew D. Martin
  * and Kevin M. Quinn; 2002-present Andrew D. Martin, Kevin M. Quinn,
  * and Daniel Pemstein.  All Rights Reserved.
@@ -63,7 +63,7 @@
  * end of this document that are not, in fact, declared in
  * distributions.h.  Again, this error is a result of Doxygen's macro
  * parsing capabilities.
- * 
+ *
  */
 
 /* TODO: Figure out how to get doxygen to stop listing erroneous
@@ -117,7 +117,7 @@
 /*! @cond */
 inline double trunc(double x) throw ()
 {
-    if (x >= 0) 
+    if (x >= 0)
       return std::floor(x);
     else
       return std::ceil(x);
@@ -136,9 +136,9 @@ inline double trunc(double x) throw ()
  */
 
 namespace scythe {
-  
+
   /*! @cond */
-  
+
   /* Forward declarations */
   double gammafn (double);
   double lngammafn (double);
@@ -160,21 +160,21 @@ namespace scythe {
     {
       SCYTHE_CHECK_10(n < 1 || n > 1000, scythe_invalid_arg,
           "n not on [1, 1000]");
-  
+
       SCYTHE_CHECK_10(x < -1.1 || x > 1.1, scythe_invalid_arg,
           "x not on [-1.1, 1.1]");
-      
+
       double b0, b1, b2;
       b0 = b1 = b2 = 0;
-  
+
       double twox = x * 2;
-  
+
       for (int i = 1; i <= n; ++i) {
         b2 = b1;
         b1 = b0;
         b0 = twox * b1 - b2 + a[n - i];
       }
-  
+
       return (b0 - b2) * 0.5;
     }
 
@@ -189,17 +189,17 @@ namespace scythe {
         -.1809129475572494194263306266719e-10,
         +.6221098041892605227126015543416e-13,
       };
-    
+
       SCYTHE_CHECK_10(x < 10, scythe_invalid_arg,
-          "This function requires x >= 10");  
+          "This function requires x >= 10");
       SCYTHE_CHECK_10(x >= 3.745194030963158e306, scythe_range_error,
           "Underflow");
-      
+
       if (x < 94906265.62425156) {
         double tmp = 10 / x;
         return chebyshev_eval(tmp * tmp * 2 - 1, algmcs, 5) / x;
       }
-      
+
       return 1 / (x * 12);
     }
 
@@ -207,7 +207,7 @@ namespace scythe {
     double
     bd0(double x, double np)
     {
-      
+
       if(std::fabs(x - np) < 0.1 * (x + np)) {
         double v = (x - np) / (x + np);
         double s = (x - np) * v;
@@ -221,10 +221,10 @@ namespace scythe {
           s = s1;
         }
       }
-      
+
       return x * std::log(x / np) + np - x;
     }
-  
+
     /* Computes the log of the error term in Stirling's formula */
     double
     stirlerr(double n)
@@ -234,7 +234,7 @@ namespace scythe {
 #define S2 0.00079365079365079365079365  /* 1/1260 */
 #define S3 0.000595238095238095238095238 /* 1/1680 */
 #define S4 0.0008417508417508417508417508/* 1/1188 */
-      
+
       /* error for 0, 0.5, 1.0, 1.5, ..., 14.5, 15.0 */
       const double sferr_halves[31] = {
         0.0, /* n=0 - wrong, place holder only */
@@ -270,7 +270,7 @@ namespace scythe {
         0.005554733551962801371038690  /* 15.0 */
       };
       double nn;
-      
+
       if (n <= 15.0) {
         nn = n + n;
         if (nn == (int)nn)
@@ -278,7 +278,7 @@ namespace scythe {
         return (scythe::lngammafn(n + 1.) - (n + 0.5) * std::log(n) + n -
             std::log(std::sqrt(2 * M_PI)));
       }
-      
+
       nn = n*n;
       if (n > 500)
         return((S0 - S1 / nn) / n);
@@ -312,19 +312,19 @@ namespace scythe {
         / std::sqrt(2 * M_PI * x);
     }
 
-  
+
     /* helper for pbeta */
     double
     pbeta_raw(double x, double pin, double qin)
     {
       double ans, c, finsum, p, ps, p1, q, term, xb, xi, y;
       int n, i, ib, swap_tail;
-      
+
       const double eps = .5 * DBL_EPSILON;
       const double sml = DBL_MIN;
       const double lneps = std::log(eps);
       const double lnsml = std::log(eps);
-      
+
       if (pin / (pin + qin) < x) {
         swap_tail = 1;
         y = 1 - x;
@@ -336,7 +336,7 @@ namespace scythe {
         p = pin;
         q = qin;
       }
-      
+
       if ((p + q) * y / (p + 1) < eps) {
         ans = 0;
         xb = p * std::log(std::max(y,sml)) - std::log(p) - lnbetafn(p,q);
@@ -369,7 +369,7 @@ namespace scythe {
           term = std::exp(xb - ib * lnsml);
           c = 1 / (1 - y);
           p1 = q * c / (p + q - 1);
-              
+
           finsum = 0;
           n = (int) q;
           if(q == n)
@@ -388,18 +388,18 @@ namespace scythe {
           }
           ans += finsum;
         }
-        
+
         if(swap_tail)
           ans = 1-ans;
         ans = std::max(std::min(ans,1.),0.);
       }
       return ans;
     }
-  
+
    /* Helper for dbinom */
     double
     dbinom_raw (double x, double n, double p, double q)
-    { 
+    {
       double f, lc;
 
       if (p == 0)
@@ -407,14 +407,14 @@ namespace scythe {
       if (q == 0)
         return((x == n) ? 1.0 : 0.0);
 
-      if (x == 0) { 
+      if (x == 0) {
         if(n == 0)
           return 1.0;
-        
+
         lc = (p < 0.1) ? -bd0(n, n * q) - n * p : n * std::log(q);
         return(std::exp(lc));
       }
-      if (x == n) { 
+      if (x == n) {
         lc = (q < 0.1) ? -bd0(n,n * p) - n * q : n * std::log(p);
         return(std::exp(lc));
       }
@@ -424,7 +424,7 @@ namespace scythe {
 
       lc = stirlerr(n) - stirlerr(x) - stirlerr(n-x) - bd0(x,n*p) -
         bd0(n - x, n * q);
-      
+
       f = (M_2PI * x * (n-x)) / n;
 
       return (std::exp(lc) / std::sqrt(f));
@@ -505,7 +505,7 @@ namespace scythe {
         0.00378239633202758244,
         7.29751555083966205e-5
       };
-      
+
       double xden, xnum, temp, del, eps, xsq, y;
       int i, lower, upper;
 
@@ -528,7 +528,7 @@ namespace scythe {
             xden = (xden + b[i]) * xsq;
           }
         } else xnum = xden = 0.0;
-        
+
         temp = x * (xnum + a[3]) / (xden + b[3]);
         if(lower)  *cum = 0.5 + temp;
         if(upper) *ccum = 0.5 - temp;
@@ -537,7 +537,7 @@ namespace scythe {
           if(upper) *ccum = std::log(*ccum);
         }
       } else if (y <= M_SQRT_32) {
-        /* Evaluate pnorm for 0.674.. = qnorm(3/4) < |x| <= sqrt(32) 
+        /* Evaluate pnorm for 0.674.. = qnorm(3/4) < |x| <= sqrt(32)
          * ~= 5.657 */
 
         xnum = c[8] * y;
@@ -602,7 +602,7 @@ namespace scythe {
   /*************
    * Functions *
    *************/
-  
+
   /* The gamma function */
 
   /*! \brief The gamma function.
@@ -619,7 +619,7 @@ namespace scythe {
    * \throw scythe_range_error (Level 1)
    * \throw scythe_precision_error (Level 1)
    */
-  inline double 
+  inline double
   gammafn (double x)
   {
     const double gamcs[22] = {
@@ -659,11 +659,11 @@ namespace scythe {
       int n = (int) x;
       if (x < 0)
         --n;
-      
+
       y = x - n;/* n = floor(x)  ==>  y in [ 0, 1 ) */
       --n;
       double value = chebyshev_eval(y * 2 - 1, gamcs, 22) + .9375;
-      
+
       if (n == 0)
         return value;/* x = 1.dddd = 1+y */
 
@@ -677,7 +677,7 @@ namespace scythe {
 
         /* The answer is less than half precision */
         /* because x too near a negative integer. */
-        SCYTHE_CHECK_10(x < -0.5 && 
+        SCYTHE_CHECK_10(x < -0.5 &&
             std::fabs(x - (int)(x - 0.5) / x) < 67108864.0,
             scythe_precision_error,
             "Answer < 1/2 precision because x is too near" <<
@@ -692,7 +692,7 @@ namespace scythe {
 
         for (int i = 0; i < n; i++)
           value /= (x + i);
-        
+
         return value;
       } else {
         /* gamma(x) for 2 <= x <= 10 */
@@ -706,21 +706,21 @@ namespace scythe {
       /* gamma(x) for   y = |x| > 10. */
 
       /* Overflow */
-      SCYTHE_CHECK_10(x > 171.61447887182298, 
+      SCYTHE_CHECK_10(x > 171.61447887182298,
           scythe_range_error,"Overflow");
 
       /* Underflow */
       SCYTHE_CHECK_10(x < -170.5674972726612,
           scythe_range_error, "Underflow");
 
-      double value = std::exp((y - 0.5) * std::log(y) - y 
+      double value = std::exp((y - 0.5) * std::log(y) - y
           + M_LN_SQRT_2PI + lngammacor(y));
 
       if (x > 0)
         return value;
 
       SCYTHE_CHECK_10(std::fabs((x - (int)(x - 0.5))/x) < 67108864.0,
-          scythe_precision_error, 
+          scythe_precision_error,
           "Answer < 1/2 precision because x is " <<
             "too near a negative integer");
 
@@ -734,10 +734,10 @@ namespace scythe {
   }
 
   /* The natural log of the absolute value of the gamma function */
-  /*! \brief The natural log of the absolute value of the gamma 
+  /*! \brief The natural log of the absolute value of the gamma
    * function.
    *
-   * Computes the natural log of the absolute value of the gamma 
+   * Computes the natural log of the absolute value of the gamma
    * function, evaluated at \a x.
    *
    * \param x The value to compute log(abs(gamma())) at.
@@ -767,7 +767,7 @@ namespace scythe {
     if (x > 0) /* i.e. y = x > 10 */
       return M_LN_SQRT_2PI + (x - 0.5) * std::log(x) - x
         + lngammacor(x);
-    
+
     /* else: x < -10; y = -x */
     double sinpiy = std::fabs(std::sin(M_PI * y));
 
@@ -779,11 +779,11 @@ namespace scythe {
     double ans = M_LN_SQRT_PId2 + (x - 0.5) * std::log(y) - x - std::log(sinpiy)
       - lngammacor(y);
 
-    SCYTHE_CHECK_10(std::fabs((x - (int)(x - 0.5)) * ans / x) 
-        < 1.490116119384765696e-8, scythe_precision_error, 
-        "Answer < 1/2 precision because x is " 
+    SCYTHE_CHECK_10(std::fabs((x - (int)(x - 0.5)) * ans / x)
+        < 1.490116119384765696e-8, scythe_precision_error,
+        "Answer < 1/2 precision because x is "
         << "too near a negative integer");
-    
+
     return ans;
   }
 
@@ -815,14 +815,14 @@ namespace scythe {
     double val = lnbetafn(a, b);
     SCYTHE_CHECK_10(val < -708.39641853226412, scythe_range_error,
         "Underflow");
-    
+
     return std::exp(val);
   }
 
   /* The natural log of the beta function */
   /*! \brief The natural log of the beta function.
    *
-   * Computes the natural log of the beta function, 
+   * Computes the natural log of the beta function,
    * evaluated at (\a a, \a b).
    *
    * \param a The first parameter.
@@ -859,7 +859,7 @@ namespace scythe {
       return lngammafn(p) + corr + p - p * std::log(p + q)
         + (q - 0.5) * std::log(1 + (-p / (p + q)));
     }
-    
+
     /* p and q are small: p <= q > 10. */
     return std::log(gammafn(p) * (gammafn(q) / gammafn(p + q)));
   }
@@ -914,13 +914,13 @@ namespace scythe {
   }
 
   /*********************************
-   * Fully Specified Distributions * 
+   * Fully Specified Distributions *
    *********************************/
 
   /* These macros provide a nice shorthand for the matrix versions of
    * the pdf and cdf functions.
    */
- 
+
 #define SCYTHE_ARGSET(...) __VA_ARGS__
 
 #define SCYTHE_DISTFUN_MATRIX(NAME, XTYPE, ARGNAMES, ...)             \
@@ -985,12 +985,12 @@ namespace scythe {
   pbeta(double x, double a, double b)
   {
     SCYTHE_CHECK_10(a <= 0 || b <= 0,scythe_invalid_arg, "a or b <= 0");
-    
+
     if (x <= 0)
       return 0.;
     if (x >= 1)
       return 1.;
-    
+
     return pbeta_raw(x,a,b);
   }
 
@@ -1072,7 +1072,7 @@ namespace scythe {
    */
   inline double
   lndbeta1(double x, double a, double b)
-  { 
+  {
     SCYTHE_CHECK_10((x < 0.0) || (x > 1.0), scythe_invalid_arg,
         "x not in [0,1]");
     SCYTHE_CHECK_10(a < 0.0, scythe_invalid_arg, "a < 0");
@@ -1118,16 +1118,16 @@ namespace scythe {
   inline double
   pbinom(double x, unsigned int n, double p)
   {
-      
+
     SCYTHE_CHECK_10(p < 0 || p > 1, scythe_invalid_arg, "p not in [0,1]");
     double X = std::floor(x);
-      
+
     if (X < 0.0)
       return 0;
-    
+
     if (n <= X)
       return 1;
-      
+
     return pbeta(1 - p, n - X, X + 1);
   }
 
@@ -1171,7 +1171,7 @@ namespace scythe {
   SCYTHE_DISTFUN_MATRIX(dbinom, double, SCYTHE_ARGSET(n, p), unsigned int n, double p)
 
   /**** The Chi Squared Distribution ****/
-  
+
   /* CDFs */
   /*! \brief The \f$\chi^2\f$ distribution function.
    *
@@ -1274,10 +1274,10 @@ namespace scythe {
   pexp(double x, double scale)
   {
     SCYTHE_CHECK_10(scale <= 0, scythe_invalid_arg, "scale <= 0");
-    
+
     if (x <= 0)
       return 0;
-    
+
     return (1 - std::exp(-x*scale));
   }
 
@@ -1311,10 +1311,10 @@ namespace scythe {
   dexp(double x, double scale)
   {
     SCYTHE_CHECK_10(scale <= 0, scythe_invalid_arg, "scale <= 0");
-    
+
     if (x < 0)
       return 0;
-      
+
     return std::exp(-x * scale) * scale;
   }
 
@@ -1347,7 +1347,7 @@ namespace scythe {
    *
    * \see df(double x, double df1, double df2)
    * \see rng::rf(double df1, double df2)
-   * 
+   *
    * \throw scythe_invalid_arg (Level 1)
    * \throw scythe_range_error (Level 1)
    * \throw scythe_precision_error (Level 1)
@@ -1356,17 +1356,17 @@ namespace scythe {
   inline double
   pf(double x, double df1, double df2)
   {
-    SCYTHE_CHECK_10(df1 <= 0 || df2 <= 0, scythe_invalid_arg, 
+    SCYTHE_CHECK_10(df1 <= 0 || df2 <= 0, scythe_invalid_arg,
         "df1 or df2 <= 0");
-  
+
     if (x <= 0)
       return 0;
-    
+
     if (df2 > 4e5)
       return pchisq(x*df1,df1);
     if (df1 > 4e5)
       return 1-pchisq(df2/x,df2);
-    
+
     return (1-pbeta(df2 / (df2 + df1 * x), df2 / 2.0, df1 / 2.0));
   }
 
@@ -1397,7 +1397,7 @@ namespace scythe {
    *
    * \see df(double x, double df1, double df2)
    * \see rng::rf(double df1, double df2)
-   * 
+   *
    * \throw scythe_invalid_arg (Level 1)
    * \throw scythe_range_error (Level 1)
    * \throw scythe_precision_error (Level 1)
@@ -1407,17 +1407,17 @@ namespace scythe {
   df(double x, double df1, double df2)
   {
     double dens;
-    
-    SCYTHE_CHECK_10(df1 <= 0 || df2 <= 0, scythe_invalid_arg, 
+
+    SCYTHE_CHECK_10(df1 <= 0 || df2 <= 0, scythe_invalid_arg,
         "df1 or df2 <= 0");
-    
+
     if (x <= 0)
       return 0;
-      
+
     double f = 1 / (df2 + x * df1);
     double q = df2 * f;
     double p = x * df1 * f;
-    
+
     if (df1 >= 2) {
       f = df1 * q / 2;
       dens = dbinom_raw((df1 - 2) / 2,(df1 + df2 - 2) / 2, p, q);
@@ -1425,7 +1425,7 @@ namespace scythe {
       f = (df1 * df1 * q) /(2 * p * (df1 + df2));
       dens = dbinom_raw(df1 / 2,(df1 + df2)/ 2, p, q);
     }
-    
+
     return f*dens;
   }
 
@@ -1466,9 +1466,9 @@ namespace scythe {
   inline double
   pgamma (double x, double shape, double scale)
   {
-    const double xbig = 1.0e+8, xlarge = 1.0e+37, 
+    const double xbig = 1.0e+8, xlarge = 1.0e+37,
       alphlimit = 1000.;/* normal approx. for shape > alphlimit */
-      
+
     int lower_tail = 1;
 
     double pn1, pn2, pn3, pn4, pn5, pn6, arg, a, b, c, an, osum, sum;
@@ -1481,7 +1481,7 @@ namespace scythe {
         "shape or scale <= 0");
 
     x /= scale;
-    
+
     if (x <= 0.)
       return 0.0;
 
@@ -1595,22 +1595,22 @@ namespace scythe {
 
     if (x < 0)
       return 0.0;
-    
+
     if (x == 0) {
-      SCYTHE_CHECK_10(shape < 1,scythe_invalid_arg, 
+      SCYTHE_CHECK_10(shape < 1,scythe_invalid_arg,
           "x == 0 and shape < 1");
-      
+
       if (shape > 1)
         return 0.0;
-      
+
       return 1 / scale;
     }
-    
-    if (shape < 1) { 
+
+    if (shape < 1) {
       double pr = dpois_raw(shape, x/scale);
       return pr * shape / x;
     }
-    
+
     /* else  shape >= 1 */
     double pr = dpois_raw(shape - 1, x / scale);
     return pr / scale;
@@ -1642,18 +1642,18 @@ namespace scythe {
    *
    * \see dlogis(double x, double location, double scale)
    * \see rng::rlogis(double location, double scale)
-   * 
+   *
    * \throw scythe_invalid_arg (Level 1)
    */
   inline double
   plogis (double x, double location, double scale)
   {
     SCYTHE_CHECK_10(scale <= 0.0, scythe_invalid_arg, "scale <= 0");
-    
+
     double X = (x-location) / scale;
-      
+
     X = std::exp(-X);
-      
+
     return 1 / (1+X);
   }
 
@@ -1681,18 +1681,18 @@ namespace scythe {
    *
    * \see plogis(double x, double location, double scale)
    * \see rng::rlogis(double location, double scale)
-   * 
+   *
    * \throw scythe_invalid_arg (Level 1)
    */
   inline double
   dlogis(double x, double location, double scale)
   {
     SCYTHE_CHECK_10(scale <= 0.0, scythe_invalid_arg, "scale <= 0");
-    
+
     double X = (x - location) / scale;
     double e = std::exp(-X);
     double f = 1.0 + e;
-      
+
     return e / (scale * f * f);
   }
 
@@ -1731,10 +1731,10 @@ namespace scythe {
   plnorm (double x, double logmean, double logsd)
   {
     SCYTHE_CHECK_10(logsd <= 0, scythe_invalid_arg, "logsd <= 0");
-    
+
     if (x > 0)
       return pnorm(std::log(x), logmean, logsd);
-    
+
     return 0;
   }
 
@@ -1770,12 +1770,12 @@ namespace scythe {
   dlnorm(double x, double logmean, double logsd)
   {
     SCYTHE_CHECK_10(logsd <= 0, scythe_invalid_arg, "logsd <= 0");
-    
+
     if (x == 0)
       return 0;
-    
+
     double y = (std::log(x) - logmean) / logsd;
-    
+
     return (1 / (std::sqrt(2 * M_PI))) * std::exp(-0.5 * y * y) / (x * logsd);
   }
 
@@ -1817,7 +1817,7 @@ namespace scythe {
   {
     SCYTHE_CHECK_10(n == 0 || p <= 0 || p >= 1, scythe_invalid_arg,
         "n == 0 or p not in (0,1)");
-    
+
     return pbeta(p, n, x + 1);
   }
 
@@ -1857,17 +1857,17 @@ namespace scythe {
   {
     SCYTHE_CHECK_10(n == 0 || p <= 0 || p >= 1, scythe_invalid_arg,
         "n == 0 or p not in (0,1)");
-    
+
     double prob = dbinom_raw(n, x + n, p, 1 - p);
     double P = (double) n / (n + x);
-    
+
     return P * prob;
   }
 
   SCYTHE_DISTFUN_MATRIX(dnbinom, unsigned int, SCYTHE_ARGSET(n, p), double n, double p)
 
   /**** The Normal Distribution ****/
-  
+
   /* CDFs */
   /*! \brief The normal distribution function.
    *
@@ -1896,7 +1896,7 @@ namespace scythe {
    */
   inline double
   pnorm (double x, double mean, double sd)
-  
+
   {
     SCYTHE_CHECK_10(sd <= 0, scythe_invalid_arg,
         "negative standard deviation");
@@ -1905,7 +1905,7 @@ namespace scythe {
   }
 
   SCYTHE_DISTFUN_MATRIX(pnorm, double, SCYTHE_ARGSET(mean, sd), double mean, double sd)
-  
+
 
   /* PDFs */
   /*! \brief The normal density function.
@@ -1937,14 +1937,14 @@ namespace scythe {
   {
     SCYTHE_CHECK_10(sd <= 0, scythe_invalid_arg,
         "negative standard deviation");
-    
+
     double X = (x - mean) / sd;
-    
+
     return (M_1_SQRT_2PI * std::exp(-0.5 * X * X) / sd);
   }
 
   SCYTHE_DISTFUN_MATRIX(dnorm, double, SCYTHE_ARGSET(mean, sd), double mean, double sd)
- 
+
 
   /* Return the natural log of the normal PDF */
   /*! \brief The natural log of normal density function.
@@ -1977,9 +1977,9 @@ namespace scythe {
   {
     SCYTHE_CHECK_10(sd <= 0, scythe_invalid_arg,
         "negative standard deviation");
-    
+
     double X = (x - mean) / sd;
-    
+
     return -(M_LN_SQRT_2PI  +  0.5 * X * X + std::log(sd));
   }
 
@@ -2023,23 +2023,23 @@ namespace scythe {
     double q4 = 0.38560700634e-2;
     double xp = 0.0;
     double p = in_p;
-      
+
     if (p > 0.5)
       p = 1 - p;
-        
+
     SCYTHE_CHECK_10(p < 10e-20, scythe_range_error,
         "p outside accuracy limit");
-      
+
     if (p == 0.5)
       return xp;
-      
+
     double y = std::sqrt (std::log (1.0 / std::pow (p, 2)));
     xp = y + ((((y * p4 + p3) * y + p2) * y + p1) * y + p0) /
       ((((y * q4 + q3) * y + q2) * y + q1) * y + q0);
-      
+
     if (in_p < 0.5)
       xp = -1 * xp;
-    
+
     return xp;
   }
 
@@ -2078,10 +2078,10 @@ namespace scythe {
   ppois(unsigned int x, double lambda)
   {
     SCYTHE_CHECK_10(lambda<=0.0, scythe_invalid_arg, "lambda <= 0");
-    
+
     if (lambda == 1)
       return 1;
-    
+
     return 1 - pgamma(lambda, x + 1, 1.0);
   }
 
@@ -2115,7 +2115,7 @@ namespace scythe {
   dpois(unsigned int x, double lambda)
   {
     SCYTHE_CHECK_10(lambda<=0.0, scythe_invalid_arg, "lambda <= 0");
-    
+
     // compute log(x!)
     double xx = x+1;
     double cof[6] = {
@@ -2130,7 +2130,7 @@ namespace scythe {
       ser += (cof[j] / ++y);
     }
     double lnfactx = std::log(2.5066282746310005 * ser / xx) - tmp;
-      
+
     return (std::exp( -1*lnfactx + x * std::log(lambda) - lambda));
   }
 
@@ -2159,7 +2159,7 @@ namespace scythe {
    *
    * \see dt(double x, bool b1, bool b2)
    * \see rng::rt1(double mu, double sigma2, double nu)
-   * 
+   *
    * \throw scythe_invalid_arg (Level 1)
    * \throw scythe_convergence_error (Level 1)
    * \throw scythe_range_error (Level 1)
@@ -2169,19 +2169,19 @@ namespace scythe {
   pt(double x, double n)
   {
     double val;
-    
+
     SCYTHE_CHECK_10(n <= 0, scythe_invalid_arg, "n <= 0");
-    
+
     if (n > 4e5) {
       val = 1/(4*n);
-      return pnorm1(x * (1 - val) / ::sqrt(1 + x * x * 2. * val), 
+      return pnorm1(x * (1 - val) / ::sqrt(1 + x * x * 2. * val),
           true, false);
     }
-    
+
     val = pbeta(n / (n + x * x), n / 2.0, 0.5);
-    
+
     val /= 2;
-    
+
     if (x <= 0)
       return val;
     else
@@ -2189,7 +2189,7 @@ namespace scythe {
   }
 
   SCYTHE_DISTFUN_MATRIX(pt, double, n, double n)
-  
+
   /* PDFs */
   /*! \brief The Student t distribution function.
    *
@@ -2211,7 +2211,7 @@ namespace scythe {
    *
    * \see pt(double x, bool b1, bool b2)
    * \see rng::rt1(double mu, double sigma2, double nu)
-   * 
+   *
    * \throw scythe_invalid_arg (Level 1)
    * \throw scythe_range_error (Level 1)
    * \throw scythe_precision_error (Level 1)
@@ -2222,7 +2222,7 @@ namespace scythe {
     double u;
 
     SCYTHE_CHECK_10(n <= 0, scythe_invalid_arg, "n <= 0");
-    
+
     double t = -bd0(n/2., (n + 1) / 2.)
       + stirlerr((n + 1) / 2.)
       - stirlerr(n / 2.);
@@ -2230,14 +2230,14 @@ namespace scythe {
       u = std::log(1+x*x/n)*n/2;
     else
       u = -bd0(n/2., (n+x*x)/2.) + x*x/2;
-    
+
     return std::exp(t-u)/std::sqrt(2*M_PI*(1+x*x/n));
   }
 
   SCYTHE_DISTFUN_MATRIX(dt, double, n, double n)
-  
-  /* Returns the univariate Student-t density evaluated at x 
-   * with mean mu, scale sigma^2, and nu degrees of freedom.  
+
+  /* Returns the univariate Student-t density evaluated at x
+   * with mean mu, scale sigma^2, and nu degrees of freedom.
    *
    * TODO:  Do we want a pt for this distribution?
    */
@@ -2278,17 +2278,17 @@ namespace scythe {
       - lngammafn(nu / 2.0) - std::log(std::sqrt(sigma2))
       - (nu + 1.0) / 2.0 * std::log(1.0 + (std::pow((x - mu), 2.0))
             / (nu * sigma2));
-    
+
     return(std::exp(logdens));
   }
 
   SCYTHE_DISTFUN_MATRIX(dt1, double, SCYTHE_ARGSET(mu, sigma2, nu), double mu, double sigma2, double nu)
 
-  /* Returns the natural log of the univariate Student-t density 
-   * evaluated at x with mean mu, scale sigma^2, and nu 
+  /* Returns the natural log of the univariate Student-t density
+   * evaluated at x with mean mu, scale sigma^2, and nu
    * degrees of freedom
    */
-   
+
   /*! \brief The natural log of the univariate Student t density
    * function.
    *
@@ -2318,7 +2318,7 @@ namespace scythe {
    * \throw scythe_range_error (Level 1)
    * \throw scythe_precision_error (Level 1)
    */
-  inline double 
+  inline double
   lndt1(double x, double mu, double sigma2, double nu)
   {
     double logdens = lngammafn((nu+1.0)/2.0)
@@ -2326,7 +2326,7 @@ namespace scythe {
       - lngammafn(nu/2.0) - std::log(std::sqrt(sigma2))
       - (nu+1.0)/2.0 * std::log(1.0 + (std::pow((x-mu),2.0))
         /(nu * sigma2));
-    
+
     return(logdens);
   }
 
@@ -2363,13 +2363,13 @@ namespace scythe {
   punif(double x, double a, double b)
   {
     SCYTHE_CHECK_10(b <= a, scythe_invalid_arg, "b <= a");
-      
+
     if (x <= a)
       return 0.0;
-        
+
     if (x >= b)
       return 1.0;
-      
+
     return (x - a) / (b - a);
   }
 
@@ -2404,10 +2404,10 @@ namespace scythe {
   dunif(double x, double a, double b)
   {
     SCYTHE_CHECK_10(b <= a, scythe_invalid_arg, "b <= a");
-    
+
     if (a <= x && x <= b)
       return 1.0 / (b - a);
-    
+
     return 0.0;
   }
 
@@ -2445,10 +2445,10 @@ namespace scythe {
   {
     SCYTHE_CHECK_10(shape <= 0 || scale <= 0, scythe_invalid_arg,
         "shape or scale <= 0");
-    
+
     if (x <= 0)
       return 0.0;
-    
+
     return 1 - std::exp(-std::pow(x / scale, shape));
   }
 
@@ -2487,10 +2487,10 @@ namespace scythe {
 
     if (x < 0)
       return 0.;
-      
+
     double tmp1 = std::pow(x / scale, shape - 1);
     double tmp2 = tmp1*(x / scale);
-      
+
     return shape * tmp1 * std::exp(-tmp2) / scale;
   }
 
@@ -2531,11 +2531,11 @@ namespace scythe {
         "mu is not a column vector");
     SCYTHE_CHECK_10(! Sigma.isSquare(), scythe_dimension_error,
         "Sigma is not square");
-    SCYTHE_CHECK_10(mu.rows()!=Sigma.rows() || x.rows()!=Sigma.rows(), 
+    SCYTHE_CHECK_10(mu.rows()!=Sigma.rows() || x.rows()!=Sigma.rows(),
                     scythe_conformation_error,
                     "mu, x and Sigma have mismatched row lengths")
     int k = (int) mu.rows();
-    return ( (-k/2.0)*std::log(2*M_PI) -0.5 * std::log(det(Sigma)) 
+    return ( (-k/2.0)*std::log(2*M_PI) -0.5 * std::log(det(Sigma))
        -0.5 * (t(x - mu)) * invpd(Sigma) * (x-mu) )[0];
   }
 

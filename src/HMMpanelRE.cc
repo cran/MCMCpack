@@ -47,7 +47,7 @@ static double lndwish (const Matrix<>& W,
     double gammain = (v - i)/2; 
     gammapart = gammapart * gammafn(gammain);// since i starts from 0!
   }
-  double logdenom = log(gammapart) + (v * K/2)*log(2) + (K * (K - 1)/4)*log(M_PI);
+  double logdenom = log(gammapart) + (v * K/2)*log(2.0) + (K * (K - 1)/4)*log(M_PI);
   double detS = 0;
   double detW = 0;
   if(K==1){
