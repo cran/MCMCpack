@@ -1,13 +1,15 @@
+//////////////////////////////////////////////////////////////////////////
 // MCMCpoissonRegChange.cc is C++ code to estimate a Poisson changepoint model
 //
 // Jong Hee Park
-// Dept. of Political Science
-// University of Chicago
-// jhp@uchicago.edu
+// Department of Political Science and International Relations
+// Seoul National University
+// jongheepark@snu.ac.kr
 //
 // 07/06/2007
 // 12/20/2007 included in MCMCpack
 // 03/09/2012 fixed a bug in a random uniform draw (thanks to Matt Blackwell)
+//////////////////////////////////////////////////////////////////////////
 
 #ifndef MCMCPOISSONCHANGE_CC
 #define MCMCPOISSONCHANGE_CC
@@ -47,7 +49,6 @@ Matrix<> tau_comp_sampler(rng<RNGTYPE>& stream,
 				const Matrix<>& s){
   
   // itialize
-  const int ns = m + 1;    
   const int n = Y.rows();
   const int k = X.cols();
   Matrix<int> component(totcomp, 1);
@@ -89,10 +90,10 @@ Matrix<> tau_comp_sampler(rng<RNGTYPE>& stream,
       Matrix<> ut = stream.runif(yt, 1);    
       // redraw the uniform if there are any repeats
       // thanks to Matt Blackwell 
-      while (::unique(ut).size() != ut.size()) {
+      while (unique(ut).size() != ut.size()) {
 	ut = stream.runif(yt, 1);
       }                   
-      Matrix<> sort_ut = ::sort(ut);
+      Matrix<> sort_ut = sort(ut);
       Matrix<> tau_tj(yt, 1);
       for(int i=1; i<yt; ++i){
 	tau_tj[i] = sort_ut[i] - sort_ut[i-1];

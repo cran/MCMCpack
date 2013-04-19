@@ -15,8 +15,9 @@
 \usage{MCMCpoissonChange(
 		formula, data = parent.frame(), m = 1,
            	b0 = 0, B0 = 1, a = NULL, b = NULL, c0 = NA, d0 = NA, 
+            lambda.mu = NA, lambda.var = NA, 
            	burnin = 1000, mcmc = 1000, thin = 1, verbose = 0, 
-           	seed = NA, beta.start = NA, P.start = NA,   
+           	seed = NA, beta.start = NA, P.start = NA, offset = NA,     
            	marginal.likelihood = c("none", "Chib95"), ...)}
 
 \arguments{
@@ -53,6 +54,16 @@
     \item{d0}{\eqn{d_0}{d0} is the scale parameter for Gamma prior on \eqn{\lambda}{lambda}
     (the mean). When there is no covariate, this should be provided by users. No default value is provided.}
 
+  \item{lambda.mu}{The mean of the
+    Gamma prior on \eqn{\lambda}{lambda}. 
+    \eqn{sigma.mu}{sigma.mu} and \eqn{sigma.var}{sigma.var} allow users to choose the Gamma prior
+    by choosing its mean and variance. }
+  
+  \item{lambda.var}{The variacne of the
+    Gamma prior on \eqn{\lambda}{lambda}.
+    \eqn{sigma.mu}{sigma.mu} and \eqn{sigma.var}{sigma.var} allow users to choose the Gamma prior
+    by choosing its mean and variance. }
+ 
     \item{burnin}{The number of burn-in iterations for the sampler.}
 
     \item{mcmc}{The number of MCMC iterations after burn-in.}
@@ -69,6 +80,8 @@
     \item{beta.start}{The starting values for the beta vector. This can either be a scalar or a column vector with dimension equal to the number of betas. The default value of NA will use draws from the Uniform distribution with the same boundary with the data as the starting value. If this is a scalar, that value will serve as the starting value mean for all of the betas. When there is no covariate, the log value of means should be used.}
 	
     \item{P.start}{The starting values for the transition matrix. A user should provide a square matrix with dimension equal to the number of states. By default, draws from the \code{Beta(0.9, 0.1)} are used to construct a proper transition matrix for each raw except the last raw.}	
+
+    \item{offset}{offset or exposure. Insert raw data. Do not take logarithm.}
 
     \item{marginal.likelihood}{How should the marginal likelihood be
     calculated? Options are: \code{none} in which case the marginal

@@ -1,12 +1,14 @@
+////////////////////////////////////////////////////////////////////
 // MCMCbinaryChange.cc is C++ code to estimate a binary changepoint model
 // with a beta prior
 //
 // Jong Hee Park
-// Dept. of Political Science
-// University of Chicago
-// jhp@uchicago.edu
+// Department of Political Science and International Relations
+// Seoul National University
+// jongheepark@snu.ac.kr
 //
-// 03/03/2009 
+// 03/03/2009 Written
+////////////////////////////////////////////////////////////////////
 
 #ifndef MCMCBINARYCHANGE_CC
 #define MCMCBINARYCHANGE_CC
@@ -322,7 +324,6 @@ extern "C"{
     
     // pull together Matrix objects
     const Matrix <> Y(*Yrow, *Ycol, Ydata);  
-    const unsigned int tot_iter = *burnin + *mcmc; 
     const unsigned int nstore = *mcmc / *thin; 
     const int n = Y.rows();
     const int ns = *m + 1;                 

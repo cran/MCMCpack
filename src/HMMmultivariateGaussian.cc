@@ -1,15 +1,17 @@
 //////////////////////////////////////////////////////////////////////////
-//HMMmultivariateGaussian.cc is C++ code to estimate a Gaussian panel model with a structural break
+// HMMmultivariateGaussian.cc is C++ code to estimate a Gaussian panel model with a structural break
 // y_{it} = \x'_{it}\b + \varepsilon_{it}
 // \varepsilon_{it} \sim \normdist{0}{\sigma^2}
 // Parameters = {beta, sigma2, P_i}// static + changing
 // 
-// Written by Jong Hee Park
-// 11/19/2008
-// Modified by JHP
-// 07/04/2011
+// Jong Hee Park
+// Department of Political Science and International Relations
+// Seoul National University
+// jongheepark@snu.ac.kr
+
+// Written 11/19/2008
+// Modified 07/04/2011
 //
-// Copyright (C) 2008-present Jong Hee Park
 //////////////////////////////////////////////////////////////////////////
 #ifndef HMMMULTIVARIATEGAUSSIAN_CC
 #define HMMMULTIVARIATEGAUSSIAN_CC
@@ -225,7 +227,6 @@ void MultivariateGaussian_impl(rng<RNGTYPE>& stream,
     for (unsigned int iter = 0; iter<nstore; ++iter){
       double SSE = 0;   
       for(unsigned int s=0;s<nsubj; ++s){
-	int ntime_s = subject_groupinfo(s, 2);
 	Matrix<> e = t(Yk_arr[s]-Xk_arr[s]*beta_st)*(Yk_arr[s] - Xk_arr[s]*beta_st);
 	SSE = SSE + e[0];
       }
@@ -826,7 +827,6 @@ void HMMmultivariateGaussian_impl(rng<RNGTYPE>& stream,
     Matrix<> pstyt1(ns, 1);
     for (unsigned int tt=0; tt<ntime ; ++tt) {
       for (int j=0; j<ns;++j){
-	int nsubj_s = time_groupinfo(tt, 2);
 	Matrix<> Sigma = eye(nsubj)*sigma2_st[j];
 	Matrix<> Mu = Xt_arr[tt]*::t(beta_st(j,_));
 	py[j]  =  ::exp(lndmvn(Yt_arr[tt], Mu, Sigma));

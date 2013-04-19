@@ -86,7 +86,7 @@ double logABfcd(const double& alpha, const double& beta,
     }      
   }
   else{
-    term1 + -numeric_limits<double>::infinity();
+    term1 = -numeric_limits<double>::infinity();
   }
 
   // a and/or b <= 0 is treated as improper uniform prior 
@@ -162,7 +162,7 @@ void hierBetaBinom_impl(rng<RNGTYPE>& stream,
 			const double* base_sigma){
   
   const int tot_iter = burnin + mcmc;
-  const int nstore = mcmc/thin;
+// JHP  const int nstore = mcmc/thin;
 
   // these probably should not be hard coded
   const double mixfrac = 0.05;
@@ -251,9 +251,9 @@ void hierBetaBinom_impl(rng<RNGTYPE>& stream,
 
     // sample [alpha_j, beta_j | theta, y, s, a, b]
     for (int j=0; j<nj; ++j){
-      const int len_thetaj = js_thetas_ptr[j].size();
-      double logfcd_cur = logABfcd(alpha[j], beta[j], 
-				      js_thetas_ptr[j], a, b);
+// JHP     const int len_thetaj = js_thetas_ptr[j].size();
+// JHP      double logfcd_cur = logABfcd(alpha[j], beta[j], 
+// JHP			      js_thetas_ptr[j], a, b);
       if (iter < 10){
 	double alpha_can = stream.rnorm(alpha[j], base_sigma[j]);
 	double beta_can = stream.rnorm(beta[j], base_sigma[j]);

@@ -1,11 +1,14 @@
+////////////////////////////////////////////////////////////////////
 // MCMCresidualBreakAnalysis.cc 
 //
 // Jong Hee Park
-// Department of Political Science
-// University of Chicago
-// jhp@uchicago.edu
+// Department of Political Science and International Relations
+// Seoul National University
+// jongheepark@snu.ac.kr
 //
-// 03/03/2009
+// Written 03/03/2009
+//
+////////////////////////////////////////////////////////////////////
 
 #ifndef MCMCRESIDUALBREAKANALYSIS_CC
 #define MCMCRESIDUALBREAKANALYSIS_CC
@@ -465,7 +468,6 @@ extern "C"{
     
     // pull together Matrix objects
     const Matrix <double> Y(*Yrow, *Ycol, Ydata); 
-    const unsigned int tot_iter = *burnin + *mcmc; 
     const unsigned int nstore = *mcmc / *thin; 
     const int n = Y.rows();
     const int ns = *m + 1;                 

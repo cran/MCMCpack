@@ -153,6 +153,7 @@
 }
 
 \examples{
+\dontrun{
 set.seed(1909)
 N <- 200
 x1 <- rnorm(N, 1, .5);
@@ -188,6 +189,7 @@ BayesFactor(out1, out2, out3)
 ## draw plots using the "right" model
 plotState(out1)
 plotChangepoint(out1)
+}
 }
 
 \keyword{models}

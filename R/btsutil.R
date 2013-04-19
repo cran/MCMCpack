@@ -248,4 +248,109 @@
 }
 
 
+## draw predicted outcomes of intervention analysis
+plotIntervention <- function(mcmcout, forward = TRUE, start = 1,
+                             alpha = 0.05, col = "red", main="", ylab="", xlab=""){
+  ## pull inputs
+  y <- ts(attr(mcmcout, "y"), start=start)
+  inter <- attr(mcmcout, "intervention") 
+  N <- length(y)
+  
+  ## draw a plot
+  plot(y, main=main, ylab=ylab, xlab=xlab)
+  abline(v = time(y)[inter], lty=2)
+  if (forward == TRUE){
+    yfore <- attr(mcmcout, "yforepred")
+    yfore.mu <- ts(apply(yfore, 2, mean), start=start); yfore.mu[1:(inter-1)] <- NA
+    yfore.upper <- ts(apply(yfore, 2, quantile, probs=(1-alpha/2)), start=start); yfore.upper[1:(inter-1)] <- NA
+    yfore.lower <- ts(apply(yfore, 2, quantile, probs=(alpha/2)), start=start); yfore.lower[1:(inter-1)] <- NA
+    lines(yfore.mu, col=col, lwd=2)
+    lines(yfore.upper, col=col, lty=3)
+    lines(yfore.lower, col=col, lty=3)
+  }
+  else {
+    yback <- attr(mcmcout, "ybackpred")
+    yback.mu <- ts(apply(yback, 2, mean), start=start);  yback.mu[(inter+1):N] <- NA
+    yback.upper <- ts(apply(yback, 2, quantile, probs=(1-alpha/2)), start=start); yback.upper[(inter+1):N] <- NA
+    yback.lower <- ts(apply(yback, 2, quantile, probs=(alpha/2)), start=start); yback.lower[(inter+1):N] <- NA
+    lines(yback.mu, col=col, lwd=2)
+    lines(yback.upper, col=col, lty=3)
+    lines(yback.lower, col=col, lty=3)
+  }
+}
+## Example
+## pdf(file="Nile_MCMCinter.pdf", width=12, height=4)
+## par(mfrow=c(1,3))
+## plotState(ar1, start=1871, main="Hidden Regime Change")
+## plotIntervention(ar1, start=1871, main="Forward Analysis", alpha= 0.5, ylab="Nile River flow", xlab="Year")
+## plotIntervention(ar1, forward=FALSE, start=1871, main="Backward Analysis", alpha= 0.5, ylab="Nile River flow", xlab="Year")
+## dev.off()
 
+## when we compare models in a list
+BayesFactorList <- function (model.list){
+  oldM <- length(model.list)
+  zero.marg <- rep(NA, oldM)
+  for (j in 1:oldM) {
+    zero.marg[j] <- ifelse(attr(model.list[[j]], "logmarglike") == 0, 1, 0)
+  }
+  new.model.list <- model.list[c(which(zero.marg == 0))]
+  M <- length(new.model.list)
+  out <- matrix(NA, M, 2)
+  BF <- rep(NA, M)
+  for (j in 1:M) {
+    BF[j] <- attr(new.model.list[[j]], "logmarglike")
+    out[j, 1] <- BF[j]
+  }
+  if (sum(exp(BF) == 0)){
+    ## if log like is too small, add some constants
+    BF <- BF + abs(BF[1])
+  }
+  prob <- exp(BF)/sum(exp(BF))
+  out[, 2] <- prob
+  marker <- which(zero.marg == 0)
+  rownames(out) <- names(model.list)[marker]
+  return(out)
+}
+
+## consecutive geweke diag test
+geweke.test <- function(output.list, z.value=1.96){
+  n <- length(output.list)
+  result <- rep(NA, n)
+  cat("\n --------------------------------- ")
+  for (i in 1:n){
+    if(sum(abs(geweke.diag(output.list[[i]])$z) > z.value)>0){
+      cat("\n Non-convergence for model ", i)
+      result[i] <- "Fail"
+    }
+    else {
+      result[i] <- "Pass"
+    }
+  }
+  cat("\n --------------------------------- \n")
+  return(result)
+}
+## outputlist <- list(ar0, ar1a, ar2a, ar1f, ar2f, ar1r, ar2r, tr0, tr1a, tr2a, tr1f, tr2f, tr1r, tr2r)
+## conv <- geweke.test(outputlist)
+
+## consecutive heidel Heidelberger and Welch's convergence diagnostic test
+heidel.test <- function(output.list, p.value=0.05){
+  n <- length(output.list)
+  result <- rep(NA, n)
+  cat("\n --------------------------------- ")
+  for (i in 1:n){
+    print(i)
+    plist1 <- heidel.diag(output.list[[i]], pvalue=p.value)[,1]
+    plist2 <- heidel.diag(output.list[[i]], pvalue=p.value)[,4]
+    if(sum(c(plist1, plist2) == 0)>0){
+      cat("\n Non-convergence for model ", i)
+      result[i] <- "Fail"
+    }
+    else {
+      result[i] <- "Pass"
+    }
+  }
+  cat("\n --------------------------------- \n")
+  return(result)
+}
+## outputlist <- list(ar0, ar1a, ar2a, ar1f, ar2f, ar1r, ar2r, tr0, tr1a, tr2a, tr1f, tr2f, tr1r, tr2r)
+## conv <- geweke.test(outputlist)
