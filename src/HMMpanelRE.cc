@@ -5,10 +5,13 @@
 // \bi_i \sim \normdist{0}{\D}
 // Parameters = {beta, bi, D, sigma2, || {s_it}, delta, P_i}// static + changing
 // 
-// First written by Jong Hee Park on 11/19/2008
-// Modified by JHP (consistent with MCMChregress by Ghislain Vieilledent) on 07/04/2011
-// Thanks for letting know the Woodbury matrix identity!
-// Included in MCMCpack b JHP on 09/2011
+// Jong Hee Park
+// Department of Political Science and International Relations
+// Seoul National University
+// jongheepark@snu.ac.kr
+
+// Modified (consistent with MCMChregress by Ghislain Vieilledent) on 07/04/2011
+// Included in MCMCpack on 09/2011
 //////////////////////////////////////////////////////////////////////////
 #ifndef HMMPANELRE_CC
 #define HMMPANELRE_CC
@@ -209,7 +212,6 @@ void GaussianPanelRE_impl(rng<RNGTYPE>& stream,
     /////////////////////////////////////////////////
     double SSE = 0;   
     for(int s=0;s<nsubj; ++s){
-      int ntime_s = subject_groupinfo(s, 2);
       Matrix<> e = t(Yk_arr[s]-Xk_arr[s]*beta - Wk_arr[s]*bi(_,s))*
 	(Yk_arr[s] - Xk_arr[s]*beta - Wk_arr[s]*bi(_,s));
       SSE = SSE + e[0];
@@ -319,7 +321,6 @@ void GaussianPanelRE_impl(rng<RNGTYPE>& stream,
        /////////////////////////////////////////////////
        double SSE = 0;   
        for(int s=0;s<nsubj; ++s){
-	 int ntime_s = subject_groupinfo(s, 2);
 	 Matrix<> e = t(Yk_arr[s]-Xk_arr[s]*beta_st - Wk_arr[s]*bi(_,s))*
 	   (Yk_arr[s] - Xk_arr[s]*beta_st - Wk_arr[s]*bi(_,s));
 	 SSE = SSE + e[0];
@@ -361,7 +362,6 @@ void GaussianPanelRE_impl(rng<RNGTYPE>& stream,
        /////////////////////////////////////////////////
        double SSE = 0;   
        for(int s=0;s<nsubj; ++s){
-	 int ntime_s = subject_groupinfo(s, 2);
 	 Matrix<> e = t(Yk_arr[s]-Xk_arr[s]*beta_st - Wk_arr[s]*bi(_,s))*
 	   (Yk_arr[s] - Xk_arr[s]*beta_st - Wk_arr[s]*bi(_,s));
 	SSE = SSE + e[0];
@@ -667,7 +667,6 @@ void HMMpanelRE_impl(rng<RNGTYPE>& stream,
       Matrix<> XVX(K, K);
       Matrix<> XVY(K, 1);
       for(int tt = (beta_count - nstate[j]); tt<beta_count; ++tt) { 
-	int nsubj_s = time_groupinfo(tt, 2); 
 	XVX += (1/sigma2[j])*cpXt_arr[tt]-pow(1/sigma2[j],2)*tXWt_arr[tt]*invpd(Dinv[j] + cpWt_arr[tt]*(1/sigma2[j]))*tWXt_arr[tt];      
 	XVY += (1/sigma2[j])*tXYt_arr[tt]-pow(1/sigma2[j],2)*tXWt_arr[tt]*invpd(Dinv[j] + cpWt_arr[tt]*(1/sigma2[j]))*tWYt_arr[tt];
       }
@@ -854,7 +853,6 @@ void HMMpanelRE_impl(rng<RNGTYPE>& stream,
 	Matrix<> XVX(K, K);
 	Matrix<> XVY(K, 1);
 	for(int tt = (beta_count - nstate[j]); tt<beta_count; ++tt) { 
-	  int nsubj_s = time_groupinfo(tt, 2);   
 	  XVX += (1/sigma_store(iter, j))*cpXt_arr[tt]-pow(1/sigma_store(iter, j),2)*tXWt_arr[tt]*invpd(Dinv_j + cpWt_arr[tt]*(1/sigma_store(iter, j)))*tWXt_arr[tt];  
 	  XVY += (1/sigma_store(iter, j))*tXYt_arr[tt]-pow(1/sigma_store(iter, j),2)*tXWt_arr[tt]*invpd(Dinv_j + cpWt_arr[tt]*(1/sigma_store(iter, j)))*tWYt_arr[tt];
 	}

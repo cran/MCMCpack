@@ -1,10 +1,13 @@
 //////////////////////////////////////////////////////////////////////////
 // HMMpanelFE.cc is C++ code 
 // 
-// Written by Jong Hee Park
-// 11/19/2008
-// 09/20/2009
-// Copyright (C) 2008-present Jong Hee Park
+// Jong Hee Park
+// Department of Political Science and International Relations
+// Seoul National University
+// jongheepark@snu.ac.kr
+
+// Written 11/19/2008
+// Modified 09/20/2009
 //////////////////////////////////////////////////////////////////////////
 #ifndef HMMPANELFE_CC
 #define HMMPANELFE_CC
@@ -36,7 +39,6 @@ using namespace scythe;
 #define M(ROW,COL,NROWS) (COL*NROWS+ROW)
 
 template <typename RNGTYPE>
-// HMM_Gaussian_Fixed_state_sampler(stream, mvector[s], ntime_s, Yres[s], Zarr[s], delta, P);
 // For better identification, first two and last two states are constrained to be 1 and ns
 // 10/31/2011 JHP
 Matrix<int> hetero_state_sampler(rng<RNGTYPE>& stream, 
@@ -130,8 +132,6 @@ void HMMpanelFE_impl(rng<RNGTYPE>& stream,
   const int NOBS = Y.rows();
 
   const int tot_iter = burnin + mcmc;
-  const int nstore = mcmc / thin; // number of draws to store
-  
   vector< vector <double> > P0_holder;
   vector< vector <double> > P_holder;
   int count = 0;

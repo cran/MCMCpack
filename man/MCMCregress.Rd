@@ -15,7 +15,7 @@
 \usage{
 MCMCregress(formula, data = NULL, burnin = 1000, mcmc = 10000,
    thin = 1, verbose = 0, seed = NA, beta.start = NA, 
-   b0 = 0, B0 = 0, c0 = 0.001, d0 = 0.001,
+   b0 = 0, B0 = 0, c0 = 0.001, d0 = 0.001, sigma.mu = NA, sigma.var = NA, 
    marginal.likelihood = c("none", "Laplace", "Chib95"), ...) }
 
 \arguments{
@@ -67,7 +67,7 @@ MCMCregress(formula, data = NULL, burnin = 1000, mcmc = 10000,
     as the prior precision of beta. Default value of 0 is equivalent to
     an improper uniform prior for beta.}
     
-  \item{c0}{\eqn{c_0/2}{c0/2} is the shape parameter for the inverse
+  	\item{c0}{\eqn{c_0/2}{c0/2} is the shape parameter for the inverse
     Gamma prior on \eqn{\sigma^2}{sigma^2} (the variance of the
     disturbances). The amount of information in the inverse Gamma prior
     is something like that from \eqn{c_0}{c0} pseudo-observations.} 
@@ -77,8 +77,18 @@ MCMCregress(formula, data = NULL, burnin = 1000, mcmc = 10000,
     disturbances). In constructing the inverse Gamma prior,
     \eqn{d_0}{d0} acts like the sum of squared errors from the
     \eqn{c_0}{c0} pseudo-observations.}
-
-  \item{marginal.likelihood}{How should the marginal likelihood be
+    
+  	\item{sigma.mu}{The mean of the
+    inverse Gamma prior on \eqn{\sigma^2}{sigma^2}. 
+    \eqn{sigma.mu}{sigma.mu} and \eqn{sigma.var}{sigma.var} allow users to choose the inverse Gamma prior
+    by choosing its mean and variance. }
+  
+  	\item{sigma.var}{The variacne of the
+    inverse Gamma prior on \eqn{\sigma^2}{sigma^2}.
+    \eqn{sigma.mu}{sigma.mu} and \eqn{sigma.var}{sigma.var} allow users to choose the inverse Gamma prior
+    by choosing its mean and variance. }
+ 
+   \item{marginal.likelihood}{How should the marginal likelihood be
     calculated? Options are: \code{none} in which case the marginal
     likelihood will not be calculated, \code{Laplace} in which case the
     Laplace approximation (see Kass and Raftery, 1995) is used, and
@@ -142,7 +152,7 @@ MCMCregress(formula, data = NULL, burnin = 1000, mcmc = 10000,
 \examples{
 \dontrun{
 line   <- list(X = c(-2,-1,0,1,2), Y = c(1,3,3,3,5))
-posterior  <- MCMCregress(Y~X, data=line, verbose=1000)
+posterior  <- MCMCregress(Y~X, b0=0, B0 = 0.1, sigma.mu = 5, sigma.var = 25, data=line, verbose=1000)
 plot(posterior)
 raftery.diag(posterior)
 summary(posterior)

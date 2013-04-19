@@ -20,18 +20,16 @@
 "MCMCregress" <-
   function(formula, data=NULL, burnin = 1000, mcmc = 10000,
            thin=1, verbose = 0, seed = NA, beta.start = NA,
-           b0 = 0, B0 = 0, c0 = 0.001, d0 = 0.001,
+           b0 = 0, B0 = 0, c0 = 0.001, d0 = 0.001, sigma.mu = NA, sigma.var = NA, 
            marginal.likelihood = c("none", "Laplace", "Chib95"),
            ...) {
     
     ## checks
     check.offset(list(...))
     check.mcmc.parameters(burnin, mcmc, thin)
-
+    
     cl <- match.call()
-    
-
-    
+        
     ## seeds
     seeds <- form.seeds(seed) 
     lecuyer <- seeds[[1]]
@@ -50,9 +48,15 @@
     mvn.prior <- form.mvn.prior(b0, B0, K)
     b0 <- mvn.prior[[1]]
     B0 <- mvn.prior[[2]]
-    check.ig.prior(c0, d0)
-
-
+    
+    if (is.na(sigma.mu)|is.na(sigma.var)) {
+      check.ig.prior(c0, d0)
+    }
+    else {
+      c0 <- 4 + 2 *(sigma.mu^2/sigma.var)
+      d0 <- 2*sigma.mu *(c0/2 - 1)
+    }
+      
     ## get marginal likelihood argument
     marginal.likelihood  <- match.arg(marginal.likelihood)
     B0.eigenvalues <- eigen(B0)$values

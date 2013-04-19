@@ -6,9 +6,10 @@
 
 "MCMCpoissonChange"<-
   function(formula, data = parent.frame(), m = 1,
-           b0 = 0, B0 = 1, a = NULL, b = NULL, c0 = NA, d0 = NA, 
+           b0 = 0, B0 = 1, a = NULL, b = NULL, c0 = NA, d0 = NA,
+           lambda.mu = NA, lambda.var = NA, 
            burnin = 1000, mcmc = 1000, thin = 1, verbose = 0, 
-           seed = NA, beta.start = NA, P.start = NA,   
+           seed = NA, beta.start = NA, P.start = NA, offset = NA,   
            marginal.likelihood = c("none", "Chib95"), ...) {
     
     ## form response and model matrices
@@ -35,10 +36,15 @@
     seed.array <- seeds[[2]]
     lecuyer.stream <- seeds[[3]]
     if(!is.na(seed)) set.seed(seed)
-    
+        
     if (k==1){
-      if (is.na(c0)||is.na(d0))
-        stop("You have to prior for lambda (c0 and d0) when there is no covariate.\n")
+      if (lambda.mu != NA && lambda.var != NA) {
+        c0 <- lambda.mu^2/lambda.var
+        d0 <- lambda.mu/lambda.var
+      }
+      if ((is.na(c0)||is.na(d0))&&((is.na(lambda.mu)||is.na(lambda.var)))){
+        stop("You have to provide a prior for lambda (c0 and d0 or lambda.mu and lambda.var) when there is no covariate.\n")
+      }
     }
     else{
       c0 <- d0 <- 0
@@ -46,6 +52,8 @@
       b0 <- mvn.prior[[1]]
       B0 <- mvn.prior[[2]]
     }
+    
+    
     
     ## get marginal likelihood argument
     marginal.likelihood  <- match.arg(marginal.likelihood)
@@ -56,11 +64,15 @@
     }
     if (m == 0){
       if (marginal.likelihood == "Chib95"){
-        output <- MCMCpoisson(formula, burnin = burnin, mcmc = mcmc,
-                              thin = thin, verbose = verbose,
-                              b0 = b0, B0 = B0,
-                              marginal.likelihood = "Laplace")
-        cat("\n Chib95 method is not yet available for m = 0. Laplace method is used instead.")
+        if (is.na(b0)||is.na(B0))
+          stop("You have to have a prior for beta (b0 and B0) when m = 0.\n")
+        else{
+          output <- MCMCpoisson(formula, burnin = burnin, mcmc = mcmc,
+                                thin = thin, verbose = verbose,
+                                b0 = b0, B0 = B0,
+                                marginal.likelihood = "Laplace")
+          cat("\n Chib95 method is not yet available for m = 0. Laplace method is used instead.")
+        }
       }
       else {
         output <- MCMCpoisson(formula, burnin = burnin, mcmc = mcmc,
@@ -80,6 +92,18 @@
       }
       taustart <- tau.initial(y, tot.comp)
       componentstart  <-  round(runif(tot.comp, 1, 5))
+      if(is.na(offset)){
+        logoffset <- rep(0, length(y))
+      }
+      else{
+        if(length(offset) == length(y)){
+          logoffset <- log(offset)
+        }
+        else{
+          stop("\n The length of offset is not matched with y.")
+        }
+      }
+      print(offset)
       
       ## normal mixture weights
       wr  <-  c(0.2294, 0.2590, 0.2480, 0.1525, 0.0472)
@@ -98,6 +122,7 @@
                       Xdata = as.double(X),
                       Xrow = as.integer(nrow(X)),
                       Xcol = as.integer(ncol(X)),
+                      logoffset = as.double(logoffset), 
                       m = as.integer(m), 
                       burnin = as.integer(burnin),           
                       mcmc = as.integer(mcmc), 
@@ -131,6 +156,11 @@
         logmarglike <- posterior$logmarglikeholder
         loglike <- posterior$loglikeholder
       }
+      else {
+        logmarglike <- 0
+        loglike <- 0
+      }
+ 
       
       ## pull together matrix and build MCMC object to return
       beta.holder <- matrix(posterior$betaout, nstore, )

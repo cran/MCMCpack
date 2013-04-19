@@ -375,7 +375,7 @@ static void doubling(double (*logfun)(const double&,
 		     const int& param){
   
   const double U = stream.runif();
-  double x0;
+  double x0 = 0.0;
   if (param==0){ // Lambda
     x0 = Lambda(rowindex, colindex);
   }
@@ -400,7 +400,7 @@ static void doubling(double (*logfun)(const double&,
   while (K > 0 && 
 	 (z < logfun(L, X, Lambda, theta, delta0, delta1, Lambda_prior_mean,
 		     Lambda_prior_prec, Lambda_ineq, theta_ineq, 
-		     k0, k1, c0, d0, c1, d1, rowindex, colindex) |
+		     k0, k1, c0, d0, c1, d1, rowindex, colindex) ||
 	  z < logfun(R, X, Lambda, theta, delta0, delta1, Lambda_prior_mean,
 		     Lambda_prior_prec, Lambda_ineq, theta_ineq, 
 		     k0, k1, c0, d0, c1, d1, rowindex, colindex))){
@@ -460,7 +460,7 @@ static void StepOut(double (*logfun)(const double&,
 		    const int& param){
   
   const double U = stream.runif();
-  double x0;
+  double x0 = 0.0;
   if (param==0){ // Lambda
     x0 = Lambda(rowindex, colindex);
   }

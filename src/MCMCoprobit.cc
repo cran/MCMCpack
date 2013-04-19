@@ -228,10 +228,10 @@ void MCMCoprobit_impl (rng<RNGTYPE>& stream, const int * Y,
   Matrix<> alpha_hat = alpha;
   
   // initialize current value stuff
-  Matrix<> propV = tune * alpha_prior_var * tune;
-  Matrix<> propCinvT = t(cholesky(invpd(propV)));
-  double logpost_cur = oprobit_logpost(nY, X, alpha, alpha_prior_mean, alpha_prior_var, beta);
-  double logjump_cur = lnmulttdens(alpha_prior_mean, alpha_hat, propCinvT, tdf);
+// JHP  Matrix<> propV = tune * alpha_prior_var * tune;
+// JHP  Matrix<> propCinvT = t(cholesky(invpd(propV)));
+// JHP  double logpost_cur = oprobit_logpost(nY, X, alpha, alpha_prior_mean, alpha_prior_var, beta);
+// JHP  double logjump_cur = lnmulttdens(alpha_prior_mean, alpha_hat, propCinvT, tdf);
   
   double tune_double = tune[0];
   for (unsigned int iter = 0; iter < tot_iter; ++iter) {		

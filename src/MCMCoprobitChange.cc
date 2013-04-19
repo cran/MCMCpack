@@ -1,13 +1,15 @@
+////////////////////////////////////////////////////////////////////
 // MCMCoprobitChange.cc is C++ code to estimate a oprobit changepoint model
 // with linear approximation
 //
 // Jong Hee Park
-// Dept. of Political Science
-// University of Chicago
-// jhp@uchicago.edu
+// Department of Political Science and International Relations
+// Seoul National University
+// jongheepark@snu.ac.kr
 //
-// 07/06/2007 
+// 07/06/2007 Written
 // 11/02/2009 Modified
+////////////////////////////////////////////////////////////////////
 
 #ifndef MCMCOPROBITCHANGE_CC
 #define MCMCOPROBITCHANGE_CC
@@ -38,7 +40,7 @@ static double dtnormLX(const double x,
 		     const double lower, 
 		     const double upper){
   double out = 0.0;
-  if (x>lower&x<upper){
+  if (x>lower && x<upper){
     double numer = dnorm(x, mean, sd);
     double denom = pnorm(upper, mean, sd) - pnorm(lower, mean, sd);
     out = numer/denom;

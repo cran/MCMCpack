@@ -118,7 +118,7 @@ void MCMCregress_impl (rng<RNGTYPE>& stream, const Matrix<>& Y,
      const Matrix<> betastar = t(meanc(t(betamatrix)));
      
      // step 1
-     Matrix<> sigma2_density(tot_iter, 1);
+     Matrix<> sigma2_density(nstore, 1);
      
      // second set of Gibbs scans
      for (unsigned int iter = 0; iter < nstore; ++iter) {
@@ -129,7 +129,7 @@ void MCMCregress_impl (rng<RNGTYPE>& stream, const Matrix<>& Y,
        const Matrix<> SSE = crossprod (e); 
        const double c_post = (c0 + X.rows ()) * 0.5;
        const double d_post = (d0 + SSE[0]) * 0.5;
-       sigma2_density(iter) = ::exp(digamma(sigma2star, c_post, d_post));
+       sigma2_density(iter) = digamma(sigma2star, c_post, d_post);
        R_CheckUserInterrupt();
      } // end MCMC loop
      double pdf_sigma2 = log(mean(sigma2_density));

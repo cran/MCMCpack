@@ -1,16 +1,15 @@
+////////////////////////////////////////////////////////////////////
 // MCMCprobitChange.cc is C++ code to estimate a probit changepoint model
 // with a beta prior
 //
 // Jong Hee Park
-// Dept. of Political Science
-// University of Chicago
-// jhp@uchicago.edu
+// Department of Political Science and International Relations
+// Seoul National University
+// jongheepark@snu.ac.kr
 //
-// Written by JHP 07/06/2007 
-// Modifieed by JHP 11/02/2009 
-// Included by JHP 1/21/2011
-// Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
-//    and Jong Hee Park
+// Written 07/06/2007 
+// Modifieed 11/02/2009 
+// Included 1/21/2011
 //////////////////////////////////////////////////////////////////////////
 
 #ifndef MCMCPROBITCHANGE_CC
@@ -363,7 +362,6 @@ extern "C"{
     // pull together Matrix objects
     const Matrix <> Y(*Yrow, *Ycol, Ydata); 
     const Matrix <> X(*Xrow, *Xcol, Xdata); 
-    const unsigned int tot_iter = *burnin + *mcmc; 
     const unsigned int nstore = *mcmc / *thin; 
     const int n = Y.rows();
     const int k = X.cols();
