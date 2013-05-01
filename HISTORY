@@ -1,9 +1,12 @@
 //
 // Changes and Bug Fixes
 //
-
+1.3-2 to 1.3-3
+  * fixed an error in MCMCpoissonChange: is.na(lambda.mu) and dropped offset argument
+  (thanks to Brian Ripley)	
+		
 1.3-1 to 1.3-2
-  * fixed two misktakes in marginal likelihood computation in MCMCregress 
+  * fixed two mistakes in marginal likelihood computation in MCMCregress 
     (thanks to Sid Chib). In computing log_sigma2, 
       - exp(digamma) -> digamma
       - averaging over tot_iter -> averaging over nstore
