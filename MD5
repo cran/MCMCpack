@@ -1,5 +1,5 @@
-27f74cbcc96af526b73ea978bdce8cb2 *DESCRIPTION
-c726ff27322432e935244da14dcd1c1c *HISTORY
+6470104b1e1bf32d945b869f9811a91e *DESCRIPTION
+19a6a667aa62fb26c81531564e05298c *HISTORY
 b1382cb26ee38f7a860c379826362e50 *NAMESPACE
 1eaf24e8d468ac0b624a9aa90cded306 *R/BayesFactors.R
 9c52f72ee21a71bfbfd312cb56233125 *R/HMMpanelFE.R
@@ -29,7 +29,7 @@ a6508dd38804705e750995ca27070cde *R/MCMCmnl.R
 6b63259803b2890eae6d5778592ed7dd *R/MCMCoprobitChange.R
 be0928d3cd74e5485b1e26a9f0a15c59 *R/MCMCordfactanal.R
 d438fc9dabd9993da5d4a45a3df68c39 *R/MCMCpoisson.R
-017cf7ca0c8f9fb15b62d6b371070df6 *R/MCMCpoissonChange.R
+cbf40bf99270db5f9dd8f4dea8f5274d *R/MCMCpoissonChange.R
 b98bdefca76d3316c664bcb2ba2bcc38 *R/MCMCprobit.R
 31fdcb514ab53ba258a581536fcbda60 *R/MCMCprobitChange.R
 e27dcf535f23c25018bb778b61640f22 *R/MCMCquantreg.R
@@ -86,10 +86,10 @@ b894aa07a0e68f9ffdeb3b09bab0aee2 *man/MCMChpoisson.Rd
 751e56edabc12da2d8246f7c34cd7613 *man/MCMCmixfactanal.Rd
 b7dfcf274126008379b0ee903f134b25 *man/MCMCmnl.Rd
 cf07e2c9f307215c8fe841f5381b62f8 *man/MCMCoprobit.Rd
-0ac0dc970781b60cecc8a7a99ce8e6ad *man/MCMCoprobitChange.Rd
+1556620313c5a4ca175fbe0b68f84161 *man/MCMCoprobitChange.Rd
 a491294e97dd0b7aa5d0de525542ea8f *man/MCMCordfactanal.Rd
 03f2e93e6876a4f0e87b3469bfe38d2f *man/MCMCpoisson.Rd
-7da98cdb1e3ec5ed459db403783309f1 *man/MCMCpoissonChange.Rd
+d754c71781dbdbcdfc4fecd6ea807056 *man/MCMCpoissonChange.Rd
 1917e296040b80c92525e5cb8ad02e71 *man/MCMCprobit.Rd
 c3631c612ccc2d8975a7e164c8506331 *man/MCMCprobitChange.Rd
 2f9caf8983e405f912eb5b25f29784eb *man/MCMCquantreg.Rd
@@ -162,7 +162,7 @@ eaab5804f229b660e958f6aa2cf728ba *src/MCMCmnl.h
 bdd18ead0856bbff8587b11639945699 *src/MCMCoprobitChange.cc
 6addbe81efb51cb4b8401e9a6931f782 *src/MCMCordfactanal.cc
 6bfed80bb7c109537461e6381837b6c4 *src/MCMCpoisson.cc
-b93e764e46e07581bd576b75597beecc *src/MCMCpoissonChange.cc
+a90346688ef620947dd846967e181603 *src/MCMCpoissonChange.cc
 84b94f6e67b026a915a23fb85bdaf00b *src/MCMCprobit.cc
 e2239f7d7503dc4eca812034f4bc1da8 *src/MCMCprobitChange.cc
 a6a01c3906a8b92b9f1a12cfa92a1a63 *src/MCMCprobitres.cc

@@ -897,7 +897,8 @@ extern "C" {
 			  const int *Ycol, 
 			  const double *Xdata,
 			  const int *Xrow, 
-			  const int *Xcol, 
+			  const int *Xcol,
+			  // const double *logoffset
 			  const int *m, 
 			  const int *burnin, 
 			  const int *mcmc, 

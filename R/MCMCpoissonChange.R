@@ -9,7 +9,7 @@
            b0 = 0, B0 = 1, a = NULL, b = NULL, c0 = NA, d0 = NA,
            lambda.mu = NA, lambda.var = NA, 
            burnin = 1000, mcmc = 1000, thin = 1, verbose = 0, 
-           seed = NA, beta.start = NA, P.start = NA, offset = NA,   
+           seed = NA, beta.start = NA, P.start = NA, ## offset = NA,   
            marginal.likelihood = c("none", "Chib95"), ...) {
     
     ## form response and model matrices
@@ -38,7 +38,7 @@
     if(!is.na(seed)) set.seed(seed)
         
     if (k==1){
-      if (lambda.mu != NA && lambda.var != NA) {
+      if (!is.na(lambda.mu) && !is.na(lambda.var)) {
         c0 <- lambda.mu^2/lambda.var
         d0 <- lambda.mu/lambda.var
       }
@@ -92,18 +92,18 @@
       }
       taustart <- tau.initial(y, tot.comp)
       componentstart  <-  round(runif(tot.comp, 1, 5))
-      if(is.na(offset)){
-        logoffset <- rep(0, length(y))
-      }
-      else{
-        if(length(offset) == length(y)){
-          logoffset <- log(offset)
-        }
-        else{
-          stop("\n The length of offset is not matched with y.")
-        }
-      }
-      print(offset)
+      ## if(is.na(offset)){
+      ##   logoffset <- rep(0, length(y))
+      ## }
+      ## else{
+      ##    if(length(offset) == length(y)){
+      ##      logoffset <- log(offset)
+      ##   }
+      ##   else{
+      ##     stop("\n The length of offset is not matched with y.")
+      ##   }
+      ##  }
+      ##  print(offset)
       
       ## normal mixture weights
       wr  <-  c(0.2294, 0.2590, 0.2480, 0.1525, 0.0472)
@@ -122,7 +122,7 @@
                       Xdata = as.double(X),
                       Xrow = as.integer(nrow(X)),
                       Xcol = as.integer(ncol(X)),
-                      logoffset = as.double(logoffset), 
+                      ## logoffset = as.double(logoffset), 
                       m = as.integer(m), 
                       burnin = as.integer(burnin),           
                       mcmc = as.integer(mcmc), 
