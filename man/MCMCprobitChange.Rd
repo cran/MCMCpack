@@ -118,8 +118,6 @@
 
 }
 
-\author{Jong Hee Park, \email{jhp@uchicago.edu}, \url{http://home.uchicago.edu/~jhp/}.}
-
 \references{
   Jong Hee Park. 2011. ``Changepoint Analysis of Binary and Ordinal Probit Models:
   An Application to Bank Rate Policy Under the Interwar Gold Standard." \emph{Political Analysis}. 19: 188-204.

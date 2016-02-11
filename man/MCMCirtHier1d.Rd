@@ -224,7 +224,7 @@ The parameters of interest are
     As is the case with all measurement models, make sure that you have plenty
   of free memory, especially when storing the item parameters.  
 }
-  \author{Michael Malecki, \email{malecki@wustl.edu}, \url{http://malecki.wustl.edu}.}
+  \author{Michael Malecki, \email{mike@crunch.io}, \url{https://github.com/malecki}.}
 
 \references{
    James H. Albert. 1992. ``Bayesian Estimation of Normal Ogive Item Response 
@@ -248,10 +248,11 @@ The parameters of interest are
    Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    
-   Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
-   \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
-   \url{http://www-fis.iarc.fr/coda/}.
-   
+   Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.
+  ``Output Analysis and Diagnostics for MCMC (CODA)'',
+   \emph{R News}. 6(1): 7-11.
+  \url{http://CRAN.R-project.org/doc/Rnews/Rnews_2006-1.pdf}.
+  
    Douglas Rivers.  2004.  ``Identification of Multidimensional Item-Response
    Models."  Stanford University, typescript.
 }
@@ -290,8 +291,9 @@ Xjdata <- data.frame(presparty= c(1,1,0,1,1,1,1,0,0),
 ## Randomly 10% Missing -- this affects the expansion parameter, increasing
 ## the variance of the (unidentified) latent parameter alpha.
 
-scMiss <- SupremeCourt
-scMiss[matrix(as.logical(rbinom(nrow(SupremeCourt)*ncol(SupremeCourt), 1, .1)), dim(SupremeCourt))] <- NA
+   scMiss <- SupremeCourt
+   scMiss[matrix(as.logical(rbinom(nrow(SupremeCourt)*ncol(SupremeCourt), 1, .1)), 
+      dim(SupremeCourt))] <- NA
 
    posterior1.miss <- MCMCirtHier1d(t(scMiss),
                    burnin=80000, mcmc=10000, thin=20, 

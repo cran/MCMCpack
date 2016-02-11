@@ -1,24 +1,26 @@
 Package: MCMCpack
-Version: 1.3-3
-Date: 2013-5-1
-Title: Markov chain Monte Carlo (MCMC) Package
+Version: 1.3-4
+Date: 2016-2-3
+Title: Markov Chain Monte Carlo (MCMC) Package
 Author: Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park
 Maintainer: Jong Hee Park <jongheepark@snu.ac.kr>
 Depends: R (>= 2.10.0), coda (>= 0.11-3), MASS, stats
-Description: This package contains functions to perform Bayesian
+Imports: graph, graphics, grDevices, lattice, methods, Rgraphviz,
+        utils, mcmc, quantreg
+Description: Contains functions to perform Bayesian
         inference using posterior simulation for a number of
         statistical models. Most simulation is done in compiled C++
         written in the Scythe Statistical Library Version 1.0.3. All
         models return coda mcmc objects that can then be summarized
-        using the coda package.  MCMCpack also contains some useful
-        utility functions, including some additional density functions
-        and pseudo-random number generators for statistical
-        distributions, a general purpose Metropolis sampling algorithm,
-        and tools for visualization.
+        using the coda package. Some useful
+        utility functions such as density functions, 
+	pseudo-random number generators for statistical
+        distributions, a general purpose Metropolis sampling algorithm, 
+        and tools for visualization are provided.
 License: GPL-3
 SystemRequirements: gcc (>= 4.0)
-URL: http://mcmcpack.wustl.edu
-Packaged: 2013-05-01 00:37:02 UTC; parkjonghee
+URL: http://mcmcpack.berkeley.edu
+Packaged: 2016-02-11 06:08:22 UTC; parkjonghee
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2013-05-01 07:02:08
+Date/Publication: 2016-02-11 08:27:40

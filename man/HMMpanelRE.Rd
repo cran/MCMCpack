@@ -147,15 +147,13 @@ HMMpanelRE(subject.id, time.id, y, X, W, m=1,
 }
 
 \references{
-   Jong Hee Park, 2011. ``A Unified Method for Dynamic and Cross-Sectional Heterogeneity: 
-   Introducing Hidden Markov Panel Models." Working Paper.
+   Jong Hee Park, 2012. ``Unified Method for Dynamic and Cross-Sectional Heterogeneity:
+   Introducing Hidden Markov Panel Models.'' \emph{American Journal of Political Science}.56: 1040-1054.
    
    Siddhartha Chib. 1998. ``Estimation and comparison of multiple change-point models.''
    \emph{Journal of Econometrics}. 86: 221-241.
 	  
 }
-
-\author{Jong Hee Park, \email{jhp@uchicago.edu}, \url{http://home.uchicago.edu/~jhp/}.}
 
 \examples{
 \dontrun{

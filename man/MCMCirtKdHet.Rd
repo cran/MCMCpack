@@ -145,8 +145,8 @@ store.sigma = TRUE, drop.constant.items = TRUE)
 \emph{Political Analysis.} 18: 151-171.
 }
 \author{
-Benjamin E. Lauderdale, \email{blauderd@princeton.edu},
-\url{http://www.princeton.edu/~blauderd/}.
+Benjamin E. Lauderdale, \email{b.e.lauderdale@lse.ac.uk},
+\url{http://www.benjaminlauderdale.net}.
 
 Modified from \code{\link[MCMCpack]{MCMCirtKd}} and \code{\link[MCMCpack]{MCMCordfactanal}}.  Suggestions for additional options are welcome.
 }
@@ -183,7 +183,8 @@ for (i in 1:102){
 legend(x="topleft",legend=c("Point sizes proportional to estimated legislator",
 "variance under heteroskedastic model.","Some legislators with large variance have",
 "more extreme estimated ideal points under the","heteroskedastic model because their",
-"deviations from the party line are attributable","to idiosyncrasy rather than moderation."),cex=0.5)
+"deviations from the party line are attributable","to idiosyncrasy rather than moderation."),
+cex=0.5)
 }
 }
 

@@ -33,7 +33,7 @@ Political Economic Risk Data from 62 Countries in 1987.
 \source{
   Mike Alvarez, Jose Antonio Cheibub, Fernando Limongi, and Adam
   Przeworski. 1999. ``ACLP Political and Economic Database.''
-  \url{http://www.ssc.upenn.edu/~cheibub/data/}.
+  \url{https://sites.google.com/site/joseantoniocheibub/datasets/democracy-and-development-aclp}.
 
   Witold J. Henisz. 2002. ``The Political Constraint Index (POLCON)
   Dataset.'' \\
@@ -41,7 +41,7 @@ Political Economic Risk Data from 62 Countries in 1987.
 
   Monty G. Marshall, Ted Robert Gurr, and Barbara Harff. 2002. ``State
   Failure Task Force Problem Set.''
-  \url{http://www.cidcm.umd.edu/inscr/stfail/index.htm}. 
+  
 }
 \references{
   Kevin M. Quinn. 2004. ``Bayesian Factor Analysis for Mixed Ordinal

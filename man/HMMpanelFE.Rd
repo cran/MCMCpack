@@ -49,7 +49,7 @@
 
     \item{B0}{The prior precision of \eqn{\beta}{beta}.  This can either be a
     scalar or a square matrix with dimensions equal to the number of betas.
-    If this
+      If this
     takes a scalar value, then that value times an identity matrix serves
     as the prior precision of beta. Default value of 0 is equivalent to
     an improper uniform prior for beta.}
@@ -85,10 +85,7 @@
 
 \details{
   
-  \code{HMMpanelFE} simulates from the fixed-effect hidden Markov panel model introduced by Park (2011). 
-  The model takes the following form:
-  \deqn{y_{it} = x'_{it} \beta + \varepsilon_{it}\;\; m = 1, \ldots, M}{y_it = x'_it * beta + epsilon_it, m = 1,...,M.}
-  Unlike conventional fixed-effects models, individual effects and variances are assumed to be time-varying at the subject level:
+  \code{HMMpanelFE} simulates from the fixed-effect hidden Markov pbject level:
   \deqn{\varepsilon_{it} \sim \mathcal{N}(\alpha_{im}, \sigma^2_{im})}{epsilon_it ~ N(alpha_im, sigma^2_im)} 
 
    We assume standard, semi-conjugate priors:
@@ -109,8 +106,6 @@
 
   }
 
-\author{Jong Hee Park, \email{jhp@uchicago.edu}, \url{http://home.uchicago.edu/~jhp/}.}
-
 \value{
    An mcmc object that contains the posterior sample. This
    object can be summarized by functions provided by the coda package.
@@ -119,8 +114,8 @@
 }
 
 \references{
-   Jong Hee Park, 2011. ``A Unified Method for Dynamic and Cross-Sectional Heterogeneity: 
-   Introducing Hidden Markov Panel Models." Working Paper.
+   Jong Hee Park, 2012. ``Unified Method for Dynamic and Cross-Sectional Heterogeneity:
+   Introducing Hidden Markov Panel Models.'' \emph{American Journal of Political Science}.56: 1040-1054.
    
    Siddhartha Chib. 1998. ``Estimation and comparison of multiple change-point models.''
    \emph{Journal of Econometrics}. 86: 221-241.
@@ -169,8 +164,9 @@
     weight <- Weight[j:(j+T-1)]
     true.alpha1[i] <- rnorm(1, 0, true.sigma.alpha)
     true.alpha2[i] <- -1*true.alpha1[i]
-    y[j:(j+T-1)] <- ((1-weight)*true.mean + (1-weight)*rnorm(T, 0, true.sigma) + (1-weight)*true.alpha1[i]) +
-    		     (weight*true.mean + weight*rnorm(T, 0, true.sigma) + weight*true.alpha2[i])
+    y[j:(j+T-1)] <- ((1-weight)*true.mean + (1-weight)*rnorm(T, 0, true.sigma) + 
+    		    (1-weight)*true.alpha1[i]) +
+    		    (weight*true.mean + weight*rnorm(T, 0, true.sigma) + weight*true.alpha2[i])
     j <- j + T
   }
 

@@ -182,9 +182,10 @@ nu=0.001, delta=0.001, FixOD=0, ...)}
   Political Science Panel Data.'' Paper presented at the 2002 Annual Meeting 
   of the American Political Science Association.
    
-  Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
-  \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
-  \url{http://www-fis.iarc.fr/coda/}.
+  Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.
+  ``Output Analysis and Diagnostics for MCMC (CODA)'',
+   \emph{R News}. 6(1): 7-11.
+  \url{http://CRAN.R-project.org/doc/Rnews/Rnews_2006-1.pdf}.
 
   Diggle P., Heagerty P., Liang K., and Zeger S. 2004. ``Analysis of Longitudinal Data.''
   \emph{Oxford University Press}, 2sd Edition.

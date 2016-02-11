@@ -140,7 +140,7 @@ Strategies}. Gary King, Ori Rosen, and Martin A. Tanner (eds.). New
 York: Cambridge University Press. 
 
 Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
- ``MCMCpack: Markov Chain Monte Carlo in R.'',
+ ``MCMCpack: Markov Chain Monte Carlo in R'',
  \emph{Journal of Statistical Software}. 42(9): 1-21.
  \url{http://www.jstatsoft.org/v42/i09/}.
 
@@ -150,12 +150,13 @@ Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
    Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    
-  Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
-  \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
-  \url{http://www-fis.iarc.fr/coda/}.
+  Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.
+  ``Output Analysis and Diagnostics for MCMC (CODA)'',
+   \emph{R News}. 6(1): 7-11.
+  \url{http://CRAN.R-project.org/doc/Rnews/Rnews_2006-1.pdf}.
 
-Jonathan C. Wakefield. 2004. ``Ecological Inference for 2 x 2 Tables.'' \emph{Journal 
-   of the Royal Statistical Society, Series A}. 167(3): 385445.
+  Jonathan C. Wakefield. 2004. ``Ecological Inference for 2 x 2 Tables.''
+  \emph{Journal of the Royal Statistical Society, Series A}. 167(3): 385445.
 
 }
 

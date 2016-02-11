@@ -214,7 +214,7 @@
             if(Lambda.ineq.constraints[i,j]==0){
               if (j==1){
                   probit.out <- glm(as.factor(X[X[,i]!=-999,i])~1,
-                                    family=binomial(link=logit))
+                                    family=binomial(link="logit"))
                   probit.beta <- coef(probit.out)
                   Lambda[i,j] <- -1 * probit.beta[1]
               }

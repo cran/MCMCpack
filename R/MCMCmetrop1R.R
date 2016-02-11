@@ -32,12 +32,19 @@
                              REPORT=10, maxit=500),
                            ...){
   
+  ## following block creates an explicit copy of theta.init so that theta.init
+  ## is not modified in place by the code below
+  theta.init.0 <- rep(NA, length(theta.init))
+  for (i in 1:length(theta.init)){
+    theta.init.0[i] <- theta.init[i]
+  }
+
   ## error checking here
   check.offset(list(...))
   check.mcmc.parameters(burnin, mcmc, thin)
     
   ## form the tuning vector
-  tune <- vector.tune(tune, length(theta.init))
+  tune <- vector.tune(tune, length(theta.init.0))
   
   ## form seed
   seeds <- form.seeds(seed) 
@@ -66,7 +73,7 @@
 
   if (is.null(V)){
     ## find approx mode and Hessian using optim()
-    opt.out <- optim(theta.init, maxfun,
+    opt.out <- optim(theta.init.0, maxfun,
                      control=optim.control,
                      lower=optim.lower, upper=optim.upper,
                      method=optim.method, hessian=TRUE, ...)
@@ -111,7 +118,7 @@
     V <- tune %*% solve(-1*hess.new) %*% tune
   }
   else{ ## V is non NULL
-    if (nrow(V) != ncol(V) || nrow(V) != length(theta.init)){
+    if (nrow(V) != ncol(V) || nrow(V) != length(theta.init.0)){
       cat("V not of appropriate dimension.\n")
       stop("Check V and theta.init and call MCMCmetrop1R() again. \n",
            call.=FALSE)     
@@ -127,7 +134,7 @@
   }
   
   ## Call the C++ function to do the MCMC sampling 
-  sample <- .Call("MCMCmetrop1R_cc", userfun, as.double(theta.init),
+  sample <- .Call("MCMCmetrop1R_cc", userfun, as.double(theta.init.0),
                   my.env, as.integer(burnin), as.integer(mcmc),
                   as.integer(thin),
                   as.integer(verbose),

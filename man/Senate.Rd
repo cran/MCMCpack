@@ -23,7 +23,7 @@ data(Senate)
 
 \source{
   Keith Poole. 2005. \emph{106th Roll Call Vote Data}.
-  \url{http://voteview.uh.edu/}.
+  \url{http://www.voteview.com/}.
 }
 
 \keyword{datasets}

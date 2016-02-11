@@ -56,7 +56,7 @@
       out <- as.list(rep(NA, max.break))
       if(nk > minimum){
         for (k in 0:max.break){
-          out[[k+1]] <- MCMCpack:::MCMCresidualBreakAnalysis(residual, m=k, 
+          out[[k+1]] <- MCMCresidualBreakAnalysis(residual, m=k, 
                                                   b0=b0, B0=B0, c0=c0, d0=d0, a=a, b=b,
                                                   burnin=burnin, mcmc=mcmc, thin=thin, verbose=verbose, 
                                                   marginal.likelihood="Chib95")

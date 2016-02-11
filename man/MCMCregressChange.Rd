@@ -156,9 +156,11 @@
    \emph{Journal of Econometrics}. 86: 221-241.
 
 
- Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
-   \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
-   \url{http://www-fis.iarc.fr/coda/}.
+  Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.
+  ``Output Analysis and Diagnostics for MCMC (CODA)'',
+   \emph{R News}. 6(1): 7-11.
+  \url{http://CRAN.R-project.org/doc/Rnews/Rnews_2006-1.pdf}.
+
 }
 
 \examples{
@@ -187,11 +189,16 @@ sigma.mu=sd(y)
 sigma.var=var(y)
 		
 ## models
-model1 <-  MCMCregressChange(formula, m=1, b0=b0, B0=B0, sigma.mu=sigma.mu, sigma.var=sigma.var, marginal.likelihood="Chib95")
-model2 <-  MCMCregressChange(formula, m=2, b0=b0, B0=B0, sigma.mu=sigma.mu, sigma.var=sigma.var, marginal.likelihood="Chib95")
-model3 <-  MCMCregressChange(formula, m=3, b0=b0, B0=B0, sigma.mu=sigma.mu, sigma.var=sigma.var, marginal.likelihood="Chib95")
-model4 <-  MCMCregressChange(formula, m=4, b0=b0, B0=B0, sigma.mu=sigma.mu, sigma.var=sigma.var, marginal.likelihood="Chib95")
-model5 <-  MCMCregressChange(formula, m=5, b0=b0, B0=B0, sigma.mu=sigma.mu, sigma.var=sigma.var, marginal.likelihood="Chib95")
+model1 <-  MCMCregressChange(formula, m=1, b0=b0, B0=B0, mcmc=100, burnin=100, 
+           sigma.mu=sigma.mu, sigma.var=sigma.var, marginal.likelihood="Chib95")
+model2 <-  MCMCregressChange(formula, m=2, b0=b0, B0=B0, mcmc=100, burnin=100,
+           sigma.mu=sigma.mu, sigma.var=sigma.var, marginal.likelihood="Chib95")
+model3 <-  MCMCregressChange(formula, m=3, b0=b0, B0=B0, mcmc=100, burnin=100,
+           sigma.mu=sigma.mu, sigma.var=sigma.var, marginal.likelihood="Chib95")
+model4 <-  MCMCregressChange(formula, m=4, b0=b0, B0=B0, mcmc=100, burnin=100,
+           sigma.mu=sigma.mu, sigma.var=sigma.var, marginal.likelihood="Chib95")
+model5 <-  MCMCregressChange(formula, m=5, b0=b0, B0=B0, mcmc=100, burnin=100,
+           sigma.mu=sigma.mu, sigma.var=sigma.var, marginal.likelihood="Chib95")
 
 print(BayesFactor(model1, model2, model3, model4, model5))
 plotState(model1)

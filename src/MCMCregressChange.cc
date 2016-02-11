@@ -370,7 +370,7 @@ void MCMCregressChange_impl(rng<RNGTYPE>& stream,
     Matrix<double> pstyt1(ns, 1);
     
     for (int t=0; t<n ; ++t){
-      int yt = (int) Y[t];
+      //int yt = (int) Y[t];
       Matrix<double> mu = X(t,_)*::t(beta_st); //k by 1 vector
       for (int j = 0; j< ns; ++j){
 	py[j]  =  dnorm(Y[t], mu[j], sqrt(Sigma_st[j]));
@@ -452,7 +452,7 @@ extern "C"{
     // pull together Matrix objects
     const Matrix <double> Y(*Yrow, *Ycol, Ydata); 
     const Matrix <double> X(*Xrow, *Xcol, Xdata); 
-    const unsigned int tot_iter = *burnin + *mcmc; //total iterations
+    // const unsigned int tot_iter = *burnin + *mcmc; //total iterations
     const unsigned int nstore = *mcmc / *thin; // number of draws to store
     const int n = Y.rows();
     const int k = X.cols();

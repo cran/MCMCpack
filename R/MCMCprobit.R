@@ -45,7 +45,7 @@
         
     ## starting values and priors
     beta.start <- coef.start(beta.start, K, formula,
-                             family=binomial(link=probit), data)
+                             family=binomial(link="probit"), data)
     mvn.prior <- form.mvn.prior(b0, B0, K)
     b0 <- mvn.prior[[1]]
     B0 <- mvn.prior[[2]]

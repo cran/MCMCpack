@@ -1,10 +1,21 @@
 useDynLib(MCMCpack)
-import(coda)
-import(MASS)
-import(stats)
+import("coda")
+import("MASS")
+import("stats")
+import("utils")
+importFrom(graphics, plot)
+import("graph")
+import("grDevices")
+import("lattice")
+import("methods")
+import("mcmc")
+import("Rgraphviz")
+import("quantreg")
+importFrom("graphics", "abline", "axTicks", "axis", "box", "layout",
+           "lcm", "legend", "par", "plot.new", "plot.window", "points",
+           "rect")
 
-export(
-       BayesFactor,
+export(BayesFactor,
        choicevar,
        ddirichlet,
        dinvgamma,
@@ -26,11 +37,9 @@ export(
        MCMChlogit,
        MCMChpoisson,
        MCMChregress,
-       MCMCintervention,
        MCMCirt1d,
        MCMCirtHier1d,
        MCMCirtKd,
-       MCMCirtKdHet,
        MCMCirtKdRob,
        MCMClogit,
        MCMCmetrop1R,
@@ -52,7 +61,6 @@ export(
        mptable,
        plotState,
        plotChangepoint,
-       plotIntervention,
        PostProbMod,
        procrustes,
        rdirichlet,

@@ -140,7 +140,8 @@
 
 \references{ 
   Jong Hee Park. 2011. ``Changepoint Analysis of Binary and Ordinal Probit Models:
-  An Application to Bank Rate Policy Under the Interwar Gold Standard." \emph{Political Analysis}. 19: 188-204.
+  An Application to Bank Rate Policy Under the Interwar Gold Standard."
+  \emph{Political Analysis}. 19: 188-204.
 
  Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
   ``MCMCpack: Markov Chain Monte Carlo in R.'',
@@ -173,17 +174,15 @@ formula <- y ~ x1
 
 ## fit multiple models with a varying number of breaks
 out1 <- MCMCoprobitChange(formula, m=1, 
-      	mcmc=1000, burnin=1000, thin=1, tune=c(.5, .5), verbose=1000, 
+      	mcmc=100, burnin=100, thin=1, tune=c(.5, .5), verbose=100, 
      	b0=0, B0=10, marginal.likelihood = "Chib95")
 out2 <- MCMCoprobitChange(formula, m=2, 
-      	mcmc=1000, burnin=1000, thin=1, tune=c(.5, .5, .5), verbose=1000, 
-     	b0=0, B0=10, marginal.likelihood = "Chib95")
-out3 <- MCMCoprobitChange(formula, m=3, 
-      	mcmc=1000, burnin=1000, thin=1, tune=c(.5, .5, .5, .5), verbose=1000, 
+      	mcmc=100, burnin=100, thin=1, tune=c(.5, .5, .5), verbose=100, 
      	b0=0, B0=10, marginal.likelihood = "Chib95")
 
-## find the most reasonable one
-BayesFactor(out1, out2, out3)
+## Do model comparison
+## NOTE: the chain should be run longer than this example!
+BayesFactor(out1, out2)
 
 ## draw plots using the "right" model
 plotState(out1)

@@ -118,7 +118,7 @@
     }
     else {
       ab.starts[i,] <- coef(suppressWarnings(glm(local.y~theta.start,
-                                                 family=binomial(probit),
+                                                 family=binomial(link="probit"),
                                                  control=glm.control(
                                                    maxit=8, epsilon=1e-3)
                                                  )))

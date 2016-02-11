@@ -25,8 +25,6 @@
 \item{overlay}{If overlay=TRUE, the probability of each regime change is drawn separately, which will be useful to draw multiple plots in one screen. See the example in \code{MCMCpoissonChange}. Otherwise, multiple plots of regime change probabilities will be drawn.}
 }
 
-\author{Jong Hee Park, \email{jhp@uchicago.edu}, \url{http://home.uchicago.edu/~jhp/}.}
-
 \keyword{hplot}
 
 \seealso{\code{\link{MCMCpoissonChange}}, \code{\link{MCMCbinaryChange}}}

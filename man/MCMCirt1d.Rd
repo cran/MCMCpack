@@ -192,9 +192,10 @@ MCMCirt1d(datamatrix, theta.constraints=list(), burnin = 1000,
    Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    
-   Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
-   \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
-   \url{http://www-fis.iarc.fr/coda/}.
+  Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.
+  ``Output Analysis and Diagnostics for MCMC (CODA)'',
+   \emph{R News}. 6(1): 7-11.
+  \url{http://CRAN.R-project.org/doc/Rnews/Rnews_2006-1.pdf}.
    
    Douglas Rivers.  2004.  ``Identification of Multidimensional Item-Response
    Models."  Stanford University, typescript.

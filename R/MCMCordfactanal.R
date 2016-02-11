@@ -156,7 +156,7 @@
               if (j==1){
                 if (ncat[i] == 2){
                   probit.out <- glm(as.factor(X[X[,i]!=-999,i])~1,
-                                    family=binomial(link=probit))
+                                    family=binomial(link="probit"))
                   probit.beta <- coef(probit.out)
                   Lambda[i,j] <- probit.beta[1]
                 }

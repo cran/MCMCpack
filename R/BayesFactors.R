@@ -149,8 +149,12 @@
   BF.mat <- matrix(NA, M, M)
   BF.log.mat <- matrix(NA, M, M)
   rownames(BF.mat) <- colnames(BF.mat) <-
-    rownames(BF.log.mat) <- colnames(BF.log.mat) <- model.names
-  BF.logmarglike <- array(NA, M, dimnames=model.names)
+      rownames(BF.log.mat) <- colnames(BF.log.mat) <- model.names
+
+  BF.logmarglike <- array(NA, c(1, M), dimnames=list("logmarglike", model.names))
+  ## Bill Dunlap found that R did not warn about illegal dimnames in array()  but rather would just disregard them.
+  ## So based on the patch by Martin Maechler, JHP changed the code. "Thu Feb  4 10:35:15 2016"
+  ## BF.logmarglike <- array(NA, M, dimnames=model.names)
   BF.call <- NULL
   
   for (i in 1:M){
@@ -163,7 +167,8 @@
         BF.mat[i,j] <- exp(BF.log.mat[i,j])
       }
       else{
-        warning(paste(model.names[i], " and ", model.names[j], " do not have exactly identical y data.\nBayes factors are not defined.\n", sep=""))
+          warning(paste(model.names[i], " and ", model.names[j],
+                        " do not have exactly identical y data.\nBayes factors are not defined.\n", sep=""))
       }
     }
   }

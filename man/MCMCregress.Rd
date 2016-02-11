@@ -143,16 +143,18 @@ MCMCregress(formula, data = NULL, burnin = 1000, mcmc = 10000,
    Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  
    \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
    
-   Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
-   \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
-   \url{http://www-fis.iarc.fr/coda/}.
+  Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.
+  ``Output Analysis and Diagnostics for MCMC (CODA)'',
+   \emph{R News}. 6(1): 7-11.
+  \url{http://CRAN.R-project.org/doc/Rnews/Rnews_2006-1.pdf}.
 }
 
 
 \examples{
 \dontrun{
 line   <- list(X = c(-2,-1,0,1,2), Y = c(1,3,3,3,5))
-posterior  <- MCMCregress(Y~X, b0=0, B0 = 0.1, sigma.mu = 5, sigma.var = 25, data=line, verbose=1000)
+posterior  <- MCMCregress(Y~X, b0=0, B0 = 0.1, 
+	      sigma.mu = 5, sigma.var = 25, data=line, verbose=1000)
 plot(posterior)
 raftery.diag(posterior)
 summary(posterior)

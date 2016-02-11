@@ -84,8 +84,6 @@
   Where \eqn{M}{M} is the number of states.
   }
 
-\author{Jong Hee Park, \email{jhp@uchicago.edu}, \url{http://home.uchicago.edu/~jhp/}.}
-
 \references{
   Jong Hee Park. 2011. ``Changepoint Analysis of Binary and Ordinal Probit Models:
   An Application to Bank Rate Policy Under the Interwar Gold Standard." \emph{Political Analysis}. 19: 188-204.
@@ -94,10 +92,6 @@
   ``MCMCpack: Markov Chain Monte Carlo in R.'',
   \emph{Journal of Statistical Software}. 42(9): 1-21.
   \url{http://www.jstatsoft.org/v42/i09/}.
-
- Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2002.
-   \emph{Output Analysis and Diagnostics for MCMC (CODA)}.
-   \url{http://www-fis.iarc.fr/coda/}.
 
   Siddhartha Chib. 1995. ``Marginal Likelihood from the Gibbs Output.''
    \emph{Journal of the American Statistical Association}. 90:
@@ -116,12 +110,18 @@
     y3 <- rbinom(120, 1, true.phi[3])
     y  <- as.ts(c(y1, y2, y3))
 
-    model0 <- MCMCbinaryChange(y, m=0, c0=2, d0=2, mcmc=1000, burnin=1000, verbose=500, marginal.likelihood = "Chib95")
-    model1 <- MCMCbinaryChange(y, m=1, c0=2, d0=2, mcmc=1000, burnin=1000, verbose=500, marginal.likelihood = "Chib95")
-    model2 <- MCMCbinaryChange(y, m=2, c0=2, d0=2, mcmc=1000, burnin=1000, verbose=500, marginal.likelihood = "Chib95")
-    model3 <- MCMCbinaryChange(y, m=3, c0=2, d0=2, mcmc=1000, burnin=1000, verbose=500, marginal.likelihood = "Chib95")
-    model4 <- MCMCbinaryChange(y, m=4, c0=2, d0=2, mcmc=1000, burnin=1000, verbose=500, marginal.likelihood = "Chib95")
-    model5 <- MCMCbinaryChange(y, m=5, c0=2, d0=2, mcmc=1000, burnin=1000, verbose=500, marginal.likelihood = "Chib95")
+    model0 <- MCMCbinaryChange(y, m=0, c0=2, d0=2, mcmc=100, burnin=100, verbose=50, 
+    	      marginal.likelihood = "Chib95")
+    model1 <- MCMCbinaryChange(y, m=1, c0=2, d0=2, mcmc=100, burnin=100, verbose=50, 
+    	      marginal.likelihood = "Chib95")
+    model2 <- MCMCbinaryChange(y, m=2, c0=2, d0=2, mcmc=100, burnin=100, verbose=50, 
+    	      marginal.likelihood = "Chib95")
+    model3 <- MCMCbinaryChange(y, m=3, c0=2, d0=2, mcmc=100, burnin=100, verbose=50, 
+    	      marginal.likelihood = "Chib95")
+    model4 <- MCMCbinaryChange(y, m=4, c0=2, d0=2, mcmc=100, burnin=100, verbose=50, 
+    	      marginal.likelihood = "Chib95")
+    model5 <- MCMCbinaryChange(y, m=5, c0=2, d0=2, mcmc=100, burnin=100, verbose=50, 
+    	      marginal.likelihood = "Chib95")
 
     print(BayesFactor(model0, model1, model2, model3, model4, model5))
     

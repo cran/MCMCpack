@@ -4,7 +4,8 @@
 \description{Plot the posterior probability that each time point is in each state.}
 
 \usage{
-   plotState(mcmcout, main="Posterior Regime Probability", ylab=expression(paste("Pr(", S[t], "= k |", Y[t], ")")),
+   plotState(mcmcout, main="Posterior Regime Probability", 
+   ylab=expression(paste("Pr(", S[t], "= k |", Y[t], ")")),
    legend.control = NULL, cex = 0.8, lwd = 1.2, start=1)
 }
 
@@ -25,8 +26,6 @@
 \item{start}{The time of the first observation to be shown in the time series plot.}
 
 }
-
-\author{Jong Hee Park, \email{jhp@uchicago.edu}, \url{http://home.uchicago.edu/~jhp/}.}
 
 \keyword{hplot}
 

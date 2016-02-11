@@ -114,8 +114,6 @@
   Where \eqn{M}{M} is the number of states.
   }
 
-\author{Jong Hee Park, \email{jhp@uchicago.edu}, \url{http://home.uchicago.edu/~jhp/}.}
-
 \references{
  Jong Hee Park. 2010. ``Structural Change in the U.S. Presidents' Use of Force Abroad.''
  \emph{American Journal of Political Science} 54: 766-782.
@@ -126,7 +124,7 @@
  Siddhartha Chib. 1998. ``Estimation and comparison of multiple change-point models.''
    \emph{Journal of Econometrics}. 86: 221-241.
 
-Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
+ Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
  ``MCMCpack: Markov Chain Monte Carlo in R.'',
  \emph{Journal of Statistical Software}. 42(9): 1-21.
  \url{http://www.jstatsoft.org/v42/i09/}.
