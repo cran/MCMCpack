@@ -1,4 +1,4 @@
-d23b6139ada7ad5cbf63eea081e028a7 *DESCRIPTION
+d87b70b76d59e27d77863684d5f3f7e2 *DESCRIPTION
 b8394456a9bbe49e93b185257f83407e *NAMESPACE
 21f17b9451d7ec3760fe3fe69336fe0c *R/BayesFactors.R
 9c52f72ee21a71bfbfd312cb56233125 *R/HMMpanelFE.R
@@ -51,7 +51,7 @@ f799711e5d3fb7140cbc0995360339b3 *R/procrust.R
 c67ac5238de55cdc8c49d017e0226ed9 *R/tomog.R
 6377da3453982f578df4a886f673122c *R/utility.R
 7e2021def8a88edb41fe78d0a0ae642c *R/zzz.R
-7bf94529cc64482070ef07fa6805012c *README
+a49acfed057fd07c87e294015890c211 *README
 31f24d1e199bde63095dcfa4556e848b *cleanup
 ce8d6bc2b702996ba91799bc33b82840 *configure
 21e1a006fb388ed39daf16e6d2ec9549 *configure.ac
@@ -168,6 +168,7 @@ cfbd489b6fd8886e262a57ca9629c6da *src/MCMCresidualBreakAnalysis.cc
 ef5566f824887d9bbef5b76f1b64d839 *src/MCMCrng.h
 f28dc81e54a6ca54a2202a0d6f52ed40 *src/MCMCtobit.cc
 43f4124319734194009441b15aff3695 *src/Makevars.in
+b3e224bb1a8452c3da347348b8e510cc *src/Makevars.win
 6ba1ab7daac8f7149663686fd7abfd53 *src/SSVSquantreg.cc
 5362ed41a42ce34cf7817f6bfd988935 *src/algorithm.h
 80eab6b8072ae34de6c192af41324093 *src/datablock.h
