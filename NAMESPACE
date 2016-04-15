@@ -3,15 +3,12 @@ import("coda")
 import("MASS")
 import("stats")
 import("utils")
-importFrom(graphics, plot)
-import("graph")
 import("grDevices")
 import("lattice")
 import("methods")
 import("mcmc")
-import("Rgraphviz")
 import("quantreg")
-importFrom("graphics", "abline", "axTicks", "axis", "box", "layout",
+importFrom("graphics", "plot", "lines", "abline", "axTicks", "axis", "box", "layout",
            "lcm", "legend", "par", "plot.new", "plot.window", "points",
            "rect")
 
