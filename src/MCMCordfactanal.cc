@@ -221,21 +221,7 @@ void MCMCordfactanal_impl(rng<RNGTYPE>& stream,
     if ((iter >= burnin) && ((iter % thin==0))) {      
       // store Lambda
       if (storelambda) { 
-	if (outswitch == 2) { 
-	  for(unsigned int l = 0; l < K; ++l) {
-	    Lambda(l,0) = Lambda(l,0) * -1.0;
-	  }
-	}
-        // XXX delete when sure working
-	//Matrix<> Lambda_store_vec = reshape(Lambda, 1, K*D);
-	//for (unsigned int l = 0; l < K * D; ++l)
-	//	Lambda_store(count, l) = Lambda_store_vec(l);
         rmview(Lambda_store(count, _)) = Lambda;
-        //Rprintf("\n\n");
-        //for (int l = 0; l < K * D; ++l)
-        //  Rprintf("%10.5f", Lambda_store(count, l));
-        //Rprintf("\n\n");
-
       }
 			
       // store gamma

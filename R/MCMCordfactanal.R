@@ -373,7 +373,9 @@
     }
     if(case.switch==2) {
       attr(output,"title") <-
-        "MCMCpack K-Dimensional Item Response Theory Model Posterior Sample"
+          "MCMCpack K-Dimensional Item Response Theory Model Posterior Sample"
+      alphas <- grep("^alpha\\.", varnames(output))
+      output[,alphas] <- -1 * output[,alphas]
     }
     return(output)
     

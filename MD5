@@ -1,4 +1,4 @@
-f93e438a313020ce15e634db8c557b9d *DESCRIPTION
+f37e82e9907996b7057dac78f0c62ed1 *DESCRIPTION
 d332312be2ebe4eecbb2a8d76647127a *NAMESPACE
 21f17b9451d7ec3760fe3fe69336fe0c *R/BayesFactors.R
 9c52f72ee21a71bfbfd312cb56233125 *R/HMMpanelFE.R
@@ -25,7 +25,7 @@ ba21d6d4a4dcaaa56b6784b749bcbc07 *R/MCMClogit.R
 a6508dd38804705e750995ca27070cde *R/MCMCmnl.R
 4b7cb2b7fa8eb3d0435c55dfdcbed40e *R/MCMCoprobit.R
 6b63259803b2890eae6d5778592ed7dd *R/MCMCoprobitChange.R
-14e27069ba0fcfa26f3888f9466013e9 *R/MCMCordfactanal.R
+e21a56ae4dafe1aa4de0cdc75b342b75 *R/MCMCordfactanal.R
 d438fc9dabd9993da5d4a45a3df68c39 *R/MCMCpoisson.R
 cbf40bf99270db5f9dd8f4dea8f5274d *R/MCMCpoissonChange.R
 0fb7f4befd7db6df2f852b0b6e472237 *R/MCMCprobit.R
@@ -61,6 +61,7 @@ e17202d22ce5ab5ab7b01e3b248a4008 *data/Nethvote.rda
 accb7b5b46207a02e49de2702a6faff4 *data/Senate.rda
 ce79b1b47b561cb44dd4f93589d3d755 *data/SupremeCourt.rda
 a5cfcf73e21c03eeaf4f3baa5c492c14 *inst/CITATION
+564ae52a74cf7e8ff5a0445e58bfb380 *inst/HISTORY
 2b42855343b5f0c51c7e9411aef57509 *man/BayesFactor.Rd
 873c9a9c8f8e4808c417f14a857a562b *man/HMMpanelFE.Rd
 c199d84ef2c1edef1858a3b25b8189e0 *man/HMMpanelRE.Rd
@@ -155,7 +156,7 @@ eaab5804f229b660e958f6aa2cf728ba *src/MCMCmnl.h
 9f0c3eea4d8ecafe8ab931c12d1616f9 *src/MCMCmnlslice.cc
 0d7b2c13371662f7cf901ef5a7ec00a3 *src/MCMCoprobit.cc
 bdd18ead0856bbff8587b11639945699 *src/MCMCoprobitChange.cc
-6addbe81efb51cb4b8401e9a6931f782 *src/MCMCordfactanal.cc
+fb5a3f2c4ece479ba75dd03d86b3a9e0 *src/MCMCordfactanal.cc
 6bfed80bb7c109537461e6381837b6c4 *src/MCMCpoisson.cc
 a90346688ef620947dd846967e181603 *src/MCMCpoissonChange.cc
 84b94f6e67b026a915a23fb85bdaf00b *src/MCMCprobit.cc
