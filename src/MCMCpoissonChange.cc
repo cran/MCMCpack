@@ -858,7 +858,7 @@ void MCMCpoissonRegChangepoint_impl(rng<RNGTYPE>& stream,
     // compute marginal likelihood
     const double logprior = sum(density_beta_prior) + sum(density_P_prior);
     const double logmarglike = (loglike + logprior) - (pdf_beta + pdf_P);
-    if (verbose >0 ){
+    if (*verbose > 0){
       Rprintf("\nlogmarglike = %10.5f\n", logmarglike);
       Rprintf("loglike = %10.5f\n", loglike);
       Rprintf("log_prior = %10.5f\n", logprior);

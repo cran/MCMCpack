@@ -153,7 +153,7 @@ Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
   Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.
   ``Output Analysis and Diagnostics for MCMC (CODA)'',
    \emph{R News}. 6(1): 7-11.
-  \url{http://CRAN.R-project.org/doc/Rnews/Rnews_2006-1.pdf}.
+  \url{https://CRAN.R-project.org/doc/Rnews/Rnews_2006-1.pdf}.
 
   Jonathan C. Wakefield. 2004. ``Ecological Inference for 2 x 2 Tables.''
   \emph{Journal of the Royal Statistical Society, Series A}. 167(3): 385445.

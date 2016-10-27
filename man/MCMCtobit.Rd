@@ -135,7 +135,7 @@ Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
   Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.
   ``Output Analysis and Diagnostics for MCMC (CODA)'',
    \emph{R News}. 6(1): 7-11.
-  \url{http://CRAN.R-project.org/doc/Rnews/Rnews_2006-1.pdf}.
+  \url{https://CRAN.R-project.org/doc/Rnews/Rnews_2006-1.pdf}.
 
    Siddhartha Chib. 1992. ``Bayes inference in the Tobit censored regression model."
     \emph{Journal of Econometrics}. 51:79-99. 

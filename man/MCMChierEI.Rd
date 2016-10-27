@@ -156,7 +156,7 @@ MCMChierEI(r0, r1, c0, c1, burnin=5000, mcmc=50000, thin=1,
   Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.
   ``Output Analysis and Diagnostics for MCMC (CODA)'',
    \emph{R News}. 6(1): 7-11.
-  \url{http://CRAN.R-project.org/doc/Rnews/Rnews_2006-1.pdf}.
+  \url{https://CRAN.R-project.org/doc/Rnews/Rnews_2006-1.pdf}.
 }
 
 \examples{

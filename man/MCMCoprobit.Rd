@@ -146,7 +146,7 @@ that can be used to analyze the posterior sample.
   Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.
   ``Output Analysis and Diagnostics for MCMC (CODA)'',
    \emph{R News}. 6(1): 7-11.
-  \url{http://CRAN.R-project.org/doc/Rnews/Rnews_2006-1.pdf}.
+  \url{https://CRAN.R-project.org/doc/Rnews/Rnews_2006-1.pdf}.
 }
 
 
