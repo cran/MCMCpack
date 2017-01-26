@@ -36,9 +36,8 @@ Political Economic Risk Data from 62 Countries in 1987.
   \url{https://sites.google.com/site/joseantoniocheibub/datasets/democracy-and-development-aclp}.
 
   Witold J. Henisz. 2002. ``The Political Constraint Index (POLCON)
-  Dataset.'' \\
- \url{http://www-management.wharton.upenn.edu/henisz/POLCON/ContactInfo.html}.
-
+  Dataset.''
+  
   Monty G. Marshall, Ted Robert Gurr, and Barbara Harff. 2002. ``State
   Failure Task Force Problem Set.''
   

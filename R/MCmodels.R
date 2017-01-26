@@ -18,18 +18,18 @@
 MCbinomialbeta <- function(y, n, alpha=1, beta=1, mc=1000, ...) {
     
    # check data
-   if(y < 0) {
-      cat("Error: Number of successes negative.\n")
-      stop("Please respecify and call function again.")
+   if (any(y < 0)) {
+        cat("Error: Number of successes negative.\n")
+        stop("Please respecify and call function again.")
     }
-   if(n < 0) {
-      cat("Error: Number of trials negative.\n")
-      stop("Please respecify and call function again.")  
-   }
-   if(y > n) {
-      cat("Error: Number of successes greater than number of trials.\n")
-      stop("Please respecify and call function again.")   
-   }
+    if (any(n < 0)) {
+        cat("Error: Number of trials negative.\n")
+        stop("Please respecify and call function again.")
+    }
+    if (any(y > n)) {
+        cat("Error: Number of successes greater than number of trials.\n")
+        stop("Please respecify and call function again.")
+    }
    
    # check other parameters
    check.beta.prior(alpha, beta)

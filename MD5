@@ -1,4 +1,4 @@
-0b992436ebaad8bc6ac4241c23f24434 *DESCRIPTION
+99bee3a0c53fe85ff840e5d74ca9fbd0 *DESCRIPTION
 d332312be2ebe4eecbb2a8d76647127a *NAMESPACE
 21f17b9451d7ec3760fe3fe69336fe0c *R/BayesFactors.R
 9c52f72ee21a71bfbfd312cb56233125 *R/HMMpanelFE.R
@@ -35,12 +35,12 @@ fe5ffab10fce83348751c3bd7abaa83a *R/MCMCregress.R
 868cfbf83aef7ee5009e78e5c0bc36f7 *R/MCMCregressChange.R
 510f86a50f94be5b4bbd76cd361025f4 *R/MCMCresidualBreakAnalysis.R
 720834bbb59d6c4ce7c610acd22558be *R/MCMCtobit.R
-4d2218bcdb4715ac9d791f26d5469f9b *R/MCmodels.R
+619650c9a52a7c75c5accff93f97d266 *R/MCmodels.R
 3a98b4d919a265b46c29d14310bb90d4 *R/SSVSquantreg.R
 555c87acdcc2f8572b14151e29022e20 *R/SSVSquantregsummary.R
 fdfcfe9909cadaf15c47bbb604be2257 *R/automate.R
 49a5845b1a235ed9e931f8f57800eb71 *R/btsutil.R
-56829ce5340d26f9488b8b9894ff5cd0 *R/distn.R
+e2abfeb1bf83c932158f1a44a1701c0d *R/distn.R
 18daa9fee800c7d8d5827405738531e2 *R/hidden-hmodels.R
 4dc19c1cb7809d9be5e7353929358aa1 *R/hidden.R
 317675992da250e591e78cc96b10581b *R/make.breaklist.R
@@ -100,7 +100,7 @@ a96eacae6b64827e40505661fb636cd4 *man/MCbinomialbeta.Rd
 4f2164ebeaaf83bde6a7f6c78b718d32 *man/MCnormalnormal.Rd
 ecc40a241e849aacfa5ee3f17b8dd97d *man/MCpoissongamma.Rd
 c04a5372b5a75cf67ef78d7e94d121e9 *man/Nethvote.Rd
-f5d931ef328d5fd614ea8547a3f0f62a *man/PErisk.Rd
+154a77b28b02244aaa6283c33e1d1f6e *man/PErisk.Rd
 034a4e9a54b8eff7dddcee5d0a923a02 *man/PostProbMod.Rd
 aa99f8aa2b507bc8e1465a2b6e3993bd *man/QRSSVSplot.Rd
 594c242058a0e3f9f2b8b5d4067c5b72 *man/QRSSVSsummary.Rd

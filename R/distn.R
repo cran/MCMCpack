@@ -147,17 +147,20 @@
 #
 #   x    the PDF evaluated (scalar)
 #
-# ADM 8/16/2002
- 
+## ADM 8/16/2002
+## JHP 01/24/2017 updated
+## thanks to mathew simpson (themattsimpson@gmail.com)
+## for commenting and suggesting a code.
+
 "diwish" <-
   function(W, v, S) {
     if (!is.matrix(S))
       S <- matrix(S)
     if (nrow(S) != ncol(S)){
-      stop("W not square in diwish().\n")
+      stop("S not square in diwish().\n")
     }
     if (!is.matrix(W))
-      S <- matrix(W)
+      W <- matrix(W)
     if (nrow(W) != ncol(W)){
       stop("W not square in diwish().\n")
     }   
@@ -166,26 +169,21 @@
     }
     if (v < nrow(S)){
       stop("v is less than the dimension of S in  diwish().\n")
-    }
-    
-    k <- nrow(S)   
-
-    # denominator
-    gammapart <- 1
-    for(i in 1:k) {
-      gammapart <- gammapart * gamma((v + 1 - i)/2)
     } 
-    denom <- gammapart *  2^(v * k / 2) * pi^(k*(k-1)/4)
-  
-    # numerator
-    detS <- det(S)
-    detW <- det(W)
-    hold <- S %*% solve(W)
-    tracehold <- sum(hold[row(hold) == col(hold)])  
-    num <- detS^(v/2) * detW^(-(v + k + 1)/2) * exp(-1/2 * tracehold)
+    p <- nrow(S)
+    gammapart <- sum(lgamma((v + 1 - 1:p)/2))
+    ldenom <- gammapart + 0.5*v*p*log(2) + 0.25*p*(p-1)*log(pi)
+    cholS <- chol(S)
+    cholW <- chol(W)
+    halflogdetS <- sum(log(diag(cholS)))
+    halflogdetW <- sum(log(diag(cholW)))
+    invW <- chol2inv(cholW)
+    exptrace <- sum(S*invW)
+    lnum <- v*halflogdetS -(v + p + 1)*halflogdetW - 0.5*exptrace
+    lpdf <- lnum - ldenom
+    return(exp(lpdf))
+}
 
-    return(num / denom)
-  }
 
 ##
 ## Inverse Gamma
