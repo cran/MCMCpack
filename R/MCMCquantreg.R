@@ -1,9 +1,151 @@
+#' Bayesian quantile regression using Gibbs sampling
+#'
+#' This function fits quantile regression models under Bayesian inference.  The
+#' function samples from the posterior distribution using Gibbs sampling with
+#' data augmentation.  A multivariate normal prior is assumed for
+#' \eqn{\beta}. The user supplies the prior parameters.  A sample of the
+#' posterior distribution is returned as an mcmc object, which can then be
+#' analysed by functions in the coda package.
+#'
+#' \code{MCMCquantreg} simulates from the posterior distribution using Gibbs
+#' sampling with data augmentation (see
+#' \url{http://people.brunel.ac.uk/~mastkky/}).  \eqn{\beta} are drawn
+#' from a multivariate normal distribution. The augmented data are drawn
+#' conditionally from the inverse Gaussian distribution. The simulation is
+#' carried out in compiled C++ code to maximise efficiency.  Please consult the
+#' coda documentation for a comprehensive list of functions that can be used to
+#' analyse the posterior sample.
+#'
+#' We assume the model
+#'
+#' \deqn{Q_{\tau}(y_i|x_i) = x_i'\beta}
+#'
+#' where \eqn{Q_{\tau}(y_i|x_i)} denotes the
+#' conditional \eqn{\tau}th quantile of \eqn{y_i} given
+#' \eqn{x_i}, and \eqn{\beta=\beta(\tau)} are the
+#' regression parameters possibly dependent on \eqn{\tau}. The likelihood
+#' is formed based on assuming independent Asymmetric Laplace distributions on
+#' the \eqn{y_i} with skewness parameter \eqn{\tau} and location
+#' parameters \eqn{x_i'\beta}. This assumption ensures that the
+#' likelihood function is maximised by the \eqn{\tau}th conditional
+#' quantile of the response variable.  We assume standard, semi-conjugate
+#' priors on \eqn{\beta}:
+#'
+#' \deqn{\beta \sim \mathcal{N}(b_0,B_0^{-1})}
+#'
+#' Only starting values for
+#' \eqn{\beta} are allowed for this sampler.
+#'
+#' @param formula Model formula.
+#'
+#' @param data Data frame.
+#'
+#' @param tau The quantile of interest. Must be between 0 and 1. The default
+#' value of 0.5 corresponds to median regression.
+#'
+#' @param burnin The number of burn-in iterations for the sampler.
+#'
+#' @param mcmc The number of MCMC iterations after burnin.
+#'
+#' @param thin The thinning interval used in the simulation.  The number of
+#' MCMC iterations must be divisible by this value.
+#'
+#' @param verbose A switch which determines whether or not the progress of the
+#' sampler is printed to the screen.  If \code{verbose} is greater than 0 the
+#' iteration number and the most recently sampled values of \eqn{\beta}
+#' and \eqn{\sigma} are printed to the screen every \code{verbose}th
+#' iteration.
+#'
+#' @param seed The seed for the random number generator. If NA, the Mersenne
+#' Twister generator is used with default seed 12345; if an integer is passed
+#' it is used to seed the Mersenne twister. The default value for this argument
+#' is a random integer between 1 and 1,000,000. This default value ensures that
+#' if the function is used again with a different value of \eqn{\tau}, it
+#' is extremely unlikely that the seed will be identical. The user can also
+#' pass a list of length two to use the L'Ecuyer random number generator, which
+#' is suitable for parallel computation.  The first element of the list is the
+#' L'Ecuyer seed, which is a vector of length six or NA (if NA a default seed
+#' of \code{rep(12345,6)} is used).  The second element of list is a positive
+#' substream number. See the MCMCpack specification for more details.
+#'
+#' @param beta.start The starting values for \eqn{\beta}.  This can
+#' either be a scalar or a column vector with dimension equal to the dimension
+#' of \eqn{\beta}.  The default value of NA will use the OLS estimate
+#' \eqn{\hat{\beta}} with
+#' \eqn{\hat{\sigma}\Phi^{-1}(\tau)} added on to the
+#' first element of \eqn{\hat{\beta}} as the starting value.
+#' (\eqn{\hat{\sigma}^2} denotes the usual unbiased estimator of
+#' \eqn{\sigma^2} under ordinary mean regression and
+#' \eqn{\Phi^{-1}(\tau)} denotes the inverse of the cumulative
+#' density function of the standard normal distribution.)  Note that the
+#' default value assume that an intercept is included in the model.  If a
+#' scalar is given, that value will serve as the starting value for all
+#' \eqn{\beta}.
+#'
+#' @param b0 The prior mean of \eqn{\beta}.  This can either be a scalar
+#' or a column vector with dimension equal to the dimension of
+#'
+#' \eqn{\beta}. If this takes a scalar value, then that value will serve
+#' as the prior mean for all \eqn{\beta}.
+#'
+#' @param B0 The prior precision of \eqn{\beta}.  This can either be a
+#' scalar or a square matrix with dimensions equal to the number of betas.  If
+#' this takes a scalar value, then that value times an identity matrix serves
+#' as the prior precision of \eqn{\beta}. Default value of 0 is
+#' equivalent to an improper uniform prior for \eqn{\beta}.
+#'
+#' @param ... further arguments to be passed
+#'
+#' @return An mcmc object that contains the posterior sample.  This object can
+#' be summarised by functions provided by the coda package.
+#'
+#' @export
+#'
+#' @author Craig Reed
+#'
+#' @seealso \code{\link[MCMCpack]{MCMCregress}}, \code{\link[coda]{plot.mcmc}},
+#' \code{\link[coda]{summary.mcmc}}, \code{\link[stats]{lm}},
+#' \code{\link[quantreg]{rq}}
+#'
+#' @references Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.
+#' \emph{Scythe Statistical Library 1.2.} \url{http://scythe.wustl.edu}.
+#'
+#' Craig Reed and Keming Yu. 2009. ``An Efficient Gibbs Sampler for Bayesian
+#' Quantile Regression.'' Technical Report.
+#'
+#' Keming Yu and Jin Zhang. 2005. ``A Three Parameter Asymmetric Laplace
+#' Distribution and it's extensions.'' \emph{Communications in Statistics -
+#' Theory and Methods}, 34, 1867-1879.
+#'
+#' Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.  ``Output
+#' Analysis and Diagnostics for MCMC (CODA)'', \emph{R News}. 6(1): 7-11.
+#' \url{https://CRAN.R-project.org/doc/Rnews/Rnews_2006-1.pdf}.
+#'
+#' @keywords models
+#'
+#' @examples
+#'
+#' \dontrun{
+#'
+#' x<-rep(1:10,5)
+#' y<-rnorm(50,mean=x)
+#' posterior_50 <- MCMCquantreg(y~x)
+#' posterior_95 <- MCMCquantreg(y~x, tau=0.95, verbose=10000,
+#'     mcmc=50000, thin=10, seed=2)
+#' plot(posterior_50)
+#' plot(posterior_95)
+#' raftery.diag(posterior_50)
+#' autocorr.plot(posterior_95)
+#' summary(posterior_50)
+#' summary(posterior_95)
+#' }
+#'
 "MCMCquantreg" <-
   function(formula, data=NULL, tau=0.5, burnin = 1000, mcmc = 10000,
            thin=1, verbose = 0, seed = sample(1:1000000,1), beta.start = NA,
-           b0 = 0, B0 = 0, 
+           b0 = 0, B0 = 0,
            ...) {
-    
+
     ## checks
     check.offset(list(...))
     check.mcmc.parameters(burnin, mcmc, thin)
@@ -12,9 +154,9 @@
     if (tau<=0 || tau>=1){
 	stop("tau must be in (0,1). \nPlease respecify and call again.\n")
 	}
-    
+
     ## seeds
-    seeds <- form.seeds(seed) 
+    seeds <- form.seeds(seed)
     lecuyer <- seeds[[1]]
     seed.array <- seeds[[2]]
     lecuyer.stream <- seeds[[3]]
@@ -23,9 +165,9 @@
     holder <- parse.formula(formula, data=data)
     Y <- holder[[1]]
     X <- holder[[2]]
-    xnames <- holder[[3]]    
+    xnames <- holder[[3]]
     K <- ncol(X)  # number of covariates
-        
+
     ## starting values and priors
     ols.fit <- lm(formula, data=data)
     defaults <- matrix(coef(ols.fit),K,1)
@@ -34,36 +176,36 @@
     mvn.prior <- form.mvn.prior(b0, B0, K)
     b0 <- mvn.prior[[1]]
     B0 <- mvn.prior[[2]]
-    
+
 
     B0.eigenvalues <- eigen(B0)$values
     if (min(B0.eigenvalues) < 0){
       stop("B0 is not positive semi-definite.\nPlease respecify and call again.\n")
     }
-    
 
-    
+
+
     ## define holder for posterior sample
     sample <- matrix(data=0, mcmc/thin, K)
-    posterior <- NULL 
-    
+    posterior <- NULL
+
     ## call C++ code to draw samples
-    auto.Scythe.call(output.object="posterior", cc.fun.name="MCMCquantreg", 
-                     sample.nonconst=sample, tau=as.double(tau), Y=Y, X=X, 
+    auto.Scythe.call(output.object="posterior", cc.fun.name="cMCMCquantreg",
+                     sample.nonconst=sample, tau=as.double(tau), Y=Y, X=X,
                      burnin=as.integer(burnin),
                      mcmc=as.integer(mcmc), thin=as.integer(thin),
-                     lecuyer=as.integer(lecuyer), 
+                     lecuyer=as.integer(lecuyer),
                      seedarray=as.integer(seed.array),
                      lecuyerstream=as.integer(lecuyer.stream),
                      verbose=as.integer(verbose), betastart=beta.start,
                      b0=b0, B0=B0, package="MCMCpack")
 
-    
+
 ## pull together matrix and build MCMC object to return
     output <- form.mcmc.object(posterior,
                                names=xnames,
                                title="MCMCquantreg Posterior Sample",
                                y=Y, call=cl)
-    
+
     return(output)
 }

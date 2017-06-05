@@ -24,19 +24,55 @@
 ##    and Jong Hee Park
 ##########################################################################
 
+
+#' Procrustes Transformation
+#'
+#' This function performs a Procrustes transformation on a matrix \code{X} to
+#' minimize the squared distance between \code{X} and another matrix
+#' \code{Xstar}.
+#'
+#' \code{R}, \code{tt}, and \code{s} are chosen so that:
+#'
+#' \deqn{s X R + 1 tt' \approx X^*}
+#'
+#' \code{X.new} is given by:
+#'
+#' \deqn{X_{new} = s X R + 1 tt'}
+#'
+#' @param X The matrix to be transformed.
+#'
+#' @param Xstar The target matrix.
+#'
+#' @param translation logical value indicating whether \code{X} should be
+#' translated.
+#'
+#' @param dilation logical value indicating whether \code{X} should be dilated.
+#'
+#' @return A list containing: \code{X.new} the matrix that is the Procrustes
+#' transformed version of \code{X}, \code{R} the rotation matrix, \code{tt} the
+#' translation vector, and \code{s} the scale factor.
+#'
+#' @export
+#'
+#' @seealso \code{\link{MCMCirtKd}}
+#'
+#' @references Borg and Groenen. 1997. \emph{Modern Multidimensional Scaling}.
+#' New York: Springer. pp. 340-342.
+#'
+#' @keywords manip
 procrustes <- function(X, Xstar, translation=FALSE, dilation=FALSE){
   if (nrow(X) != nrow(Xstar)){
     cat("X and Xstar do not have same number of rows.\n")
-    stop("Check data and call procrustes() again. \n") 
+    stop("Check data and call procrustes() again. \n")
   }
   if (ncol(X) != ncol(Xstar)){
     cat("X and Xstar do not have same number of columns.\n")
-    stop("Check data and call procrustes() again. \n") 
+    stop("Check data and call procrustes() again. \n")
   }
 
   n <- nrow(X)
   m <- ncol(X)
-  
+
   if (translation){
     J <- diag(n) - 1/n * matrix(1, n, n)
   }
@@ -65,10 +101,6 @@ procrustes <- function(X, Xstar, translation=FALSE, dilation=FALSE){
   }
 
   X.new <- s * X %*% R + matrix(tt, nrow(X), ncol(X), byrow=TRUE)
-  
-  return(list(X.new=X.new, R=R, tt=tt, s=s))  
+
+  return(list(X.new=X.new, R=R, tt=tt, s=s))
 }
-
-
-
-

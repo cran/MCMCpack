@@ -7,7 +7,7 @@
 ##    University of Chicago
 ##    jhp@uchicago.edu
 ##
-## Revised on 09/12/2007 JHP	  
+## Revised on 09/12/2007 JHP
 ##
 ## NOTE: only the plot functions are documented and exported in the
 ## NAMESPACE.
@@ -26,16 +26,55 @@
 ##############################################################
 ## Helper functions for MCMCpoissonChange and MCMCbinaryChange()
 ##############################################################
-    
+
+
+## code as shown in Gelman and Vehtari (2014)
+colVars <- function(a) {
+    n <- dim(a)[[1]]; c <- dim(a)[[2]];
+    return(.colMeans(((a - matrix(.colMeans(a, n, c), nrow = n, ncol =
+                                      c, byrow = TRUE)) ^ 2), n, c) * n / (n - 1))}
+
+waic <- function(log_lik){
+    ## log_lik <- extract (stanfit, "log_lik")$log_lik
+    dim(log_lik) <- if (length(dim(log_lik))==1) c(length(log_lik),1) else
+    c(dim(log_lik)[1], prod(dim(log_lik)[2:length(dim(log_lik))]))
+    S <- nrow(log_lik)
+    n <- ncol(log_lik)
+    lpd <- log(colMeans(exp(log_lik)))
+    p_waic <- colVars(log_lik)
+    p_waic1 <- 2*(log(colMeans(exp(log_lik))) - colMeans(log_lik))
+    elpd_waic <- lpd - p_waic
+    waic <- -2*elpd_waic
+    waic2 <- -2*(lpd - p_waic1)
+    loo_weights_raw <- 1/exp(log_lik-max(log_lik))
+    loo_weights_normalized <- loo_weights_raw/
+        matrix(colMeans(loo_weights_raw),nrow=S,ncol=n,byrow=TRUE)
+    loo_weights_regularized <- pmin (loo_weights_normalized, sqrt(S))
+    elpd_loo <- log(colMeans(exp(log_lik)*loo_weights_regularized)/
+                        colMeans(loo_weights_regularized))
+    p_loo <- lpd - elpd_loo
+    pointwise <- cbind(waic,waic2, lpd,p_waic,p_waic1, elpd_waic,p_loo,elpd_loo)
+    total <- colSums(pointwise)
+    ## this is strange? SE = s/sqrt(n)
+    se <- sqrt(n*colVars(pointwise))
+    ## se <- sqrt(colVars(pointwise)/n)
+    waic.ci <- c(total[1] - 1.96*se[1], total[1] + 1.96*se[1])
+    return(list(waic=total["waic"], waic2=total["waic2"],  elpd_waic=total["elpd_waic"],
+                p_waic=total["p_waic"], p_waic1 = total["p_waic1"], elpd_loo=total["elpd_loo"], p_loo=total["p_loo"],
+                pointwise=pointwise, total=total, se=se, waic.ci=waic.ci))
+}
+#
+
+
 ## switch a state vector into a matrix containing the number of states
-"switchg" <-  function(s1){    
+"switchg" <-  function(s1){
   s <- max(s1)
   out <- matrix(0,s,s)
-  
+
   ## all P(i,i+1) are 1
   for (i in 1:(s-1)){
     out[i,i+1] <- 1}
-  
+
   ## diagonal elements is (the number of occurrence - 1)
   diag(out) <- table(s1)-1
   return(out)
@@ -58,9 +97,37 @@
   ## put b in trans[i, i+1]
   for (i in 1:m){trans[i, i+1]<-b}
   return(trans)
-} 
+}
 
-## "plotState" draws a plot of posterior distribution of states 
+## "plotState" draws a plot of posterior distribution of states
+
+#' Changepoint State Plot
+#'
+#' Plot the posterior probability that each time point is in each state.
+#'
+#' @param mcmcout The \code{mcmc} object containing the posterior density
+#' sample from a changepoint model.  Note that this must have a
+#' \code{prob.state} attribute.
+#'
+#' @param main Title of the plot.
+#'
+#' @param ylab Label for the y-axis.
+#'
+#' @param legend.control Control the location of the legend.  It is necessary
+#' to pass both the x and y locations; i.e., \code{c(x,y)}.
+#'
+#' @param cex Control point size.
+#'
+#' @param lwd Line width parameter.
+#'
+#' @param start The time of the first observation to be shown in the time
+#' series plot.
+#'
+#' @export
+#'
+#' @seealso \code{\link{MCMCpoissonChange}}, \code{\link{MCMCbinaryChange}}
+#'
+#' @keywords hplot
 "plotState" <-
   function (mcmcout, main="Posterior Regime Probability", ylab=expression(paste("Pr(", S[t], "= k |", Y[t], ")")),
             legend.control = NULL, cex = 0.8, lwd = 1.2, start=1)
@@ -68,19 +135,20 @@
     out <- attr(mcmcout, "prob.state")
     y <- attr(mcmcout, "y")
     m <- attr(mcmcout, "m")
-    
+
     if (!is.ts(y))
       y <- ts(y, start)
     time.frame <- as.vector(time(y))
-    
+
     plot(start, 0, xlim = range(time.frame), ylim = c(0, 1), type = "n",
          main = main, xlab = "Time", cex = cex, lwd = lwd,
          ylab = ylab, axes=F)
     axis(1, tick = FALSE, col="darkgrey")
     axis(2, tick = FALSE, col="darkgrey")
-    for (i in 1:length(axTicks(1))) lines(c(axTicks(1)[i], axTicks(1)[i]), c(0,1), col="darkgrey")
-    for (i in 1:length(axTicks(2))) lines(c(axTicks(2)[i], max(axTicks(1))), c(axTicks(2)[i], axTicks(2)[i]), col="darkgrey")
-     
+    for (i in 1:length(axTicks(1))) lines(c(axTicks(1)[i], axTicks(1)[i]), c(0,1), col="darkgrey", lwd=0.5)
+    for (i in 1:length(axTicks(2))) lines(c(axTicks(2)[1], max(time.frame)),
+                                          c(axTicks(2)[i], axTicks(2)[i]), col="darkgrey", lwd=0.5)
+
     for (i in 1:(m + 1)) points(time.frame, out[, i], type = "o",
                                 lty = i, lwd = lwd, col = i, cex = cex)
     if (!is.null(legend.control)) {
@@ -96,70 +164,115 @@
 
 ## "plotChangepoint" draws a plot of posterior changepoint probability
 ## Thanks to Patrick Brandt for providing the idea of overlaying.
+
+#' Posterior Density of Regime Change Plot
+#'
+#' Plot the posterior density of regime change.
+#'
+#' @param mcmcout The \code{mcmc} object containing the posterior density
+#' sample from a changepoint model.  Note that this must have a
+#'
+#' \code{prob.state} attribute.
+#'
+#' @param main Title of the plot
+#'
+#' @param xlab Label for the x-axis.
+#'
+#' @param ylab Label for the y-axis.
+#'
+#' @param verbose If \code{verbose=TRUE}, expected changepoints are printed.
+#'
+#' @param start The time of the first observation to be shown in the time
+#' series plot.
+#'
+#' @param overlay If \code{overlay=TRUE}, the probability of each regime change is
+#' drawn separately, which will be useful to draw multiple plots in one screen.
+#' See the example in \code{MCMCpoissonChange}. Otherwise, multiple plots of
+#' regime change probabilities will be drawn.
+#'
+#' @export
+#'
+#' @seealso \code{\link{MCMCpoissonChange}}, \code{\link{MCMCbinaryChange}}
+#'
+#' @keywords hplot
 "plotChangepoint" <-
   function (mcmcout, main="Posterior Density of Regime Change Probabilities", xlab = "Time", ylab = "",
-            verbose = FALSE, start=1, overlay=FALSE)
-  {
-    out <- attr(mcmcout, "prob.state")
-    y <- attr(mcmcout, "y")
-    m <- attr(mcmcout, "m")
-    if(overlay==FALSE){
-      par(mfrow = c(m, 1), mar = c(2, 4, 1, 1))
-    }
-    if (!is.ts(y))
-      y <- ts(y, start)
-    time.frame <- as.vector(time(y))
-    
-    if (m == 1) {
-      pr.st <- c(0, diff(out[, (m + 1)]))
-      pr.st[pr.st<0] <- 0           
-      plot(time.frame, pr.st, type = "h", lwd=2, main = main, xlab = xlab, ylab = ylab, axes=F)
-      axis(1, tick = FALSE, col="darkgrey")
-      axis(2, tick = FALSE, col="darkgrey")
-      for (i in 1:length(axTicks(1))) lines(c(axTicks(1)[i], axTicks(1)[i]), c(0, max(axTicks(2))), col="darkgrey")
-      for (i in 1:length(axTicks(2))) lines(c(axTicks(2)[i], max(axTicks(1))), c(axTicks(2)[i], axTicks(2)[i]), col="darkgrey")
-      cp <- which(cumsum(pr.st) > 0.5)[1] - 1
-      lines(c(cp + time.frame[1], cp + time.frame[1]), c(0, max(axTicks(2))), lty = 3, col = "red")
-    }
-    
-    else {
-      cp <- rep(NA, m)
-      for (i in 2:m) {
-        pr.st <- c(0, diff(out[, i]))
-        pr.st <- ifelse(pr.st < 0, 0, pr.st)
-        plot(time.frame, pr.st, type = "h", lwd=2, main = "", xlab = xlab, ylab = ylab, col="black", axes=FALSE)
-        axis(1, tick = FALSE, col="darkgrey")
-        axis(2, tick = FALSE, col="darkgrey")
-        for (k in 1:length(axTicks(1))) {lines(c(axTicks(1)[k], axTicks(1)[k]), c(0, max(axTicks(2))), col="darkgrey")}
-        for (k in 1:length(axTicks(2))) {lines(c(axTicks(2)[k], max(axTicks(1))), c(axTicks(2)[k], axTicks(2)[k]),
-                                              col="darkgrey")}
-        cp[i - 1] <- which(cumsum(pr.st) > 0.5)[1] - 1
-        lines(c(cp[i - 1] + time.frame[1], cp[i - 1] + time.frame[1]), c(0, max(axTicks(2))), lty = 3, col = "red")
+            verbose = FALSE, start=1, overlay=FALSE){
+      out <- attr(mcmcout, "prob.state")
+      y <- attr(mcmcout, "y")
+      m <- attr(mcmcout, "m")
+      if(overlay==FALSE){
+          par(mfrow = c(m, 1), mar = c(2, 4, 1, 1))
       }
-      pr.st <- c(0, diff(out[, (m + 1)]))
-      pr.st[pr.st<0] <- 0           
-      plot(time.frame, pr.st, type = "h", lwd=2, main = main, xlab = xlab, ylab = ylab, col="black", axes=FALSE)
-      axis(1, tick = FALSE, col="darkgrey")
-      axis(2, tick = FALSE, col="darkgrey")
-      for (k in 1:length(axTicks(1))) {lines(c(axTicks(1)[k], axTicks(1)[k]), c(0, max(axTicks(2))), col="darkgrey")}
-      for (k in 1:length(axTicks(2))) {lines(c(axTicks(2)[k], max(axTicks(1))), c(axTicks(2)[k], axTicks(2)[k]),
-                                              col="darkgrey")}
-      cp[m] <- which(cumsum(pr.st) > 0.5)[1] - 1
-      lines(c(cp[m] + time.frame[1], cp[m] + time.frame[1]), c(0, max(axTicks(2))), lty = 3, col = "red")
-    }
+      if (!is.ts(y))
+          y <- ts(y, start)
+      time.frame <- as.vector(time(y))
 
-    cp.means <- rep(NA, m + 1)
-    cp.start <- c(1, cp + 1)
-    cp.end <- c(cp, length(y))
+      if (m == 1) {
+          pr.st <- c(0, diff(out[, (m + 1)]))
+          pr.st[pr.st<0] <- 0
+          plot(time.frame, pr.st, type = "h", lwd=2, main = main, ylim=c(0, max(pr.st)), xlab = xlab, ylab = ylab, axes=FALSE)
+          axis(1, tick = FALSE, col="darkgrey", lwd=0.5)
+          axis(2, tick = FALSE, col="darkgrey", lwd=0.5)
+          for (i in 1:length(axTicks(1))) lines(c(axTicks(1)[i], axTicks(1)[i]), c(0,1), col="darkgrey", lwd=0.5)
+          for (i in 1:length(axTicks(2))) lines(c(axTicks(2)[1], max(time.frame)),
+                                                c(axTicks(2)[i], axTicks(2)[i]), col="darkgrey", lwd=0.5)
 
-    if (verbose == TRUE){
-      cat("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
-      cat("Expected changepoint(s) ", cp + time.frame[1], "\n")
-      for (i in 1:(m + 1)) cp.means[i] <- mean(y[cp.start[i]:cp.end[i]])
-      cat("Local means for each regime are ", cp.means, "\n")
-      cat("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
-    }
+          ## for (i in 1:length(axTicks(1))) lines(c(axTicks(1)[i], axTicks(1)[i]), c(0, max(axTicks(2))), col="darkgrey")
+          ## for (i in 1:length(axTicks(2))) lines(c(axTicks(2)[1], max(axTicks(1))), c(axTicks(2)[i], axTicks(2)[i]), col="darkgrey")
+          cp <- which(cumsum(pr.st) > 0.5)[1] - 1
+          lines(c(cp + time.frame[1], cp + time.frame[1]), c(0, max(axTicks(2))), lty = 3, col = "red")
+          points(cp + time.frame[1], 0, cex = 1.5, pch=21, col = "red")
+      }else {
+          cp <- rep(NA, m)
+          for (i in 2:m) {
+              pr.st <- c(0, diff(out[, i]))
+              pr.st <- ifelse(pr.st < 0, 0, pr.st)
+              if(i == 2){
+                  plot(time.frame, pr.st, type = "h", lwd=2, main = main, xlab = xlab, ylab = ylab, col="black", axes=FALSE)
+              }else{
+                  plot(time.frame, pr.st, type = "h", lwd=2, main = "", xlab = xlab, ylab = ylab, col="black", axes=FALSE)
+              }
+              axis(1, tick = FALSE, col="darkgrey", lwd=0.5)
+              axis(2, tick = FALSE, col="darkgrey", lwd=0.5)
+              for (k in 1:length(axTicks(1))) {lines(c(axTicks(1)[k], axTicks(1)[k]), c(0, max(axTicks(2))),
+                                                     col="darkgrey", lwd=0.5)}
+              ## for (i in 1:length(axTicks(2))) lines(c(axTicks(2)[1], max(time.frame)),
+              ##                                       c(axTicks(2)[i], axTicks(2)[i]), col="darkgrey", lwd=0.5)
+              for (k in 1:length(axTicks(2))) {lines(c(axTicks(2)[1], max(axTicks(1))), c(axTicks(2)[k], axTicks(2)[k]),
+                                                     col="darkgrey", lwd=0.5)}
+              cp[i - 1] <- which(cumsum(pr.st) > 0.5)[1] - 1
+              lines(c(cp[i - 1] + time.frame[1], cp[i - 1] + time.frame[1]), c(0, max(axTicks(2))), lty = 3, col = "red")
+              points(cp[i - 1] + time.frame[1], 0, cex = 0.8, pch=21, col = "red")
+        }
+          pr.st <- c(0, diff(out[, (m + 1)]))
+          pr.st[pr.st<0] <- 0
+          plot(time.frame, pr.st, type = "h", lwd=2, main = "", xlab = xlab, ylab = ylab, col="black", axes=FALSE)
+          axis(1, tick = FALSE, col="darkgrey")
+          axis(2, tick = FALSE, col="darkgrey")
+          for (k in 1:length(axTicks(1))) {lines(c(axTicks(1)[k], axTicks(1)[k]), c(0, max(axTicks(2))), col="darkgrey")}
+          for (k in 1:length(axTicks(2))) {lines(c(axTicks(2)[1], max(axTicks(1))), c(axTicks(2)[k], axTicks(2)[k]),
+                                                 col="darkgrey")}
+          cp[m] <- which(cumsum(pr.st) > 0.5)[1] - 1
+          lines(c(cp[m] + time.frame[1], cp[m] + time.frame[1]), c(0, max(axTicks(2))), lty = 3, col = "red")
+        points(cp[m] + time.frame[1], 0, cex = 0.8, pch=21, col = "red")
+      }
+
+      cp.means <- rep(NA, m + 1)
+      cp.start <- c(1, cp + 1)
+      cp.end <- c(cp, length(y))
+
+      if (verbose == TRUE){
+          cat("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
+          cat("Expected changepoint(s) ", cp + time.frame[1], "\n")
+          for (i in 1:(m + 1)) cp.means[i] <- mean(y[cp.start[i]:cp.end[i]])
+          cat("Local means for each regime are ", cp.means, "\n")
+          cat("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
+      }
+      cat("Expected changepoint(s) \n")
+      return(cp + time.frame[1])
   }
+
 
 ## prior check for transition matrix
 "check.P" <- function(P.start = NA, m=m, n=n, a=a, b=b){
@@ -253,9 +366,9 @@ plotIntervention <- function(mcmcout, forward = TRUE, start = 1,
                              alpha = 0.05, col = "red", main="", ylab="", xlab=""){
   ## pull inputs
   y <- ts(attr(mcmcout, "y"), start=start)
-  inter <- attr(mcmcout, "intervention") 
+  inter <- attr(mcmcout, "intervention")
   N <- length(y)
-  
+
   ## draw a plot
   plot(y, main=main, ylab=ylab, xlab=xlab)
   abline(v = time(y)[inter], lty=2)

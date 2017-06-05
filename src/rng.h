@@ -631,7 +631,7 @@ namespace scythe {
         SCYTHE_CHECK_10(n == 0 || p <= 0 || p > 1, scythe_invalid_arg,
             "n == 0, p <= 0, or p > 1");
 
-        return rpois(rgamma(n, (1 - p) / p));
+        return rpois(rgamma(n, p / (1 - p)));
       }
 
       SCYTHE_RNGMETH_MATRIX(rnbinom, unsigned int,

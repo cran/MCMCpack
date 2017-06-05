@@ -32,23 +32,273 @@
 ## Dept. of Government
 ## Harvard University
 ## kevin_quinn@harvard.edu
-## 
+##
 ## This software is distributed under the terms of the GNU GENERAL
 ## PUBLIC LICENSE Version 2, June 1991.  See the package LICENSE
 ## file for more information.
 ##
 ## Copyright (C) 2011 Andrew D. Martin and Kevin M. Quinn
-## 
+##
 ####################################################################
 ##
-## Revisions: 
+## Revisions:
 ## - G. Vieilledent, May 9 2011 [initial file]
 ##
 ####################################################################
 
 
+#' Markov Chain Monte Carlo for the Hierarchical Poisson Linear Regression
+#' Model using the log link function
+#'
+#' MCMChpoisson generates a sample from the posterior distribution of a
+#' Hierarchical Poisson Linear Regression Model using the log link function and
+#' Algorithm 2 of Chib and Carlin (1999). This model uses a multivariate Normal
+#' prior for the fixed effects parameters, an Inverse-Wishart prior on the
+#' random effects variance matrix, and an Inverse-Gamma prior on the variance
+#' modelling over-dispersion. The user supplies data and priors, and a sample
+#' from the posterior distribution is returned as an mcmc object, which can be
+#' subsequently analyzed with functions provided in the coda package.
+#'
+#'
+#' \code{MCMChpoisson} simulates from the posterior distribution sample using
+#' the blocked Gibbs sampler of Chib and Carlin (1999), Algorithm 2. The
+#' simulation is done in compiled C++ code to maximize efficiency. Please
+#' consult the coda documentation for a comprehensive list of functions that
+#' can be used to analyze the posterior sample.
+#'
+#' The model takes the following form:
+#'
+#' \deqn{y_i \sim \mathcal{P}oisson(\lambda_i)}
+#'
+#' With latent variables \eqn{\phi(\lambda_i)}, \eqn{\phi} being the
+#' log link function:
+#'
+#' \deqn{\phi(\lambda_i) = X_i \beta + W_i b_i + \varepsilon_i}
+#'
+#' Where each group \eqn{i} have \eqn{k_i} observations.
+#'
+#' Where the random effects:
+#'
+#' \deqn{b_i \sim \mathcal{N}_q(0,V_b)}
+#'
+#' And the over-dispersion terms:
+#'
+#' \deqn{\varepsilon_i \sim \mathcal{N}(0, \sigma^2 I_{k_i})}
+#'
+#' We assume standard, conjugate priors:
+#'
+#' \deqn{\beta \sim \mathcal{N}_p(\mu_{\beta},V_{\beta})}
+#'
+#' And:
+#'
+#' \deqn{\sigma^{2} \sim \mathcal{IG}amma(\nu, 1/\delta)}
+#'
+#' And:
+#'
+#' \deqn{V_b \sim \mathcal{IW}ishart(r, rR)} See Chib and Carlin (1999) for more
+#' details.
+#'
+#' \emph{NOTE:} We do not provide default parameters for the priors on the
+#' precision matrix for the random effects. When fitting one of these models,
+#' it is of utmost importance to choose a prior that reflects your prior
+#' beliefs about the random effects. Using the \code{dwish} and \code{rwish}
+#' functions might be useful in choosing these values.
+#'
+#' @param fixed A two-sided linear formula of the form 'y~x1+...+xp' describing
+#' the fixed-effects part of the model, with the response on the left of a '~'
+#' operator and the p fixed terms, separated by '+' operators, on the right.
+#' Response variable y must be 0 or 1 (Binomial process).
+#'
+#' @param random A one-sided formula of the form '~x1+...+xq' specifying the
+#' model for the random effects part of the model, with the q random terms,
+#' separated by '+' operators.
+#'
+#' @param group String indicating the name of the grouping variable in
+#' \code{data}, defining the hierarchical structure of the model.
+#'
+#' @param data A data frame containing the variables in the model.
+#'
+#' @param burnin The number of burnin iterations for the sampler.
+#'
+#' @param mcmc The number of Gibbs iterations for the sampler. Total number of
+#' Gibbs iterations is equal to \code{burnin+mcmc}. \code{burnin+mcmc} must be
+#' divisible by 10 and superior or equal to 100 so that the progress bar can be
+#' displayed.
+#'
+#' @param thin The thinning interval used in the simulation. The number of mcmc
+#' iterations must be divisible by this value.
+#'
+#' @param seed The seed for the random number generator. If NA, the Mersenne
+#' Twister generator is used with default seed 12345; if an integer is passed
+#' it is used to seed the Mersenne twister.
+#'
+#' @param verbose A switch (0,1) which determines whether or not the progress
+#' of the sampler is printed to the screen. Default is 1: a progress bar is
+#' printed, indicating the step (in \%) reached by the Gibbs sampler.
+#'
+#' @param beta.start The starting values for the \eqn{\beta} vector. This
+#' can either be a scalar or a p-length vector. The default value of NA will
+#' use the OLS \eqn{\beta} estimate of the corresponding Gaussian Linear
+#' Regression without random effects. If this is a scalar, that value will
+#' serve as the starting value mean for all of the betas.
+#'
+#' @param sigma2.start Scalar for the starting value of the residual error
+#' variance. The default value of NA will use the OLS estimates of the
+#' corresponding Gaussian Linear Regression without random effects.
+#'
+#' @param Vb.start The starting value for variance matrix of the random
+#' effects. This must be a square q-dimension matrix. Default value of NA uses
+#' an identity matrix.
+#'
+#' @param mubeta The prior mean of \eqn{\beta}. This can either be a
+#' scalar or a p-length vector. If this takes a scalar value, then that value
+#' will serve as the prior mean for all of the betas. The default value of 0
+#' will use a vector of zeros for an uninformative prior.
+#'
+#' @param Vbeta The prior variance of \eqn{\beta}.  This can either be a
+#' scalar or a square p-dimension matrix. If this takes a scalar value, then
+#' that value times an identity matrix serves as the prior variance of beta.
+#' Default value of 1.0E6 will use a diagonal matrix with very large variance
+#' for an uninformative flat prior.
+#'
+#' @param r The shape parameter for the Inverse-Wishart prior on variance
+#' matrix for the random effects. r must be superior or equal to q. Set r=q for
+#' an uninformative prior. See the NOTE for more details.
+#'
+#' @param R The scale matrix for the Inverse-Wishart prior on variance matrix
+#' for the random effects. This must be a square q-dimension matrix. Use
+#' plausible variance regarding random effects for the diagonal of R. See the
+#' NOTE for more details.
+#'
+#' @param nu The shape parameter for the Inverse-Gamma prior on the residual
+#' error variance. Default value is \code{nu=delta=0.001} for uninformative
+#' prior.
+#'
+#' @param delta The rate (1/scale) parameter for the Inverse-Gamma prior on the
+#' residual error variance. Default value is \code{nu=delta=0.001} for
+#' uninformative prior.
+#'
+#' @param FixOD A switch (0,1) which determines whether or not the variance for
+#' over-dispersion (sigma2) should be fixed (1) or not (0). Default is 0,
+#' parameter sigma2 is estimated. If FixOD=1, sigma2 is fixed to the value
+#' provided for \code{sigma2.start}.
+#'
+#' @param ... further arguments to be passed
+#'
+#' @return
+#'
+#' \item{mcmc}{An mcmc object that contains the posterior sample. This
+#' object can be summarized by functions provided by the coda
+#' package. The posterior sample of the deviance \eqn{D}, with
+#' \eqn{D=-2\log(\prod_i P(y_i|\lambda_i))}, is also provided.}
+#'
+#' \item{lambda.pred}{Predictive posterior mean for the exponential of
+#' the latent variables. The approximation of Diggle et al. (2004) is
+#' used to marginalized with respect to over-dispersion terms:
+#'
+#' \deqn{E[\lambda_i|\beta,b_i,\sigma^2]=\phi^{-1}((X_i \beta+W_i b_i)+0.5 \sigma^2)}}
+#'
+#' @export
+#'
+#' @author Ghislain Vieilledent <ghislain.vieilledent@@cirad.fr>
+#'
+#' @seealso \code{\link[coda]{plot.mcmc}}, \code{\link[coda]{summary.mcmc}}
+#'
+#' @references Siddhartha Chib and Bradley P. Carlin. 1999. ``On MCMC Sampling
+#' in Hierarchical Longitudinal Models.'' \emph{Statistics and Computing.} 9:
+#' 17-26.
+#'
+#' Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
+#' Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+#'
+#' Andrew D. Martin and Kyle L. Saunders. 2002. ``Bayesian Inference for
+#' Political Science Panel Data.'' Paper presented at the 2002 Annual Meeting
+#' of the American Political Science Association.
+#'
+#' Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.  ``Output
+#' Analysis and Diagnostics for MCMC (CODA)'', \emph{R News}. 6(1): 7-11.
+#' \url{https://CRAN.R-project.org/doc/Rnews/Rnews_2006-1.pdf}.
+#'
+#' @keywords models hierarchical models mixed models glmm Poisson MCMC bayesian
+#'
+#' @examples
+#'
+#' \dontrun{
+#' #========================================
+#' # Hierarchical Poisson Linear Regression
+#' #========================================
+#'
+#' #== Generating data
+#'
+#' # Constants
+#' nobs <- 1000
+#' nspecies <- 20
+#' species <- c(1:nspecies,sample(c(1:nspecies),(nobs-nspecies),replace=TRUE))
+#'
+#' # Covariates
+#' X1 <- runif(n=nobs,min=-1,max=1)
+#' X2 <- runif(n=nobs,min=-1,max=1)
+#' X <- cbind(rep(1,nobs),X1,X2)
+#' W <- X
+#'
+#' # Target parameters
+#' # beta
+#' beta.target <- matrix(c(0.1,0.1,0.1),ncol=1)
+#' # Vb
+#' Vb.target <- c(0.05,0.05,0.05)
+#' # b
+#' b.target <- cbind(rnorm(nspecies,mean=0,sd=sqrt(Vb.target[1])),
+#'                   rnorm(nspecies,mean=0,sd=sqrt(Vb.target[2])),
+#'                   rnorm(nspecies,mean=0,sd=sqrt(Vb.target[3])))
+#'
+#' # Response
+#' lambda <- vector()
+#' Y <- vector()
+#' for (n in 1:nobs) {
+#'   lambda[n] <- exp(X[n,]%*%beta.target+W[n,]%*%b.target[species[n],])
+#'   Y[n] <- rpois(1,lambda[n])
+#' }
+#'
+#' # Data-set
+#' Data <- as.data.frame(cbind(Y,lambda,X1,X2,species))
+#' plot(Data$X1,Data$lambda)
+#'
+#' #== Call to MCMChpoisson
+#' model <- MCMChpoisson(fixed=Y~X1+X2, random=~X1+X2, group="species",
+#'               data=Data, burnin=5000, mcmc=1000, thin=1,verbose=1,
+#'               seed=NA, beta.start=0, sigma2.start=1,
+#'               Vb.start=1, mubeta=0, Vbeta=1.0E6,
+#'               r=3, R=diag(c(0.1,0.1,0.1)), nu=0.001, delta=0.001, FixOD=1)
+#'
+#' #== MCMC analysis
+#'
+#' # Graphics
+#' pdf("Posteriors-MCMChpoisson.pdf")
+#' plot(model$mcmc)
+#' dev.off()
+#'
+#' # Summary
+#' summary(model$mcmc)
+#'
+#' # Predictive posterior mean for each observation
+#' model$lambda.pred
+#'
+#' # Predicted-Observed
+#' plot(Data$lambda,model$lambda.pred)
+#' abline(a=0,b=1)
+#'
+#' ## #Not run
+#' ## #You can also compare with lme4 results
+#' ## #== lme4 resolution
+#' ## library(lme4)
+#' ## model.lme4 <- lmer(Y~X1+X2+(1+X1+X2|species),data=Data,family="poisson")
+#' ## summary(model.lme4)
+#' ## plot(fitted(model.lme4),model$lambda.pred,main="MCMChpoisson/lme4")
+#' ## abline(a=0,b=1)
+#' }
+#'
 MCMChpoisson <- function (fixed, random, group, data, burnin=5000,
-                          mcmc=10000, thin=10, 
+                          mcmc=10000, thin=10,
                           verbose=1, seed=NA, beta.start=NA, sigma2.start=NA,
                           Vb.start=NA, mubeta=0, Vbeta=1.0E6, r, R,
                           nu=0.001, delta=0.001, FixOD=0, ...)
@@ -67,8 +317,8 @@ MCMChpoisson <- function (fixed, random, group, data, burnin=5000,
   # Seed
   #========
   seed <- form.seeds.hmodels(seed)
-  
-  #======== 
+
+  #========
   # Form response and model matrices
   #========
   mf.fixed <- model.frame(formula=fixed,data=data)
@@ -78,7 +328,7 @@ MCMChpoisson <- function (fixed, random, group, data, burnin=5000,
   mf.random <- model.frame(formula=random,data=data)
   W <- model.matrix(attr(mf.random,"terms"),data=mf.random)
 
-  #======== 
+  #========
   # Model parameters
   #========
   nobs <- nrow(X)
@@ -99,7 +349,7 @@ MCMChpoisson <- function (fixed, random, group, data, burnin=5000,
   beta.start <- form.beta.start.hmodels(fixed,data,beta.start,np,family="poisson",defaults=NA)
   sigma2.start <- form.sigma2.start.hmodels(fixed,data,sigma2.start,family="poisson")
   Vb.start <- form.Vb.start.hmodels(Vb.start,nq)
-      
+
   #========
   # Form priors
   #========
@@ -126,7 +376,7 @@ MCMChpoisson <- function (fixed, random, group, data, burnin=5000,
   #========
   # call C++ code to draw sample
   #========
-  Sample <- .C("MCMChpoisson",
+  Sample <- .C("cMCMChpoisson",
                #= Constants and data
                ngibbs=as.integer(ngibbs), nthin=as.integer(nthin), nburn=as.integer(nburn),## Number of iterations, burning and samples
                nobs=as.integer(nobs), ngroup=as.integer(ngroup), ## Constants
@@ -148,13 +398,13 @@ MCMChpoisson <- function (fixed, random, group, data, burnin=5000,
                Deviance.nonconst=as.double(Deviance),
                lambda_pred.nonconst=as.double(lambda_pred), ## Predictive posterior mean
                #= Seeds
-               seed=as.integer(seed), 
+               seed=as.integer(seed),
                #= Verbose
                verbose=as.integer(verbose),
                #= Overdispersion
                FixOD=as.integer(FixOD),
                PACKAGE="MCMCpack")
- 
+
   #= Matrix of MCMC samples
   Matrix <- matrix(NA,nrow=nsamp,ncol=np+nq*ngroup+nq*nq+2)
   names.fixed <- paste("beta.",colnames(X),sep="")
@@ -171,7 +421,7 @@ MCMChpoisson <- function (fixed, random, group, data, burnin=5000,
 
   #= Transform Sample list in an MCMC object
   MCMC <- mcmc(Matrix,start=nburn+1,end=ngibbs,thin=nthin)
-  
+
   #= Output
   return (list(mcmc=MCMC,lambda.pred=Sample[[23]]))
 }

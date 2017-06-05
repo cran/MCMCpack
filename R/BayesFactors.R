@@ -40,14 +40,14 @@
   sigma2 <- exp(theta[k+1])
 
   Sigma <- solve(B0)
-  
+
   loglike <- sum(dnorm(y, X%*%beta, sqrt(sigma2), log=TRUE))
 
   ## note the change to the prior for sigma2 b/c of the transformation
   logprior <- logdinvgamma(sigma2, c0/2, d0/2) + theta[k+1] +
     logdmvnorm(beta, b0, Sigma)
 
-  return (loglike + logprior)  
+  return (loglike + logprior)
 }
 
 
@@ -57,13 +57,13 @@
   beta <- theta
 
   p <- pnorm(X %*% beta)
-  
+
   Sigma <- solve(B0)
-  
+
   loglike <- sum( y * log(p) + (1-y)*log(1-p) )
   logprior <- logdmvnorm(beta, b0, Sigma)
 
-  return (loglike + logprior)  
+  return (loglike + logprior)
 }
 
 "logpost.logit" <- function(theta, y, X, b0, B0){
@@ -73,13 +73,13 @@
 
   eta <- X %*% beta
   p <- 1.0/(1.0+exp(-eta))
-  
+
   Sigma <- solve(B0)
-  
+
   loglike <- sum( y * log(p) + (1-y)*log(1-p) )
   logprior <- logdmvnorm(beta, b0, Sigma)
 
-  return (loglike + logprior)  
+  return (loglike + logprior)
 }
 
 "logpost.logit.userprior" <- function(theta, y, X, userfun, logfun,
@@ -90,7 +90,7 @@
 
   eta <- X %*% beta
   p <- 1.0/(1.0+exp(-eta))
-  
+
   loglike <- sum( y * log(p) + (1-y)*log(1-p) )
   if (logfun){
     logprior <- eval(userfun(theta), envir=my.env)
@@ -99,7 +99,7 @@
     logprior <- log(eval(userfun(theta), envir=my.env))
   }
 
-  return (loglike + logprior)  
+  return (loglike + logprior)
 }
 
 
@@ -110,22 +110,84 @@
 
   eta <- X %*% beta
   lambda <- exp(eta)
-  
+
   Sigma <- solve(B0)
-  
+
   loglike <- sum(dpois(y, lambda, log=TRUE))
   logprior <- logdmvnorm(beta, b0, Sigma)
-  
-  return (loglike + logprior)  
+
+  return (loglike + logprior)
 }
 
 
 
 
-## functions for working with BayesFactor objects
+#' Create an object of class BayesFactor from MCMCpack output
+#'
+#' This function creates an object of class \code{BayesFactor} from
+#' MCMCpack output.
+#'
+#' @param ... MCMCpack output objects. These have to be of class
+#'   \code{mcmc} and have a \code{logmarglike} attribute. In what
+#'   follows, we let \code{M} denote the total number of models to be
+#'   compared.
+#'
+#' @param BF An object to be checked for membership in class
+#'
+#' \code{BayesFactor}.
+#' @return An object of class \code{BayesFactor}. A \code{BayesFactor}
+#'   object has four attributes. They are: \code{BF.mat} an \eqn{M
+#'   \times M} matrix in which element \eqn{i,j} contains the Bayes
+#'   factor for model \eqn{i} relative to model \eqn{j};
+#'   \code{BF.log.mat} an \eqn{M \times M} matrix in which element
+#'   \eqn{i,j} contains the natural log of the Bayes factor for model
+#'   \eqn{i} relative to model \eqn{j}; \code{BF.logmarglike} an
+#'   \eqn{M} vector containing the log marginal likelihoods for models
+#'   1 through \eqn{M}; and \code{BF.call} an \eqn{M} element list
+#'   containing the calls used to fit models 1 through \eqn{M}.
+#'
+#' @export
+#'
+#' @aliases BayesFactor is.BayesFactor
+#'
+#' @seealso \code{\link{MCMCregress}}
+#'
+#' @keywords models
+#'
+#' @examples
+#'
+#' \dontrun{
+#' data(birthwt)
+#'
+#' model1 <- MCMCregress(bwt~age+lwt+as.factor(race) + smoke + ht,
+#'                      data=birthwt, b0=c(2700, 0, 0, -500, -500,
+#'                                         -500, -500),
+#'                      B0=c(1e-6, .01, .01, 1.6e-5, 1.6e-5, 1.6e-5,
+#'                           1.6e-5), c0=10, d0=4500000,
+#'                      marginal.likelihood="Chib95", mcmc=10000)
+#'
+#' model2 <- MCMCregress(bwt~age+lwt+as.factor(race) + smoke,
+#'                      data=birthwt, b0=c(2700, 0, 0, -500, -500,
+#'                                         -500),
+#'                      B0=c(1e-6, .01, .01, 1.6e-5, 1.6e-5, 1.6e-5),
+#'                      c0=10, d0=4500000,
+#'                      marginal.likelihood="Chib95", mcmc=10000)
+#'
+#' model3 <- MCMCregress(bwt~as.factor(race) + smoke + ht,
+#'                      data=birthwt, b0=c(2700, -500, -500,
+#'                                         -500, -500),
+#'                      B0=c(1e-6, 1.6e-5, 1.6e-5, 1.6e-5,
+#'                           1.6e-5), c0=10, d0=4500000,
+#'                      marginal.likelihood="Chib95", mcmc=10000)
+#'
+#' BF <- BayesFactor(model1, model2, model3)
+#' print(BF)
+#'
+#' }
+#'
 "BayesFactor" <- function(...){
   model.list <- list(...)
-  M <- length(model.list)  
+  M <- length(model.list)
   #model.names <- paste("model", 1:M, sep="")
   this.call <- match.call()
   this.call.string <- deparse(this.call)
@@ -139,13 +201,13 @@
   }
   model.names <- gsub(")", "", model.names)
   model.names <- gsub(" ", "", model.names)
-  
+
   for (i in 1:M){
     if (!is.mcmc(model.list[[i]])){
       stop("argument not of class mcmc\n")
     }
   }
-  
+
   BF.mat <- matrix(NA, M, M)
   BF.log.mat <- matrix(NA, M, M)
   rownames(BF.mat) <- colnames(BF.mat) <-
@@ -156,7 +218,7 @@
   ## So based on the patch by Martin Maechler, JHP changed the code. "Thu Feb  4 10:35:15 2016"
   ## BF.logmarglike <- array(NA, M, dimnames=model.names)
   BF.call <- NULL
-  
+
   for (i in 1:M){
     BF.logmarglike[i] <- attr(model.list[[i]], "logmarglike")
     BF.call <- c(BF.call, attr(model.list[[i]], "call"))
@@ -172,19 +234,21 @@
       }
     }
   }
-  
+
   return(structure(list(BF.mat=BF.mat, BF.log.mat=BF.log.mat,
                         BF.logmarglike=BF.logmarglike,
                         BF.call=BF.call),
                    class="BayesFactor"))
 }
 
-
+#' @export
+#' @rdname BayesFactor
 "is.BayesFactor" <- function(BF){
   return(class(BF) == "BayesFactor")
 }
 
 
+#' @export
 "print.BayesFactor" <- function(x, ...){
 
   cat("The matrix of Bayes Factors is:\n")
@@ -199,12 +263,12 @@
     cat("   call = \n")
     print(x$BF.call[[i]])
     cat("\n   log marginal likelihood = ", x$BF.logmarglike[i], "\n\n")
-    
+
   }
-  
+
 }
 
-
+#' @export
 "summary.BayesFactor" <- function(object, ...){
 
   cat("The matrix of Bayes Factors is:\n")
@@ -213,29 +277,29 @@
   cat("\nThe matrix of the natural log Bayes Factors is:\n")
   print(object$BF.log.mat, digits=3)
 
-  BF.mat.NA <- object$BF.mat    
+  BF.mat.NA <- object$BF.mat
   diag(BF.mat.NA) <- NA
   minvec <- apply(BF.mat.NA, 1, min, na.rm=TRUE)
   best.model <- which.max(minvec)
   if (minvec[best.model] > 150){
     cat("\nThere is very strong evidence to support",
         rownames(object$BF.mat)[best.model],
-        "over\nall other models considered.\n") 
+        "over\nall other models considered.\n")
   }
   else if(minvec[best.model] > 20){
     cat("\nThere is strong evidence or better to support",
         rownames(object$BF.mat)[best.model],
-        "over\nall other models considered.\n")    
+        "over\nall other models considered.\n")
   }
   else if(minvec[best.model] > 3){
     cat("\nThere is positive evidence or better to support",
         rownames(object$BF.mat)[best.model],
-        "over\nall other models considered.\n")    
+        "over\nall other models considered.\n")
   }
   else {
     cat("\nThe evidence to support",
         rownames(object$BF.mat)[best.model],
-        "over all\nother models considered is worth no more\n than a bare mention.\n")    
+        "over all\nother models considered is worth no more\n than a bare mention.\n")
   }
 
   cat("\n\nStrength of Evidence Guidelines\n(from Kass and Raftery, 1995, JASA)\n")
@@ -248,19 +312,73 @@
   cat("  6 to 10           20 to 150        Strong\n")
   cat("  >10               >150             Very Strong\n")
   cat("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n")
-  
+
   M <- length(object$BF.call)
   for (i in 1:M){
     cat("\n", rownames(object$BF.mat)[i], ":\n")
     cat("   call = \n")
     print(object$BF.call[[i]])
     cat("\n   log marginal likelihood = ", object$BF.logmarglike[i], "\n\n")
-    
+
   }
-  
+
 }
 
 
+#' Calculate Posterior Probability of Model
+#'
+#' This function takes an object of class \code{BayesFactor} and
+#' calculates the posterior probability that each model under study is
+#' correct given that one of the models under study is correct.
+#'
+#' @param BF An object of class \code{BayesFactor}.
+#'
+#' @param prior.probs The prior probabilities that each model is
+#'   correct. Can be either a scalar or array. Must be positive. If
+#'   the sum of the prior probabilities is not equal to 1 prior.probs
+#'   will be normalized so that it does sum to unity.
+#'
+#' @return An array holding the posterior probabilities that each
+#'   model under study is correct given that one of the models under
+#'   study is correct.
+#'
+#' @export
+#'
+#' @seealso \code{\link{MCMCregress}}
+#'
+#' @keywords models
+#'
+#' @examples
+#'
+#' \dontrun{
+#' data(birthwt)
+#'
+#' post1 <- MCMCregress(bwt~age+lwt+as.factor(race) + smoke + ht,
+#'                      data=birthwt, b0=c(2700, 0, 0, -500, -500,
+#'                                         -500, -500),
+#'                      B0=c(1e-6, .01, .01, 1.6e-5, 1.6e-5, 1.6e-5,
+#'                           1.6e-5), c0=10, d0=4500000,
+#'                      marginal.likelihood="Chib95", mcmc=10000)
+#'
+#' post2 <- MCMCregress(bwt~age+lwt+as.factor(race) + smoke,
+#'                      data=birthwt, b0=c(2700, 0, 0, -500, -500,
+#'                                         -500),
+#'                      B0=c(1e-6, .01, .01, 1.6e-5, 1.6e-5, 1.6e-5),
+#'                      c0=10, d0=4500000,
+#'                      marginal.likelihood="Chib95", mcmc=10000)
+#'
+#' post3 <- MCMCregress(bwt~as.factor(race) + smoke + ht,
+#'                      data=birthwt, b0=c(2700, -500, -500,
+#'                                         -500, -500),
+#'                      B0=c(1e-6, 1.6e-5, 1.6e-5, 1.6e-5,
+#'                           1.6e-5), c0=10, d0=4500000,
+#'                      marginal.likelihood="Chib95", mcmc=10000)
+#'
+#' BF <- BayesFactor(post1, post2, post3)
+#' mod.probs <- PostProbMod(BF)
+#' print(mod.probs)
+#' }
+#'
 "PostProbMod" <- function(BF, prior.probs=1){
   if (!is.BayesFactor(BF)){
     stop("BF is not of class BayesFactor\n")
@@ -269,12 +387,12 @@
   M <- length(BF$BF.call)
 
   if (min(prior.probs) <= 0){
-    stop("An element of prior.probs is non-positive\n") 
+    stop("An element of prior.probs is non-positive\n")
   }
-  
+
   prior.probs <- rep(prior.probs, M)[1:M]
   prior.probs <- prior.probs / sum(prior.probs)
-  
+
   lognumer <- BF$BF.logmarglike + log(prior.probs)
   maxlognumer <- max(lognumer)
 
@@ -284,7 +402,7 @@
     denom <- denom + exp(lognumer[i]-maxlognumer)
   }
   logdenom <- log(denom)
-  
+
   for (i in 1:M){
     logpostprobs[i] <- (lognumer[i] - maxlognumer) - logdenom
   }
@@ -292,5 +410,5 @@
 
   names(postprobs) <- rownames(BF$BF.mat)
 
-  return(postprobs)  
+  return(postprobs)
 }
