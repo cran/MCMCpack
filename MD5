@@ -1,4 +1,4 @@
-a7a6ac4898d9a667440666489dade976 *DESCRIPTION
+81f5f75593e108f1e3a4894d80860156 *DESCRIPTION
 4c5f8f93d4b568adbe7d21ca3a08e48e *NAMESPACE
 489c13dcd0f8b0bf0109cb26e339c489 *R/BayesFactors.R
 4494114220f44ca6681dfd740491a913 *R/HDPHMMnegbin.R
@@ -23,7 +23,7 @@ a7e59ed96d470722cba9b4893ab1def7 *R/MCMCirtKd.R
 b3078cf84c3ab130214b36a3987b4346 *R/MCMCirtKdRob.R
 ad21f0eee321e9d5f3c3efe3d2b2a75a *R/MCMClogit.R
 1da2d7a7c0f01beba151ae6b5a1d07e6 *R/MCMCmetrop1R.R
-707a0d6eb241cb3609241896b43959c4 *R/MCMCmixfactanal.R
+b054436afb8f4f7aa309f095c898022f *R/MCMCmixfactanal.R
 527b724a627bd3be581655e5ce9d5820 *R/MCMCmnl.R
 632b2ce600e4fbbee9cdd4ce02385a37 *R/MCMCnegbin.R
 bdf336ddd52d3da065c149a81ebc52e4 *R/MCMCnegbinChange.R
@@ -49,7 +49,7 @@ fdfcfe9909cadaf15c47bbb604be2257 *R/automate.R
 d51c4bb909bbbde846dd62441303a9c1 *R/distn.R
 1589cbe1b84ab5b397b96ef59ba79422 *R/hdp-utils.R
 18daa9fee800c7d8d5827405738531e2 *R/hidden-hmodels.R
-4dc19c1cb7809d9be5e7353929358aa1 *R/hidden.R
+be7691f6fdb77aef7eda44602d234e6f *R/hidden.R
 591c4b85f5caf086c3b4bb085f010b75 *R/make.breaklist.R
 d451566d6a37400a46248a807dffd0e8 *R/procrust.R
 97d534007fa9418edc9cc7671a64928d *R/scythe.R

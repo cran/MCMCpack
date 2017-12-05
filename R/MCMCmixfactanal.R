@@ -207,6 +207,9 @@
 #' @return An mcmc object that contains the posterior sample.  This object can
 #' be summarized by functions provided by the coda package.
 #'
+#' @export
+#'
+#' 
 #' @seealso \code{\link[coda]{plot.mcmc}}, \code{\link[coda]{summary.mcmc}},
 #' \code{\link[stats]{factanal}}, \code{\link[MCMCpack]{MCMCfactanal}},
 #' \code{\link[MCMCpack]{MCMCordfactanal}}, \code{\link[MCMCpack]{MCMCirt1d}},

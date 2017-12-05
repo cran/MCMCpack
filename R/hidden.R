@@ -129,7 +129,7 @@
       stop("Please respecify and call ", calling.function(), " again.\n",
          call.=FALSE)
     }
-    if(alpha <= 0) {
+    if(beta <= 0) {
       cat("Error: Gamma(alpha,beta) prior beta less than or equal to zero.\n")
        stop("Please respecify and call ", calling.function(), " again.\n",
         call.=FALSE)    
