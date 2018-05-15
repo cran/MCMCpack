@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////
-// cHDPHMMpoisson.cc is C++ code to estimate a (sticky) HDP-HMM with 
+// cHDPHMMpoisson.cc is C++ code to estimate a (sticky) HDP-HMM with
 // Poisson emission distribution
 // (Fox, Sudderth, Jordan, & Willsky, 2013)
 //
@@ -31,8 +31,8 @@
 
 #include "MCMCnbutil.h"
 
-#include <R.h>      
-#include <R_ext/Utils.h> 
+#include <R.h>
+#include <R_ext/Utils.h>
 
 using namespace std;
 using namespace scythe;
@@ -40,13 +40,13 @@ using namespace scythe;
 
 
 template <typename RNGTYPE>
-hmm_state poisson_hdp_reg_state_sampler(rng<RNGTYPE>& stream, 
+hmm_state poisson_hdp_reg_state_sampler(rng<RNGTYPE>& stream,
                                           const int& ns,
                                           const Matrix<>& Y,
                                           const Matrix<>& X,
                                           const Matrix<>& beta,
                                           const Matrix<>& P){
-  
+
   const int n = Y.rows();
   Matrix<> trans(ns, ns);
   Matrix<> nstate(ns, 1);
@@ -57,13 +57,13 @@ hmm_state poisson_hdp_reg_state_sampler(rng<RNGTYPE>& stream,
   Matrix<> logP = log(P);
   for (int t = (n-1); t >= 0; --t){
     int yt = (int) Y[t];
-    Matrix<> lambda = exp(X(t,_) * ::t(beta)); 
+    Matrix<> lambda = exp(X(t,_) * ::t(beta));
     for (int j = 0; j< ns; ++j){
       py(j, t) = log(dpois(yt, lambda[j]));
     }
     Matrix<> unnorm_pstyt(ns, 1);
     Matrix<> pstyt(ns, 1);
-    
+
     if (t == (n - 1)) {
       pstyt1 = py(_,t);
     } else {
@@ -71,14 +71,14 @@ hmm_state poisson_hdp_reg_state_sampler(rng<RNGTYPE>& stream,
     }
     for (int j = 0; j < ns; j++) {
       Matrix<> Phold = ::t(logP(j,_)) + pstyt1;
-      unnorm_pstyt[j] = log(sum(exp(Phold-max(Phold)))) + max(Phold); 
+      unnorm_pstyt[j] = log(sum(exp(Phold-max(Phold)))) + max(Phold);
     }
     M(_,t) = unnorm_pstyt;
   }
 
-  int st = 1;  
-  Matrix<int> s(n, 1);                        
-  Matrix<> ps(n, ns);  
+  int st = 1;
+  Matrix<int> s(n, 1);
+  Matrix<> ps(n, ns);
   Matrix<> pstyn(ns, 1);
   Matrix<> Pst_1(ns,1);
   Matrix<> unnorm_pstyn(ns,1);
@@ -88,7 +88,7 @@ hmm_state poisson_hdp_reg_state_sampler(rng<RNGTYPE>& stream,
   for (int t = 0; t < n; ++t) {
     if (t == 0) {
       unnorm_pstyn = M(_,t+1) + py(_,t);
-      
+
     } else {
       st = s(t-1);
       Pst_1 = ::t(logP(st-1,_));
@@ -107,30 +107,30 @@ hmm_state poisson_hdp_reg_state_sampler(rng<RNGTYPE>& stream,
     }
     nstate[s(t)-1] += 1;
     ps(t,_) = pstyn;
-  }  
-  
+  }
+
   hmm_state result;
   result.s = s;
   result.ps = ps;
   result.trans = trans;
   result.nstate = nstate;
-  
+
   return result;
-} 
+}
 
 
 
 
 
-//////////////////////////////////////////// 
-// HDPHMMpoissonReg implementation.  
-//////////////////////////////////////////// 
+////////////////////////////////////////////
+// HDPHMMpoissonReg implementation.
+////////////////////////////////////////////
 template <typename RNGTYPE>
-void HDPHMMpoissonReg_impl(rng<RNGTYPE>& stream, 
-                           double *betaout, 
-                           double *Pout, 
-                           double *psout, 
-                           double *sout,   
+void HDPHMMpoissonReg_impl(rng<RNGTYPE>& stream,
+                           double *betaout,
+                           double *Pout,
+                           double *psout,
+                           double *sout,
                            double *tau1out,
                            double *tau2out,
                            int *comp1out,
@@ -142,45 +142,45 @@ void HDPHMMpoissonReg_impl(rng<RNGTYPE>& stream,
                            double *gammaout,
                            double *akout,
                            double *thetaout,
-                           const double *Ydata, 
-                           const int *Yrow, 
-                           const int *Ycol, 
-                           const double *Xdata, 
-                           const int *Xrow, 
-                           const int *Xcol, 
-                           const int *K, 
-                           const int *burnin, 
-                           const int *mcmc, 
-                           const int *thin, 
-                           const int *verbose, 
-                           const double *betastart, 
-                           const double *Pstart, 
-                           const double *tau1start, 
-                           const double *tau2start, 
+                           const double *Ydata,
+                           const int *Yrow,
+                           const int *Ycol,
+                           const double *Xdata,
+                           const int *Xrow,
+                           const int *Xcol,
+                           const int *K,
+                           const int *burnin,
+                           const int *mcmc,
+                           const int *thin,
+                           const int *verbose,
+                           const double *betastart,
+                           const double *Pstart,
+                           const double *tau1start,
+                           const double *tau2start,
                            const double *component1start,
                            const double *gammastart,
                            const double *akstart,
                            const double *thetastart,
-                           const double *a_alpha, 
+                           const double *a_alpha,
                            const double *b_alpha,
-                           const double *a_gamma, 
+                           const double *a_gamma,
                            const double *b_gamma,
                            const double *a_theta,
                            const double *b_theta,
-                           const double *b0data, 
+                           const double *b0data,
                            const double *B0data)
 {
-  const Matrix <> Y(*Yrow, *Ycol, Ydata);  
+  const Matrix <> Y(*Yrow, *Ycol, Ydata);
   const Matrix <> X(*Xrow, *Xcol, Xdata);
-  const int tot_iter = *burnin + *mcmc;  
-  const int nstore = *mcmc / *thin;     
+  const int tot_iter = *burnin + *mcmc;
+  const int nstore = *mcmc / *thin;
   const int n = Y.rows();
   const int k = X.cols();
-  const int ns = *K;        
+  const int ns = *K;
   const int max_comp = 10;
   const Matrix <> b0(k, 1, b0data);
-  const Matrix <> B0(k, k, B0data);   
-  const Matrix <> B0inv = invpd(B0);   
+  const Matrix <> B0(k, k, B0data);
+  const Matrix <> B0inv = invpd(B0);
   Matrix<> wr1(max_comp, 1);
   Matrix<> mr1(max_comp, 1);
   Matrix<> sr1(max_comp, 1);
@@ -202,12 +202,12 @@ void HDPHMMpoissonReg_impl(rng<RNGTYPE>& stream,
   double theta = *thetastart;
   double alpha = (1 - theta) * alpha_p_kappa;
   double kappa = theta * alpha_p_kappa;
-  
+
   Matrix<> beta_store(nstore, ns*k);
   Matrix<> P_store(nstore, ns*ns);
   Matrix<> ps_store(n, ns);
   Matrix<> s_store(nstore, n);
-  Matrix<int> nstate(ns, 1);   
+  Matrix<int> nstate(ns, 1);
   Matrix<int> component1_store(nstore, n);
   Matrix<int> component2_store(nstore, n);
   Matrix<> tau1_store(nstore, n);
@@ -219,7 +219,7 @@ void HDPHMMpoissonReg_impl(rng<RNGTYPE>& stream,
   Matrix<> gamma_store(nstore, 1);
   Matrix<> theta_store(nstore, 1);
   Matrix<> ak_store(nstore, 1);
-  
+
   hmm_state Sout;
   Matrix<> s(n,1);
   Matrix<> ps(n,ns);
@@ -267,7 +267,7 @@ void HDPHMMpoissonReg_impl(rng<RNGTYPE>& stream,
 
     if (debug > 0) Rprintf("Sampling tau...\n");
     //////////////////////
-    // 4. Sample tau 
+    // 4. Sample tau
     //////////////////////
     Matrix<> TAUout;
     for (int t = 0; t < n; t++) {
@@ -276,8 +276,8 @@ void HDPHMMpoissonReg_impl(rng<RNGTYPE>& stream,
       Matrix<> xt = X(t, _);
       Matrix<> mu_t = exp(xt* ::t(beta(st-1,_)));
       double mut = mu_t[0];
-      
-      TAUout = tau_comp_sampler(stream, yt, mut, wr1, mr1, sr1, 
+
+      TAUout = tau_comp_sampler(stream, yt, mut, wr1, mr1, sr1,
                                 wr2(t,_), mr2(t,_), sr2(t,_), nr2[t]);
       tau1[t] = TAUout[0];
       tau2[t] = TAUout[1];
@@ -287,7 +287,7 @@ void HDPHMMpoissonReg_impl(rng<RNGTYPE>& stream,
 
     if (debug > 0) Rprintf("Sampling beta...\n");
     //////////////////////
-    // 2. Sample beta 
+    // 2. Sample beta
     //////////////////////
     Matrix<> y_tilde(n,1);
     Matrix<> Sigma_inv_sum(n, 1);
@@ -298,7 +298,7 @@ void HDPHMMpoissonReg_impl(rng<RNGTYPE>& stream,
     Matrix<> mr1_hold(n,1);
     Matrix<> mr2_hold(n,1);
     for (int t = 0; t<n ; ++t) {
-      int yt = (int) Y[t]; 
+      int yt = (int) Y[t];
       int comp1 = (int) component1[t];
         if (yt > 0) {
           int comp2 = (int) component2[t];
@@ -308,7 +308,7 @@ void HDPHMMpoissonReg_impl(rng<RNGTYPE>& stream,
           yp_tilde[t] = (-log(tau2[t]) - log(nu[t]) - mr2(t, comp2 - 1))/sqrt(sr2(t, comp2-1));
         }
         sr1_hold[t] = sr1[comp1 - 1];
-        mr1_hold[t] = mr1[comp1 - 1];          
+        mr1_hold[t] = mr1[comp1 - 1];
         Sigma_inv_sum[t] = 1/sqrt(sr1[comp1 - 1]);
         y_tilde[t] = (-log(tau1[t]) - log(nu[t])  - mr1[comp1 - 1])/sqrt(sr1[comp1 - 1]);
     }
@@ -316,17 +316,17 @@ void HDPHMMpoissonReg_impl(rng<RNGTYPE>& stream,
     int beta_count = 0;
     int pcount = 0;
     Matrix<int> pnstate(ns, 1);
-    
+
     for (int j = 0; j <ns ; ++j){
       for (int i = 0; i<n; ++i){
-	if (s[i] == (j+1)) { 
+	if (s[i] == (j+1)) {
           int yt = (int) Y[i];
           if (yt > 0) {
             pnstate[j] = pnstate[j] + 1;
           }
 	}
       }
-      beta_count = beta_count + nstate[j];      
+      beta_count = beta_count + nstate[j];
       pcount = pcount + pnstate[j];
       if (nstate[j] == 0) {
         if (k == 1) {
@@ -345,15 +345,15 @@ void HDPHMMpoissonReg_impl(rng<RNGTYPE>& stream,
         wip(0, 0, nstate[j] - 1, 0) = selif(Sigma_inv_sum, s == (j + 1));
         if (pnstate[j] > 0) {
           yjp(nstate[j], 0, tot_rows - 1, 0) = selif(yp_tilde, (s == (j+1)) & (Y > 0));
-          Xjp(nstate[j], 0, tot_rows - 1, k - 1) = selif(X, s == (j + 1) & Y > 0);
-          wip(nstate[j], 0, tot_rows - 1, 0) = selif(Sigma_plus_inv_sum, s == (j + 1) & Y > 0);
+          Xjp(nstate[j], 0, tot_rows - 1, k - 1) = selif(X, (s == (j + 1)) & (Y > 0));
+          wip(nstate[j], 0, tot_rows - 1, 0) = selif(Sigma_plus_inv_sum, (s == (j + 1)) & (Y > 0));
         }
         Matrix<> Xwj(Xjp.rows(), k);
         for (int h = 0; h<Xjp.rows(); ++h){
           Xwj(h, _) = Xjp(h,_)*wip[h];
         }
 
-        Matrix<> Bn = invpd(B0 + ::t(Xwj)*Xwj); 
+        Matrix<> Bn = invpd(B0 + ::t(Xwj)*Xwj);
         Matrix<> bn = Bn*gaxpy(B0, b0, ::t(Xwj)*yjp);
 
         if (k == 1) {
@@ -367,7 +367,7 @@ void HDPHMMpoissonReg_impl(rng<RNGTYPE>& stream,
     if (debug > 0) Rprintf("Sampling dish counts...\n");
     //////////////////////
     // 3. Sample dish counts
-    //////////////////////        
+    //////////////////////
     Matrix<> rest_dishes(ns, ns);
     Matrix<> rest_dishes_over(ns, ns);
     Matrix<> sum_w(ns, 1);
@@ -406,7 +406,7 @@ void HDPHMMpoissonReg_impl(rng<RNGTYPE>& stream,
     //////////////////////
     Matrix<> gamma_prime_dir = gamma/ns + ::t(sumc(rest_dishes_over));
     gamma_prime = stream.rdirich(gamma_prime_dir);
-    // sometimes with single regime stuff, you get nans from this draw. 
+    // sometimes with single regime stuff, you get nans from this draw.
     if (isnan(gamma_prime(1))) {
       gamma_prime = gamma/ns;
     }
@@ -438,27 +438,27 @@ void HDPHMMpoissonReg_impl(rng<RNGTYPE>& stream,
     int Mbar_tot = sum(rest_dishes_over);
     // only sample these if the parameters make sense
     if (debug > 0) Rprintf("Sampling alpha+kappa...\n");
-    if (*a_alpha > 0 & *b_alpha > 0) {
+    if (*a_alpha > 0 && *b_alpha > 0) {
       alpha_p_kappa = sample_conparam(stream, ak0, Nkdot_valid, sum(Mkdot_valid), *a_alpha, *b_alpha, 50);
     }
     if (debug > 0) Rprintf("Sampling gamma...\n");
-    if (*a_gamma > 0 & *b_gamma > 0) {
+    if (*a_gamma > 0 && *b_gamma > 0) {
       gamma = sample_conparam(stream, gamma0, Mbar_tot, Kbar, *a_gamma, *b_gamma, 50);
     }
     if (debug > 0) Rprintf("Sampling theta...\n");
-    if (*a_theta > 0 & *b_theta > 0) {
+    if (*a_theta > 0 && *b_theta > 0) {
       theta = stream.rbeta(*a_theta + sum(sum_w), *b_theta + (sum(rest_dishes) - sum(sum_w)));
     }
     kappa = theta * alpha_p_kappa;
-    alpha = (1 - theta) * alpha_p_kappa;    
+    alpha = (1 - theta) * alpha_p_kappa;
 
 
     if (iter >= *burnin && ((iter % *thin)==0)){
-      Matrix<> tbeta = ::t(beta); 
+      Matrix<> tbeta = ::t(beta);
       for (int i=0; i<(ns*k); ++i){
 	beta_store(count,i) = tbeta[i];
       }
-      for (int j=0; j<ns*ns; ++j){    
+      for (int j=0; j<ns*ns; ++j){
 	P_store(count,j)= P[j];
       }
       s_store(count,_) = s(_, 0);
@@ -473,32 +473,32 @@ void HDPHMMpoissonReg_impl(rng<RNGTYPE>& stream,
       theta_store(count) = theta;
       gamma_store(count) = gamma;
       ak_store(count) = alpha_p_kappa;
-      ++count; 
-    }   
+      ++count;
+    }
 
     if(*verbose > 0 && iter % *verbose == 0){
       Rprintf("\n\n HDPHMMpoisson iteration %i of %i \n\n", (iter+1), tot_iter);
       for (int j = 0;j<ns; ++j){
-	Rprintf("The number of observations in state %i is %10.5f\n", j+1, static_cast<double>(nstate[j]));     
+	Rprintf("The number of observations in state %i is %10.5f\n", j+1, static_cast<double>(nstate[j]));
       }
       for (int i = 0; i<ns; ++i){
         if (nstate[i] > 0) {
           for (int j = 0; j<k; ++j){
-            Rprintf("beta(%i) in state %i is %10.5f\n", j+1, i+1, beta(i, j)); 
+            Rprintf("beta(%i) in state %i is %10.5f\n", j+1, i+1, beta(i, j));
           }
         }
       }
     }
-    
-  }// end MCMC loop 
-        
-  R_CheckUserInterrupt();      
-  
+
+  }// end MCMC loop
+
+  R_CheckUserInterrupt();
+
   for (int i = 0; i<(nstore*ns*k); ++i){
-    betaout[i] = beta_store[i]; 
+    betaout[i] = beta_store[i];
   }
   for (int i = 0; i<(nstore*ns*ns); ++i){
-    Pout[i] = P_store[i]; 
+    Pout[i] = P_store[i];
   }
   for (int i = 0; i<(nstore*n); ++i){
     sout[i] = s_store[i];
@@ -518,12 +518,12 @@ void HDPHMMpoissonReg_impl(rng<RNGTYPE>& stream,
     akout[i] = ak_store(i);
   }
 }
- 
+
 extern "C" {
-  void cHDPHMMpoisson(double *betaout, 
-                      double *Pout, 
-                      double *psout, 
-                      double *sout,   
+  void cHDPHMMpoisson(double *betaout,
+                      double *Pout,
+                      double *psout,
+                      double *sout,
                       double *tau1out,
                       double *tau2out,
                       int *comp1out,
@@ -535,55 +535,53 @@ extern "C" {
                       double *gammaout,
                       double *akout,
                       double *thetaout,
-                      const double *Ydata, 
-                      const int *Yrow, 
-                      const int *Ycol, 
+                      const double *Ydata,
+                      const int *Yrow,
+                      const int *Ycol,
                       const double *Xdata,
-                      const int *Xrow, 
-                      const int *Xcol, 
-                      const int *K, 
-                      const int *burnin, 
-                      const int *mcmc, 
-                      const int *thin, 
-                      const int *verbose, 
-                      const double *betastart, 
-                      const double *Pstart, 
-                      const double *tau1start, 
-                      const double *tau2start, 
+                      const int *Xrow,
+                      const int *Xcol,
+                      const int *K,
+                      const int *burnin,
+                      const int *mcmc,
+                      const int *thin,
+                      const int *verbose,
+                      const double *betastart,
+                      const double *Pstart,
+                      const double *tau1start,
+                      const double *tau2start,
                       const double *component1start,
                       const double *gammastart,
                       const double *akstart,
                       const double *thetastart,
-                      const double *a_alpha, 
+                      const double *a_alpha,
                       const double *b_alpha,
-                      const double *a_gamma, 
+                      const double *a_gamma,
                       const double *b_gamma,
                       const double *a_theta,
                       const double *b_theta,
-                      const int* uselecuyer, 
-                      const int* seedarray, 
+                      const int* uselecuyer,
+                      const int* seedarray,
                       const int* lecuyerstream,
-                      const double *b0data, 
+                      const double *b0data,
                       const double *B0data) {
 
-    MCMCPACK_PASSRNG2MODEL(HDPHMMpoissonReg_impl, 
+    MCMCPACK_PASSRNG2MODEL(HDPHMMpoissonReg_impl,
                            betaout, Pout, psout, sout,
                            tau1out, tau2out, comp1out, comp2out,
                            sr1out, sr2out, mr1out, mr2out,
-                           gammaout, akout, thetaout, 
-                           Ydata, Yrow, Ycol, 
-                           Xdata, Xrow, Xcol, 
-                           K, burnin, mcmc, thin, verbose, 
-                           betastart, Pstart, 
+                           gammaout, akout, thetaout,
+                           Ydata, Yrow, Ycol,
+                           Xdata, Xrow, Xcol,
+                           K, burnin, mcmc, thin, verbose,
+                           betastart, Pstart,
                            tau1start, tau2start, component1start,
                            gammastart, akstart, thetastart,
                            a_alpha, b_alpha, a_gamma, b_gamma,
-                           a_theta, b_theta, 
+                           a_theta, b_theta,
                            b0data, B0data);
   }//end MCMC
 } // end extern "C"
 
 
 #endif
-
-

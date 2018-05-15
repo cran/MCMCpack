@@ -16,7 +16,6 @@ full oral argument and cases decided by an equally divided vote
 \source{
 Harold J. Spaeth. 2005. \emph{Original United States Supreme Court
 Database: 1953-2004 Terms.}
-\url{http://facweb.knowlton.ohio-state.edu/pviton/support/codebook-c.html}.
 }
 \description{
 This dataframe contains a matrix of votes cast by U.S. Supreme Court

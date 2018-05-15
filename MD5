@@ -1,4 +1,4 @@
-1d4994568222bfe3e175cb5074c334b0 *DESCRIPTION
+3f7f179015a0f1cd9d35f17671731918 *DESCRIPTION
 4d49b8c5f1f90650c8967f18a5d1b2cc *NAMESPACE
 489c13dcd0f8b0bf0109cb26e339c489 *R/BayesFactors.R
 4494114220f44ca6681dfd740491a913 *R/HDPHMMnegbin.R
@@ -45,20 +45,20 @@ adba1bb99b45b27a1b77c3a4f58d6f60 *R/MCMCquantreg.R
 860f50b8e3d79da3d6a28d95744fba41 *R/SSVSquantregsummary.R
 fdfcfe9909cadaf15c47bbb604be2257 *R/automate.R
 80bedd199cd49c78355d3383c0170832 *R/btsutil.R
-16f186e06a23db78e43824654847e74c *R/data.R
+77bce14a19cc9cc19b0101ff87dbcdd2 *R/data.R
 d51c4bb909bbbde846dd62441303a9c1 *R/distn.R
 1589cbe1b84ab5b397b96ef59ba79422 *R/hdp-utils.R
 18daa9fee800c7d8d5827405738531e2 *R/hidden-hmodels.R
 be7691f6fdb77aef7eda44602d234e6f *R/hidden.R
 591c4b85f5caf086c3b4bb085f010b75 *R/make.breaklist.R
 d451566d6a37400a46248a807dffd0e8 *R/procrust.R
-97d534007fa9418edc9cc7671a64928d *R/scythe.R
+fc741a1be79b4348114074bed2c7bd47 *R/scythe.R
 99eea48562debd8163c0b54a15d73ce7 *R/testpanelGroupBreak.R
 53e924da8867050bcf4ff64ed0021944 *R/testpanelSubjectBreak.R
 03b95e2b1fb0d42d2b7202423b77b23a *R/tomog.R
 175f5ed085a3f66d7cb87d64bac0e344 *R/utility.R
 7e2021def8a88edb41fe78d0a0ae642c *R/zzz.R
-a49acfed057fd07c87e294015890c211 *README
+da48e08cde3dff063f68dbf54c82f29b *README
 31f24d1e199bde63095dcfa4556e848b *cleanup
 ce8d6bc2b702996ba91799bc33b82840 *configure
 21e1a006fb388ed39daf16e6d2ec9549 *configure.ac
@@ -117,7 +117,7 @@ d79e5091a65f40dab48903b9e19592e9 *man/MCnormalnormal.Rd
 080d1245caf21cc3b435f7229a57646d *man/NoncenHypergeom.Rd
 7df9534be48427c9a7766bf433c11b37 *man/PErisk.Rd
 f1549bdb3850f1a8101ed14a2d13dfd0 *man/PostProbMod.Rd
-6ca569d93a147e27ac7ccf168365fe21 *man/Rehnquist.Rd
+5e57b1e38e0847023bab4e00dc1378d1 *man/Rehnquist.Rd
 9b0e2f74df79ef5ac7208e9a39e69e2c *man/SSVSquantreg.Rd
 35be0b1ff40367bd599d8552377a46e2 *man/Senate.Rd
 3bfc7eb5d0aa81f678b4c32de8fea896 *man/SupremeCourt.Rd
@@ -138,7 +138,7 @@ ae7074786522ea2a68f7eeefb2bec955 *man/testpanelGroupBreak.Rd
 25cda9c0d5b7ae12f539d76397e17570 *man/tomogplot.Rd
 4d4dc1d5169d966ff2dc5f9b7ef2a472 *man/topmodels.Rd
 36ebe9977157db5a14373f347e183754 *man/vech.Rd
-50f93f0b058751bfa0d598f2c5c17580 *man/write.Scythe.Rd
+44b6da4f55e23028a578ea28e81943f1 *man/write.Scythe.Rd
 1d71348836f0c214c36bd87b0204a488 *man/xpnd.Rd
 5ca10cd5c2050d7ae43a8d4756ab9006 *src/HMMmultivariateGaussian.cc
 c6353855b63e402d7e60d248b22e6f50 *src/MCMCdynamicEI.cc
@@ -162,7 +162,7 @@ ef5566f824887d9bbef5b76f1b64d839 *src/MCMCrng.h
 b3e224bb1a8452c3da347348b8e510cc *src/Makevars.win
 5362ed41a42ce34cf7817f6bfd988935 *src/algorithm.h
 d79d11cc57a04734c5fc044bae6c40a0 *src/cHDPHMMnegbin.cc
-356fe6b966177a428b92a231b6197b42 *src/cHDPHMMpoisson.cc
+a72e78bc37111529dd4b9e299c403126 *src/cHDPHMMpoisson.cc
 2976cb440c0af066b192008fb88cb57c *src/cHDPHSMMnegbin.cc
 0c8d2ff8a454d8bee60624efa213be41 *src/cHMMpanelFE.cc
 38db5274dbe2fcec05e2133841fdcfe7 *src/cHMMpanelRE.cc
@@ -179,7 +179,7 @@ ba4fbaf8e35c1e4b83b7b8b47aab9546 *src/cMCMCirtHier1d.cc
 38505f888de6f6951a2ac2888a37dc80 *src/cMCMClogit.cc
 81eb953311e758dfd6cff0ad76b7bef6 *src/cMCMCnegbin.cc
 130ed48b17407f5985e2d9e23490c49a *src/cMCMCnegbinChange.cc
-cf39264269bfe77333811c184b4dbb21 *src/cMCMCoprobit.cc
+0b5c19152bc0e0c303e9b6eef96a3f26 *src/cMCMCoprobit.cc
 80b1ff187408bd55b7b43febf7dbea25 *src/cMCMCoprobitChange.cc
 d3af207d8651d767109691ed48cf0532 *src/cMCMCpoisson.cc
 e5c2951646f50ada80694d828303adfe *src/cMCMCpoissonChange.cc

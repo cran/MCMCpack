@@ -1,8 +1,8 @@
 Package: MCMCpack
-Version: 1.4-2
-Date: 2018-01-18
+Version: 1.4-3
+Date: 2018-05-01
 Title: Markov Chain Monte Carlo (MCMC) Package
-Author: Andrew D. Martin [aut], Kevin M. Quinn [aut], Jong Hee Park [aut,cre], Ghislain Vieilledent [ctb], Michael Malecki[ctb], Matthew Blackwell [ctb]
+Author: Andrew D. Martin [aut], Kevin M. Quinn [aut], Jong Hee Park [aut,cre], Ghislain Vieilledent [ctb], Michael Malecki[ctb], Matthew Blackwell [ctb], Keith Poole [ctb], Craig Reed [ctb], Ben Goodrich [ctb], Ross Ihaka [cph], The R Development Core Team [cph], The R Foundation [cph], Pierre L'Ecuyer [cph], Makoto Matsumoto [cph], Takuji Nishimura [cph]
 Maintainer: Jong Hee Park <jongheepark@snu.ac.kr>
 Depends: R (>= 2.10.0), coda (>= 0.11-3), MASS, stats
 Imports: graphics, grDevices, lattice, methods, utils, mcmc, quantreg
@@ -10,8 +10,8 @@ Description: Contains functions to perform Bayesian
         inference using posterior simulation for a number of
         statistical models. Most simulation is done in compiled C++
         written in the Scythe Statistical Library Version 1.0.3. All
-        models return coda mcmc objects that can then be summarized
-        using the coda package. Some useful
+        models return 'coda' mcmc objects that can then be summarized
+        using the 'coda' package. Some useful
         utility functions such as density functions,
 	pseudo-random number generators for statistical
         distributions, a general purpose Metropolis sampling algorithm,
@@ -19,8 +19,8 @@ Description: Contains functions to perform Bayesian
 License: GPL-3
 SystemRequirements: gcc (>= 4.0)
 URL: https://CRAN.R-project.org/package=MCMCpack
-Packaged: 2018-01-18 02:53:09 UTC; interstellar
+Packaged: 2018-05-15 03:23:36 UTC; park
 NeedsCompilation: yes
 Repository: CRAN
 RoxygenNote: 6.0.1
-Date/Publication: 2018-01-21 19:10:36 UTC
+Date/Publication: 2018-05-15 07:53:55 UTC

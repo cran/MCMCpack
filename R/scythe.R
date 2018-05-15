@@ -45,7 +45,7 @@
 #' @examples
 #'
 #'   \dontrun{
-#'   write.Scythe(mymatrix, "myfile.txt")
+#'   write.Scythe(mymatrix, file.path(tempdir(), "myfile.txt"))
 #'   }
 #'
 "write.Scythe" <-

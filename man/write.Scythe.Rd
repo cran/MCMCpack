@@ -26,7 +26,7 @@ number of rows and columns in the first row, followed by the data.
 \examples{
 
   \dontrun{
-  write.Scythe(mymatrix, "myfile.txt")
+  write.Scythe(mymatrix, file.path(tempdir(), "myfile.txt"))
   }
 
 }

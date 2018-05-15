@@ -20,6 +20,7 @@
 // fixed a bug pointed out by Alexander Raach 1/16/2005 KQ
 // updated to Scythe 1.0.X 7/10/2007 ADM
 // Albert and Chib method added 9/20/2007 JHP
+// fixed a bug pointed out by Shawn Treier 5/7/2018 KQ
 //
 // Copyright (C) 2003-2007 Andrew D. Martin and Kevin M. Quinn
 // Copyright (C) 2007-present Andrew D. Martin, Kevin M. Quinn,
@@ -272,6 +273,14 @@ void MCMCoprobit_impl (rng<RNGTYPE>& stream, const int * Y,
 	    - log(pnorm(gamma[Y[i]] - Xbeta[i], 0.0, 1.0) -
 		  pnorm(gamma[Y[i]-1] - Xbeta[i], 0.0, 1.0) );
 	}
+      }
+      for (int j=2; j<ncat; ++j){	   
+	loggendenrat = loggendenrat
+	  + log(pnorm(gamma[j+1], gamma[j], tune[0]) - 
+		pnorm(gamma_p[j-1], gamma[j], tune[0]) )  
+	  - log(pnorm(gamma_p[j+1], gamma_p[j], tune[0]) - 
+		pnorm(gamma[j-1], gamma_p[j], tune[0]) );
+	
       }
       double logacceptrat = loglikerat + loggendenrat;
       if (stream.runif() <= exp(logacceptrat)){
