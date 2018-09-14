@@ -1,4 +1,4 @@
-3f7f179015a0f1cd9d35f17671731918 *DESCRIPTION
+75d020a771fca9f639c887974966f826 *DESCRIPTION
 4d49b8c5f1f90650c8967f18a5d1b2cc *NAMESPACE
 489c13dcd0f8b0bf0109cb26e339c489 *R/BayesFactors.R
 4494114220f44ca6681dfd740491a913 *R/HDPHMMnegbin.R
@@ -162,7 +162,7 @@ ef5566f824887d9bbef5b76f1b64d839 *src/MCMCrng.h
 b3e224bb1a8452c3da347348b8e510cc *src/Makevars.win
 5362ed41a42ce34cf7817f6bfd988935 *src/algorithm.h
 d79d11cc57a04734c5fc044bae6c40a0 *src/cHDPHMMnegbin.cc
-a72e78bc37111529dd4b9e299c403126 *src/cHDPHMMpoisson.cc
+cd82bb1bf5460fee9f747b0bb782a78a *src/cHDPHMMpoisson.cc
 2976cb440c0af066b192008fb88cb57c *src/cHDPHSMMnegbin.cc
 0c8d2ff8a454d8bee60624efa213be41 *src/cHMMpanelFE.cc
 38db5274dbe2fcec05e2133841fdcfe7 *src/cHMMpanelRE.cc
@@ -207,7 +207,7 @@ f924b218cd6eaed80846ed0cba534b03 *src/matrix_forward_iterator.h
 3dc8b8e303daa7ffdf3e2d29b2fa43d9 *src/matrix_random_access_iterator.h
 b0f0c5a5c5197df32d18b77af2b85957 *src/mersenne.h
 a111bb9e9e66be7cb044ad27ea675124 *src/optimize.h
-d0cf994cd4c6886f8bd348c351a00ecf *src/rng.h
+17e0af0143791e39c8c81f8f59034c11 *src/rng.h
 b48baf77b93da895a04154ef15c8683f *src/rtmvnorm.h
 9a1656760820e50605248198302c308c *src/smath.h
 a5574b5829f3cab30cd73eb26725ae68 *src/stat.h

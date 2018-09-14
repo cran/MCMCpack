@@ -1311,7 +1311,9 @@ namespace scythe {
         // and wouldn't get inlined.
         const_matrix_forward_iterator<double,O,O,S> ait;
         const_matrix_forward_iterator<double,O,O,S> alast
-          = alpha.template end_f();
+	  //  = alpha.template end_f();
+	  // patch by mattblackwell 2018-08-27
+	  = alpha.end_f();
         typename Matrix<double,O,Concrete>::forward_iterator yit
           = y.begin_f();
         for (ait = alpha.begin_f(); ait != alast; ++ait) {

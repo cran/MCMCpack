@@ -407,7 +407,7 @@ void HDPHMMpoissonReg_impl(rng<RNGTYPE>& stream,
     Matrix<> gamma_prime_dir = gamma/ns + ::t(sumc(rest_dishes_over));
     gamma_prime = stream.rdirich(gamma_prime_dir);
     // sometimes with single regime stuff, you get nans from this draw.
-    if (isnan(gamma_prime(1))) {
+    if (std::isnan(gamma_prime(1))) {
       gamma_prime = gamma/ns;
     }
     if (debug > 0) Rprintf("Sampling P...\n");
