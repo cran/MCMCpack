@@ -7,8 +7,8 @@ Model using the logit link function}
 \usage{
 MCMChlogit(fixed, random, group, data, burnin = 5000, mcmc = 10000,
   thin = 10, verbose = 1, seed = NA, beta.start = NA,
-  sigma2.start = NA, Vb.start = NA, mubeta = 0, Vbeta = 1e+06, r, R,
-  nu = 0.001, delta = 0.001, FixOD = 0, ...)
+  sigma2.start = NA, Vb.start = NA, mubeta = 0, Vbeta = 1e+06, r,
+  R, nu = 0.001, delta = 0.001, FixOD = 0, ...)
 }
 \arguments{
 \item{fixed}{A two-sided linear formula of the form 'y~x1+...+xp' describing
@@ -251,7 +251,7 @@ in Hierarchical Longitudinal Models.'' \emph{Statistics and Computing.} 9:
 17-26.
 
 Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
-Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+Statistical Library 1.0.} \url{http://scythe.lsa.umich.edu}.
 
 Andrew D. Martin and Kyle L. Saunders. 2002. ``Bayesian Inference for
 Political Science Panel Data.'' Paper presented at the 2002 Annual Meeting

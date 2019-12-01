@@ -192,7 +192,7 @@
 #' 42(9): 1-21.  \url{http://www.jstatsoft.org/v42/i09/}.
 #'
 #' Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
-#' Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+#' Statistical Library 1.0.} \url{http://scythe.lsa.umich.edu}.
 #'
 #' Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.  ``Output
 #' Analysis and Diagnostics for MCMC (CODA)'', \emph{R News}. 6(1): 7-11.

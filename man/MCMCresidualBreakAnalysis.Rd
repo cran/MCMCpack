@@ -4,11 +4,11 @@
 \alias{MCMCresidualBreakAnalysis}
 \title{Break Analysis of Univariate Time Series using Markov Chain Monte Carlo}
 \usage{
-MCMCresidualBreakAnalysis(resid, m = 1, b0 = 0, B0 = 0.001, c0 = 0.1,
-  d0 = 0.1, a = NULL, b = NULL, mcmc = 1000, burnin = 1000,
-  thin = 1, verbose = 0, seed = NA, beta.start = NA, P.start = NA,
-  random.perturb = FALSE, WAIC = FALSE, marginal.likelihood = c("none",
-  "Chib95"), ...)
+MCMCresidualBreakAnalysis(resid, m = 1, b0 = 0, B0 = 0.001,
+  c0 = 0.1, d0 = 0.1, a = NULL, b = NULL, mcmc = 1000,
+  burnin = 1000, thin = 1, verbose = 0, seed = NA,
+  beta.start = NA, P.start = NA, random.perturb = FALSE,
+  WAIC = FALSE, marginal.likelihood = c("none", "Chib95"), ...)
 }
 \arguments{
 \item{resid}{Univariate time series}

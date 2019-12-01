@@ -121,9 +121,9 @@ void MCMCprobitres_impl (rng<RNGTYPE>& stream, const Matrix<>& Y,
   if(chib==1){
     Rprintf("\n Marginal Likelihood Computation Starts!\n"); 
 
-    Matrix<double> beta_star = meanc(beta_store); 
-    Matrix<double> density_beta(nstore, 1);      
-    for (int iter = 0; iter<nstore; ++iter){     
+    Matrix<double> beta_star = meanc(beta_store);
+    Matrix<double> density_beta(nstore, 1);
+    for (unsigned int iter = 0; iter<nstore; ++iter){
       const Matrix<> Z_reduced = Z_store(iter,_);
       const Matrix<double> XpZ = (::t(X)*Z_reduced);
       const Matrix<double> Bn = invpd(B0inv + XpX);

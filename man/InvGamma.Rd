@@ -4,8 +4,6 @@
 \alias{InvGamma}
 \alias{dinvgamma}
 \alias{rinvgamma}
-\alias{dinvgamma}
-\alias{rinvgamma}
 \title{The Inverse Gamma Distribution}
 \usage{
 dinvgamma(x, shape, scale = 1)

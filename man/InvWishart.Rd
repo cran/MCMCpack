@@ -4,8 +4,6 @@
 \alias{InvWishart}
 \alias{diwish}
 \alias{riwish}
-\alias{riwish}
-\alias{diwish}
 \title{The Inverse Wishart Distribution}
 \usage{
 riwish(v, S)

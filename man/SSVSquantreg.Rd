@@ -140,7 +140,7 @@ Craig Reed, David B. Dunson and Keming Yu. 2010. "Bayesian
 Variable Selection for Quantile Regression" Technical Report.
 
 Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
-Statistical Library 1.2.} \url{http://scythe.wustl.edu}.
+Statistical Library 1.2.} \url{http://scythe.lsa.umich.edu}.
 
 Keming Yu and Jin Zhang. 2005. "A Three Parameter Asymmetric Laplace
 Distribution and it's extensions." \emph{Communications in Statistics -

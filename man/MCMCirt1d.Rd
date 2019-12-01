@@ -5,10 +5,10 @@
 \title{Markov Chain Monte Carlo for One Dimensional Item Response Theory Model}
 \usage{
 MCMCirt1d(datamatrix, theta.constraints = list(), burnin = 1000,
-  mcmc = 20000, thin = 1, verbose = 0, seed = NA, theta.start = NA,
-  alpha.start = NA, beta.start = NA, t0 = 0, T0 = 1, ab0 = 0,
-  AB0 = 0.25, store.item = FALSE, store.ability = TRUE,
-  drop.constant.items = TRUE, ...)
+  mcmc = 20000, thin = 1, verbose = 0, seed = NA,
+  theta.start = NA, alpha.start = NA, beta.start = NA, t0 = 0,
+  T0 = 1, ab0 = 0, AB0 = 0.25, store.item = FALSE,
+  store.ability = TRUE, drop.constant.items = TRUE, ...)
 }
 \arguments{
 \item{datamatrix}{The matrix of data.  Must be 0, 1, or missing values.  The
@@ -200,7 +200,7 @@ Markov Chain Monte Carlo in R.'', \emph{Journal of Statistical Software}.
 42(9): 1-21.  \url{http://www.jstatsoft.org/v42/i09/}.
 
 Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
-Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+Statistical Library 1.0.} \url{http://scythe.lsa.umich.edu}.
 
 Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.  ``Output
 Analysis and Diagnostics for MCMC (CODA)'', \emph{R News}. 6(1): 7-11.

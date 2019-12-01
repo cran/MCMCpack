@@ -4,8 +4,6 @@
 \alias{Wishart}
 \alias{dwish}
 \alias{rwish}
-\alias{rwish}
-\alias{dwish}
 \title{The Wishart Distribution}
 \usage{
 rwish(v, S)

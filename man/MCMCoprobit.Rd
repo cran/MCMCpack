@@ -4,9 +4,9 @@
 \alias{MCMCoprobit}
 \title{Markov Chain Monte Carlo for Ordered Probit Regression}
 \usage{
-MCMCoprobit(formula, data = parent.frame(), burnin = 1000, mcmc = 10000,
-  thin = 1, tune = NA, tdf = 1, verbose = 0, seed = NA,
-  beta.start = NA, b0 = 0, B0 = 0, a0 = 0, A0 = 0,
+MCMCoprobit(formula, data = parent.frame(), burnin = 1000,
+  mcmc = 10000, thin = 1, tune = NA, tdf = 1, verbose = 0,
+  seed = NA, beta.start = NA, b0 = 0, B0 = 0, a0 = 0, A0 = 0,
   mcmc.method = c("Cowles", "AC"), ...)
 }
 \arguments{
@@ -81,9 +81,10 @@ An mcmc object that contains the posterior sample.  This object can
 be summarized by functions provided by the coda package.
 }
 \description{
-This function generates a sample from the posterior distribution of an
-ordered probit regression model using the data augmentation approach of
-Cowles (1996). The user supplies data and priors, and a sample from the
+This function generates a sample from the posterior distribution of
+an ordered probit regression model using the data augmentation approach of
+Albert and Chib (1993), with cut-points sampled according to Cowles (1996)
+or Albert and Chib (2001). The user supplies data and priors, and a sample from the
 posterior distribution is returned as an mcmc object, which can be
 subsequently analyzed with functions provided in the coda package.
 }
@@ -152,7 +153,7 @@ Albert, James and Siddhartha Chib. 2001. ``Sequential Ordinal Modeling with
 Applications to Survival Data." \emph{Biometrics.} 57: 829-836.
 
 Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
-Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+Statistical Library 1.0.} \url{http://scythe.lsa.umich.edu}.
 
 Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.  ``Output
 Analysis and Diagnostics for MCMC (CODA)'', \emph{R News}. 6(1): 7-11.

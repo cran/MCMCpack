@@ -183,107 +183,107 @@ double logdetminhalf;
 template <typename RNGTYPE>
 COV_TRIAL
 QR_SSVS_covariate_trials_draw_absent(const Matrix<>& C, const Matrix<>& X_gamma, const Matrix<>& U,
-const Matrix<>& newXcol, unsigned int row_index, const Matrix<>& weights, double pi0, double newlambda, double logolddetminhalf, rng<RNGTYPE>& stream){
-	const unsigned int n_obs = U.rows();
-	const unsigned int k = C.rows();
-
-//Calculate new row required to update the Cholesky decomposition
+				     const Matrix<>& newXcol, unsigned int row_index, const Matrix<>& weights, double pi0, double newlambda, double logolddetminhalf, rng<RNGTYPE>& stream){
+  const unsigned int n_obs = U.rows();
+  const unsigned int k = C.rows();
+  
+  //Calculate new row required to update the Cholesky decomposition
   Matrix<> XUXnewtXnew(k+1,1,false);
   double temp_xux1 = 0.0;
   double temp_xux2 = 0.0;
   double temp_xux3 = 0.0;
-
-//Calculate XUXnewtXnew
+  
+  //Calculate XUXnewtXnew
   for (unsigned int i=0; i<k-1; ++i){
-   for (unsigned int m=0; m<n_obs; ++m){
-	temp_xux1 += X_gamma(m,i)*newXcol(m)/weights(m);
-      }
-      XUXnewtXnew(i) = 0.5*temp_xux1;
-      temp_xux1 = 0.0;
+    for (unsigned int m=0; m<n_obs; ++m){
+      temp_xux1 += X_gamma(m,i)*newXcol(m)/weights(m);
     }
+    XUXnewtXnew(i) = 0.5*temp_xux1;
+    temp_xux1 = 0.0;
+  }
   for (unsigned int m=0; m<n_obs; ++m){
-temp_xux2 += U(m)*newXcol(m)/weights(m);
-temp_xux3 += newXcol(m)*newXcol(m)/weights(m);
-}
-XUXnewtXnew(k-1) = 0.5*temp_xux2;
-XUXnewtXnew(k) = 0.5*temp_xux3+newlambda;
-
-//Obtain the Cholesky Decomposition of the new matrix formed by adding newXcol onto the right hand side
-
-Matrix<> z(k,1,false);
-for (unsigned int i = 0; i < k; ++i) {
-        double sum = 0;
-        for (unsigned int j = 0; j < i; ++j) {
-          sum += C(i,j) * z(j);
-        }
-        z(i) = (XUXnewtXnew(i) - sum) / C(i, i);
-      }
-double rho = std::sqrt(XUXnewtXnew(k)-crossprod(z)(0));
-
-Matrix<> Cnew(k+1, k+1, true, 0.0);
-Cnew(0,0,k-1,k-1) = C;
-Cnew(k,0,k,k-1) = z;
-Cnew(k,k) = rho;
-
-// Permuting the Cholesky decomposition so that it corresponds to what would be obtained if the X matrix included the covariate
-
-    Matrix<> temp(Cnew);
-if (row_index != 0){
+    temp_xux2 += U(m)*newXcol(m)/weights(m);
+    temp_xux3 += newXcol(m)*newXcol(m)/weights(m);
+  }
+  XUXnewtXnew(k-1) = 0.5*temp_xux2;
+  XUXnewtXnew(k) = 0.5*temp_xux3+newlambda;
+  
+  //Obtain the Cholesky Decomposition of the new matrix formed by adding newXcol onto the right hand side
+  
+  Matrix<> z(k,1,false);
+  for (unsigned int i = 0; i < k; ++i) {
+    double sum = 0;
+    for (unsigned int j = 0; j < i; ++j) {
+      sum += C(i,j) * z(j);
+    }
+    z(i) = (XUXnewtXnew(i) - sum) / C(i, i);
+  }
+  double rho = std::sqrt(XUXnewtXnew(k)-crossprod(z)(0));
+  
+  Matrix<> Cnew(k+1, k+1, true, 0.0);
+  Cnew(0,0,k-1,k-1) = C;
+  Cnew(k,0,k,k-1) = z;
+  Cnew(k,k) = rho;
+  
+  // Permuting the Cholesky decomposition so that it corresponds to what would be obtained if the X matrix included the covariate
+  
+  Matrix<> temp(Cnew);
+  if (row_index != 0){
     temp(0,0,row_index-1,k) = Cnew(0,0,row_index-1,k);
-}
-    temp(row_index,_) = Cnew(k,_);
-    temp(row_index+1,0,k,k) = Cnew(row_index,0,k-1,k);
-
-// Givens rotations
-
-    Matrix<> Q(2,2,false);
- for (unsigned int i=k; i>row_index; --i)
-     {
-    double two_norm = std::sqrt(temp(row_index,i)*temp(row_index,i)
-  +temp(row_index,i-1)*temp(row_index,i-1));
-    Q(0,0) = temp(row_index,i-1)/two_norm;
-    Q(1,0) = temp(row_index,i)/two_norm;
-    Q(1,1) = Q(0,0);
-    Q(0,1) = -1.0*Q(1,0);
+  }
+  temp(row_index,_) = Cnew(k,_);
+  temp(row_index+1,0,k,k) = Cnew(row_index,0,k-1,k);
+  
+  // Givens rotations
+  
+  Matrix<> Q(2,2,false);
+  for (unsigned int i=k; i>row_index; --i)
+    {
+      double two_norm = std::sqrt(temp(row_index,i)*temp(row_index,i)
+				  +temp(row_index,i-1)*temp(row_index,i-1));
+      Q(0,0) = temp(row_index,i-1)/two_norm;
+      Q(1,0) = temp(row_index,i)/two_norm;
+      Q(1,1) = Q(0,0);
+      Q(0,1) = -1.0*Q(1,0);
       if (i!=k){
-         temp(i+1,i-1,k,i) = temp(i+1,i-1,k,i) * Q;
+	temp(i+1,i-1,k,i) = temp(i+1,i-1,k,i) * Q;
       }
-    double temp2 = temp(i,i-1);
-    temp(i,i-1) = Q(0,0)*temp2;
-    temp(i,i) = Q(0,1)*temp2;
-    if (temp(i,i) < 0){
+      double temp2 = temp(i,i-1);
+      temp(i,i-1) = Q(0,0)*temp2;
+      temp(i,i) = Q(0,1)*temp2;
+      if (temp(i,i) < 0){
 	temp(i,i,k,i) = -1.0*temp(i,i,k,i);
-	}
-    temp(row_index,i-1) = two_norm;
-    temp(row_index,i) = 0.0;
+      }
+      temp(row_index,i-1) = two_norm;
+      temp(row_index,i) = 0.0;
     }
   Cnew=temp;
-
-//Work out -0.5*log(det(Cnew'Cnew))
-  double lognewdetminhalf = 0.0;
- for (unsigned int i=0; i<k; ++i){
-  lognewdetminhalf -= std::log(Cnew(i,i));
-}
-
   
-    
-double log_g0 = logolddetminhalf-0.5*C(k-1,k-1)*C(k-1,k-1);
-double log_g1 = 0.5*std::log(newlambda)+lognewdetminhalf-0.5*Cnew(k,k)*Cnew(k,k);
-         
+  //Work out -0.5*log(det(Cnew'Cnew))
+  double lognewdetminhalf = 0.0;
+  for (unsigned int i=0; i<k; ++i){
+    lognewdetminhalf -= std::log(Cnew(i,i));
+  }
+  
+  
+  
+  double log_g0 = logolddetminhalf-0.5*C(k-1,k-1)*C(k-1,k-1);
+  double log_g1 = 0.5*std::log(newlambda)+lognewdetminhalf-0.5*Cnew(k,k)*Cnew(k,k);
+  
   double log_ratio = log_g0+std::log(1.0-pi0)-log_g1-std::log(pi0);
   double success_prob = 1.0/(1.0+std::exp(log_ratio));
   bool new_covariate_trial = stream.rbern(success_prob);
-COV_TRIAL result;
-result.newtrial = new_covariate_trial;
+  COV_TRIAL result;
+  result.newtrial = new_covariate_trial;
   if (new_covariate_trial == false){
-  result.Cnew = C;
-  result.logdetminhalf = logolddetminhalf;
+    result.Cnew = C;
+    result.logdetminhalf = logolddetminhalf;
   }
   else {
-  result.Cnew = Cnew;
-  result.logdetminhalf = lognewdetminhalf;
+    result.Cnew = Cnew;
+    result.logdetminhalf = lognewdetminhalf;
   }  
-return result;
+  return result;
 }
 
 // updating the indicator variable corresponding to whether a 
@@ -294,67 +294,67 @@ template <typename RNGTYPE>
 COV_TRIAL
 QR_SSVS_covariate_trials_draw_present(const Matrix<>& C, unsigned int row_index, unsigned int n_obs, double pi0, double oldlambda, double logolddetminhalf, rng<RNGTYPE>& stream){
   unsigned int k = C.rows();
- 
-// Permuting the Cholesky decomposition so that it corresponds to what would be obtained if the X matrix had the covariate in the final column
-
-    Matrix<> temp(C);
-if (row_index != 0){
-    temp(0,0,row_index-1,k-1) = C(0,0,row_index-1,k-1);
-}
-    temp(k-1,_) = C(row_index,_);
-    temp(row_index,0,k-2,k-1) = C(row_index+1,0,k-1,k-1);
-
-// Givens rotations
-
-    Matrix<> Q(2,2,false);
- for (unsigned int i=row_index; i<k-1; ++i)
-     {
-    double two_norm = std::sqrt(temp(i,i)*temp(i,i)
-  +temp(i,i+1)*temp(i,i+1));
-    Q(0,0) = temp(i,i)/two_norm;
-    Q(1,0) = temp(i,i+1)/two_norm;
-    Q(1,1) = Q(0,0);
-    Q(0,1) = -1.0*Q(1,0);
-      if (i!=k-2){
-         temp(i+1,i,k-2,i+1) = temp(i+1,i,k-2,i+1) * Q;
-      }
-    double temp2 = temp(k-1,i);
-    temp(k-1,i) = Q(0,0)*temp2;
-    temp(k-1,i+1) = Q(0,1)*temp2;
-    temp(i,i) = two_norm;
-    temp(i,i+1) = 0.0;
-    }
- if (temp(k-1,k-1) < 0){
- temp(k-1,k-1) = -1.0*temp(k-1,k-1);
-}
-
-Matrix<> Cnew = temp(0,0,k-2,k-2);
-
-// Work out -1/2*log(det(Cnew'Cnew))
- double lognewdetminhalf = 0.0;
- for (unsigned int i=0; i<k-2; ++i){
-  lognewdetminhalf -= std::log(Cnew(i,i));
-}
   
- 
-      double log_g0 = lognewdetminhalf-0.5*Cnew(k-2,k-2)*Cnew(k-2,k-2);
-      double log_g1 = 0.5*std::log(oldlambda)+logolddetminhalf-0.5*C(k-1,k-1)*C(k-1,k-1);
-
-
-double log_ratio = log_g0+std::log(1.0-pi0)-log_g1-std::log(pi0);
+  // Permuting the Cholesky decomposition so that it corresponds to what would be obtained if the X matrix had the covariate in the final column
+  
+  Matrix<> temp(C);
+  if (row_index != 0){
+    temp(0,0,row_index-1,k-1) = C(0,0,row_index-1,k-1);
+  }
+  temp(k-1,_) = C(row_index,_);
+  temp(row_index,0,k-2,k-1) = C(row_index+1,0,k-1,k-1);
+  
+  // Givens rotations
+  
+  Matrix<> Q(2,2,false);
+  for (unsigned int i=row_index; i<k-1; ++i)
+    {
+      double two_norm = std::sqrt(temp(i,i)*temp(i,i)
+				  +temp(i,i+1)*temp(i,i+1));
+      Q(0,0) = temp(i,i)/two_norm;
+      Q(1,0) = temp(i,i+1)/two_norm;
+      Q(1,1) = Q(0,0);
+      Q(0,1) = -1.0*Q(1,0);
+      if (i!=k-2){
+	temp(i+1,i,k-2,i+1) = temp(i+1,i,k-2,i+1) * Q;
+      }
+      double temp2 = temp(k-1,i);
+      temp(k-1,i) = Q(0,0)*temp2;
+      temp(k-1,i+1) = Q(0,1)*temp2;
+      temp(i,i) = two_norm;
+      temp(i,i+1) = 0.0;
+    }
+  if (temp(k-1,k-1) < 0){
+    temp(k-1,k-1) = -1.0*temp(k-1,k-1);
+  }
+  
+  Matrix<> Cnew = temp(0,0,k-2,k-2);
+  
+  // Work out -1/2*log(det(Cnew'Cnew))
+  double lognewdetminhalf = 0.0;
+  for (unsigned int i=0; i<k-2; ++i){
+    lognewdetminhalf -= std::log(Cnew(i,i));
+  }
+  
+  
+  double log_g0 = lognewdetminhalf-0.5*Cnew(k-2,k-2)*Cnew(k-2,k-2);
+  double log_g1 = 0.5*std::log(oldlambda)+logolddetminhalf-0.5*C(k-1,k-1)*C(k-1,k-1);
+  
+  
+  double log_ratio = log_g0+std::log(1.0-pi0)-log_g1-std::log(pi0);
   double success_prob = 1.0/(1.0+std::exp(log_ratio));
   bool new_covariate_trial = stream.rbern(success_prob);
-COV_TRIAL result;
-result.newtrial = new_covariate_trial;
+  COV_TRIAL result;
+  result.newtrial = new_covariate_trial;
   if (new_covariate_trial == false){
-  result.Cnew = Cnew;
-  result.logdetminhalf = lognewdetminhalf;
+    result.Cnew = Cnew;
+    result.logdetminhalf = lognewdetminhalf;
   }
   else {
-  result.Cnew = C;
-  result.logdetminhalf = logolddetminhalf;
+    result.Cnew = C;
+    result.logdetminhalf = logolddetminhalf;
   }  
-return result;
+  return result;
 }
 
 // update betas using Cholesky decomposition
@@ -367,13 +367,13 @@ QR_SSVS_beta_draw(const Matrix<>& C, rng<RNGTYPE>& stream){
   z = t(C(k-1,0,k-1,k-2));
   Matrix<> Q = z+standnorm*std::sqrt(2.0);
   Matrix<> result(k-1,1,false);
- for (int i = k-2; i >= 0; --i) {
-        double sum = 0;
-        for (unsigned int j = i+1; j < k-1; ++j) {
-          sum += C(j,i) * result(j);
-        }
-        result(i) = (Q(i) - sum) / C(i, i);
-      }
+  for (int i = k-2; i >= 0; --i) {
+    double sum = 0;
+    for (unsigned int j = i+1; j < k-1; ++j) {
+      sum += C(j,i) * result(j);
+    }
+    result(i) = (Q(i) - sum) / C(i, i);
+  }
   return result; 
 }
 
@@ -399,21 +399,21 @@ Matrix<> newlambda(n_uncert_cov,1,false);
 
 for (unsigned int i=n_cert_cov; i<tot_n_cov; ++i){
 
-unsigned int j = i-n_cert_cov;
-
-if (gamma(i) == true){
-
-        unsigned int col_index = n_cert_cov;
-	//obtain column index of betas
-	for (unsigned int m=n_cert_cov; m<i; ++m){
-	if (gamma(m) == true){
+  unsigned int j = i-n_cert_cov;
+  
+  if (gamma(i) == true){
+    
+    unsigned int col_index = n_cert_cov;
+    //obtain column index of betas
+    for (unsigned int m=n_cert_cov; m<i; ++m){
+      if (gamma(m) == true){
 	++col_index;
-	}
-	}
-
-newlambda(j) = stream.rexp(0.5*(1.0+beta_red(col_index)*beta_red(col_index)));
-}
-
+      }
+    }
+    
+    newlambda(j) = stream.rexp(0.5*(1.0+beta_red(col_index)*beta_red(col_index)));
+  }
+  
 else {
 newlambda(j) = stream.rexp(0.5);
 }
@@ -510,30 +510,28 @@ void irt_theta_update1 (Matrix<>& theta, const Matrix<>& Z,
 
   // calculate the posterior variance outside the justice specific loop
   double theta_post_var = T0;
-  for (unsigned int i = 0; i < K; ++i)
+  for (unsigned int i = 0; i < K; ++i){
     theta_post_var += std::pow(beta(i), 2.0);
+  }
   theta_post_var = 1.0 / theta_post_var;
   const double theta_post_sd = std::sqrt(theta_post_var);
-
+  
   // sample for each justice
   for (unsigned int j = 0; j < J; ++j) {
     // no equality constraints 
     if (theta_eq(j) == -999) {
       double betaTZjalpha = 0;
-      for (unsigned int k = 0; k < K; ++k)
-        betaTZjalpha += beta(k) * (Z(j,k) + alpha(k)); 
-        const double theta_post_mean = theta_post_var 
-          * (T0t0 + betaTZjalpha);
-
-        if (theta_ineq(j) == 0) { // no inequality constraint
-          theta(j) = theta_post_mean + stream.rnorm(0.0, theta_post_sd); 
-        } else if (theta_ineq(j) > 0) { // theta[j] > 0
-          theta(j) = stream.rtbnorm_combo(theta_post_mean, theta_post_var,
-              0);  
-        } else { // theta[j] < 0
-          theta(j) = stream.rtanorm_combo(theta_post_mean, theta_post_var,
-              0);  	  
-        }
+      for (unsigned int k = 0; k < K; ++k){
+        betaTZjalpha += beta(k) * (Z(j,k) + alpha(k));
+      }
+      const double theta_post_mean = theta_post_var*(T0t0 + betaTZjalpha);
+      if (theta_ineq(j) == 0) { // no inequality constraint
+	theta(j) = theta_post_mean + stream.rnorm(0.0, theta_post_sd); 
+      } else if (theta_ineq(j) > 0) { // theta[j] > 0
+	theta(j) = stream.rtbnorm_combo(theta_post_mean, theta_post_var, 0);  
+      } else { // theta[j] < 0
+	theta(j) = stream.rtanorm_combo(theta_post_mean, theta_post_var, 0);    
+      }
     } else { // equality constraints
       theta(j) = theta_eq(j);
     }

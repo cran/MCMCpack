@@ -5,13 +5,13 @@
 \title{Markov Chain Monte Carlo for Hierarchical One Dimensional Item Response
 Theory Model, Covariates Predicting Latent Ideal Point (Ability)}
 \usage{
-MCMCirtHier1d(datamatrix, Xjdata, burnin = 1000, mcmc = 20000, thin = 1,
-  verbose = 0, seed = NA, theta.start = NA, a.start = NA,
-  b.start = NA, beta.start = NA, b0 = 0, B0 = 0.01, c0 = 0.001,
-  d0 = 0.001, ab0 = 0, AB0 = 0.25, store.item = FALSE,
-  store.ability = TRUE, drop.constant.items = TRUE,
-  marginal.likelihood = c("none", "Chib95"), px = TRUE, px_a0 = 10,
-  px_b0 = 10, ...)
+MCMCirtHier1d(datamatrix, Xjdata, burnin = 1000, mcmc = 20000,
+  thin = 1, verbose = 0, seed = NA, theta.start = NA,
+  a.start = NA, b.start = NA, beta.start = NA, b0 = 0, B0 = 0.01,
+  c0 = 0.001, d0 = 0.001, ab0 = 0, AB0 = 0.25,
+  store.item = FALSE, store.ability = TRUE,
+  drop.constant.items = TRUE, marginal.likelihood = c("none",
+  "Chib95"), px = TRUE, px_a0 = 10, px_b0 = 10, ...)
 }
 \arguments{
 \item{datamatrix}{The matrix of data.  Must be 0, 1, or missing values.  The
@@ -271,7 +271,7 @@ Markov Chain Monte Carlo in R.'', \emph{Journal of Statistical Software}.
 42(9): 1-21.  \url{http://www.jstatsoft.org/v42/i09/}.
 
 Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
-Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+Statistical Library 1.0.} \url{http://scythe.lsa.umich.edu}.
 
 Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.  ``Output
 Analysis and Diagnostics for MCMC (CODA)'', \emph{R News}. 6(1): 7-11.

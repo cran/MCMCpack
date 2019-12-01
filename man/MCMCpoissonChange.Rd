@@ -4,10 +4,10 @@
 \alias{MCMCpoissonChange}
 \title{Markov Chain Monte Carlo for a Poisson Regression Changepoint Model}
 \usage{
-MCMCpoissonChange(formula, data = parent.frame(), m = 1, b0 = 0, B0 = 1,
-  a = NULL, b = NULL, c0 = NA, d0 = NA, lambda.mu = NA,
-  lambda.var = NA, burnin = 1000, mcmc = 1000, thin = 1, verbose = 0,
-  seed = NA, beta.start = NA, P.start = NA,
+MCMCpoissonChange(formula, data = parent.frame(), m = 1, b0 = 0,
+  B0 = 1, a = NULL, b = NULL, c0 = NA, d0 = NA, lambda.mu = NA,
+  lambda.var = NA, burnin = 1000, mcmc = 1000, thin = 1,
+  verbose = 0, seed = NA, beta.start = NA, P.start = NA,
   marginal.likelihood = c("none", "Chib95"), ...)
 }
 \arguments{

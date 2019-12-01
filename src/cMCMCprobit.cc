@@ -115,7 +115,7 @@ void MCMCprobit_impl (rng<RNGTYPE>& stream, const Matrix<>& Y,
     beta_star(_ ,0) = meanc(beta_store);
     Matrix<double> bn_reduced(k, 1);
     Matrix<double> density_beta(nstore, 1);
-    for (int iter = 0; iter<nstore; ++iter){
+    for (unsigned int iter = 0; iter<nstore; ++iter){
       bn_reduced(_, 0) = bn_store(iter, _);
       Matrix<double> bn_reduced1 = bn_store(iter, _);
       const Matrix<double> Bn = invpd(B0 + XpX);

@@ -220,10 +220,10 @@ void MCMCdynamicIRT1d_b_impl(rng<RNGTYPE>& stream,
   vector< vector < vector <int> > > STI;
   for (int s=0; s<*nsubj; ++s){
     vector < vector <int> > timeitemholder;
-    for (int tt=0; tt<theta[s].size(); ++tt){
+    for (unsigned int tt=0; tt<theta[s].size(); ++tt){
       const int t = tt + theta_offset[s];
       vector <int> itemholder;
-      for (int ii=0; ii<TI[t].size(); ++ii){
+      for (unsigned int ii=0; ii<TI[t].size(); ++ii){
 	const int i = TI[t][ii];
 	if (Z[s][i] != -999){
 	  itemholder.push_back(i);
@@ -336,7 +336,7 @@ void MCMCdynamicIRT1d_b_impl(rng<RNGTYPE>& stream,
 	beta_s0.reserve(STI[s][0].size());
 	vector<double> zalpha_s0;
 	zalpha_s0.reserve(STI[s][0].size());
-	for (int ii=0; ii<STI[s][0].size(); ++ii){
+	for (unsigned int ii=0; ii<STI[s][0].size(); ++ii){
 	  const int i = STI[s][0][ii];
 	  beta_s0.push_back(betadata[i]);
 	  zalpha_s0.push_back(Z[s][i] + alphadata[i]);
@@ -348,12 +348,12 @@ void MCMCdynamicIRT1d_b_impl(rng<RNGTYPE>& stream,
 	R.reserve(ntime_s);
 	R.push_back(E0inv[s] + tau2data[s]);
 	vector <double> f_0 = beta_s0;
-	for (int i=0; i<f_0.size(); ++i){
+	for (unsigned int i=0; i<f_0.size(); ++i){
 	  f_0[i] = f_0[i] * a[0];
 	}
 	Matrix <> Q_0(beta_s0.size(), beta_s0.size());
-	for (int i=0; i<beta_s0.size(); ++i){
-	  for (int j=i; j<beta_s0.size(); ++j){
+	for (unsigned int i=0; i<beta_s0.size(); ++i){
+	  for (unsigned int j=i; j<beta_s0.size(); ++j){
 	    if (i!=j){
 	      Q_0(i,j) = Q_0(j,i) = beta_s0[i] * beta_s0[j] * R[0];
 	    }
@@ -363,16 +363,16 @@ void MCMCdynamicIRT1d_b_impl(rng<RNGTYPE>& stream,
 	  }
 	}
 	vector <double> e_0 = zalpha_s0;
-	for (int i=0; i<e_0.size(); ++i){
+	for (unsigned int i=0; i<e_0.size(); ++i){
 	  e_0[i] = e_0[i] - f_0[i];
 	}
 	const Matrix <> Q_0_inv = invpd(Q_0);
 
 	vector <double> A_0;
 	A_0.reserve(beta_s0.size());
-	for (int i=0; i<beta_s0.size(); ++i){
+	for (unsigned int i=0; i<beta_s0.size(); ++i){
 	  double sumholder = 0.0;
-	  for (int j=0; j<beta_s0.size(); ++j){
+	  for (unsigned int j=0; j<beta_s0.size(); ++j){
 	    sumholder += beta_s0[j] * Q_0_inv(j,i);
 	  }
 	  A_0.push_back(sumholder * R[0]);
@@ -380,7 +380,7 @@ void MCMCdynamicIRT1d_b_impl(rng<RNGTYPE>& stream,
 	vector<double> m;
 	m.reserve(ntime_s);
 	double mhold = a[0];
-	for (int i=0; i<A_0.size(); ++i){
+	for (unsigned int i=0; i<A_0.size(); ++i){
 	  mhold += A_0[i] * e_0[i];
 	}
 	m.push_back(mhold);
@@ -390,9 +390,9 @@ void MCMCdynamicIRT1d_b_impl(rng<RNGTYPE>& stream,
 	C.reserve(ntime_s);
 	double Chold = 0.0;
 
-	for (int i=0; i<A_0.size(); ++i){
+	for (unsigned int i=0; i<A_0.size(); ++i){
 	  double hold2 = 0.0;
-	  for (int j=0; j<A_0.size(); ++j){
+	  for (unsigned int j=0; j<A_0.size(); ++j){
 	    //cout << "i = " << i << "   j = " << j << endl;
 	    hold2 += Q_0(i,j) * A_0[j];
 	  }
@@ -417,7 +417,7 @@ void MCMCdynamicIRT1d_b_impl(rng<RNGTYPE>& stream,
 	    beta_s.reserve(STI[s][tt].size());
 	    vector<double> zalpha_s;
 	    zalpha_s.reserve(STI[s][tt].size());
-	    for (int ii=0; ii<STI[s][tt].size(); ++ii){
+	    for (unsigned int ii=0; ii<STI[s][tt].size(); ++ii){
 	      const int i = STI[s][tt][ii];
 	      beta_s.push_back(betadata[i]);
 	      zalpha_s.push_back(Z[s][i] + alphadata[i]);
@@ -427,12 +427,12 @@ void MCMCdynamicIRT1d_b_impl(rng<RNGTYPE>& stream,
 	    // R
 	    R.push_back(C[tt-1] + tau2data[s]);
 	    vector <double> f = beta_s;
-	    for (int i=0; i<f.size(); ++i){
+	    for (unsigned int i=0; i<f.size(); ++i){
 	      f[i] = f[i] * a[tt];
 	    }
 	    Matrix <> Q(beta_s.size(), beta_s.size());
-	    for (int i=0; i<beta_s.size(); ++i){
-	      for (int j=i; j<beta_s.size(); ++j){
+	    for (unsigned int i=0; i<beta_s.size(); ++i){
+	      for (unsigned int j=i; j<beta_s.size(); ++j){
 		if (i!=j){
 		  Q(i,j) = Q(j,i) = beta_s[i] * beta_s[j] * R[tt];
 		}
@@ -442,30 +442,30 @@ void MCMCdynamicIRT1d_b_impl(rng<RNGTYPE>& stream,
 	      }
 	    }
 	    vector <double> e = zalpha_s;
-	    for (int i=0; i<e.size(); ++i){
+	    for (unsigned int i=0; i<e.size(); ++i){
 	      e[i] = e[i] - f[i];
 	    }
 	    const Matrix <> Q_inv = invpd(Q);
 
 	    vector <double> A;
 	    A.reserve(beta_s.size());
-	    for (int i=0; i<beta_s.size(); ++i){
+	    for (unsigned int i=0; i<beta_s.size(); ++i){
 	      double sumholder = 0.0;
-	      for (int j=0; j<beta_s.size(); ++j){
+	      for (unsigned int j=0; j<beta_s.size(); ++j){
 		sumholder += beta_s[j] * Q_inv(j,i);
 	      }
 	      A.push_back(sumholder * R[tt]);
 	    }
 	    mhold = a[tt];
-	    for (int i=0; i<A.size(); ++i){
+	    for (unsigned int i=0; i<A.size(); ++i){
 	      mhold += A[i] * e[i];
 	    }
 	    m.push_back(mhold);
 
 	    Chold = 0.0;
-	    for (int i=0; i<A.size(); ++i){
+	    for (unsigned int i=0; i<A.size(); ++i){
 	      double hold2 = 0.0;
-	      for (int j=0; j<A.size(); ++j){
+	      for (unsigned int j=0; j<A.size(); ++j){
 		hold2 += Q(i,j) * A[j];
 	      }
 	      Chold += hold2 * A[i];
@@ -542,7 +542,7 @@ void MCMCdynamicIRT1d_b_impl(rng<RNGTYPE>& stream,
       if (*storeability == 1){
 	int internalcount = 0;
 	for (int s=0; s<*nsubj; ++s){
-	  for (int t=0; t<theta[s].size(); ++t){
+	  for (unsigned int t=0; t<theta[s].size(); ++t){
 	    thetadraws[M(sampcount, internalcount, *nrowthetadraws)] =
 	      theta[s][t];
 	    ++internalcount;

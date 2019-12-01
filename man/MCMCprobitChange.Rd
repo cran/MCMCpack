@@ -4,10 +4,10 @@
 \alias{MCMCprobitChange}
 \title{Markov Chain Monte Carlo for a linear Gaussian Multiple Changepoint Model}
 \usage{
-MCMCprobitChange(formula, data = parent.frame(), m = 1, burnin = 10000,
-  mcmc = 10000, thin = 1, verbose = 0, seed = NA, beta.start = NA,
-  P.start = NA, b0 = NULL, B0 = NULL, a = NULL, b = NULL,
-  marginal.likelihood = c("none", "Chib95"), ...)
+MCMCprobitChange(formula, data = parent.frame(), m = 1,
+  burnin = 10000, mcmc = 10000, thin = 1, verbose = 0, seed = NA,
+  beta.start = NA, P.start = NA, b0 = NULL, B0 = NULL, a = NULL,
+  b = NULL, marginal.likelihood = c("none", "Chib95"), ...)
 }
 \arguments{
 \item{formula}{Model formula.}

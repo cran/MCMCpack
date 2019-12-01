@@ -162,9 +162,9 @@ void MCMCirtKdHet_impl(rng<RNGTYPE>& stream,
 	const Matrix<> phicon_i  = t(selif(t(phi), not_free_indic));
 	const Matrix<> X_i = Xstar(_,i);
 	const Matrix<> newX_i = gaxpy((-1.0*phicon_i), Lambdacon_i, X_i);
-						
+
 	for (unsigned int R=0; R<N; ++R){  // multiply through by inverse sigma
-		for (int Q=0; Q<D; ++ Q){
+		for (unsigned int Q=0; Q<D; ++Q){
 		phifree_i(R,Q) = phifree_i(R,Q) / sigma(R,0);
 		}
 		newX_i(R,0) = newX_i(R,0) /sigma(R,0);
@@ -196,10 +196,10 @@ void MCMCirtKdHet_impl(rng<RNGTYPE>& stream,
 	    gaxpy(Lam_post_C, stream.rnorm(hold.rows(), 1, 0, 1), Lam_post_mean);
 	  Lam_count = 0;
 	  double test = 0;
-	  for (int j=0; j<D; ++j){
+	  for (unsigned int j=0; j<D; ++j){
 	    if (free_indic[j]==1){
-	      Matrix<> prodcheck = 
-		Lambda_ineq_vec[j]*Lambdafree_i[Lam_count];    
+	      Matrix<> prodcheck =
+		Lambda_ineq_vec[j]*Lambdafree_i[Lam_count];
 	      test = std::min(test, prodcheck[0]); 	      
 	      ++Lam_count;
 	    }
@@ -226,10 +226,10 @@ void MCMCirtKdHet_impl(rng<RNGTYPE>& stream,
 	  eye<double>(hold.rows());  // prior prec
 	for (unsigned int j=0; j<hold.rows(); ++j)
 	  sig2lamfree_inv_i(j,j) = hold[j];
-	  
-	Matrix<> sX_i = ones<double>(N,1);  
+
+	Matrix<> sX_i = ones<double>(N,1);
 	for (unsigned int R=0; R<N; ++R){  // multiply through by inverse sigma
-		for (int Q=0; Q<D; ++ Q){
+		for (unsigned int Q=0; Q<D; ++Q){
 			phifree_i(R,Q) = phifree_i(R,Q) / sigma(R,0);
 		}
 		sX_i(R,0) = Xstar(R,i) / sigma(R,0);

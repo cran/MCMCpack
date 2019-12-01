@@ -4,10 +4,10 @@
 \alias{MCMCprobit}
 \title{Markov Chain Monte Carlo for Probit Regression}
 \usage{
-MCMCprobit(formula, data = NULL, burnin = 1000, mcmc = 10000, thin = 1,
-  verbose = 0, seed = NA, beta.start = NA, b0 = 0, B0 = 0,
-  bayes.resid = FALSE, marginal.likelihood = c("none", "Laplace", "Chib95"),
-  ...)
+MCMCprobit(formula, data = NULL, burnin = 1000, mcmc = 10000,
+  thin = 1, verbose = 0, seed = NA, beta.start = NA, b0 = 0,
+  B0 = 0, bayes.resid = FALSE, marginal.likelihood = c("none",
+  "Laplace", "Chib95"), ...)
 }
 \arguments{
 \item{formula}{Model formula.}
@@ -131,7 +131,7 @@ Siddhartha Chib. 1995. ``Marginal Likelihood from the Gibbs Output.''
 \emph{Journal of the American Statistical Association}. 90: 1313-1321.
 
 Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
-Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+Statistical Library 1.0.} \url{http://scythe.lsa.umich.edu}.
 
 Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.  ``Output
 Analysis and Diagnostics for MCMC (CODA)'', \emph{R News}. 6(1): 7-11.

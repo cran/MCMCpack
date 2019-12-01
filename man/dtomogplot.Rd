@@ -5,8 +5,9 @@
 \title{Dynamic Tomography Plot}
 \usage{
 dtomogplot(r0, r1, c0, c1, time.vec = NA, delay = 0,
-  xlab = "fraction of r0 in c0 (p0)", ylab = "fraction of r1 in c0 (p1)",
-  color.palette = heat.colors, bgcol = "black", ...)
+  xlab = "fraction of r0 in c0 (p0)",
+  ylab = "fraction of r1 in c0 (p1)", color.palette = heat.colors,
+  bgcol = "black", ...)
 }
 \arguments{
 \item{r0}{An \eqn{(ntables \times 1)} vector of row sums from

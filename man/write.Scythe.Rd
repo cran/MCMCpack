@@ -32,7 +32,7 @@ number of rows and columns in the first row, followed by the data.
 }
 \references{
 Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.
-\emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+\emph{Scythe Statistical Library 1.0.} \url{http://scythe.lsa.umich.edu}.
 }
 \seealso{
 \code{\link{write.Scythe}}

@@ -4,10 +4,10 @@
 \alias{MCMCSVDreg}
 \title{Markov Chain Monte Carlo for SVD Regression}
 \usage{
-MCMCSVDreg(formula, data = NULL, burnin = 1000, mcmc = 10000, thin = 1,
-  verbose = 0, seed = NA, tau2.start = 1, g0 = 0, a0 = 0.001,
-  b0 = 0.001, c0 = 2, d0 = 2, w0 = 1, beta.samp = FALSE,
-  intercept = TRUE, ...)
+MCMCSVDreg(formula, data = NULL, burnin = 1000, mcmc = 10000,
+  thin = 1, verbose = 0, seed = NA, tau2.start = 1, g0 = 0,
+  a0 = 0.001, b0 = 0.001, c0 = 2, d0 = 2, w0 = 1,
+  beta.samp = FALSE, intercept = TRUE, ...)
 }
 \arguments{
 \item{formula}{Model formula. Predictions are returned for elements
@@ -137,7 +137,7 @@ Statistical Software}.  42(9): 1-21.
 
 Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.
 \emph{Scythe Statistical Library 1.0.}
-\url{http://scythe.wustl.edu}.
+\url{http://scythe.lsa.umich.edu}.
 
 Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.
 ``Output Analysis and Diagnostics for MCMC (CODA)'', \emph{R

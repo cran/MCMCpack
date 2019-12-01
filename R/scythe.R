@@ -38,7 +38,7 @@
 #' @seealso \code{\link{write.Scythe}}
 #'
 #' @references Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.
-#' \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+#' \emph{Scythe Statistical Library 1.0.} \url{http://scythe.lsa.umich.edu}.
 #'
 #' @keywords file
 #'
@@ -92,7 +92,7 @@
 #' @seealso \code{\link{write.Scythe}}
 #'
 #' @references Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.
-#' \emph{Scythe Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+#' \emph{Scythe Statistical Library 1.0.} \url{http://scythe.lsa.umich.edu}.
 #'
 #' @keywords file
 #'

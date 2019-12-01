@@ -7,8 +7,8 @@ Model}
 \usage{
 MCMChierEI(r0, r1, c0, c1, burnin = 5000, mcmc = 50000, thin = 1,
   verbose = 0, seed = NA, m0 = 0, M0 = 2.287656, m1 = 0,
-  M1 = 2.287656, a0 = 0.825, b0 = 0.0105, a1 = 0.825, b1 = 0.0105,
-  ...)
+  M1 = 2.287656, a0 = 0.825, b0 = 0.0105, a1 = 0.825,
+  b1 = 0.0105, ...)
 }
 \arguments{
 \item{r0}{\eqn{(ntables \times 1)} vector of row sums from row 0.}
@@ -161,7 +161,7 @@ Markov Chain Monte Carlo in R.'', \emph{Journal of Statistical Software}.
 42(9): 1-21.  \url{http://www.jstatsoft.org/v42/i09/}.
 
 Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
-Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+Statistical Library 1.0.} \url{http://scythe.lsa.umich.edu}.
 
 Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.  ``Output
 Analysis and Diagnostics for MCMC (CODA)'', \emph{R News}. 6(1): 7-11.

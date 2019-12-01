@@ -4,8 +4,6 @@
 \alias{Dirichlet}
 \alias{ddirichlet}
 \alias{rdirichlet}
-\alias{ddirichlet}
-\alias{rdirichlet}
 \title{The Dirichlet Distribution}
 \usage{
 ddirichlet(x, alpha)

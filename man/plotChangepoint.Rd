@@ -5,8 +5,9 @@
 \title{Posterior Density of Regime Change Plot}
 \usage{
 plotChangepoint(mcmcout,
-  main = "Posterior Density of Regime Change Probabilities", xlab = "Time",
-  ylab = "", verbose = FALSE, start = 1, overlay = FALSE)
+  main = "Posterior Density of Regime Change Probabilities",
+  xlab = "Time", ylab = "", verbose = FALSE, start = 1,
+  overlay = FALSE)
 }
 \arguments{
 \item{mcmcout}{The \code{mcmc} object containing the posterior density

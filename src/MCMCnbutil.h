@@ -62,12 +62,12 @@ inline int sample_discrete(rng<RNGTYPE>& stream,
                     const Matrix<>& probs) {
   Matrix <> cprobs(probs.rows(), 1);
   cprobs[0] = probs[0];
-  for (int i = 1; i < probs.rows(); i++) {
+  for (unsigned int i = 1; i < probs.rows(); i++) {
     cprobs[i] = cprobs[i-1] + probs[i];
   }
   double U = stream.runif(); 
   int draw = 1;
-  for (int h = 0; h < probs.rows(); h++) { 
+  for (unsigned int h = 0; h < probs.rows(); h++) {
     if (cprobs[h] <= U && U < cprobs[h+1]) {
       draw = h + 2;
     }

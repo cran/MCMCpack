@@ -227,10 +227,10 @@ void MCMCnegbinReg_impl(rng<RNGTYPE>& stream,
     Matrix<> Xjp = rbind(X, selif(X, Y > 0));
     Matrix<> wip = rbind(Sigma_inv_sum, selif(Sigma_plus_inv_sum, Y > 0));
     Matrix<> Xwj(Xjp.rows(), k);
-    for (int h = 0; h<Xjp.rows(); ++h){
+    for (unsigned int h = 0; h<Xjp.rows(); ++h){
       Xwj(h, _) = Xjp(h,_)*wip[h];
     }
-    Matrix<> Bn = invpd(B0 + ::t(Xwj)*Xwj); 
+    Matrix<> Bn = invpd(B0 + ::t(Xwj)*Xwj);
     Matrix<> bn = Bn*gaxpy(B0, b0, ::t(Xwj)*yjp);
     if (k == 1) {
       beta[0] = stream.rnorm(bn[0], sqrt(Bn[0]));
@@ -304,10 +304,10 @@ void MCMCnegbinReg_impl(rng<RNGTYPE>& stream,
       Matrix<> Xjp = rbind(X, selif(X, Y > 0));
       Matrix<> wip = rbind(Sigma_inv_sum, selif(Sigma_plus_inv_sum, Y > 0));
       Matrix<> Xwj(Xjp.rows(), k);
-      for (int h = 0; h<Xjp.rows(); ++h){
+      for (unsigned int h = 0; h<Xjp.rows(); ++h){
         Xwj(h, _) = Xjp(h,_)*wip[h];
       }
-      Matrix<> Bn = invpd(B0 + ::t(Xwj)*Xwj); 
+      Matrix<> Bn = invpd(B0 + ::t(Xwj)*Xwj);
       Matrix<> bn = Bn*gaxpy(B0, b0, ::t(Xwj)*yjp);
       if (k == 1) {
         density_beta[iter] = exp(lndnorm(beta_st[0], bn[0], sqrt(Bn[0])));
@@ -461,5 +461,3 @@ extern "C" {
 
 
 #endif
-
-

@@ -93,14 +93,16 @@ namespace scythe {
                                                                       \
     Matrix<T,RO,RS> res;                                              \
                                                                       \
+    using std::placeholders::_1;                                      \
+                                                                      \
     if (A.size() == 1) {                                              \
       res.resize2Match(B);                                            \
       std::transform(B.template begin_f<RO>(), B.template end_f<RO>(),\
-          res.begin_f(), std::bind1st(std::ptr_fun((T (*) (T, S))OP), A(0)));                     \
+          res.begin_f(), std::bind(static_cast<T(*)(T,S)>(&OP), A(0), _1));      \
     } else if (B.size() == 1) {                                       \
       res.resize2Match(A);                                            \
       std::transform(A.template begin_f<RO>(), A.template end_f<RO>(),\
-                     res.begin_f(), std::bind2nd(std::ptr_fun((T (*) (T, S))OP), B(0)));          \
+                     res.begin_f(), std::bind(static_cast<T(*)(T,S)>(&OP), _1, B(0)));          \
     } else {                                                          \
       res.resize2Match(A);                                            \
       std::transform(A.template begin_f<RO>(), A.template end_f<RO>(),\
@@ -759,7 +761,7 @@ namespace scythe {
 	* \param A Matrix to be exponentiated
 	* \param ex Desired exponent
 	*/
-  SCYTHE_MATH_OP_2ARG(pow, ::pow)
+  SCYTHE_MATH_OP_2ARG(pow, std::pow)
 
   /* calc rem == x - n * y */
   SCYTHE_MATH_OP_2ARG(remainder, ::remainder)

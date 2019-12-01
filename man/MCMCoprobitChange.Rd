@@ -4,11 +4,11 @@
 \alias{MCMCoprobitChange}
 \title{Markov Chain Monte Carlo for Ordered Probit Changepoint Regression Model}
 \usage{
-MCMCoprobitChange(formula, data = parent.frame(), m = 1, burnin = 1000,
-  mcmc = 1000, thin = 1, tune = NA, verbose = 0, seed = NA,
-  beta.start = NA, gamma.start = NA, P.start = NA, b0 = NULL,
-  B0 = NULL, a = NULL, b = NULL, marginal.likelihood = c("none",
-  "Chib95"), gamma.fixed = 0, ...)
+MCMCoprobitChange(formula, data = parent.frame(), m = 1,
+  burnin = 1000, mcmc = 1000, thin = 1, tune = NA, verbose = 0,
+  seed = NA, beta.start = NA, gamma.start = NA, P.start = NA,
+  b0 = NULL, B0 = NULL, a = NULL, b = NULL,
+  marginal.likelihood = c("none", "Chib95"), gamma.fixed = 0, ...)
 }
 \arguments{
 \item{formula}{Model formula.}

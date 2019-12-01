@@ -89,9 +89,9 @@ doubling(double (*logfun)(const Matrix<>&, const Matrix<>&,
 }
 
 // Radford Neal's (2000) Accept procedure coded for a logdensity
-static const bool 
-Accept(double (*logfun)(const Matrix<>&, const Matrix<>&, 
-			const Matrix<>&, const Matrix<>&, 
+static  bool
+Accept(double (*logfun)(const Matrix<>&, const Matrix<>&,
+			const Matrix<>&, const Matrix<>&,
 			const Matrix<>&), const Matrix<>& beta,
        int index, double x0, double z, double w, const Matrix<>& Y,
        const Matrix<>& X, const Matrix<>& beta_prior_mean,

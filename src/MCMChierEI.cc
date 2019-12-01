@@ -97,10 +97,10 @@ void doubling(double (*logfun)(double[], const double&, const double&,
 }
 
 // Radford Neal's (2000) Accept procedure coded for a logdensity
-static const 
-bool Accept(double (*logfun)(double[], const double&, 
-			     const double&, const double&, const double&, 
-			     const double&, const double&, const double&), 
+static
+bool Accept(double (*logfun)(double[], const double&,
+			     const double&, const double&, const double&,
+			     const double&, const double&, const double&),
             double theta[], const int& index, const double x0, 
 	    const double& z, const double& w, const double& r0, 
 	    const double& r1, const double& c0, 

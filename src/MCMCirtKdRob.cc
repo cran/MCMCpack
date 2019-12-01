@@ -505,8 +505,8 @@ static void StepOut(double (*logfun)(const double&,
 
 
 
-// Radford Neal's (2000) Accept procedure coded for a logdensity  
-static const bool Accept(double (*logfun)(const double&,
+// Radford Neal's (2000) Accept procedure coded for a logdensity
+static bool Accept(double (*logfun)(const double&,
 					  const Matrix<int>&,
 					  const Matrix<>&,
 					  const Matrix<>&,
@@ -1188,5 +1188,3 @@ extern "C"{
 
 
 #endif
-
-

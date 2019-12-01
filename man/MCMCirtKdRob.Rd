@@ -5,14 +5,14 @@
 \title{Markov Chain Monte Carlo for Robust K-Dimensional Item Response Theory Model}
 \usage{
 MCMCirtKdRob(datamatrix, dimensions, item.constraints = list(),
-  ability.constraints = list(), burnin = 500, mcmc = 5000, thin = 1,
-  interval.method = "step", theta.w = 0.5, theta.mp = 4,
+  ability.constraints = list(), burnin = 500, mcmc = 5000,
+  thin = 1, interval.method = "step", theta.w = 0.5, theta.mp = 4,
   alphabeta.w = 1, alphabeta.mp = 4, delta0.w = NA, delta0.mp = 3,
   delta1.w = NA, delta1.mp = 3, verbose = FALSE, seed = NA,
   theta.start = NA, alphabeta.start = NA, delta0.start = NA,
-  delta1.start = NA, b0 = 0, B0 = 0, k0 = 0.1, k1 = 0.1, c0 = 1,
-  d0 = 1, c1 = 1, d1 = 1, store.item = TRUE, store.ability = FALSE,
-  drop.constant.items = TRUE, ...)
+  delta1.start = NA, b0 = 0, B0 = 0, k0 = 0.1, k1 = 0.1,
+  c0 = 1, d0 = 1, c1 = 1, d1 = 1, store.item = TRUE,
+  store.ability = FALSE, drop.constant.items = TRUE, ...)
 }
 \arguments{
 \item{datamatrix}{The matrix of data.  Must be 0, 1, or missing values.  It
@@ -311,7 +311,7 @@ Markov Chain Monte Carlo in R.'', \emph{Journal of Statistical Software}.
 42(9): 1-21.  \url{http://www.jstatsoft.org/v42/i09/}.
 
 Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
-Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+Statistical Library 1.0.} \url{http://scythe.lsa.umich.edu}.
 
 Radford Neal. 2003. ``Slice Sampling'' (with discussion). \emph{Annals of
 Statistics}, 31: 705-767.

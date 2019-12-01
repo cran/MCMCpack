@@ -106,9 +106,9 @@ static void doubling(double (*logfun)(double[], const double&, const double&,
 
 
 // Radford Neal's (2000) Accept procedure coded for a logdensity
-static const bool Accept(double (*logfun)(double[], const double&, 
+static bool Accept(double (*logfun)(double[], const double&,
 					  const double&,
-					  const double&, const double&, 
+					  const double&, const double&,
 					  const double&,
 					  const double&, const double&), 
 			 double theta[], const int& index, const double x0, 
@@ -169,6 +169,8 @@ static double shrinkage(double (*logfun)(double[], const double&,
 
   double Lbar = L;
   double Rbar = R;
+  /* A.G.: The following piece of code is unused: */
+  /* ***
   int ind0;
   if (index==0){
     ind0 = 1;
@@ -176,6 +178,7 @@ static double shrinkage(double (*logfun)(double[], const double&,
   else {
     ind0 = 0;
   }
+  *** */
   double theta_x1[2];
   theta_x1[0] = theta[0];
   theta_x1[1] = theta[1];

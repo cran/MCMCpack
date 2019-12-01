@@ -5,12 +5,13 @@
 \title{Markov Chain Monte Carlo for sticky HDP-HMM with a Negative
 Binomial outcome distribution}
 \usage{
-HDPHMMnegbin(formula, data = parent.frame(), K = 10, b0 = 0, B0 = 1,
-  a.theta = 50, b.theta = 5, a.alpha = 1, b.alpha = 0.1, a.gamma = 1,
-  b.gamma = 0.1, e = 2, f = 2, g = 10, burnin = 1000, mcmc = 1000,
-  thin = 1, verbose = 0, seed = NA, beta.start = NA, P.start = NA,
-  rho.start = NA, rho.step, nu.start = NA, gamma.start = 0.5,
-  theta.start = 0.98, ak.start = 100, ...)
+HDPHMMnegbin(formula, data = parent.frame(), K = 10, b0 = 0,
+  B0 = 1, a.theta = 50, b.theta = 5, a.alpha = 1, b.alpha = 0.1,
+  a.gamma = 1, b.gamma = 0.1, e = 2, f = 2, g = 10,
+  burnin = 1000, mcmc = 1000, thin = 1, verbose = 0, seed = NA,
+  beta.start = NA, P.start = NA, rho.start = NA, rho.step,
+  nu.start = NA, gamma.start = 0.5, theta.start = 0.98,
+  ak.start = 100, ...)
 }
 \arguments{
 \item{formula}{Model formula.}
@@ -196,7 +197,7 @@ Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
 Software}. 42(9): 1-21.  \url{http://www.jstatsoft.org/v42/i09/}.
 
 Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
-Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+Statistical Library 1.0.} \url{http://scythe.lsa.umich.edu}.
 
 Sylvia Fruehwirth-Schnatter, Rudolf Fruehwirth, Leonhard Held, and
     Havard Rue. 2009. ``Improved auxiliary mixture sampling for

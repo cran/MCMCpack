@@ -4,9 +4,9 @@
 \alias{MCMCregress}
 \title{Markov Chain Monte Carlo for Gaussian Linear Regression}
 \usage{
-MCMCregress(formula, data = NULL, burnin = 1000, mcmc = 10000, thin = 1,
-  verbose = 0, seed = NA, beta.start = NA, b0 = 0, B0 = 0,
-  c0 = 0.001, d0 = 0.001, sigma.mu = NA, sigma.var = NA,
+MCMCregress(formula, data = NULL, burnin = 1000, mcmc = 10000,
+  thin = 1, verbose = 0, seed = NA, beta.start = NA, b0 = 0,
+  B0 = 0, c0 = 0.001, d0 = 0.001, sigma.mu = NA, sigma.var = NA,
   marginal.likelihood = c("none", "Laplace", "Chib95"), ...)
 }
 \arguments{
@@ -147,7 +147,7 @@ Robert E. Kass and Adrian E. Raftery. 1995. ``Bayes Factors.'' \emph{Journal
 of the American Statistical Association}. 90: 773-795.
 
 Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
-Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+Statistical Library 1.0.} \url{http://scythe.lsa.umich.edu}.
 
 Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.  ``Output
 Analysis and Diagnostics for MCMC (CODA)'', \emph{R News}. 6(1): 7-11.

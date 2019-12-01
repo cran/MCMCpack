@@ -3,7 +3,6 @@
 \name{BayesFactor}
 \alias{BayesFactor}
 \alias{is.BayesFactor}
-\alias{is.BayesFactor}
 \title{Create an object of class BayesFactor from MCMCpack output}
 \usage{
 BayesFactor(...)

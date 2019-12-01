@@ -4,8 +4,6 @@
 \alias{NoncenHypergeom}
 \alias{rnoncenhypergeom}
 \alias{dnoncenhypergeom}
-\alias{dnoncenhypergeom}
-\alias{rnoncenhypergeom}
 \title{The Noncentral Hypergeometric Distribution}
 \source{
 J. G. Liao and Ori Rosen. 2001. ``Fast and Stable Algorithms for

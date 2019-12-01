@@ -17,9 +17,10 @@
 
 #' Markov Chain Monte Carlo for Ordered Probit Regression
 #'
-#' This function generates a sample from the posterior distribution of an
-#' ordered probit regression model using the data augmentation approach of
-#' Cowles (1996). The user supplies data and priors, and a sample from the
+#' This function generates a sample from the posterior distribution of
+#' an ordered probit regression model using the data augmentation approach of
+#' Albert and Chib (1993), with cut-points sampled according to Cowles (1996)
+#' or Albert and Chib (2001). The user supplies data and priors, and a sample from the
 #' posterior distribution is returned as an mcmc object, which can be
 #' subsequently analyzed with functions provided in the coda package.
 #'
@@ -143,7 +144,7 @@
 #' Applications to Survival Data." \emph{Biometrics.} 57: 829-836.
 #'
 #' Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
-#' Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+#' Statistical Library 1.0.} \url{http://scythe.lsa.umich.edu}.
 #'
 #' Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.  ``Output
 #' Analysis and Diagnostics for MCMC (CODA)'', \emph{R News}. 6(1): 7-11.
@@ -195,7 +196,7 @@
     vars <- as.character(attr(mt, "variables"))[-1] # y varname and x varnames
 
     ## null model support
-    X <- if (!is.empty.model(mt)) model.matrix(mt, mf, contrasts)# else NULL
+    X <- if (!is.empty.model(mt)) model.matrix(mt, mf)# else NULL
     X.names <- dimnames(X)[[2]]
     Y    <- model.response(mf, "numeric")
     Y    <- factor(Y, ordered=TRUE)

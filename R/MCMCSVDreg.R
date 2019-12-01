@@ -36,7 +36,7 @@ parse.formula.SVDreg <- function(formula, data, intercept){
   }
 
   ## null model support
-  X <- if (!is.empty.model(mt)) model.matrix(mt, mf, contrasts)
+  X <- if (!is.empty.model(mt)) model.matrix(mt, mf)
   X <- as.matrix(X)         # X matrix
   Y <- as.matrix(model.response(mf, "numeric")) # Y matrix
 
@@ -184,7 +184,7 @@ parse.formula.SVDreg <- function(formula, data, intercept){
 #'
 #' Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.
 #' \emph{Scythe Statistical Library 1.0.}
-#' \url{http://scythe.wustl.edu}.
+#' \url{http://scythe.lsa.umich.edu}.
 #'
 #' Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.
 #' ``Output Analysis and Diagnostics for MCMC (CODA)'', \emph{R

@@ -5,10 +5,10 @@
 \title{Metropolis Sampling from User-Written R function}
 \usage{
 MCMCmetrop1R(fun, theta.init, burnin = 500, mcmc = 20000, thin = 1,
-  tune = 1, verbose = 0, seed = NA, logfun = TRUE, force.samp = FALSE,
-  V = NULL, optim.method = "BFGS", optim.lower = -Inf,
-  optim.upper = Inf, optim.control = list(fnscale = -1, trace = 0, REPORT =
-  10, maxit = 500), ...)
+  tune = 1, verbose = 0, seed = NA, logfun = TRUE,
+  force.samp = FALSE, V = NULL, optim.method = "BFGS",
+  optim.lower = -Inf, optim.upper = Inf, optim.control = list(fnscale
+  = -1, trace = 0, REPORT = 10, maxit = 500), ...)
 }
 \arguments{
 \item{fun}{The unnormalized (log)density of the distribution from which to
@@ -210,7 +210,7 @@ Markov Chain Monte Carlo in R.'', \emph{Journal of Statistical Software}.
 42(9): 1-21.  \url{http://www.jstatsoft.org/v42/i09/}.
 
 Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
-Statistical Library 1.0.} \url{http://scythe.wustl.edu}.
+Statistical Library 1.0.} \url{http://scythe.lsa.umich.edu}.
 
 Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.  ``Output
 Analysis and Diagnostics for MCMC (CODA)'', \emph{R News}. 6(1): 7-11.

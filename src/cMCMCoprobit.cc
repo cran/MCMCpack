@@ -361,7 +361,7 @@ void MCMCoprobit_impl (rng<RNGTYPE>& stream, const int * Y,
   }// end of MCMC
   if (verbose > 0){
     Rprintf("\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-    Rprintf("The Metropolis acceptance rate for beta was %3.5f",
+    Rprintf("The Metropolis acceptance rate for gamma was %3.5f",
 	    static_cast<double>(accepts) / static_cast<double>(tot_iter));
     Rprintf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
   }

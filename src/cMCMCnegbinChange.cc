@@ -429,7 +429,7 @@ void MCMCnegbinRegChangepoint_impl(rng<RNGTYPE>& stream,
           wip(nstate[j], 0, tot_rows - 1, 0) = selif(Sigma_plus_inv_sum, (s == (j + 1)) & (Y > 0));
         }
         Matrix<> Xwj(Xjp.rows(), k);
-        for (int h = 0; h<Xjp.rows(); ++h){
+        for (unsigned int h = 0; h<Xjp.rows(); ++h){
           Xwj(h, _) = Xjp(h,_)*wip[h];
         }
 
@@ -578,10 +578,10 @@ void MCMCnegbinRegChangepoint_impl(rng<RNGTYPE>& stream,
           wip(nstate[j], 0, tot_rows - 1, 0) = selif(Sigma_plus_inv_sum, (s == (j + 1)) & (Y > 0));
         }
         Matrix<> Xwj(Xjp.rows(), k);
-        for (int h = 0; h<Xjp.rows(); ++h) {
+        for (unsigned int h = 0; h<Xjp.rows(); ++h) {
           Xwj(h, _) = Xjp(h,_)*wip[h];
         }
-        
+
         Matrix<> Bn = invpd(B0 + ::t(Xwj)*Xwj); 
         Matrix<> bn = Bn*gaxpy(B0, b0, ::t(Xwj)*yjp);
         
@@ -851,5 +851,3 @@ extern "C" {
 
 
 #endif
-
-
