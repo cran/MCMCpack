@@ -1,4 +1,4 @@
-4f9fc9f87a278b670bdbe37b5f339e0a *DESCRIPTION
+e11d0398b09fbd41c4d3957bfc40fecf *DESCRIPTION
 4d49b8c5f1f90650c8967f18a5d1b2cc *NAMESPACE
 489c13dcd0f8b0bf0109cb26e339c489 *R/BayesFactors.R
 fd02007629b07659d2534c142bb495ea *R/HDPHMMnegbin.R
@@ -54,7 +54,7 @@ d51c4bb909bbbde846dd62441303a9c1 *R/distn.R
 d451566d6a37400a46248a807dffd0e8 *R/procrust.R
 8b765f0882bbd8ba6ff3e19da454c4fc *R/scythe.R
 99eea48562debd8163c0b54a15d73ce7 *R/testpanelGroupBreak.R
-53e924da8867050bcf4ff64ed0021944 *R/testpanelSubjectBreak.R
+aa7d98a5fd1b1bc0e3bdec254466356b *R/testpanelSubjectBreak.R
 03b95e2b1fb0d42d2b7202423b77b23a *R/tomog.R
 175f5ed085a3f66d7cb87d64bac0e344 *R/utility.R
 7e2021def8a88edb41fe78d0a0ae642c *R/zzz.R
@@ -68,7 +68,7 @@ e17202d22ce5ab5ab7b01e3b248a4008 *data/Nethvote.rda
 accb7b5b46207a02e49de2702a6faff4 *data/Senate.rda
 ce79b1b47b561cb44dd4f93589d3d755 *data/SupremeCourt.rda
 a5cfcf73e21c03eeaf4f3baa5c492c14 *inst/CITATION
-564ae52a74cf7e8ff5a0445e58bfb380 *inst/HISTORY
+75ca22638ae19756a9981bd0146931b0 *inst/HISTORY.txt
 cb4856b66283c4e98efeee9b0866b4ce *man/BayesFactor.Rd
 3fde04199db6c766bf4474f697236a44 *man/Dirichlet.Rd
 37c7183716af471f158c485d94eb4910 *man/HDPHMMnegbin.Rd
@@ -134,7 +134,7 @@ c44b7eaa6214c35503d73640787a2731 *man/plotChangepoint.Rd
 0e51c784229f93855d749541d77f3a58 *man/read.Scythe.Rd
 b0abe164d7bf55870f0232580778cf82 *man/summaryqrssvs.Rd
 ca0c1cd492de49ae59e69191036e7261 *man/testpanelGroupBreak.Rd
-f656f8da46131e6cb04e9e33e9bfd93f *man/testpanelSubjectBreak.Rd
+1189ccf7eb566810a04f30117f27b486 *man/testpanelSubjectBreak.Rd
 25cda9c0d5b7ae12f539d76397e17570 *man/tomogplot.Rd
 4d4dc1d5169d966ff2dc5f9b7ef2a472 *man/topmodels.Rd
 36ebe9977157db5a14373f347e183754 *man/vech.Rd

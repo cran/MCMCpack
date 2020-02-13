@@ -191,7 +191,7 @@
   function(subject.id, time.id, resid, max.break=2, minimum = 10,
            mcmc=1000, burnin=1000, thin=1, verbose=0,
            b0, B0, c0, d0, a = NULL, b = NULL, seed = NA,
-           Time = NULL, ps.out = FALSE){
+           Time = NULL, ps.out = FALSE, ...){
     ## seeds
     seeds <- form.seeds(seed)
     lecuyer <- seeds[[1]]
