@@ -5,10 +5,26 @@
 \title{Markov Chain Monte Carlo for Wakefield's Hierarchial Ecological Inference
 Model}
 \usage{
-MCMChierEI(r0, r1, c0, c1, burnin = 5000, mcmc = 50000, thin = 1,
-  verbose = 0, seed = NA, m0 = 0, M0 = 2.287656, m1 = 0,
-  M1 = 2.287656, a0 = 0.825, b0 = 0.0105, a1 = 0.825,
-  b1 = 0.0105, ...)
+MCMChierEI(
+  r0,
+  r1,
+  c0,
+  c1,
+  burnin = 5000,
+  mcmc = 50000,
+  thin = 1,
+  verbose = 0,
+  seed = NA,
+  m0 = 0,
+  M0 = 2.287656,
+  m1 = 0,
+  M1 = 2.287656,
+  a0 = 0.825,
+  b0 = 0.0105,
+  a1 = 0.825,
+  b1 = 0.0105,
+  ...
+)
 }
 \arguments{
 \item{r0}{\eqn{(ntables \times 1)} vector of row sums from row 0.}
@@ -86,7 +102,7 @@ for unit \eqn{t} where \eqn{t=1,\ldots,ntables}:
             \tab | \eqn{c_{0t}} \tab | \eqn{c_{1t}} \tab | \eqn{N_t}
 }
 
-Where \eqn{r_{0t}}, \eqn{r_{1t}}, \eqn{c_{0t}}, \eqn{c_{1t}}, and
+ Where \eqn{r_{0t}}, \eqn{r_{1t}}, \eqn{c_{0t}}, \eqn{c_{1t}}, and
 \eqn{N_t} are non-negative integers that are observed. The interior
 cell entries are not observed. It is assumed that
 \eqn{Y_{0t}|r_{0t} \sim \mathcal{B}inomial(r_{0t}, p_{0t})} and

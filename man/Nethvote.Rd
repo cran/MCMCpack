@@ -4,7 +4,8 @@
 \name{Nethvote}
 \alias{Nethvote}
 \title{Dutch Voting Behavior in 1989}
-\format{A data frame with 1754 observations and 11 variables from the 1989
+\format{
+A data frame with 1754 observations and 11 variables from the 1989
 Dutch Parliamentary Election Study (Anker and Oppenhuis, 1993). Each
 observation is a survey respondent.  These data are a subset of one of five
 multiply imputed datasets used in Quinn and Martin (2002). For more
@@ -35,7 +36,8 @@ information see Quinn and Martin (2002).
   \item{urban}{Indicator variable equal to 0 if the respondent is not a
     resident of an urban area and 1 if the respondent is a resident of an urban
     area.}
-}}
+}
+}
 \source{
 H. Anker and E.V. Oppenhuis. 1993. ``Dutch Parliamentary Election
 Study.'' (computer file). Dutch Electoral Research Foundation and

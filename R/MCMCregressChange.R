@@ -190,7 +190,7 @@
 #'
 #' ## prior
 #' b0 <- 0
-#' B0 <- 1
+#' B0 <- 0.1
 #' sigma.mu=sd(y)
 #' sigma.var=var(y)
 #'

@@ -4,11 +4,24 @@
 \alias{MCMCmetrop1R}
 \title{Metropolis Sampling from User-Written R function}
 \usage{
-MCMCmetrop1R(fun, theta.init, burnin = 500, mcmc = 20000, thin = 1,
-  tune = 1, verbose = 0, seed = NA, logfun = TRUE,
-  force.samp = FALSE, V = NULL, optim.method = "BFGS",
-  optim.lower = -Inf, optim.upper = Inf, optim.control = list(fnscale
-  = -1, trace = 0, REPORT = 10, maxit = 500), ...)
+MCMCmetrop1R(
+  fun,
+  theta.init,
+  burnin = 500,
+  mcmc = 20000,
+  thin = 1,
+  tune = 1,
+  verbose = 0,
+  seed = NA,
+  logfun = TRUE,
+  force.samp = FALSE,
+  V = NULL,
+  optim.method = "BFGS",
+  optim.lower = -Inf,
+  optim.upper = Inf,
+  optim.control = list(fnscale = -1, trace = 0, REPORT = 10, maxit = 500),
+  ...
+)
 }
 \arguments{
 \item{fun}{The unnormalized (log)density of the distribution from which to

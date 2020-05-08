@@ -4,7 +4,8 @@
 \name{PErisk}
 \alias{PErisk}
 \title{Political Economic Risk Data from 62 Countries in 1987}
-\format{A data frame with 62 observations on the following 9 variables. All
+\format{
+A data frame with 62 observations on the following 9 variables. All
 data points are from 1987. See Quinn (2004) for more details.
 \describe{
   \item{country}{a factor with levels \code{Argentina} through
@@ -24,7 +25,8 @@ data points are from 1987. See Quinn (2004) for more details.
     From Marshall, Gurr, and Harff (2002).}
   \item{gdpw2}{a numeric vector giving the natural log of real GDP per worker in
    1985 international prices. From Alvarez et al. (1999).}
-}}
+}
+}
 \source{
 Mike Alvarez, Jose Antonio Cheibub, Fernando Limongi, and Adam
 Przeworski. 1999. ``ACLP Political and Economic Database.''

@@ -4,11 +4,27 @@
 \alias{MCMCoprobitChange}
 \title{Markov Chain Monte Carlo for Ordered Probit Changepoint Regression Model}
 \usage{
-MCMCoprobitChange(formula, data = parent.frame(), m = 1,
-  burnin = 1000, mcmc = 1000, thin = 1, tune = NA, verbose = 0,
-  seed = NA, beta.start = NA, gamma.start = NA, P.start = NA,
-  b0 = NULL, B0 = NULL, a = NULL, b = NULL,
-  marginal.likelihood = c("none", "Chib95"), gamma.fixed = 0, ...)
+MCMCoprobitChange(
+  formula,
+  data = parent.frame(),
+  m = 1,
+  burnin = 1000,
+  mcmc = 1000,
+  thin = 1,
+  tune = NA,
+  verbose = 0,
+  seed = NA,
+  beta.start = NA,
+  gamma.start = NA,
+  P.start = NA,
+  b0 = NULL,
+  B0 = NULL,
+  a = NULL,
+  b = NULL,
+  marginal.likelihood = c("none", "Chib95"),
+  gamma.fixed = 0,
+  ...
+)
 }
 \arguments{
 \item{formula}{Model formula.}
@@ -157,10 +173,10 @@ formula <- y ~ x1
 ## fit multiple models with a varying number of breaks
 out1 <- MCMCoprobitChange(formula, m=1,
       	mcmc=100, burnin=100, thin=1, tune=c(.5, .5), verbose=100,
-     	b0=0, B0=10, marginal.likelihood = "Chib95")
+     	b0=0, B0=0.1, marginal.likelihood = "Chib95")
 out2 <- MCMCoprobitChange(formula, m=2,
       	mcmc=100, burnin=100, thin=1, tune=c(.5, .5, .5), verbose=100,
-     	b0=0, B0=10, marginal.likelihood = "Chib95")
+     	b0=0, B0=0.1, marginal.likelihood = "Chib95")
 
 ## Do model comparison
 ## NOTE: the chain should be run longer than this example!

@@ -4,9 +4,21 @@
 \alias{MCMCpoisson}
 \title{Markov Chain Monte Carlo for Poisson Regression}
 \usage{
-MCMCpoisson(formula, data = NULL, burnin = 1000, mcmc = 10000,
-  thin = 1, tune = 1.1, verbose = 0, seed = NA, beta.start = NA,
-  b0 = 0, B0 = 0, marginal.likelihood = c("none", "Laplace"), ...)
+MCMCpoisson(
+  formula,
+  data = NULL,
+  burnin = 1000,
+  mcmc = 10000,
+  thin = 1,
+  tune = 1.1,
+  verbose = 0,
+  seed = NA,
+  beta.start = NA,
+  b0 = 0,
+  B0 = 0,
+  marginal.likelihood = c("none", "Laplace"),
+  ...
+)
 }
 \arguments{
 \item{formula}{Model formula.}

@@ -4,8 +4,13 @@
 \alias{plotHDPChangepoint}
 \title{Posterior Changepoint Probabilities from HDP-HMM}
 \usage{
-plotHDPChangepoint(mcmcout, main = "Posterior Changepoint Probabilities",
-  xlab = "Time", ylab = "", start = 1)
+plotHDPChangepoint(
+  mcmcout,
+  main = "Posterior Changepoint Probabilities",
+  xlab = "Time",
+  ylab = "",
+  start = 1
+)
 }
 \arguments{
 \item{mcmcout}{The \code{mcmc} object containing the posterior density

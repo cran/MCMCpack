@@ -4,8 +4,16 @@
 \alias{tomogplot}
 \title{Tomography Plot}
 \usage{
-tomogplot(r0, r1, c0, c1, xlab = "fraction of r0 in c0 (p0)",
-  ylab = "fraction of r1 in c0 (p1)", bgcol = "white", ...)
+tomogplot(
+  r0,
+  r1,
+  c0,
+  c1,
+  xlab = "fraction of r0 in c0 (p0)",
+  ylab = "fraction of r1 in c0 (p1)",
+  bgcol = "white",
+  ...
+)
 }
 \arguments{
 \item{r0}{An \eqn{(ntables \times 1)} vector of row sums from

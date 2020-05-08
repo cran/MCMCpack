@@ -497,8 +497,7 @@
       rownames(accepts) <- X.names
       colnames(accepts) <- ""
       cat("\n\nAcceptance rates:\n")
-      print(t(accepts) / (posterior$burnin+posterior$mcmc), digits=2,
-            width=6)
+      print(t(accepts) / (posterior$burnin+posterior$mcmc), digits=2)
     }
 
     # put together matrix and build MCMC object to return

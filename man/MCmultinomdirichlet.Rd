@@ -42,7 +42,7 @@ observed data.
 posterior <- MCmultinomdirichlet(c(727,583,137), c(1,1,1), mc=10000)
 bush.dukakis.diff <- posterior[,1] - posterior[,2]
 cat("Pr(Bush > Dukakis): ",
-   sum(bush.dukakis.diff > 0) / length(bush.dukakis.diff), "\\n")
+   sum(bush.dukakis.diff > 0) / length(bush.dukakis.diff), "\n")
 hist(bush.dukakis.diff)
 }
 

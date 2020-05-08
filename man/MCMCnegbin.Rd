@@ -4,11 +4,26 @@
 \alias{MCMCnegbin}
 \title{Markov Chain Monte Carlo for Negative Binomial Regression}
 \usage{
-MCMCnegbin(formula, data = parent.frame(), b0 = 0, B0 = 1, e = 2,
-  f = 2, g = 10, burnin = 1000, mcmc = 1000, thin = 1,
-  verbose = 0, seed = NA, beta.start = NA, rho.start = NA,
-  rho.step = 0.1, nu.start = NA, marginal.likelihood = c("none",
-  "Chib95"), ...)
+MCMCnegbin(
+  formula,
+  data = parent.frame(),
+  b0 = 0,
+  B0 = 1,
+  e = 2,
+  f = 2,
+  g = 10,
+  burnin = 1000,
+  mcmc = 1000,
+  thin = 1,
+  verbose = 0,
+  seed = NA,
+  beta.start = NA,
+  rho.start = NA,
+  rho.step = 0.1,
+  nu.start = NA,
+  marginal.likelihood = c("none", "Chib95"),
+  ...
+)
 }
 \arguments{
 \item{formula}{Model formula.}

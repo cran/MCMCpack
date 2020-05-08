@@ -5,10 +5,25 @@
 \title{A Test for the Group-level Break using a Multivariate Linear Regression
 Model with Breaks}
 \usage{
-testpanelGroupBreak(subject.id, time.id, resid, m = 1, mcmc = 1000,
-  burnin = 1000, thin = 1, verbose = 0, b0, B0, c0, d0, a = NULL,
-  b = NULL, seed = NA, marginal.likelihood = c("none", "Chib95"),
-  ...)
+testpanelGroupBreak(
+  subject.id,
+  time.id,
+  resid,
+  m = 1,
+  mcmc = 1000,
+  burnin = 1000,
+  thin = 1,
+  verbose = 0,
+  b0,
+  B0,
+  c0,
+  d0,
+  a = NULL,
+  b = NULL,
+  seed = NA,
+  marginal.likelihood = c("none", "Chib95"),
+  ...
+)
 }
 \arguments{
 \item{subject.id}{A numeric vector indicating the group number. It should

@@ -4,11 +4,33 @@
 \alias{HMMpanelRE}
 \title{Markov Chain Monte Carlo for the Hidden Markov Random-effects Model}
 \usage{
-HMMpanelRE(subject.id, time.id, y, X, W, m = 1, mcmc = 1000,
-  burnin = 1000, thin = 1, verbose = 0, b0 = 0, B0 = 0.001,
-  c0 = 0.001, d0 = 0.001, r0, R0, a = NULL, b = NULL, seed = NA,
-  beta.start = NA, sigma2.start = NA, D.start = NA, P.start = NA,
-  marginal.likelihood = c("none", "Chib95"), ...)
+HMMpanelRE(
+  subject.id,
+  time.id,
+  y,
+  X,
+  W,
+  m = 1,
+  mcmc = 1000,
+  burnin = 1000,
+  thin = 1,
+  verbose = 0,
+  b0 = 0,
+  B0 = 0.001,
+  c0 = 0.001,
+  d0 = 0.001,
+  r0,
+  R0,
+  a = NULL,
+  b = NULL,
+  seed = NA,
+  beta.start = NA,
+  sigma2.start = NA,
+  D.start = NA,
+  P.start = NA,
+  marginal.likelihood = c("none", "Chib95"),
+  ...
+)
 }
 \arguments{
 \item{subject.id}{A numeric vector indicating the group number. It

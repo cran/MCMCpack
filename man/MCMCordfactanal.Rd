@@ -4,11 +4,25 @@
 \alias{MCMCordfactanal}
 \title{Markov Chain Monte Carlo for Ordinal Data Factor Analysis Model}
 \usage{
-MCMCordfactanal(x, factors, lambda.constraints = list(),
-  data = parent.frame(), burnin = 1000, mcmc = 20000, thin = 1,
-  tune = NA, verbose = 0, seed = NA, lambda.start = NA, l0 = 0,
-  L0 = 0, store.lambda = TRUE, store.scores = FALSE,
-  drop.constantvars = TRUE, ...)
+MCMCordfactanal(
+  x,
+  factors,
+  lambda.constraints = list(),
+  data = parent.frame(),
+  burnin = 1000,
+  mcmc = 20000,
+  thin = 1,
+  tune = NA,
+  verbose = 0,
+  seed = NA,
+  lambda.start = NA,
+  l0 = 0,
+  L0 = 0,
+  store.lambda = TRUE,
+  store.scores = FALSE,
+  drop.constantvars = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{Either a formula or a numeric matrix containing the manifest

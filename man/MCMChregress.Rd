@@ -5,10 +5,27 @@
 \title{Markov Chain Monte Carlo for the Hierarchical Gaussian Linear Regression
 Model}
 \usage{
-MCMChregress(fixed, random, group, data, burnin = 1000, mcmc = 10000,
-  thin = 10, verbose = 1, seed = NA, beta.start = NA,
-  sigma2.start = NA, Vb.start = NA, mubeta = 0, Vbeta = 1e+06, r,
-  R, nu = 0.001, delta = 0.001, ...)
+MCMChregress(
+  fixed,
+  random,
+  group,
+  data,
+  burnin = 1000,
+  mcmc = 10000,
+  thin = 10,
+  verbose = 1,
+  seed = NA,
+  beta.start = NA,
+  sigma2.start = NA,
+  Vb.start = NA,
+  mubeta = 0,
+  Vbeta = 1e+06,
+  r,
+  R,
+  nu = 0.001,
+  delta = 0.001,
+  ...
+)
 }
 \arguments{
 \item{fixed}{A two-sided linear formula of the form 'y~x1+...+xp' describing

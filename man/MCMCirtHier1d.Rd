@@ -5,13 +5,33 @@
 \title{Markov Chain Monte Carlo for Hierarchical One Dimensional Item Response
 Theory Model, Covariates Predicting Latent Ideal Point (Ability)}
 \usage{
-MCMCirtHier1d(datamatrix, Xjdata, burnin = 1000, mcmc = 20000,
-  thin = 1, verbose = 0, seed = NA, theta.start = NA,
-  a.start = NA, b.start = NA, beta.start = NA, b0 = 0, B0 = 0.01,
-  c0 = 0.001, d0 = 0.001, ab0 = 0, AB0 = 0.25,
-  store.item = FALSE, store.ability = TRUE,
-  drop.constant.items = TRUE, marginal.likelihood = c("none",
-  "Chib95"), px = TRUE, px_a0 = 10, px_b0 = 10, ...)
+MCMCirtHier1d(
+  datamatrix,
+  Xjdata,
+  burnin = 1000,
+  mcmc = 20000,
+  thin = 1,
+  verbose = 0,
+  seed = NA,
+  theta.start = NA,
+  a.start = NA,
+  b.start = NA,
+  beta.start = NA,
+  b0 = 0,
+  B0 = 0.01,
+  c0 = 0.001,
+  d0 = 0.001,
+  ab0 = 0,
+  AB0 = 0.25,
+  store.item = FALSE,
+  store.ability = TRUE,
+  drop.constant.items = TRUE,
+  marginal.likelihood = c("none", "Chib95"),
+  px = TRUE,
+  px_a0 = 10,
+  px_b0 = 10,
+  ...
+)
 }
 \arguments{
 \item{datamatrix}{The matrix of data.  Must be 0, 1, or missing values.  The

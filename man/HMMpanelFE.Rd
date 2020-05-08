@@ -4,9 +4,26 @@
 \alias{HMMpanelFE}
 \title{Markov Chain Monte Carlo for the Hidden Markov Fixed-effects Model}
 \usage{
-HMMpanelFE(subject.id, y, X, m, mcmc = 1000, burnin = 1000, thin = 1,
-  verbose = 0, b0 = 0, B0 = 0.001, c0 = 0.001, d0 = 0.001,
-  delta0 = 0, Delta0 = 0.001, a = NULL, b = NULL, seed = NA, ...)
+HMMpanelFE(
+  subject.id,
+  y,
+  X,
+  m,
+  mcmc = 1000,
+  burnin = 1000,
+  thin = 1,
+  verbose = 0,
+  b0 = 0,
+  B0 = 0.001,
+  c0 = 0.001,
+  d0 = 0.001,
+  delta0 = 0,
+  Delta0 = 0.001,
+  a = NULL,
+  b = NULL,
+  seed = NA,
+  ...
+)
 }
 \arguments{
 \item{subject.id}{A numeric vector indicating the group number. It
@@ -176,7 +193,7 @@ OLS estimates are used for starting values.
   ## model fitting
   out <- HMMpanelFE(subject.id = id, y, X=X, m =  estimated.breaks,
              mcmc=G, burnin=G, thin=1, verbose=G,
-             b0=0, B0=1/1000, c0=2, d0=2, delta0=0, Delta0=1/1000)
+             b0=0, B0=1/100, c0=2, d0=2, delta0=0, Delta0=1/100)
 
   ## print out the slope estimate
   ## true values are 1 and 1

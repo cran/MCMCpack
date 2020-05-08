@@ -5,12 +5,37 @@
 \title{Markov Chain Monte Carlo for HDP-HSMM with a Negative
 Binomial outcome distribution}
 \usage{
-HDPHSMMnegbin(formula, data = parent.frame(), K = 10, b0 = 0,
-  B0 = 1, a.alpha = 1, b.alpha = 0.1, a.gamma = 1, b.gamma = 0.1,
-  a.omega, b.omega, e = 2, f = 2, g = 10, r = 1, burnin = 1000,
-  mcmc = 1000, thin = 1, verbose = 0, seed = NA, beta.start = NA,
-  P.start = NA, rho.start = NA, rho.step, nu.start = NA,
-  omega.start = NA, gamma.start = 0.5, alpha.start = 100, ...)
+HDPHSMMnegbin(
+  formula,
+  data = parent.frame(),
+  K = 10,
+  b0 = 0,
+  B0 = 1,
+  a.alpha = 1,
+  b.alpha = 0.1,
+  a.gamma = 1,
+  b.gamma = 0.1,
+  a.omega,
+  b.omega,
+  e = 2,
+  f = 2,
+  g = 10,
+  r = 1,
+  burnin = 1000,
+  mcmc = 1000,
+  thin = 1,
+  verbose = 0,
+  seed = NA,
+  beta.start = NA,
+  P.start = NA,
+  rho.start = NA,
+  rho.step,
+  nu.start = NA,
+  omega.start = NA,
+  gamma.start = 0.5,
+  alpha.start = 100,
+  ...
+)
 }
 \arguments{
 \item{formula}{Model formula.}
@@ -131,7 +156,7 @@ finite number of regimes that can be switched between. Unlike other
 changepoint models in \code{MCMCpack}, the HDP-HSMM approach allows
 for the state sequence to return to previous visited states.
 
-The model takes the following form, where we show the fixed-limit version:
+ The model takes the following form, where we show the fixed-limit version:
 
 \deqn{y_t \sim \mathcal{P}oisson(\nu_t\mu_t)}
 

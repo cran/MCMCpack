@@ -4,9 +4,20 @@
 \alias{MCMCquantreg}
 \title{Bayesian quantile regression using Gibbs sampling}
 \usage{
-MCMCquantreg(formula, data = NULL, tau = 0.5, burnin = 1000,
-  mcmc = 10000, thin = 1, verbose = 0, seed = sample(1:1e+06, 1),
-  beta.start = NA, b0 = 0, B0 = 0, ...)
+MCMCquantreg(
+  formula,
+  data = NULL,
+  tau = 0.5,
+  burnin = 1000,
+  mcmc = 10000,
+  thin = 1,
+  verbose = 0,
+  seed = sample(1:1e+06, 1),
+  beta.start = NA,
+  b0 = 0,
+  B0 = 0,
+  ...
+)
 }
 \arguments{
 \item{formula}{Model formula.}

@@ -182,7 +182,7 @@
 #'   ## model fitting
 #'   out <- HMMpanelFE(subject.id = id, y, X=X, m =  estimated.breaks,
 #'              mcmc=G, burnin=G, thin=1, verbose=G,
-#'              b0=0, B0=1/1000, c0=2, d0=2, delta0=0, Delta0=1/1000)
+#'              b0=0, B0=1/100, c0=2, d0=2, delta0=0, Delta0=1/100)
 #'
 #'   ## print out the slope estimate
 #'   ## true values are 1 and 1

@@ -4,10 +4,25 @@
 \alias{MCMCSVDreg}
 \title{Markov Chain Monte Carlo for SVD Regression}
 \usage{
-MCMCSVDreg(formula, data = NULL, burnin = 1000, mcmc = 10000,
-  thin = 1, verbose = 0, seed = NA, tau2.start = 1, g0 = 0,
-  a0 = 0.001, b0 = 0.001, c0 = 2, d0 = 2, w0 = 1,
-  beta.samp = FALSE, intercept = TRUE, ...)
+MCMCSVDreg(
+  formula,
+  data = NULL,
+  burnin = 1000,
+  mcmc = 10000,
+  thin = 1,
+  verbose = 0,
+  seed = NA,
+  tau2.start = 1,
+  g0 = 0,
+  a0 = 0.001,
+  b0 = 0.001,
+  c0 = 2,
+  d0 = 2,
+  w0 = 1,
+  beta.samp = FALSE,
+  intercept = TRUE,
+  ...
+)
 }
 \arguments{
 \item{formula}{Model formula. Predictions are returned for elements

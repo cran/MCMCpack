@@ -5,12 +5,30 @@
 \title{Markov Chain Monte Carlo for sticky HDP-HMM with a Poisson
 outcome distribution}
 \usage{
-HDPHMMpoisson(formula, data = parent.frame(), K = 10, b0 = 0,
-  B0 = 1, a.alpha = 1, b.alpha = 0.1, a.gamma = 1, b.gamma = 0.1,
-  a.theta = 50, b.theta = 5, burnin = 1000, mcmc = 1000,
-  thin = 1, verbose = 0, seed = NA, beta.start = NA,
-  P.start = NA, gamma.start = 0.5, theta.start = 0.98,
-  ak.start = 100, ...)
+HDPHMMpoisson(
+  formula,
+  data = parent.frame(),
+  K = 10,
+  b0 = 0,
+  B0 = 1,
+  a.alpha = 1,
+  b.alpha = 0.1,
+  a.gamma = 1,
+  b.gamma = 0.1,
+  a.theta = 50,
+  b.theta = 5,
+  burnin = 1000,
+  mcmc = 1000,
+  thin = 1,
+  verbose = 0,
+  seed = NA,
+  beta.start = NA,
+  P.start = NA,
+  gamma.start = 0.5,
+  theta.start = 0.98,
+  ak.start = 100,
+  ...
+)
 }
 \arguments{
 \item{formula}{Model formula.}
@@ -102,11 +120,12 @@ finite number of regimes that can be switched between. Unlike other
 changepoint models in \code{MCMCpack}, the HDP-HMM approach allows
 for the state sequence to return to previous visited states.
 
-The model takes the following form, where we show the fixed-limit version:
+ The model takes the following form, where we show the fixed-limit version:
 
 \deqn{y_t \sim \mathcal{P}oisson(\mu_t)}
 
 \deqn{\mu_t = x_t ' \beta_m,\;\; m = 1, \ldots, M}
+
 
 Where \eqn{M} is an upper bound on the number of states and
 \eqn{\beta_m} are parameters when a state is
@@ -120,7 +139,7 @@ heirarchical Dirichlet process:
 
 \deqn{\delta \sim \mathcal{D}irichlet(\gamma/M, \ldots, \gamma/M)}
 
-The \eqn{\kappa} value here is the sticky parameter that
+ The \eqn{\kappa} value here is the sticky parameter that
  encourages self-transitions. The sampler follows Fox et al (2011)
  and parameterizes these priors with \eqn{\alpha + \kappa} and
  \eqn{\theta = \kappa/(\alpha + \kappa)}, with the latter
@@ -130,6 +149,7 @@ The \eqn{\kappa} value here is the sticky parameter that
 We assume Gaussian distribution for prior of \eqn{\beta}:
 
 \deqn{\beta_m \sim \mathcal{N}(b_0,B_0^{-1}),\;\; m = 1, \ldots, M}
+
 
 The model is simulated via blocked Gibbs conditonal on the states.
 The \eqn{\beta} being simulated via the auxiliary mixture sampling

@@ -171,10 +171,10 @@
 #' ## fit multiple models with a varying number of breaks
 #' out1 <- MCMCoprobitChange(formula, m=1,
 #'       	mcmc=100, burnin=100, thin=1, tune=c(.5, .5), verbose=100,
-#'      	b0=0, B0=10, marginal.likelihood = "Chib95")
+#'      	b0=0, B0=0.1, marginal.likelihood = "Chib95")
 #' out2 <- MCMCoprobitChange(formula, m=2,
 #'       	mcmc=100, burnin=100, thin=1, tune=c(.5, .5, .5), verbose=100,
-#'      	b0=0, B0=10, marginal.likelihood = "Chib95")
+#'      	b0=0, B0=0.1, marginal.likelihood = "Chib95")
 #'
 #' ## Do model comparison
 #' ## NOTE: the chain should be run longer than this example!

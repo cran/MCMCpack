@@ -4,9 +4,15 @@
 \alias{plotState}
 \title{Changepoint State Plot}
 \usage{
-plotState(mcmcout, main = "Posterior Regime Probability",
+plotState(
+  mcmcout,
+  main = "Posterior Regime Probability",
   ylab = expression(paste("Pr(", S[t], "= k |", Y[t], ")")),
-  legend.control = NULL, cex = 0.8, lwd = 1.2, start = 1)
+  legend.control = NULL,
+  cex = 0.8,
+  lwd = 1.2,
+  start = 1
+)
 }
 \arguments{
 \item{mcmcout}{The \code{mcmc} object containing the posterior density

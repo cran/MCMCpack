@@ -4,10 +4,21 @@
 \alias{MCMCprobit}
 \title{Markov Chain Monte Carlo for Probit Regression}
 \usage{
-MCMCprobit(formula, data = NULL, burnin = 1000, mcmc = 10000,
-  thin = 1, verbose = 0, seed = NA, beta.start = NA, b0 = 0,
-  B0 = 0, bayes.resid = FALSE, marginal.likelihood = c("none",
-  "Laplace", "Chib95"), ...)
+MCMCprobit(
+  formula,
+  data = NULL,
+  burnin = 1000,
+  mcmc = 10000,
+  thin = 1,
+  verbose = 0,
+  seed = NA,
+  beta.start = NA,
+  b0 = 0,
+  B0 = 0,
+  bayes.resid = FALSE,
+  marginal.likelihood = c("none", "Laplace", "Chib95"),
+  ...
+)
 }
 \arguments{
 \item{formula}{Model formula.}

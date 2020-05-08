@@ -5,9 +5,23 @@
 \title{Markov Chain Monte Carlo for Gaussian Linear Regression with a Censored
 Dependent Variable}
 \usage{
-MCMCtobit(formula, data = NULL, below = 0, above = Inf,
-  burnin = 1000, mcmc = 10000, thin = 1, verbose = 0, seed = NA,
-  beta.start = NA, b0 = 0, B0 = 0, c0 = 0.001, d0 = 0.001, ...)
+MCMCtobit(
+  formula,
+  data = NULL,
+  below = 0,
+  above = Inf,
+  burnin = 1000,
+  mcmc = 10000,
+  thin = 1,
+  verbose = 0,
+  seed = NA,
+  beta.start = NA,
+  b0 = 0,
+  B0 = 0,
+  c0 = 0.001,
+  d0 = 0.001,
+  ...
+)
 }
 \arguments{
 \item{formula}{A model formula.}

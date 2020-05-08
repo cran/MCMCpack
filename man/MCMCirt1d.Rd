@@ -4,11 +4,26 @@
 \alias{MCMCirt1d}
 \title{Markov Chain Monte Carlo for One Dimensional Item Response Theory Model}
 \usage{
-MCMCirt1d(datamatrix, theta.constraints = list(), burnin = 1000,
-  mcmc = 20000, thin = 1, verbose = 0, seed = NA,
-  theta.start = NA, alpha.start = NA, beta.start = NA, t0 = 0,
-  T0 = 1, ab0 = 0, AB0 = 0.25, store.item = FALSE,
-  store.ability = TRUE, drop.constant.items = TRUE, ...)
+MCMCirt1d(
+  datamatrix,
+  theta.constraints = list(),
+  burnin = 1000,
+  mcmc = 20000,
+  thin = 1,
+  verbose = 0,
+  seed = NA,
+  theta.start = NA,
+  alpha.start = NA,
+  beta.start = NA,
+  t0 = 0,
+  T0 = 1,
+  ab0 = 0,
+  AB0 = 0.25,
+  store.item = FALSE,
+  store.ability = TRUE,
+  drop.constant.items = TRUE,
+  ...
+)
 }
 \arguments{
 \item{datamatrix}{The matrix of data.  Must be 0, 1, or missing values.  The
@@ -138,6 +153,7 @@ J)}.  We assume that the choice is dictated by an unobserved
 utility:
 
 \deqn{z_{i,j} = -\alpha_i + \beta_i \theta_j + \varepsilon_{i,j}}
+
 
 Where the errors are assumed to be distributed standard Normal.
 The parameters of interest are the subject abilities (ideal points)

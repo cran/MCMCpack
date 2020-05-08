@@ -4,10 +4,24 @@
 \alias{MCMCoprobit}
 \title{Markov Chain Monte Carlo for Ordered Probit Regression}
 \usage{
-MCMCoprobit(formula, data = parent.frame(), burnin = 1000,
-  mcmc = 10000, thin = 1, tune = NA, tdf = 1, verbose = 0,
-  seed = NA, beta.start = NA, b0 = 0, B0 = 0, a0 = 0, A0 = 0,
-  mcmc.method = c("Cowles", "AC"), ...)
+MCMCoprobit(
+  formula,
+  data = parent.frame(),
+  burnin = 1000,
+  mcmc = 10000,
+  thin = 1,
+  tune = NA,
+  tdf = 1,
+  verbose = 0,
+  seed = NA,
+  beta.start = NA,
+  b0 = 0,
+  B0 = 0,
+  a0 = 0,
+  A0 = 0,
+  mcmc.method = c("Cowles", "AC"),
+  ...
+)
 }
 \arguments{
 \item{formula}{Model formula.}

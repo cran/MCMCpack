@@ -166,22 +166,22 @@
 #'     ## fit multiple models with a varying number of breaks
 #'     model0 <-  MCMCpoissonChange(formula, m=0,
 #'             mcmc = 1000, burnin = 1000, verbose = 500,
-#'             b0 = rep(0, 2), B0 = 5*diag(2), marginal.likelihood = "Chib95")
+#'             b0 = rep(0, 2), B0 = 1/5*diag(2), marginal.likelihood = "Chib95")
 #'     model1 <-  MCMCpoissonChange(formula, m=1,
 #'             mcmc = 1000, burnin = 1000, verbose = 500,
-#'             b0 = rep(0, 2), B0 = 5*diag(2), marginal.likelihood = "Chib95")
+#'             b0 = rep(0, 2), B0 = 1/5*diag(2), marginal.likelihood = "Chib95")
 #'     model2 <-  MCMCpoissonChange(formula, m=2,
 #'             mcmc = 1000, burnin = 1000, verbose = 500,
-#'             b0 = rep(0, 2), B0 = 5*diag(2), marginal.likelihood = "Chib95")
+#'             b0 = rep(0, 2), B0 = 1/5*diag(2), marginal.likelihood = "Chib95")
 #'     model3 <-  MCMCpoissonChange(formula, m=3,
 #'             mcmc = 1000, burnin = 1000, verbose = 500,
-#'             b0 = rep(0, 2), B0 = 5*diag(2), marginal.likelihood = "Chib95")
+#'             b0 = rep(0, 2), B0 = 1/5*diag(2), marginal.likelihood = "Chib95")
 #'     model4 <-  MCMCpoissonChange(formula, m=4,
 #'             mcmc = 1000, burnin = 1000, verbose = 500,
-#'             b0 = rep(0, 2), B0 = 5*diag(2), marginal.likelihood = "Chib95")
+#'             b0 = rep(0, 2), B0 = 1/5*diag(2), marginal.likelihood = "Chib95")
 #'     model5 <-  MCMCpoissonChange(formula, m=5,
 #'             mcmc = 1000, burnin = 1000, verbose = 500,
-#'             b0 = rep(0, 2), B0 = 5*diag(2), marginal.likelihood = "Chib95")
+#'             b0 = rep(0, 2), B0 = 1/5*diag(2), marginal.likelihood = "Chib95")
 #'
 #'     ## find the most reasonable one
 #'     print(BayesFactor(model0, model1, model2, model3, model4, model5))

@@ -4,9 +4,20 @@
 \alias{SSVSquantreg}
 \title{Stochastic search variable selection for quantile regression}
 \usage{
-SSVSquantreg(formula, data = NULL, tau = 0.5, include = NULL,
-  burnin = 1000, mcmc = 10000, thin = 1, verbose = 0,
-  seed = sample(1:1e+06, 1), pi0a0 = 1, pi0b0 = 1, ...)
+SSVSquantreg(
+  formula,
+  data = NULL,
+  tau = 0.5,
+  include = NULL,
+  burnin = 1000,
+  mcmc = 10000,
+  thin = 1,
+  verbose = 0,
+  seed = sample(1:1e+06, 1),
+  pi0a0 = 1,
+  pi0b0 = 1,
+  ...
+)
 }
 \arguments{
 \item{formula}{Model formula.}

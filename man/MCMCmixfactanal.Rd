@@ -4,12 +4,29 @@
 \alias{MCMCmixfactanal}
 \title{Markov Chain Monte Carlo for Mixed Data Factor Analysis Model}
 \usage{
-MCMCmixfactanal(x, factors, lambda.constraints = list(),
-  data = parent.frame(), burnin = 1000, mcmc = 20000, thin = 1,
-  tune = NA, verbose = 0, seed = NA, lambda.start = NA,
-  psi.start = NA, l0 = 0, L0 = 0, a0 = 0.001, b0 = 0.001,
-  store.lambda = TRUE, store.scores = FALSE, std.mean = TRUE,
-  std.var = TRUE, ...)
+MCMCmixfactanal(
+  x,
+  factors,
+  lambda.constraints = list(),
+  data = parent.frame(),
+  burnin = 1000,
+  mcmc = 20000,
+  thin = 1,
+  tune = NA,
+  verbose = 0,
+  seed = NA,
+  lambda.start = NA,
+  psi.start = NA,
+  l0 = 0,
+  L0 = 0,
+  a0 = 0.001,
+  b0 = 0.001,
+  store.lambda = TRUE,
+  store.scores = FALSE,
+  std.mean = TRUE,
+  std.var = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{A one-sided formula containing the manifest variables. Ordinal

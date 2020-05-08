@@ -4,10 +4,23 @@
 \alias{MCMCmnl}
 \title{Markov Chain Monte Carlo for Multinomial Logistic Regression}
 \usage{
-MCMCmnl(formula, baseline = NULL, data = NULL, burnin = 1000,
-  mcmc = 10000, thin = 1, mcmc.method = c("IndMH", "RWM", "slice"),
-  tune = 1, tdf = 6, verbose = 0, seed = NA, beta.start = NA,
-  b0 = 0, B0 = 0, ...)
+MCMCmnl(
+  formula,
+  baseline = NULL,
+  data = NULL,
+  burnin = 1000,
+  mcmc = 10000,
+  thin = 1,
+  mcmc.method = c("IndMH", "RWM", "slice"),
+  tune = 1,
+  tdf = 6,
+  verbose = 0,
+  seed = NA,
+  beta.start = NA,
+  b0 = 0,
+  B0 = 0,
+  ...
+)
 }
 \arguments{
 \item{formula}{Model formula.

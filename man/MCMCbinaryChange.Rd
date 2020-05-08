@@ -4,10 +4,23 @@
 \alias{MCMCbinaryChange}
 \title{Markov Chain Monte Carlo for a Binary Multiple Changepoint Model}
 \usage{
-MCMCbinaryChange(data, m = 1, c0 = 1, d0 = 1, a = NULL, b = NULL,
-  burnin = 10000, mcmc = 10000, thin = 1, verbose = 0, seed = NA,
-  phi.start = NA, P.start = NA, marginal.likelihood = c("none",
-  "Chib95"), ...)
+MCMCbinaryChange(
+  data,
+  m = 1,
+  c0 = 1,
+  d0 = 1,
+  a = NULL,
+  b = NULL,
+  burnin = 10000,
+  mcmc = 10000,
+  thin = 1,
+  verbose = 0,
+  seed = NA,
+  phi.start = NA,
+  P.start = NA,
+  marginal.likelihood = c("none", "Chib95"),
+  ...
+)
 }
 \arguments{
 \item{data}{The data.}

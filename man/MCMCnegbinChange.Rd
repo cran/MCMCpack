@@ -5,12 +5,31 @@
 \title{Markov Chain Monte Carlo for Negative Binomial Regression
 Changepoint Model}
 \usage{
-MCMCnegbinChange(formula, data = parent.frame(), m = 1,
-  fixed.m = TRUE, b0 = 0, B0 = 1, a = NULL, b = NULL, e = 2,
-  f = 2, g = 10, burnin = 1000, mcmc = 1000, thin = 1,
-  verbose = 0, seed = NA, beta.start = NA, P.start = NA,
-  rho.start = NA, rho.step, nu.start = NA,
-  marginal.likelihood = c("none", "Chib95"), ...)
+MCMCnegbinChange(
+  formula,
+  data = parent.frame(),
+  m = 1,
+  fixed.m = TRUE,
+  b0 = 0,
+  B0 = 1,
+  a = NULL,
+  b = NULL,
+  e = 2,
+  f = 2,
+  g = 10,
+  burnin = 1000,
+  mcmc = 1000,
+  thin = 1,
+  verbose = 0,
+  seed = NA,
+  beta.start = NA,
+  P.start = NA,
+  rho.start = NA,
+  rho.step,
+  nu.start = NA,
+  marginal.likelihood = c("none", "Chib95"),
+  ...
+)
 }
 \arguments{
 \item{formula}{Model formula.}
@@ -125,13 +144,14 @@ Negative Binomial regression model with multiple changepoints using the methods 
 Chib (1998) and Fruehwirth-Schnatter et al (2009).  The details of the
 model are discussed in Blackwell (2017).
 
-The model takes the following form:
+ The model takes the following form:
 
 \deqn{y_t \sim \mathcal{P}oisson(\nu_t\mu_t)}
 
 \deqn{\mu_t = x_t ' \beta_m,\;\; m = 1, \ldots, M}
 
 \deqn{\nu_t \sim \mathcal{G}amma(\rho_m, \rho_m)}
+
 
 Where
 \eqn{M} is the number of states and \eqn{\beta_m} and \eqn{\rho_m}

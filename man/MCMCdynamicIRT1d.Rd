@@ -6,19 +6,57 @@
 \title{Markov Chain Monte Carlo for Dynamic One Dimensional Item Response
 Theory Model}
 \usage{
-MCMCdynamicIRT1d_b(datamatrix, item.time.map, theta.constraints = list(),
-  burnin = 1000, mcmc = 20000, thin = 1, verbose = 0, seed = NA,
-  theta.start = NA, alpha.start = NA, beta.start = NA,
-  tau2.start = 1, a0 = 0, A0 = 0.1, b0 = 0, B0 = 0.1, c0 = -1,
-  d0 = -1, e0 = 0, E0 = 1, store.ability = TRUE,
-  store.item = TRUE, ...)
+MCMCdynamicIRT1d_b(
+  datamatrix,
+  item.time.map,
+  theta.constraints = list(),
+  burnin = 1000,
+  mcmc = 20000,
+  thin = 1,
+  verbose = 0,
+  seed = NA,
+  theta.start = NA,
+  alpha.start = NA,
+  beta.start = NA,
+  tau2.start = 1,
+  a0 = 0,
+  A0 = 0.1,
+  b0 = 0,
+  B0 = 0.1,
+  c0 = -1,
+  d0 = -1,
+  e0 = 0,
+  E0 = 1,
+  store.ability = TRUE,
+  store.item = TRUE,
+  ...
+)
 
-MCMCdynamicIRT1d(datamatrix, item.time.map, theta.constraints = list(),
-  burnin = 1000, mcmc = 20000, thin = 1, verbose = 0, seed = NA,
-  theta.start = NA, alpha.start = NA, beta.start = NA,
-  tau2.start = 1, a0 = 0, A0 = 0.1, b0 = 0, B0 = 0.1, c0 = -1,
-  d0 = -1, e0 = 0, E0 = 1, store.ability = TRUE,
-  store.item = TRUE, ...)
+MCMCdynamicIRT1d(
+  datamatrix,
+  item.time.map,
+  theta.constraints = list(),
+  burnin = 1000,
+  mcmc = 20000,
+  thin = 1,
+  verbose = 0,
+  seed = NA,
+  theta.start = NA,
+  alpha.start = NA,
+  beta.start = NA,
+  tau2.start = 1,
+  a0 = 0,
+  A0 = 0.1,
+  b0 = 0,
+  B0 = 0.1,
+  c0 = -1,
+  d0 = -1,
+  e0 = 0,
+  E0 = 1,
+  store.ability = TRUE,
+  store.item = TRUE,
+  ...
+)
 }
 \arguments{
 \item{datamatrix}{The matrix of data.  Must be 0, 1, or missing

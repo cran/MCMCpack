@@ -4,9 +4,23 @@
 \alias{MCMCdynamicEI}
 \title{Markov Chain Monte Carlo for Quinn's Dynamic Ecological Inference Model}
 \usage{
-MCMCdynamicEI(r0, r1, c0, c1, burnin = 5000, mcmc = 50000, thin = 1,
-  verbose = 0, seed = NA, W = 0, a0 = 0.825, b0 = 0.0105,
-  a1 = 0.825, b1 = 0.0105, ...)
+MCMCdynamicEI(
+  r0,
+  r1,
+  c0,
+  c1,
+  burnin = 5000,
+  mcmc = 50000,
+  thin = 1,
+  verbose = 0,
+  seed = NA,
+  W = 0,
+  a0 = 0.825,
+  b0 = 0.0105,
+  a1 = 0.825,
+  b1 = 0.0105,
+  ...
+)
 }
 \arguments{
 \item{r0}{\eqn{(ntables \times 1)} vector of row sums from row 0.}

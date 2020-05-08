@@ -4,10 +4,24 @@
 \alias{MCMCregress}
 \title{Markov Chain Monte Carlo for Gaussian Linear Regression}
 \usage{
-MCMCregress(formula, data = NULL, burnin = 1000, mcmc = 10000,
-  thin = 1, verbose = 0, seed = NA, beta.start = NA, b0 = 0,
-  B0 = 0, c0 = 0.001, d0 = 0.001, sigma.mu = NA, sigma.var = NA,
-  marginal.likelihood = c("none", "Laplace", "Chib95"), ...)
+MCMCregress(
+  formula,
+  data = NULL,
+  burnin = 1000,
+  mcmc = 10000,
+  thin = 1,
+  verbose = 0,
+  seed = NA,
+  beta.start = NA,
+  b0 = 0,
+  B0 = 0,
+  c0 = 0.001,
+  d0 = 0.001,
+  sigma.mu = NA,
+  sigma.var = NA,
+  marginal.likelihood = c("none", "Laplace", "Chib95"),
+  ...
+)
 }
 \arguments{
 \item{formula}{Model formula.}

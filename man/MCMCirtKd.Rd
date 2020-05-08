@@ -4,10 +4,23 @@
 \alias{MCMCirtKd}
 \title{Markov Chain Monte Carlo for K-Dimensional Item Response Theory Model}
 \usage{
-MCMCirtKd(datamatrix, dimensions, item.constraints = list(),
-  burnin = 1000, mcmc = 10000, thin = 1, verbose = 0, seed = NA,
-  alphabeta.start = NA, b0 = 0, B0 = 0, store.item = FALSE,
-  store.ability = TRUE, drop.constant.items = TRUE, ...)
+MCMCirtKd(
+  datamatrix,
+  dimensions,
+  item.constraints = list(),
+  burnin = 1000,
+  mcmc = 10000,
+  thin = 1,
+  verbose = 0,
+  seed = NA,
+  alphabeta.start = NA,
+  b0 = 0,
+  B0 = 0,
+  store.item = FALSE,
+  store.ability = TRUE,
+  drop.constant.items = TRUE,
+  ...
+)
 }
 \arguments{
 \item{datamatrix}{The matrix of data.  Must be 0, 1, or missing values.  It
