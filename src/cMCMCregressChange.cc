@@ -46,7 +46,7 @@ Matrix<double> loglike_fn(const int m,
   const int ns = m + 1;
   const int n = Y.rows();
   Matrix<double> F = Matrix<double>(n, ns);
-  Matrix<double> like(n, 1);
+  Matrix<double> loglike(n, 1);
   Matrix<double> pr1 = Matrix<double>(ns, 1);
   pr1[0] = 1;
   Matrix<double> py(ns, 1);
@@ -67,10 +67,11 @@ Matrix<double> loglike_fn(const int m,
     for (int j=0; j<ns ; ++j){
       F(t,j) = pstyt(j);
     }
-    like[t] = sum(unnorm_pstyt);
+    loglike[t] = log(sum(unnorm_pstyt));
+    //like[t] = sum(unnorm_pstyt);
   }// end of likelihood computation
 
-  return like;
+  return loglike;
 }
 
 

@@ -1,4 +1,4 @@
-2c0820154387cf8986862dae461526ea *DESCRIPTION
+47c78fb5551e8457e00df6c3406b3690 *DESCRIPTION
 4d49b8c5f1f90650c8967f18a5d1b2cc *NAMESPACE
 489c13dcd0f8b0bf0109cb26e339c489 *R/BayesFactors.R
 fd02007629b07659d2534c142bb495ea *R/HDPHMMnegbin.R
@@ -188,7 +188,7 @@ d527d0f89bfb9d7ca1fc81d24bffdf44 *src/cMCMCprobitChange.cc
 715bae4bc49d7c06c0ffcf7822a75ded *src/cMCMCprobitres.cc
 553dcda6fc4ce46990c28d5b33792273 *src/cMCMCquantreg.cc
 305e8e6af6c20a72b63522eab5a54d6b *src/cMCMCregress.cc
-bece93225c826b51c34e078495358881 *src/cMCMCregressChange.cc
+d47cc6033b8c2324b81b72f6ca48d08d *src/cMCMCregressChange.cc
 ddcc7c4b92e1baa96e54db0551f67b43 *src/cMCMCresidualBreakAnalysis.cc
 fbd9eabe7caa5bcd8d06dcc63ca905c1 *src/cMCMCtobit.cc
 1388cda93fe803ffad37c6ebd7fa26d1 *src/cSSVSquantreg.cc
