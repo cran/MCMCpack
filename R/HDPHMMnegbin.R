@@ -162,7 +162,7 @@
 #'
 #' @references Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
 #' ``MCMCpack: Markov Chain Monte Carlo in R.'', \emph{Journal of Statistical
-#' Software}. 42(9): 1-21.  \url{http://www.jstatsoft.org/v42/i09/}.
+#' Software}. 42(9): 1-21.  \url{https://www.jstatsoft.org/v42/i09/}.
 #'
 #' Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
 #' Statistical Library 1.0.} \url{http://scythe.lsa.umich.edu}.
@@ -171,16 +171,16 @@
 #'     Havard Rue. 2009. ``Improved auxiliary mixture sampling for
 #'     hierarchical models of non-Gaussian data'', \emph{Statistics
 #'     and Computing} 19(4): 479-492.
-#'   \url{http://doi.org/10.1007/s11222-008-9109-4}
+#'   <doi:10.1007/s11222-008-9109-4>
 #'
 #' Matthew Blackwell. 2017. ``Game Changers: Detecting Shifts in
 #'   Overdispersed Count Data,'' \emph{Political Analysis}
-#'   Forthcoming. \url{http://www.mattblackwell.org/files/papers/gamechangers-letter.pdf}
+#'   26(2), 230-239. <doi:10.1017/pan.2017.42>
 #'
 #' Emily B. Fox, Erik B. Sudderth, Michael I. Jordan, and Alan S.
 #'   Willsky. 2011.. ``A sticky HDP-HMM with application to speaker
 #'   diarization.'' \emph{The Annals of Applied Statistics}, 5(2A),
-#'   1020-1056. \url{http://doi.org/10.1214/10-AOAS395SUPP}
+#'   1020-1056. <doi:10.1214/10-AOAS395>
 #'
 #' @keywords models
 #'

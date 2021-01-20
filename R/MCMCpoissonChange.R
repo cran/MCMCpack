@@ -126,7 +126,7 @@
 #'
 #' @references Jong Hee Park. 2010. ``Structural Change in the U.S. Presidents'
 #' Use of Force Abroad.'' \emph{American Journal of Political Science} 54:
-#' 766-782.
+#' 766-782. <doi:10.1111/j.1540-5907.2010.00459.x>
 #'
 #' Sylvia Fruhwirth-Schnatter and Helga Wagner 2006. ``Auxiliary Mixture
 #' Sampling for Parameter-driven Models of Time Series of Counts with
@@ -134,14 +134,16 @@
 #'
 #' Siddhartha Chib. 1998. ``Estimation and comparison of multiple change-point
 #' models.'' \emph{Journal of Econometrics}. 86: 221-241.
+#' <doi: 10.1016/S0304-4076(97)00115-2>
 #'
 #' Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.  ``MCMCpack:
 #' Markov Chain Monte Carlo in R.'', \emph{Journal of Statistical Software}.
-#' 42(9): 1-21.  \url{http://www.jstatsoft.org/v42/i09/}.
+#' 42(9): 1-21.  \url{https://www.jstatsoft.org/v42/i09/}.
 #'
 #' Siddhartha Chib. 1995. ``Marginal Likelihood from the Gibbs Output.''
 #' \emph{Journal of the American Statistical Association}. 90: 1313-1321.
-#'
+#' <doi: 10.1080/01621459.1995.10476635>
+#' 
 #' @keywords models
 #'
 #' @examples

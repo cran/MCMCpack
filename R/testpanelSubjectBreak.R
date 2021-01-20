@@ -113,9 +113,11 @@
 #' @references Jong Hee Park, 2012. ``Unified Method for Dynamic and
 #' Cross-Sectional Heterogeneity: Introducing Hidden Markov Panel Models.''
 #' \emph{American Journal of Political Science}.56: 1040-1054.
+#' <doi: 10.1111/j.1540-5907.2012.00590.x>
 #'
 #' Siddhartha Chib. 1998. ``Estimation and comparison of multiple change-point
 #' models.'' \emph{Journal of Econometrics}. 86: 221-241.
+#' <doi: 10.1080/01621459.1995.10476635>
 #'
 #' @keywords models
 #'

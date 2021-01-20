@@ -174,11 +174,11 @@ plotChangepoint(out2)
 \references{
 Jong Hee Park. 2011. ``Changepoint Analysis of Binary and
 Ordinal Probit Models: An Application to Bank Rate Policy Under the Interwar
-Gold Standard." \emph{Political Analysis}. 19: 188-204.
+Gold Standard."  \emph{Political Analysis}. 19: 188-204. <doi:10.1093/pan/mpr007>
 
 Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.  ``MCMCpack:
 Markov Chain Monte Carlo in R.'', \emph{Journal of Statistical Software}.
-42(9): 1-21.  \url{http://www.jstatsoft.org/v42/i09/}.
+42(9): 1-21.  \url{https://www.jstatsoft.org/v42/i09/}.
 
 Siddhartha Chib. 1998. ``Estimation and comparison of multiple change-point
 models.'' \emph{Journal of Econometrics}. 86: 221-241.

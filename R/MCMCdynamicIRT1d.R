@@ -241,11 +241,11 @@
 #'
 #' @references Andrew D. Martin and Kevin M. Quinn. 2002. "Dynamic Ideal Point
 #' Estimation via Markov Chain Monte Carlo for the U.S. Supreme Court,
-#' 1953-1999." \emph{Political Analysis.} 10: 134-153.
+#' 1953-1999." \emph{Political Analysis.} 10: 134-153. <doi:10.1093/pan/10.2.134>
 #'
 #' Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.  ``MCMCpack:
 #' Markov Chain Monte Carlo in R.'', \emph{Journal of Statistical Software}.
-#' 42(9): 1-21.  \url{http://www.jstatsoft.org/v42/i09/}.
+#' 42(9): 1-21.  \url{https://www.jstatsoft.org/v42/i09/}.
 #'
 #' @keywords models
 #'

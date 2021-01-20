@@ -220,7 +220,7 @@
 #'
 #' Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.  ``MCMCpack:
 #' Markov Chain Monte Carlo in R.'', \emph{Journal of Statistical Software}.
-#' 42(9): 1-21.  \url{http://www.jstatsoft.org/v42/i09/}.
+#' 42(9): 1-21.  \url{https://www.jstatsoft.org/v42/i09/}.
 #'
 #' M. K. Cowles. 1996. ``Accelerating Monte Carlo Markov Chain Convergence for
 #' Cumulative-link Generalized Linear Models." \emph{Statistics and Computing.}
@@ -591,8 +591,7 @@
     rownames(accepts) <- X.names
     colnames(accepts) <- ""
     cat("\n\nAcceptance rates:\n")
-    print(t(accepts) / (posterior$burnin+posterior$mcmc), digits=2,
-          width=6)
+    print(t(accepts) / (posterior$burnin+posterior$mcmc), digits=2)
 
     # put together matrix and build MCMC object to return
     sample <- matrix(posterior$samdata, posterior$samrow, posterior$samcol,
