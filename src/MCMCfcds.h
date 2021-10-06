@@ -543,6 +543,137 @@ void irt_theta_update1 (Matrix<>& theta, const Matrix<>& Z,
 
 
 
+
+// update latent Ystar values in paired comparisons model
+template <typename RNGTYPE>
+void paircompare_Ystar_update (Matrix<>& Ystar,
+			       const Matrix<unsigned int>& MD, 
+			       const Matrix<>& theta, const Matrix<>& alpha,
+			       rng<RNGTYPE>& stream){
+
+  const unsigned int N = MD.rows();
+  for (unsigned int i = 0; i < N; ++i){
+    const double alpha_i = alpha(MD(i,0));
+    const double theta_1 = theta(MD(i,1));
+    const double theta_2 = theta(MD(i,2));
+    const double mean = alpha_i * (theta_1 - theta_2);
+    const bool above = MD(i,1) == MD(i,3); // cand 1 chosen
+    const bool below = MD(i,2) == MD(i,3); // cand 2 chosen
+    if (above){
+      Ystar(i) = stream.rtbnorm_combo(mean, 1.0, 0.0);
+    }
+    else if (below){
+      Ystar(i) = stream.rtanorm_combo(mean, 1.0, 0.0);
+    }
+    else{
+      Ystar(i) = stream.rnorm(mean, 1.0);
+    }
+  }
+}
+
+
+
+
+
+// update theta values in paired comparisons model
+template <typename RNGTYPE>
+void paircompare_theta_update (Matrix<>& theta, const Matrix<>& Ystar, 
+			       const Matrix<unsigned int>& MD,
+			       const Matrix<>& alpha,
+			       const Matrix<unsigned int>& theta_n,
+			       const Matrix<>& theta_eq,
+			       const Matrix<>& theta_ineq,
+			       const vector< vector < double* > >& theta_Ystar_ptr,
+			       const vector< vector < double* > >& theta_alpha_ptr,
+			       const vector< vector < double* > >& theta_theta_ptr,
+			       const vector< vector < double > >& theta_sign,
+			       rng<RNGTYPE>& stream){
+  
+  const unsigned int J = theta.rows();  
+  for (unsigned int j = 0; j < J; ++j){
+    double xx = 0.0;
+    double xz = 0.0;
+    for (unsigned int i = 0; i < theta_n[j]; ++i){
+      const double x_ji = theta_sign[j][i] *  *theta_alpha_ptr[j][i];
+      const double z_ji = *theta_Ystar_ptr[j][i] + theta_sign[j][i] *
+	*theta_alpha_ptr[j][i] * *theta_theta_ptr[j][i]; 
+	 /*
+	 The reason for the above plus sign: -(-theta_sign[j][i])=+theta_sign[j][i]. 
+	 The other theta's sign in a comparison is the opposite to the theta in scrutiny.
+	 */
+      xx += x_ji * x_ji;
+      xz += x_ji * z_ji;
+    }
+	// prior for theta is N(0,1), therefore the posterior mean and variance are as follow
+	
+	const double v = 1.0/(xx + 1.0); 
+    const double m = v * (xz);
+    // no equality constraints 
+    if (theta_eq(j) == -999) {      
+      if (theta_ineq(j) == 0) { // no inequality constraint
+	theta(j) =  stream.rnorm(m, std::sqrt(v)); 
+      } else if (theta_ineq(j) > 0) { // theta[j] > 0
+	theta(j) = stream.rtbnorm_combo(m, v, 0);  
+      } else { // theta[j] < 0
+	theta(j) = stream.rtanorm_combo(m, v, 0);  	  
+      }
+    } else { // equality constraints
+      theta(j) = theta_eq(j);
+    }    
+  }
+  
+}
+
+
+
+
+
+
+
+
+
+// update alpha values in paired comparisons model
+template <typename RNGTYPE>
+void paircompare_alpha_update (Matrix<>& alpha,
+			       const Matrix<>& Ystar, 
+			       const Matrix<unsigned int>& MD,
+			       const Matrix<>& theta,
+			       const double& A0,
+			       const double& A0a0,
+			       const Matrix<unsigned int>& alpha_n,
+			       const vector< vector < double* > >& alpha_Ystar_ptr,
+			       const vector< vector < double* > >& alpha_theta1_ptr,
+			       const vector< vector < double* > >& alpha_theta2_ptr,
+			       rng<RNGTYPE>& stream){
+  
+  const unsigned int I = alpha.rows();  
+  for (unsigned int i = 0; i < I; ++i){
+    double xx = 0.0;
+    double xz = 0.0;
+    for (unsigned int j = 0; j < alpha_n[i]; ++j){
+      const double x_ji = *alpha_theta1_ptr[i][j] -  *alpha_theta2_ptr[i][j];
+      const double z_ji = *alpha_Ystar_ptr[i][j];
+      xx += x_ji * x_ji;
+      xz += x_ji * z_ji;
+    }
+	// prior for alpha is N(0,1), therefore the posterior mean and variance are as follow. Same as Bayesian regression
+    const double v = 1.0/(xx + A0);
+    const double m = v * (xz + A0a0);
+    alpha(i) = stream.rnorm(m, std::sqrt(v));    
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 // factor analysis model with normal mean 0, precision F0 prior on 
 // factor scores
 // X follows a multivariate normal distribution

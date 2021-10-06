@@ -75,6 +75,61 @@
     return( list(Lambda.eq.constraints, Lambda.ineq.constraints, X.names))    
   }
 
+
+
+
+
+## create constraints for pairwise comparison models
+"build.pairwise.theta.constraints" <-
+    function(theta.constraints, cand.codes, n.cand, factors){
+        
+        ## build initial constraint matrices and assign var names
+        theta.eq.constraints <- matrix(NA, n.cand, factors)
+        theta.ineq.constraints <- matrix(0, n.cand, factors)    
+        
+        rownames(theta.eq.constraints) <- cand.codes
+        rownames(theta.ineq.constraints) <- cand.codes
+        
+        ## setup the equality and inequality contraints on theta
+        if (length(theta.constraints) != 0){
+            constraint.names <- names(theta.constraints)  
+            for (i in 1:length(constraint.names)){
+                name.i <- constraint.names[i]
+                theta.constraints.i <- theta.constraints[[i]]
+                col.index <- theta.constraints.i[[1]]
+                replace.element <- theta.constraints.i[[2]]
+                if (is.numeric(replace.element)){
+                    theta.eq.constraints[rownames(theta.eq.constraints)==name.i,
+                                          col.index] <- replace.element
+                }
+                if (replace.element=="+"){
+                    theta.ineq.constraints[rownames(theta.ineq.constraints)==name.i,
+                                            col.index] <- 1 
+                }
+                if (replace.element=="-"){
+                    theta.ineq.constraints[rownames(theta.ineq.constraints)==name.i,
+                                            col.index] <- -1
+                }
+            }
+        }
+        
+        testmat <- theta.ineq.constraints * theta.eq.constraints
+        
+        if (min(is.na(testmat))==0){
+            if ( min(testmat[!is.na(testmat)]) < 0){
+                cat("Constraints on theta are logically inconsistent.\n")
+                stop("Please respecify and call ", calling.function(), " again.\n")
+            }
+        }
+        theta.eq.constraints[is.na(theta.eq.constraints)] <- -999
+        
+        return( list(theta.eq.constraints, theta.ineq.constraints))    
+    }
+
+
+
+
+
 # return name of the calling function
 "calling.function" <-
    function(parentheses=TRUE) {
@@ -715,6 +770,85 @@
            
     return(list(v,S))
 }
+
+
+
+
+
+
+## generate starting values for pairwise comparison thetas
+"pairwise.theta.start" <-
+  function(theta.start, K, factors, theta.eq.constraints,
+           theta.ineq.constraints){
+
+    theta <- matrix(0, K, factors)
+    if (any(is.na(theta.start))){# sets theta to equality constraints & 0s
+      for (i in 1:K){
+        for (j in 1:factors){
+          if (theta.eq.constraints[i,j]==-999){
+            if(theta.ineq.constraints[i,j]==0){
+              theta[i,j] <- 0
+            }
+            if(theta.ineq.constraints[i,j]>0){
+              theta[i,j] <- .5
+            }
+            if(theta.ineq.constraints[i,j]<0){
+              theta[i,j] <- -.5
+            }          
+          }
+          else theta[i,j] <- theta.eq.constraints[i,j]
+        }
+      }    
+    }
+    else if (is.matrix(theta.start)){
+      if (nrow(theta.start)==K && ncol(theta.start)==factors)
+        theta  <- theta.start
+      else {
+        cat("theta.start not of correct size for model specification.\n")
+        stop("Please respecify and call ", calling.function(), " again.\n")
+      }
+      for (i in 1:K){
+          for (j in 1:factors){
+              if (theta.eq.constraints[i,j]==-999){
+                  if(theta.ineq.constraints[i,j]>0 & theta[i,j] <= 0){
+                      theta[i,j] <- -1 * theta[i,j] + 0.001
+                  }
+                  if(theta.ineq.constraints[i,j]<0 & theta[i,j] >= 0){
+                      theta[i,j] <- -1 * theta[i,j] - 0.001
+                  }          
+              }
+              else theta[i,j] <- theta.eq.constraints[i,j]
+          }
+      }
+    }
+    else if (length(theta.start)==1 && is.numeric(theta.start)){
+      theta <- matrix(theta.start, K, factors)
+      for (i in 1:K){
+          for (j in 1:factors){
+              if (theta.eq.constraints[i,j]==-999){
+                  if(theta.ineq.constraints[i,j]>0 & theta[i,j] <= 0){
+                      theta[i,j] <- -1 * theta[i,j] + 0.001
+                  }
+                  if(theta.ineq.constraints[i,j]<0 & theta[i,j] >= 0){
+                      theta[i,j] <- -1 * theta[i,j] - 0.001
+                  }          
+              }
+              else theta[i,j] <- theta.eq.constraints[i,j]
+        }
+      }    
+    }
+    else {
+      cat("theta.start neither NA, matrix, nor scalar.\n")
+      stop("Please respecify and call ", calling.function, " again.\n")
+    }
+
+    return(theta)
+  }
+
+
+
+
+
 
 # parse formula and return a list that contains the model response
 # matrix as element one, and the model matrix as element two

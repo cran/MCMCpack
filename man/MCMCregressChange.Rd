@@ -232,6 +232,10 @@ Siddhartha Chib. 1995. "Marginal Likelihood from the Gibbs Output."
 Siddhartha Chib. 1998. "Estimation and comparison of multiple change-point
 models."  \emph{Journal of Econometrics}. 86: 221-241.
 <doi: 10.1080/01621459.1995.10476635>
+
+Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
+``MCMCpack: Markov Chain Monte Carlo in R.'', \emph{Journal of
+Statistical Software}.  42(9): 1-21. \doi{10.18637/jss.v042.i09}.
 }
 \seealso{
 \code{\link{plotState}}, \code{\link{plotChangepoint}}

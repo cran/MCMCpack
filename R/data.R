@@ -167,3 +167,33 @@ NULL
 #'
 #' @keywords datasets
 NULL
+
+#' Euro 2016 data
+#'
+#' Data on head-to-head outcomes from the 2016 UEFA European Football
+#' Championship.
+#'
+#' @name Euro2016
+#'
+#' @docType data
+#'
+#' @format This dataframe contains all of the head-to-head results from
+#' Euro 2016. This includes results from both the group stage and the
+#' knock-out rounds.
+#' \describe{
+#'   \item{dummy.rater}{An artificial "dummy" rater equal to 1 for all
+#' matches. Included so that \code{Euro2016} can be used directly with
+#' \code{MCMCpack}'s models for pairwise comparisons.}
+#'   \item{team1}{The home team}
+#'   \item{team2}{The away team }
+#'   \item{winner}{The winner of the match. \code{NA} if a draw.}
+#' }
+#' 
+#'
+#' 
+#' @source \url{https://en.wikipedia.org/wiki/UEFA_Euro_2016}
+#' 
+#' @keywords datasets
+NULL
+
+

@@ -1,6 +1,20 @@
 //
 // Changes and Bug Fixes
 //
+
+1.5-0 to 1.6-0
+  * MCMCpaircompare.R is added.
+
+1.4-9 to 1.5-0 
+  * Removed print(, digits=2) in MCMCmixfactanal  
+
+1.4-8 to 1.4-9
+  * error in marginal likelihood computation in MCMCregressChange
+    Thanks to Sid Chib for letting us know it
+
+1.4-6 to 1.4-7
+  * print(, digits=2) in MCMCmixfactanal 
+	
 1.4-5 to 1.4-6
   * Fixed ... in testSubjectBreak.Rd
 

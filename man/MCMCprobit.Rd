@@ -136,7 +136,7 @@ Response Regression Models.'' \emph{Biometrika.} 82, 747-759.
 
 Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.  ``MCMCpack:
 Markov Chain Monte Carlo in R.'', \emph{Journal of Statistical Software}.
-42(9): 1-21.  \url{https://www.jstatsoft.org/v42/i09/}.
+42(9): 1-21.  \doi{10.18637/jss.v042.i09}.
 
 Siddhartha Chib. 1995. ``Marginal Likelihood from the Gibbs Output.''
 \emph{Journal of the American Statistical Association}. 90: 1313-1321.
