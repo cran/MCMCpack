@@ -1,4 +1,4 @@
-12828356ea09f10e8788158d0b427708 *DESCRIPTION
+c26c985b6293ccaf6b539991945e79f2 *DESCRIPTION
 5cdd3af9ac0f101a82634541b96c65c0 *NAMESPACE
 489c13dcd0f8b0bf0109cb26e339c489 *R/BayesFactors.R
 a73077aedf968174f4b546177f872332 *R/HDPHMMnegbin.R
@@ -24,7 +24,7 @@ c404a10ed9422cdde7eb3f04374330d9 *R/MCMCirtKdRob.R
 9ff2828825a0b37f221e7394cfd83359 *R/MCMClogit.R
 d94303bc04acd8dcbadb5fecc0bcaa1c *R/MCMCmetrop1R.R
 35adb8c9f932bd128d5412d524ae1d9a *R/MCMCmixfactanal.R
-62086c625aa86ddd8145cda2aedacc57 *R/MCMCmnl.R
+15a9026a7863f6ad83272b4a810f8438 *R/MCMCmnl.R
 6605b03005420d2954de4b184db08137 *R/MCMCnegbin.R
 14eed04fbcf387b0f8c27a49048eb6f1 *R/MCMCnegbinChange.R
 08a402d761d51a1ccb550ff5d43b8ac6 *R/MCMCoprobit.R
@@ -48,7 +48,7 @@ cc61576fd01bc5f2c3bf3291ac85f24c *R/SSVSquantreg.R
 860f50b8e3d79da3d6a28d95744fba41 *R/SSVSquantregsummary.R
 fdfcfe9909cadaf15c47bbb604be2257 *R/automate.R
 80bedd199cd49c78355d3383c0170832 *R/btsutil.R
-45caf8e800f202268a86d5c128129b1a *R/data.R
+fbb284659e5fabce18dcb425cb0b8321 *R/data.R
 d51c4bb909bbbde846dd62441303a9c1 *R/distn.R
 1589cbe1b84ab5b397b96ef59ba79422 *R/hdp-utils.R
 18daa9fee800c7d8d5827405738531e2 *R/hidden-hmodels.R
@@ -62,7 +62,7 @@ d7e2a19ac5c3cd710f0351b9f11a8dfb *R/testpanelSubjectBreak.R
 175f5ed085a3f66d7cb87d64bac0e344 *R/utility.R
 7e2021def8a88edb41fe78d0a0ae642c *R/zzz.R
 da48e08cde3dff063f68dbf54c82f29b *README
-b711bc619e0ce0d41f279dfb504feb5a *build/partial.rdb
+3ffaa5fea047e89d6bee66895bfc205e *build/partial.rdb
 31f24d1e199bde63095dcfa4556e848b *cleanup
 ce8d6bc2b702996ba91799bc33b82840 *configure
 21e1a006fb388ed39daf16e6d2ec9549 *configure.ac
@@ -124,7 +124,7 @@ d79e5091a65f40dab48903b9e19592e9 *man/MCnormalnormal.Rd
 564018064df72880e8a63c4c7b2d93c1 *man/MCpoissongamma.Rd
 c43d3db02c8ce4d090bf81ab20c0d6fe *man/Nethvote.Rd
 9bac4a616489829fe78e5088f05ec4f5 *man/NoncenHypergeom.Rd
-2a0e6757ae24980889867c9b560b3fbf *man/PErisk.Rd
+03b1471af01dafa6d773a6eca6c04c98 *man/PErisk.Rd
 f1549bdb3850f1a8101ed14a2d13dfd0 *man/PostProbMod.Rd
 4ab53e7baba24a56f800af618349a119 *man/Rehnquist.Rd
 63e257cf8fb761aba9d446f329a9064f *man/SSVSquantreg.Rd

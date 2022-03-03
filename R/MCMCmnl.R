@@ -623,6 +623,10 @@
                                  title="MCMCmnl Posterior Sample")
 
     }
+    else{
+        cat("\n\nmcmc.method not equal to one of 'RWM', 'IndMH', or 'slice'.\n")
+        stop("Please respecifify and call MCMCmnl() again.\n")
+    }
 
     return(output)
 

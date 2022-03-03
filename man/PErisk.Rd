@@ -30,7 +30,6 @@ data points are from 1987. See Quinn (2004) for more details.
 \source{
 Mike Alvarez, Jose Antonio Cheibub, Fernando Limongi, and Adam
 Przeworski. 1999. ``ACLP Political and Economic Database.''
-\url{https://sites.google.com/site/joseantoniocheibub/datasets/democracy-and-development-aclp}.
 
 Witold J. Henisz. 2002. ``The Political Constraint Index (POLCON) Dataset.''
 
