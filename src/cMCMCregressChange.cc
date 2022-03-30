@@ -138,7 +138,7 @@ Matrix<double> gaussian_state_sampler(rng<RNGTYPE>& stream,
   if(sos == 1){
      int singleobsstate = 0.0;
     for (int i = 1; i<(n - 1); ++i){
-      if ((s[i-1] != s[i]) & (s[i] != s[i+1])) {
+      if ((s[i-1] != s[i]) && (s[i] != s[i+1])) {
 	singleobsstate = singleobsstate + 1;
       }// end of if
     }// end of int i<n

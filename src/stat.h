@@ -318,7 +318,7 @@ namespace scythe {
    * Also used by skew and kurtosis. */
   namespace {
     template <typename T, typename T2>
-    struct var_step : std::binary_function<T, T, T>
+    struct var_step
     {
       T constant_;
       T2 divisor_;

@@ -268,7 +268,7 @@
     sos <- ifelse(random.perturb, 1, 0)
 
     if (m == 0){
-      output <- MCMCregress(formula, burnin = burnin, mcmc = mcmc,
+      output <- MCMCregress(formula, data=data, burnin = burnin, mcmc = mcmc,
                             thin = thin, verbose = verbose,
                             b0 = b0, B0 = B0, c0 =c0, d0=d0,
                             marginal.likelihood = "Chib95")

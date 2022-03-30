@@ -69,7 +69,7 @@ namespace scythe {
    * generic algorithms.
    */
   template <typename T>
-  struct exponentiate : std::binary_function<T, T, T>
+  struct exponentiate
   {
     T operator() (T base, T exp) const
     {
@@ -83,7 +83,7 @@ namespace scythe {
    * generic algorithms, where a is some constant.
    */
   template <typename T>
-  struct ax_plus_b : std::binary_function<T,T,T>
+  struct ax_plus_b
   {
     T a_;
     ax_plus_b (T a) : a_ (a) {}

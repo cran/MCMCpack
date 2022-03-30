@@ -1338,8 +1338,8 @@ extern "C" {
     Matrix<> beta_store(*betarow, *betacol);
     Matrix<> sigma_store(*betarow, mns);
     Matrix<> D_store(*betarow, *Wcol* *Wcol * mns);
-    double logmarglike;
-    double loglike;
+    double logmarglike = 0.0;
+    double loglike = 0.0;
 
     if (*m == 0){
       MCMCPACK_PASSRNG2MODEL(GaussianPanelRE_impl,

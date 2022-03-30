@@ -932,8 +932,8 @@ extern "C" {
     Matrix<> subject_groupinfo(*nsubj, 3, subject_groupinfodata);
     Matrix<> time_groupinfo(*ntime, 3, time_groupinfodata);
     const int ns = *m + 1;   
-    double logmarglike;
-    double loglike;
+    double logmarglike = 0.0;
+    double loglike = 0.0;
     
     if (*m == 0) {
       Matrix<> beta_store(*betarow, *betacol);

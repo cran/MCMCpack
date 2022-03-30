@@ -1,6 +1,12 @@
 //
 // Changes and Bug Fixes
 //
+1.6.1 to 1.6.2
+  * fixed warnings regarding deprecated C++ features
+  * initialized double logmarglike = 0.0; int st = 0.0 in cHDPHMMnegbin.cc
+
+1.6-0 to 1.6.1 
+  * fixed "failure: the condition has length > 1" problem. 
 
 1.5-0 to 1.6-0
   * MCMCpaircompare.R is added.

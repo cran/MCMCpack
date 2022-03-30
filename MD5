@@ -1,4 +1,4 @@
-c26c985b6293ccaf6b539991945e79f2 *DESCRIPTION
+6a331008f0066515de80038ebdf1b902 *DESCRIPTION
 5cdd3af9ac0f101a82634541b96c65c0 *NAMESPACE
 489c13dcd0f8b0bf0109cb26e339c489 *R/BayesFactors.R
 a73077aedf968174f4b546177f872332 *R/HDPHMMnegbin.R
@@ -40,7 +40,7 @@ dcbb50f17d47b3c53583921a2ecbf240 *R/MCMCpaircompare.R
 dee7081e726e16ad62d66aa59871be69 *R/MCMCprobitChange.R
 e4b5208b09de1590187c700bd450bf12 *R/MCMCquantreg.R
 59e6304502af102c3d2be21fcd5f8163 *R/MCMCregress.R
-3d8cea6297ec9c1cd48bea3d162e384d *R/MCMCregressChange.R
+e88d81bc942ddc2161f97e23e2d59df3 *R/MCMCregressChange.R
 cfaa7b7b68eaa8ebb77f5964e376c5c1 *R/MCMCresidualBreakAnalysis.R
 7b60264616e1c51efc61ccb3f78f35d4 *R/MCMCtobit.R
 4afd92a950cb5580bb0d21f05332f3a6 *R/MCmodels.R
@@ -62,7 +62,7 @@ d7e2a19ac5c3cd710f0351b9f11a8dfb *R/testpanelSubjectBreak.R
 175f5ed085a3f66d7cb87d64bac0e344 *R/utility.R
 7e2021def8a88edb41fe78d0a0ae642c *R/zzz.R
 da48e08cde3dff063f68dbf54c82f29b *README
-3ffaa5fea047e89d6bee66895bfc205e *build/partial.rdb
+ed3fdb00f882ba97c6b65e3ef66bc971 *build/partial.rdb
 31f24d1e199bde63095dcfa4556e848b *cleanup
 ce8d6bc2b702996ba91799bc33b82840 *configure
 21e1a006fb388ed39daf16e6d2ec9549 *configure.ac
@@ -73,7 +73,7 @@ e17202d22ce5ab5ab7b01e3b248a4008 *data/Nethvote.rda
 accb7b5b46207a02e49de2702a6faff4 *data/Senate.rda
 ce79b1b47b561cb44dd4f93589d3d755 *data/SupremeCourt.rda
 c94fffe49ba014cbc6708326fbda0364 *inst/CITATION
-954d223935ee10145211f1f6ce0ae13f *inst/HISTORY.txt
+ad822ee9656fa1674f27ad1f94d2159d *inst/HISTORY.txt
 cb4856b66283c4e98efeee9b0866b4ce *man/BayesFactor.Rd
 3fde04199db6c766bf4474f697236a44 *man/Dirichlet.Rd
 558a86fab20e23525e33a6bb7e74ab88 *man/Euro2016.Rd
@@ -149,7 +149,7 @@ a197a3102a0fec287538c7e4508ae0cd *man/testpanelGroupBreak.Rd
 36ebe9977157db5a14373f347e183754 *man/vech.Rd
 89958ed0f4233f85ec88217d8bd9b41c *man/write.Scythe.Rd
 1d71348836f0c214c36bd87b0204a488 *man/xpnd.Rd
-5ca10cd5c2050d7ae43a8d4756ab9006 *src/HMMmultivariateGaussian.cc
+4ecfc859a5f0dd5b320b6697ff82bc1d *src/HMMmultivariateGaussian.cc
 8dc624f6b2ea2967170da8cc98a04bdb *src/MCMCdynamicEI.cc
 40962cb2912c4c8de9bc61f5592b38cb *src/MCMCfcds.h
 db0074b59394f540436a57cbe7d03544 *src/MCMChierBetaBinom.cc
@@ -169,12 +169,12 @@ fb5a3f2c4ece479ba75dd03d86b3a9e0 *src/MCMCordfactanal.cc
 ef5566f824887d9bbef5b76f1b64d839 *src/MCMCrng.h
 f3e2f911f14c895bd0ad382501e6a5e8 *src/Makevars.in
 80e927d7e94f5aa4466584d560ca29e6 *src/Makevars.win
-5362ed41a42ce34cf7817f6bfd988935 *src/algorithm.h
-90b99c30a863b8dda64366d797ba6da4 *src/cHDPHMMnegbin.cc
+1e8e4743434cb112ee908b1cef2d77a1 *src/algorithm.h
+b4853a55aa8221694bc5921f54e21bec *src/cHDPHMMnegbin.cc
 102fd1e1d5524217a05391c53edb1602 *src/cHDPHMMpoisson.cc
 2976cb440c0af066b192008fb88cb57c *src/cHDPHSMMnegbin.cc
 0c8d2ff8a454d8bee60624efa213be41 *src/cHMMpanelFE.cc
-38db5274dbe2fcec05e2133841fdcfe7 *src/cHMMpanelRE.cc
+3ca54e3e6bf06bd15af190747274f015 *src/cHMMpanelRE.cc
 2fa00744c59733dfdfa2620a2d4faf2c *src/cMCMCSVDreg.cc
 6e3bf8b46677b82d51b7bab78dc14581 *src/cMCMCbinaryChange.cc
 0b257675a9637b49d82a6318c37efe9b *src/cMCMCdynamicIRT1d-b.cc
@@ -200,7 +200,7 @@ d527d0f89bfb9d7ca1fc81d24bffdf44 *src/cMCMCprobitChange.cc
 715bae4bc49d7c06c0ffcf7822a75ded *src/cMCMCprobitres.cc
 553dcda6fc4ce46990c28d5b33792273 *src/cMCMCquantreg.cc
 305e8e6af6c20a72b63522eab5a54d6b *src/cMCMCregress.cc
-d47cc6033b8c2324b81b72f6ca48d08d *src/cMCMCregressChange.cc
+cc1e01fe6a9b08791aa80504e8b10b81 *src/cMCMCregressChange.cc
 ddcc7c4b92e1baa96e54db0551f67b43 *src/cMCMCresidualBreakAnalysis.cc
 fbd9eabe7caa5bcd8d06dcc63ca905c1 *src/cMCMCtobit.cc
 1388cda93fe803ffad37c6ebd7fa26d1 *src/cSSVSquantreg.cc
@@ -222,5 +222,5 @@ a111bb9e9e66be7cb044ad27ea675124 *src/optimize.h
 17e0af0143791e39c8c81f8f59034c11 *src/rng.h
 b48baf77b93da895a04154ef15c8683f *src/rtmvnorm.h
 374de28976ad1e0023c89d5a1c0f9a01 *src/smath.h
-a5574b5829f3cab30cd73eb26725ae68 *src/stat.h
+49de167bf3995fbd672fc7c051d8730b *src/stat.h
 ca47c74890139220fcf9dddd01d33c3c *src/wrapped_generator.h
