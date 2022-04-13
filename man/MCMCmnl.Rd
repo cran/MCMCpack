@@ -11,7 +11,7 @@ MCMCmnl(
   burnin = 1000,
   mcmc = 10000,
   thin = 1,
-  mcmc.method = c("IndMH", "RWM", "slice"),
+  mcmc.method = "IndMH",
   tune = 1,
   tdf = 6,
   verbose = 0,

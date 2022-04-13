@@ -1,6 +1,10 @@
 //
 // Changes and Bug Fixes
 //
+
+1.6.2 to 1.6.3
+  * IndMH is set as a default mcmc.method for MCMCmnl
+
 1.6.1 to 1.6.2
   * fixed warnings regarding deprecated C++ features
   * initialized double logmarglike = 0.0; int st = 0.0 in cHDPHMMnegbin.cc

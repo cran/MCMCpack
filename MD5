@@ -1,4 +1,4 @@
-6a331008f0066515de80038ebdf1b902 *DESCRIPTION
+583da0236016482974624f514330309c *DESCRIPTION
 5cdd3af9ac0f101a82634541b96c65c0 *NAMESPACE
 489c13dcd0f8b0bf0109cb26e339c489 *R/BayesFactors.R
 a73077aedf968174f4b546177f872332 *R/HDPHMMnegbin.R
@@ -24,7 +24,7 @@ c404a10ed9422cdde7eb3f04374330d9 *R/MCMCirtKdRob.R
 9ff2828825a0b37f221e7394cfd83359 *R/MCMClogit.R
 d94303bc04acd8dcbadb5fecc0bcaa1c *R/MCMCmetrop1R.R
 35adb8c9f932bd128d5412d524ae1d9a *R/MCMCmixfactanal.R
-15a9026a7863f6ad83272b4a810f8438 *R/MCMCmnl.R
+b58faedc1a9a52fd06f03fd9ac28355d *R/MCMCmnl.R
 6605b03005420d2954de4b184db08137 *R/MCMCnegbin.R
 14eed04fbcf387b0f8c27a49048eb6f1 *R/MCMCnegbinChange.R
 08a402d761d51a1ccb550ff5d43b8ac6 *R/MCMCoprobit.R
@@ -62,7 +62,7 @@ d7e2a19ac5c3cd710f0351b9f11a8dfb *R/testpanelSubjectBreak.R
 175f5ed085a3f66d7cb87d64bac0e344 *R/utility.R
 7e2021def8a88edb41fe78d0a0ae642c *R/zzz.R
 da48e08cde3dff063f68dbf54c82f29b *README
-ed3fdb00f882ba97c6b65e3ef66bc971 *build/partial.rdb
+5aa81453a20b9a047edebb008cfbc100 *build/partial.rdb
 31f24d1e199bde63095dcfa4556e848b *cleanup
 ce8d6bc2b702996ba91799bc33b82840 *configure
 21e1a006fb388ed39daf16e6d2ec9549 *configure.ac
@@ -73,7 +73,7 @@ e17202d22ce5ab5ab7b01e3b248a4008 *data/Nethvote.rda
 accb7b5b46207a02e49de2702a6faff4 *data/Senate.rda
 ce79b1b47b561cb44dd4f93589d3d755 *data/SupremeCourt.rda
 c94fffe49ba014cbc6708326fbda0364 *inst/CITATION
-ad822ee9656fa1674f27ad1f94d2159d *inst/HISTORY.txt
+214a76270e04c2709ffa8e606c324672 *inst/HISTORY.txt
 cb4856b66283c4e98efeee9b0866b4ce *man/BayesFactor.Rd
 3fde04199db6c766bf4474f697236a44 *man/Dirichlet.Rd
 558a86fab20e23525e33a6bb7e74ab88 *man/Euro2016.Rd
@@ -100,7 +100,7 @@ cf552f93f0cda2161cc7e12a17a32445 *man/MCMChlogit.Rd
 24ce6124e98a706b080e0336c453fdbb *man/MCMClogit.Rd
 28daf408c1ad06a47a41cd081f262fc0 *man/MCMCmetrop1R.Rd
 983ad537525d0ffa42d1f0ac8c31bb80 *man/MCMCmixfactanal.Rd
-5d65e5d4ea252c89fba433d3d97765b1 *man/MCMCmnl.Rd
+bbcab21931fa07bdf84a7488a72f178c *man/MCMCmnl.Rd
 bd3b07be733f834230b509defee21b57 *man/MCMCnegbin.Rd
 267bb85012a7eccd89174b6e105bda92 *man/MCMCnegbinChange.Rd
 584d506ed31167dee991c5a59466e9f8 *man/MCMCoprobit.Rd
