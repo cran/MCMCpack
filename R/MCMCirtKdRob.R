@@ -683,49 +683,51 @@
 
 
 
-    ## put together matrix and build MCMC object to return
-    sample <- matrix(posterior$samdata, posterior$samrow, posterior$samcol,
-                     byrow=FALSE)
-    output <- mcmc(data=sample,start=1, end=mcmc, thin=thin)
+      ## put together matrix and build MCMC object to return
+      sample <- matrix(posterior$samdata, posterior$samrow, posterior$samcol,
+                       byrow=FALSE)
+      output <- mcmc(data=sample,start=1, end=mcmc, thin=thin)
+      
+      par.names <- NULL
+      if (store.item==TRUE){
+          alpha.hold <- paste("alpha", X.names, sep=".")
+          beta.hold <- NULL
+          for (local.dim in 1:dimensions){
+              beta.hold <- cbind(beta.hold, paste("beta", X.names, local.dim,
+                                                  sep = "."))
+          }
+          
+          Lambda.names <- t(cbind(matrix(alpha.hold, K, 1),
+                                  beta.hold))
+          dim(Lambda.names) <- NULL
+          par.names <- c(par.names, Lambda.names)
+      }
 
-    par.names <- NULL
-    if (store.item==TRUE){
-      alpha.hold <- paste("alpha", X.names, sep=".")
-      beta.hold <- paste("beta", X.names, sep = ".")
-      beta.hold <- rep(beta.hold, dimensions, each=dimensions)
-      beta.hold <- paste(beta.hold, 1:dimensions, sep=".")
-
-      Lambda.names <- t(cbind(matrix(alpha.hold, K, 1),
-                              matrix(beta.hold,K,dimensions,byrow=TRUE)))
-      dim(Lambda.names) <- NULL
-      par.names <- c(par.names, Lambda.names)
-    }
-
-    if (store.ability==TRUE){
-      phi.names <- paste(paste("theta",
-                               rep(xobs, each=(dimensions+1)), sep="."),
-                         rep(0:dimensions,(dimensions+1)), sep=".")
-      par.names <- c(par.names, phi.names)
-    }
-
-    par.names <- c("delta0", "delta1", par.names)
-
-    varnames(output) <- par.names
-
-    ## get rid of columns for constrained parameters
-    output.df <- as.data.frame(as.matrix(output))
-    output.var <- diag(var(output.df))
-    output.df <- output.df[,output.var != 0]
-    output <- mcmc(as.matrix(output.df), start=1, end=mcmc, thin=thin)
-
-    ## add constraint info so this isn't lost
-    attr(output, "constraints") <- item.constraints
-    attr(output, "n.items") <- K
-    attr(output, "n.dimensions") <- dimensions
-    attr(output,"title") <-
-      "MCMCpack Robust K-Dimensional Item Response Theory Model Posterior Sample"
-
-return(output)
-
-
+      if (store.ability==TRUE){
+          phi.names <- paste(paste("theta",
+                                   rep(xobs, each=(dimensions+1)), sep="."),
+                             rep(0:dimensions,(dimensions+1)), sep=".")
+          par.names <- c(par.names, phi.names)
+      }
+      
+      par.names <- c("delta0", "delta1", par.names)
+      
+      varnames(output) <- par.names
+      
+      ## get rid of columns for constrained parameters
+      output.df <- as.data.frame(as.matrix(output))
+      output.var <- diag(var(output.df))
+      output.df <- output.df[,output.var != 0]
+      output <- mcmc(as.matrix(output.df), start=1, end=mcmc, thin=thin)
+      
+      ## add constraint info so this isn't lost
+      attr(output, "constraints") <- item.constraints
+      attr(output, "n.items") <- K
+      attr(output, "n.dimensions") <- dimensions
+      attr(output,"title") <-
+          "MCMCpack Robust K-Dimensional Item Response Theory Model Posterior Sample"
+      
+      return(output)
+      
+      
   }

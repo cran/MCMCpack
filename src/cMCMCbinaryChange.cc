@@ -111,7 +111,7 @@ void MCMCbinaryChange_impl(rng<RNGTYPE>& stream, const Matrix<>& Y,
   const int tot_iter = burnin + mcmc;
   const int nstore = mcmc / thin;
   const int n = Y.rows();
-  const int ns = m + 1;
+  const int ns = (int)m + 1; //  Jan 12, 2024, explicit conversion to int
 
   //MCMC loop
    int count = 0;
@@ -120,7 +120,7 @@ void MCMCbinaryChange_impl(rng<RNGTYPE>& stream, const Matrix<>& Y,
     //////////////////////
     // 1. Sample s
     //////////////////////
-    Matrix<> Sout = binary_state_sampler(stream, m, Y, phi, P);
+    Matrix<> Sout = binary_state_sampler(stream, (int)m, Y, phi, P); //  Jan 12, 2024, explicit conversion to int
     Matrix<> s = Sout(_, 0);
     Matrix<> ps(n, ns);
     for (int j = 0; j<ns; ++j){
@@ -222,7 +222,7 @@ void MCMCbinaryChange_impl(rng<RNGTYPE>& stream, const Matrix<>& Y,
     //////////////////////
     Matrix<> density_P(nstore, ns);
     for (int iter = 0; iter < nstore; ++iter){
-      Matrix<> Sout = binary_state_sampler(stream, m, Y, phi_st, P);
+      Matrix<> Sout = binary_state_sampler(stream, (int) m, Y, phi_st, P);    //  Jan 12, 2024, explicit conversion to int
       Matrix <> s = Sout(_, 0);
       Matrix <> ps(n, ns);
       for (int j = 0; j<ns; ++j){

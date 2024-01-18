@@ -144,8 +144,8 @@ void MCMCprobitres_impl (rng<RNGTYPE>& stream, const Matrix<>& Y,
     
     logmarglike = loglike + logprior - logbeta;
     
-    Rprintf("\n logmarglike %10.5f", logmarglike, "\n"); 
-    Rprintf("\n loglike %10.5f", loglike, "\n"); 
+    // Rprintf("\n logmarglike %10.5f", logmarglike, "\n"); 
+    // Rprintf("\n loglike %10.5f", loglike, "\n"); 
     
   }// end of marginal likelihood computation
  

@@ -237,7 +237,8 @@ namespace scythe {
   seqa (T start, T incr, uint rows)
   {
     Matrix<T,O,Concrete> ret(rows, 1, false);
-    generate(ret.begin_f(), ret.end_f(), seqa_alg<T>(start, incr));
+    std::generate(ret.begin_f(), ret.end_f(), seqa_alg<T>(start, incr));// January 18, 2024 replaced generate(ret.begin_f(), ret.end_f(), seqa_alg<T>(start, incr));
+    
     SCYTHE_VIEW_RETURN(T, O, S, ret)
   }
 

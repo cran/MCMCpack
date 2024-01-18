@@ -48,14 +48,14 @@
 #endif
 
 namespace scythe {
-	/* convenience typedefs */
+  /* convenience typedefs */
   namespace { // local to this file
-	  typedef unsigned int uint;
+    typedef unsigned int uint;
   }
   
-	/* forward declaration of the matrix class */
-	template <typename T_type, matrix_order ORDER, matrix_style STYLE>
-	class Matrix;
+  /* forward declaration of the matrix class */
+  template <typename T_type, matrix_order ORDER, matrix_style STYLE>
+    class Matrix;
 
   /*! \brief An STL-compliant const bidirectional iterator for Matrix.
    *
@@ -71,92 +71,101 @@ namespace scythe {
    * \see matrix_random_access_iterator
    */
   
+  // January 17, 2024:  Made the iterator definition C++17 compliant, removing the deprecated std::iterator based constructor
+
   template <typename T_type, matrix_order ORDER, matrix_order M_ORDER,
-            matrix_style M_STYLE>
-  class const_matrix_bidirectional_iterator
-    : public std::iterator<std::bidirectional_iterator_tag, T_type>
-  {
-		public:
-			/**** TYPEDEFS ***/
-			typedef const_matrix_bidirectional_iterator<T_type, ORDER, 
-              M_ORDER, M_STYLE> self;
+    matrix_style M_STYLE>
+    class const_matrix_bidirectional_iterator
+  //   : public std::iterator<std::bidirectional_iterator_tag, T_type>
+    {
+      //public:
+      //	/**** TYPEDEFS ***/
+      //	typedef const_matrix_bidirectional_iterator<T_type, ORDER, 
+      //            M_ORDER, M_STYLE> self;
 
-			/* These are a little formal, but useful */
-			typedef typename std::iterator_traits<self>::value_type
-				value_type;
-			typedef typename std::iterator_traits<self>::iterator_category
-				iterator_category;
-			typedef typename std::iterator_traits<self>::difference_type
-				difference_type;
-			typedef typename std::iterator_traits<self>::pointer pointer;
-			typedef typename std::iterator_traits<self>::reference reference;
-
+      //	/* These are a little formal, but useful */
+      //	typedef typename std::iterator_traits<self>::value_type
+      //		value_type;
+      //	typedef typename std::iterator_traits<self>::iterator_category
+      //		iterator_category;
+      //	typedef typename std::iterator_traits<self>::difference_type
+      //		difference_type;
+      //	typedef typename std::iterator_traits<self>::pointer pointer;
+      //	typedef typename std::iterator_traits<self>::reference reference;
+    public:
+      typedef const_matrix_bidirectional_iterator<T_type, ORDER, 
+	M_ORDER, M_STYLE> self;
+      using iterator_category = std::bidirectional_iterator_tag;
+      using value_type = T_type;
+      using difference_type = std::ptrdiff_t;
+      using pointer = T_type*;
+      using reference = T_type&;
 		
-			/**** CONSTRUCTORS ****/
+      /**** CONSTRUCTORS ****/
 			
-			/* Default constructor */
-			const_matrix_bidirectional_iterator ()
-			{}
+      /* Default constructor */
+      const_matrix_bidirectional_iterator ()
+	{}
 
-			/* Standard constructor */
-			const_matrix_bidirectional_iterator
+      /* Standard constructor */
+      const_matrix_bidirectional_iterator
         (const Matrix<value_type, M_ORDER, M_STYLE> &M)
         : pos_ (M.getArray()),
-          matrix_ (&M)
-      {
-        SCYTHE_CHECK_30 (pos_ == 0, scythe_null_error,
-            "Requesting iterator to NULL matrix");
+	matrix_ (&M)
+	  {
+	    SCYTHE_CHECK_30 (pos_ == 0, scythe_null_error,
+			     "Requesting iterator to NULL matrix");
 
-        /* The basic story is: when M_STYLE == Concrete and ORDER ==
-         * M_ORDER, we only need pos_ and iteration will be as fast as
-         * possible.  All other types of iteration need more variables
-         * to keep track of things and are slower.
-         */
+	    /* The basic story is: when M_STYLE == Concrete and ORDER ==
+	     * M_ORDER, we only need pos_ and iteration will be as fast as
+	     * possible.  All other types of iteration need more variables
+	     * to keep track of things and are slower.
+	     */
 
 
-        if (M_STYLE != Concrete || M_ORDER != ORDER) {
-          offset_ = 0;
+	    if (M_STYLE != Concrete || M_ORDER != ORDER) {
+	      offset_ = 0;
 
-          if (ORDER == Col) {
-            lead_length_ = M.rows();
-            lead_inc_ = M.rowstride();
-            trail_inc_ = M.colstride();
-          } else {
-            lead_length_ = M.cols();
-            lead_inc_ = M.colstride();
-            trail_inc_ = M.rowstride();
-          }
-          jump_ = trail_inc_ + (1 - lead_length_) * lead_inc_;
-          vend_ = pos_ + (lead_length_ - 1) * lead_inc_;
-          vbegin_ = pos_;
-        }
+	      if (ORDER == Col) {
+		lead_length_ = M.rows();
+		lead_inc_ = M.rowstride();
+		trail_inc_ = M.colstride();
+	      } else {
+		lead_length_ = M.cols();
+		lead_inc_ = M.colstride();
+		trail_inc_ = M.rowstride();
+	      }
+	      jump_ = trail_inc_ + (1 - lead_length_) * lead_inc_;
+	      vend_ = pos_ + (lead_length_ - 1) * lead_inc_;
+	      vbegin_ = pos_;
+	    }
 #if SCYTHE_DEBUG > 2
-				size_ = M.size();
-        start_ = pos_;
+	    size_ = M.size();
+	    start_ = pos_;
 #endif
 
-      }
+	  }
 
       /* Copy constructor */
       const_matrix_bidirectional_iterator (const self &mi)
         : pos_ (mi.pos_),
-          matrix_ (mi.matrix_)
-      {
-        if (M_STYLE != Concrete || M_ORDER != ORDER) {
-          offset_ = mi.offset_;
-          lead_length_ = mi.lead_length_;
-          lead_inc_ = mi.lead_inc_;
-          trail_inc_ = mi.trail_inc_;
-          vend_ = mi.vend_;
-          vbegin_ = mi.vbegin_;
-          jump_ = mi.jump_;
-        }
+	matrix_ (mi.matrix_)
+	  {
+	    if (M_STYLE != Concrete || M_ORDER != ORDER) {
+	      offset_ = mi.offset_;
+	      lead_length_ = mi.lead_length_;
+	      lead_inc_ = mi.lead_inc_;
+	      trail_inc_ = mi.trail_inc_;
+	      vend_ = mi.vend_;
+	      vbegin_ = mi.vbegin_;
+	      jump_ = mi.jump_;
+	    }
 
 #if SCYTHE_DEBUG > 2
-			  size_ = mi.size_;
-        start_ = mi.start_;
+	    size_ = mi.size_;
+	    start_ = mi.start_;
 #endif
-      }
+	  }
 
       /**** EXTRA MODIFIER ****/
 
@@ -186,36 +195,36 @@ namespace scythe {
       /**** FORWARD ITERATOR FACILITIES ****/
 
       inline self& operator= (const self& mi)
-      {
-        pos_ = mi.pos_;
-        matrix_ = mi.matrix_;
+	{
+	  pos_ = mi.pos_;
+	  matrix_ = mi.matrix_;
 
-        if (M_STYLE != Concrete || M_ORDER != ORDER) {
-          offset_ = mi.offset_;
-          lead_length_ = mi.lead_length_;
-          lead_inc_ = mi.lead_inc_;
-          trail_inc_ = mi.trail_inc_;
-          vend_ = mi.vend_;
-          vbegin_ = mi.vbegin_;
-          jump_ = mi.jump_;
-        }
+	  if (M_STYLE != Concrete || M_ORDER != ORDER) {
+	    offset_ = mi.offset_;
+	    lead_length_ = mi.lead_length_;
+	    lead_inc_ = mi.lead_inc_;
+	    trail_inc_ = mi.trail_inc_;
+	    vend_ = mi.vend_;
+	    vbegin_ = mi.vbegin_;
+	    jump_ = mi.jump_;
+	  }
 #if SCYTHE_DEBUG > 2
-				size_ = mi.size_;
-        start_ = mi.start_;
+	  size_ = mi.size_;
+	  start_ = mi.start_;
 #endif
 
-        return *this;
-      }
+	  return *this;
+	}
 
       inline const reference operator* () const
       {
-				SCYTHE_ITER_CHECK_BOUNDS();
+	SCYTHE_ITER_CHECK_BOUNDS();
         return *pos_;
       }
 
       inline const pointer operator-> () const
       {
-				SCYTHE_ITER_CHECK_BOUNDS();
+	SCYTHE_ITER_CHECK_BOUNDS();
         return pos_;
       }
 
@@ -318,12 +327,12 @@ namespace scythe {
                  // begin of next
       // Pointer used only for set_end.  TODO Cleaner impl.
       const Matrix<T_type, M_ORDER, M_STYLE>* matrix_;
-			// Size variable for range checking
+      // Size variable for range checking
 #if SCYTHE_DEBUG > 2
-			uint size_;  // Logical matrix size
+      uint size_;  // Logical matrix size
       T_type* start_;  // only needed for bounds checking
 #endif
-  };
+    };
 
   /*! \brief An STL-compliant bidirectional iterator for Matrix.
    *
@@ -339,47 +348,47 @@ namespace scythe {
    * \see matrix_random_access_iterator
    */
 
-	template <typename T_type, matrix_order ORDER, matrix_order M_ORDER,
-            matrix_style M_STYLE>
-	class matrix_bidirectional_iterator
-		: public const_matrix_bidirectional_iterator<T_type, ORDER, 
-                                           M_ORDER, M_STYLE>
-	{
-			/**** TYPEDEFS ***/
-			typedef matrix_bidirectional_iterator<T_type, ORDER, M_ORDER, 
-                                      M_STYLE> self;
-			typedef const_matrix_bidirectional_iterator<T_type, ORDER, 
-                                            M_ORDER, M_STYLE> Base;
+  template <typename T_type, matrix_order ORDER, matrix_order M_ORDER,
+    matrix_style M_STYLE>
+    class matrix_bidirectional_iterator
+    : public const_matrix_bidirectional_iterator<T_type, ORDER, 
+    M_ORDER, M_STYLE>
+    {
+      /**** TYPEDEFS ***/
+      typedef matrix_bidirectional_iterator<T_type, ORDER, M_ORDER, 
+	M_STYLE> self;
+      typedef const_matrix_bidirectional_iterator<T_type, ORDER, 
+	M_ORDER, M_STYLE> Base;
 		
-		public:
-			/* These are a little formal, but useful */
-			typedef typename std::iterator_traits<Base>::value_type
-				value_type;
-			typedef typename std::iterator_traits<Base>::iterator_category
-				iterator_category;
-			typedef typename std::iterator_traits<Base>::difference_type
-				difference_type;
-			typedef typename std::iterator_traits<Base>::pointer pointer;
-			typedef typename std::iterator_traits<Base>::reference reference;
+    public:
+      /* These are a little formal, but useful */
+      typedef typename std::iterator_traits<Base>::value_type
+	value_type;
+      typedef typename std::iterator_traits<Base>::iterator_category
+	iterator_category;
+      typedef typename std::iterator_traits<Base>::difference_type
+	difference_type;
+      typedef typename std::iterator_traits<Base>::pointer pointer;
+      typedef typename std::iterator_traits<Base>::reference reference;
 
 		
-			/**** CONSTRUCTORS ****/
+      /**** CONSTRUCTORS ****/
 			
-			/* Default constructor */
-			matrix_bidirectional_iterator ()
-				: Base () 
-			{}
+      /* Default constructor */
+      matrix_bidirectional_iterator ()
+	: Base () 
+	{}
 
-			/* Standard constructor */
-			matrix_bidirectional_iterator (const Matrix<value_type, M_ORDER, 
-                                                  M_STYLE> &M)
-				:	Base(M)
-			{}
+      /* Standard constructor */
+      matrix_bidirectional_iterator (const Matrix<value_type, M_ORDER, 
+				     M_STYLE> &M)
+	:	Base(M)
+      {}
 
       /* Copy constructor */
-			matrix_bidirectional_iterator (const self &mi)
-				:	Base (mi)
-			{}
+      matrix_bidirectional_iterator (const self &mi)
+	:	Base (mi)
+      {}
 
       /**** EXTRA MODIFIER ****/
       inline self& set_end ()
@@ -388,73 +397,73 @@ namespace scythe {
         return *this;
       }
 
-			/**** FORWARD ITERATOR FACILITIES ****/
+      /**** FORWARD ITERATOR FACILITIES ****/
 
-			/* We have to override a lot of these to get return values
-			 * right.*/
+      /* We have to override a lot of these to get return values
+       * right.*/
       inline self& operator= (const self& mi)
-      {
-        pos_ = mi.pos_;
-        matrix_ = mi.matrix_;
+	{
+	  pos_ = mi.pos_;
+	  matrix_ = mi.matrix_;
 
-        if (M_STYLE != Concrete || M_ORDER != ORDER) {
-          offset_ = mi.offset_;
-          lead_length_ = mi.lead_length_;
-          lead_inc_ = mi.lead_inc_;
-          trail_inc_ = mi.trail_inc_;
-          vend_ = mi.vend_;
-          vbegin_ = mi.vbegin_;
-          jump_ = mi.jump_;
-        }
+	  if (M_STYLE != Concrete || M_ORDER != ORDER) {
+	    offset_ = mi.offset_;
+	    lead_length_ = mi.lead_length_;
+	    lead_inc_ = mi.lead_inc_;
+	    trail_inc_ = mi.trail_inc_;
+	    vend_ = mi.vend_;
+	    vbegin_ = mi.vbegin_;
+	    jump_ = mi.jump_;
+	  }
 #if SCYTHE_DEBUG > 2
-				size_ = mi.size_;
-        start_ = mi.start_;
+	  size_ = mi.size_;
+	  start_ = mi.start_;
 #endif
 
-        return *this;
+	  return *this;
+	}
+
+      inline reference operator* () const
+      {
+	SCYTHE_ITER_CHECK_BOUNDS();
+	return *pos_;
       }
 
-			inline reference operator* () const
-			{
-				SCYTHE_ITER_CHECK_BOUNDS();
-				return *pos_;
-			}
+      inline pointer operator-> () const
+      {
+	SCYTHE_ITER_CHECK_BOUNDS();
+	return pos_;
+      }
 
-			inline pointer operator-> () const
-			{
-				SCYTHE_ITER_CHECK_BOUNDS();
-				return pos_;
-			}
+      inline self& operator++ ()
+      {
+	Base::operator++();
+	return *this;
+      }
 
-			inline self& operator++ ()
-			{
-				Base::operator++();
-				return *this;
-			}
+      inline self operator++ (int)
+      {
+	self tmp = *this;
+	++(*this);
+	return tmp;
+      }
 
-			inline self operator++ (int)
-			{
-				self tmp = *this;
-				++(*this);
-				return tmp;
-			}
+      inline self& operator-- ()
+      {
+	Base::operator--();
+	return *this;
+      }
 
-			inline self& operator-- ()
-			{
-				Base::operator--();
-				return *this;
-			}
+      inline self operator-- (int)
+      {
+	self tmp = *this;
+	--(*this);
+	return tmp;
+      }
 
-			inline self operator-- (int)
-			{
-				self tmp = *this;
-				--(*this);
-				return tmp;
-			}
-
-		private:
-			/* Get handles to base members.  It boggles the mind */
-			using Base::pos_;
+    private:
+      /* Get handles to base members.  It boggles the mind */
+      using Base::pos_;
       using Base::vend_;
       using Base::vbegin_;
       using Base::offset_;
@@ -464,10 +473,10 @@ namespace scythe {
       using Base::jump_;
       using Base::matrix_;
 #if SCYTHE_DEBUG > 2
-			using Base::size_;
+      using Base::size_;
       using Base::start_;
 #endif
-	};
+    };
 
 } // namespace scythe
 

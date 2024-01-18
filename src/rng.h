@@ -1165,8 +1165,8 @@ namespace scythe {
                 - below) + below;
           }
           if (! R_finite(x)) {
-            SCYTHE_WARN("Mean extremely far from truncation point. "
-                << "Returning truncation point");
+            // SCYTHE_WARN("Mean extremely far from truncation point. "
+            //    << "Returning truncation point");
             return below;
           }
           return x;
@@ -1235,8 +1235,8 @@ namespace scythe {
                   - below) + below;
           }
           if (! R_finite(x)) {
-            SCYTHE_WARN("Mean extremely far from truncation point. "
-                << "Returning truncation point");
+            // SCYTHE_WARN("Mean extremely far from truncation point. "
+            //    << "Returning truncation point");
             return above;
           }
           return -1*x;

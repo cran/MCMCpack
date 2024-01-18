@@ -259,7 +259,7 @@
 # NOTE: This can be used for any GLM model by passing the right family
 #       or for another model by passing default starting values to
 #       the function   
-"coef.start" <-
+"coef_start" <-
    function(beta.start, K, formula, family, data=NULL, defaults=NA) {
           
      if (is.na(beta.start)[1] & is.na(defaults)[1]){ # use GLM estimates

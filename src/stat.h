@@ -541,7 +541,7 @@ namespace scythe {
   T
   max (const Matrix<T,PO,PS> &A)
   {
-    return *(max_element(A.begin_f(), A.end_f()));
+    return *(std::max_element(A.begin_f(), A.end_f()));// January 18, 2024 replaced return *(max_element(A.begin_f(), A.end_f()));
   }
 
    /*! 
@@ -573,7 +573,7 @@ namespace scythe {
   T
   min (const Matrix<T,PO,PS> &A)
   {
-    return *(min_element(A.begin_f(), A.end_f()));
+    return *(std::min_element(A.begin_f(), A.end_f()));// January 18, 2024 replaced return *(min_element(A.begin_f(), A.end_f()));
   }
   
    /*! 
@@ -606,7 +606,7 @@ namespace scythe {
   unsigned int
   maxind (const Matrix<T,PO,PS> &A)
   {
-    return (max_element(A.begin_f(), A.end_f())).get_index();
+    return (std::max_element(A.begin_f(), A.end_f())).get_index();// January 18, 2024 replaced 
   }
   
    /*! 
@@ -639,7 +639,7 @@ namespace scythe {
   unsigned int
   minind (const Matrix<T,PO,PS> &A)
   {
-    return (min_element(A.begin_f(), A.end_f())).get_index();
+    return (std::min_element(A.begin_f(), A.end_f())).get_index();// January 18, 2024 replaced return (min_element(A.begin_f(), A.end_f())).get_index();
   }
 
     /*! 

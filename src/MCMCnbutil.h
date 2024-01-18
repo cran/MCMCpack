@@ -49,7 +49,7 @@ inline void init_aux(rng<RNGTYPE>& stream,
         mr2(t, j) = rmat2(j, 1);
         sr2(t, j) = rmat2(j, 2);
       }
-      int comp = ceil((rmat2.rows()) * stream.runif());
+      int comp = (int) ceil((rmat2.rows()) * stream.runif()); //  Jan 12, 2024, explicit conversion to int
       component2[t] = comp;
     }
   }
@@ -111,7 +111,7 @@ Matrix<> rho_slice_sampler(rng<RNGTYPE>& stream,
   R = L + step_out;
   L = max(0.0, L);
   V = stream.runif();
-  J = floor(M * V);
+  J = (int) floor(M * V); //  Jan 12, 2024, explicit conversion to int
   K = (M - 1) - J;
       
   // Step out left
@@ -185,7 +185,7 @@ Matrix<> rho_prior_sampler(rng<RNGTYPE>& stream,
   R = L + step_out;
   L = max(0.0, L);
   V = stream.runif();
-  J = floor(M * V);
+  J = (int) floor(M * V); //  Jan 12, 2024, explicit conversion to int
   K = (M - 1) - J;
       
   // Step out left

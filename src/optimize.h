@@ -328,7 +328,7 @@ namespace scythe {
     h = std::sqrt(h);
     //T h = std::sqrt(2.2e-16);
 
-    T deriv;
+    T deriv = h;
 
     for (unsigned int i = 0; i < k; ++i) {
       T temp = alpha + h;

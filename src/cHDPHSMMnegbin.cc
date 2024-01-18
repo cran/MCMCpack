@@ -496,7 +496,7 @@ void HDPHSMMnegbinReg_impl(rng<RNGTYPE>& stream,
       if (debug > 1) Rprintf("j = %i, froms = %i P = %10.5f tc = %i\n", j, froms[j], P(j,j), trans_counts(j,j));
       int draw;
       for (int nj = 0; nj < froms[j]; nj++) {
-        draw = std::floor(stream.rexp(-log(P(j,j))));
+        draw = (int) std::floor(stream.rexp(-log(P(j,j))));  //  Jan 12, 2024, explicit conversion to int
         // sometimes we get wonky draws here
         if (draw > 0) trans_counts(j,j) += draw;
       }
@@ -567,7 +567,7 @@ void HDPHSMMnegbinReg_impl(rng<RNGTYPE>& stream,
       gamma_prime = stream.rdirich(gamma_prime_dir);
     }
 
-    if (debug > 0) Rprintf("before P\n", alpha);
+    // if (debug > 0) Rprintf("before P\n", alpha);
     for (int j = 0; j < ns; ++j) {
       Matrix<double> p_dirich_params(ns,1);
       for (int i = 0; i < ns; ++i) {

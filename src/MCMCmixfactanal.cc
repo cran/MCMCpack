@@ -78,9 +78,9 @@ void MCMCmixfactanal_impl(rng<RNGTYPE>& stream,
   
     // constants 
     const unsigned int K = X.cols();  // number of manifest variables
-    int n_ord_ge3 = 0; // number of ordinal varibles with >= 3 categories
-    for (unsigned int i=0; i<K; ++i)
-      if (ncateg[i] >= 3) ++n_ord_ge3;
+    //int n_ord_ge3 = 0; // number of ordinal varibles with >= 3 categories
+    //for (unsigned int i=0; i<K; ++i)
+    // if (ncateg[i] >= 3) ++n_ord_ge3;
     const unsigned int N = X.rows();  // number of observations
     const unsigned int D = Lambda.cols(); // number of factors 
                                           // (including constant)

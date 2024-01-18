@@ -1,7 +1,13 @@
 //
 // Changes and Bug Fixes
 //
-
+1.6.4 to 1.6.5
+  * fixed warnings generated during c++ compiling 
+  * matrix_random_access_iterator.h:97 matrix_forward_iterator.h:77, matrix_bidirectional_iterator.h:77 (void, void, void) is added 
+	
+1.6.3 to 1.6.4
+  * optimize.h warning addresed
+ 
 1.6.2 to 1.6.3
   * IndMH is set as a default mcmc.method for MCMCmnl
 

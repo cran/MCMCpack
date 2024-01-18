@@ -46,7 +46,7 @@ static double dtnormLX(const double x,
     out = numer/denom;
   }
   else{
-    Rprintf("\n x input for dtnormLX() %10.5f is out of bounds %10.5f %10.5f ", x, lower, upper, "\n");
+    // Rprintf("\n x input for dtnormLX() %10.5f is out of bounds %10.5f %10.5f ", x, lower, upper, "\n");
     out = 1;
   }
   return out;
@@ -89,7 +89,7 @@ static double oprobit_log_postLX( int j,
 
   if (gammafixed==1){
     for ( int i=0; i<N; ++i){
-      int yi = Y[i];
+      int yi = (int) Y[i];  //  Jan 12, 2024, explicit conversion to int
       if (yi == ncat){
 	loglikerat = loglikerat
 	  + log(1.0  - pnorm(gamma_p(yi-1) - Xbeta[i], 0.0, 1.0) )
@@ -117,7 +117,7 @@ static double oprobit_log_postLX( int j,
   }
   else{
     for ( int i=0; i<N; ++i){
-      int yi = Y[i];
+      int yi = (int) Y[i];  //  Jan 12, 2024, explicit conversion to int
       if (yi == ncat){
 	loglikerat = loglikerat
 	  + log(1.0  - pnorm(gamma_p(j, yi-1) - Xbeta[i], 0.0, 1.0) )
@@ -251,7 +251,7 @@ void MCMCoprobitChange_impl(rng<RNGTYPE>& stream,
     // 2. Sample Z
     for ( int i = 0; i<N; ++i) {
       Matrix<> mu = X(i,_)*t(beta(s[i]-1,_));
-       int yi = Y[i];
+      int yi = (int) Y[i];  //  Jan 12, 2024, explicit conversion to int
       Z[i] = stream.rtnorm_combo(mu[0], 1.0, gamma(s[i]-1, yi-1), gamma(s[i]-1, yi));
     }
 
@@ -614,7 +614,7 @@ void MCMCoprobitChange_impl(rng<RNGTYPE>& stream,
     for (int t=0; t< N ; ++t){
       Matrix<> mu = X(t,_)*::t(beta_st);
       for (int j=0; j<ns ; ++j){
-	int yt = Y[t];
+	int yt = (int) Y[t]; //  Jan 12, 2024, explicit conversion to int
 	py[j]  =  oprobit_pdfLX(ncat, yt, mu[j], gamma_st(j,_));
       }
       if (t==0) pstyt1 = pr1;

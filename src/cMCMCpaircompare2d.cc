@@ -445,10 +445,10 @@ void MCMCpaircompare2d_impl (rng<RNGTYPE>& stream,
 	gamma_accept_num += local_accrate;
 	gamma_accept_denom += 1.0;
       }
-      Rprintf("Minimum gamma acceptance rate: %7.3f", gamma_accept_min, " ");
-      Rprintf("\nMean gamma acceptance rate:    %7.3f", gamma_accept_num/gamma_accept_denom, " ");
-      Rprintf("\nMaximum gamma acceptance rate: %7.3f", gamma_accept_max, " ");
-      Rprintf("\n\n");
+      // Rprintf("Minimum gamma acceptance rate: %7.3f", gamma_accept_min, " ");
+      // Rprintf("\nMean gamma acceptance rate:    %7.3f", gamma_accept_num/gamma_accept_denom, " ");
+      // Rprintf("\nMaximum gamma acceptance rate: %7.3f", gamma_accept_max, " ");
+      // Rprintf("\n\n");
      
     }
     

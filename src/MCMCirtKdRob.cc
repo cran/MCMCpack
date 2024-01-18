@@ -824,16 +824,16 @@ void MCMCirtKdRob_impl(rng<RNGTYPE>& stream,
 
 
     // storage matrices (row major order)
-    Matrix<> Lambda_store;
-    if (storeitem[0]==1){
+    Matrix<double> Lambda_store;
+    if (*storeitem==1){
       Lambda_store = Matrix<double>(nsamp, K*D);
     }
-    Matrix<> theta_store;
+    Matrix<double> theta_store;
     if (*storeability==1){
       theta_store = Matrix<double>(nsamp, N*D);
     }
-    Matrix<> delta0_store(nsamp, 1);
-    Matrix<> delta1_store(nsamp, 1);
+    Matrix<double> delta0_store(nsamp, 1);
+    Matrix<double> delta1_store(nsamp, 1);
 
     ///////////////////
     // Slice Sampler //
@@ -1033,19 +1033,34 @@ void MCMCirtKdRob_impl(rng<RNGTYPE>& stream,
       if ((iter >= burnin[0]) && ((iter % thin[0]==0))) {      
       
 	// store Lambda
-	if (storeitem[0]==1){
+	if (*storeitem==1){
 	  //Matrix<double> Lambda_store_vec = reshape(Lambda,1,K*D);
 	  //for (int l=0; l<K*D; ++l)
 	  //  Lambda_store(count, l) = Lambda_store_vec[l];
-	  rmview(Lambda_store(count, _)) = Lambda;
+	  //rmview(Lambda_store(count, _)) = Lambda;//causes warning 12/2023
+	  int localcount = 0;
+	  for (int rowind=0; rowind<K; ++rowind){
+	    for (int colind=0; colind<D; ++colind){
+	      Lambda_store(count, localcount) = Lambda(rowind, colind);
+	      ++localcount;
+	    }
+	  }
 	}
+	  
       
 	// store theta
-	if (storeability[0]==1){
+	if (*storeability==1){
 	  //Matrix<double> theta_store_vec = reshape(theta, 1, N*D);
 	  //for (int l=0; l<N*D; ++l)
 	  //  theta_store(count, l) = theta_store_vec[l];
-	  rmview(theta_store(count, _)) = theta;
+	  //rmview(theta_store(count, _)) = theta;//causes warning 12/2023
+	  int localcount = 0;
+	  for (int rowind=0; rowind<N; ++rowind){
+	    for (int colind=0; colind<D; ++colind){
+	      theta_store(count, localcount) = theta(rowind, colind);
+	      ++localcount;
+	    }
+	  }
 	}
       
 	// store delta0 and delta1

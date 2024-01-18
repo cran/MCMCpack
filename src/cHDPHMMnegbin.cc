@@ -80,7 +80,7 @@ hmm_state negbin_hdp_reg_state_sampler(rng<RNGTYPE>& stream,
     M(_,t) = unnorm_pstyt;
   }
 
-  int st = 0.0;  
+  int st = 0; // 0.0;
   Matrix<int> s(n, 1);                        
   Matrix<> ps(n, ns);  
   Matrix<> pstyn(ns, 1);

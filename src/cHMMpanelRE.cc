@@ -400,15 +400,15 @@ void GaussianPanelRE_impl(rng<RNGTYPE>& stream,
      double logprior = density_beta_prior + density_sigma2_prior + density_D_prior;
      logmarglike = (loglike + logprior) - (pdf_beta + pdf_sigma2 + pdf_D);
 
-     if (verbose >0){
-       Rprintf("\n ----------------------------------------------------------------------- \n");
-       Rprintf("\n logmarglike %10.5f", logmarglike);
-       Rprintf("\n loglike %10.5f", loglike, "\n");
-       Rprintf("\n log_prior %10.5f", logprior, "\n");
-       Rprintf("\n pdf_beta is %10.5f", pdf_beta, "\n");
-       Rprintf("\n pdf_D is %10.5f", pdf_D, "\n");
-       Rprintf("\n pdf_sigma2 is %10.5f", pdf_sigma2, "\n");
-      }
+     // if (verbose >0){
+     //   Rprintf("\n ----------------------------------------------------------------------- \n");
+    //    Rprintf("\n logmarglike %10.5f", logmarglike);
+    //    Rprintf("\n loglike %10.5f", loglike, "\n");
+    //    Rprintf("\n log_prior %10.5f", logprior, "\n");
+    //    Rprintf("\n pdf_beta is %10.5f", pdf_beta, "\n");
+    //   Rprintf("\n pdf_D is %10.5f", pdf_D, "\n");
+    //    Rprintf("\n pdf_sigma2 is %10.5f", pdf_sigma2, "\n");
+   //   }
    }// end of marginal likelihood computation
 
    delete [] Xk_arr;

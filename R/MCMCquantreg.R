@@ -172,7 +172,7 @@
     ols.fit <- lm(formula, data=data)
     defaults <- matrix(coef(ols.fit),K,1)
     defaults[1] <- defaults[1]+summary(ols.fit)$sigma*qnorm(tau)
-    beta.start <- coef.start(beta.start, K, formula, family=gaussian, data, defaults=defaults)
+    beta.start <- coef_start(beta.start, K, formula, family=gaussian, data, defaults=defaults)
     mvn.prior <- form.mvn.prior(b0, B0, K)
     b0 <- mvn.prior[[1]]
     B0 <- mvn.prior[[2]]

@@ -176,7 +176,7 @@
     K <- ncol(X)  # number of covariates
 
     ## starting values and priors
-    beta.start <- coef.start(beta.start, K, formula,
+    beta.start <- coef_start(beta.start, K, formula,
                              family=binomial(link="probit"), data)
     mvn.prior <- form.mvn.prior(b0, B0, K)
     b0 <- mvn.prior[[1]]

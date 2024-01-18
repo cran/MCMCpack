@@ -259,7 +259,7 @@ pi0 = QR_SSVS_pi0_draw(n_cov-q, k-q, pi0a0, pi0b0, stream);
          (iter+1), tot_iter);
        Rprintf("gamma = \n");
        for (unsigned int r=0; r<k; ++r)
-         Rprintf("%10.5f\n", gamma(r));
+         // Rprintf("%10.5f\n", gamma(r));
         Rprintf("beta = \n");
        for (unsigned int r=0; r<k; ++r)
         Rprintf("%10.5f\n", beta(r));

@@ -59,6 +59,7 @@
 #include <cstring>
 
 #ifdef SCYTHE_RPACK
+#include <string.h>           // needed to use strcpy_s
 #include <R.h>           // needed to use Rprintf()
 #include <R_ext/Utils.h> // needed to allow user interrupts
 #endif
@@ -92,7 +93,7 @@
     _SCYTHE_WARN_ss << "WARNING in " << __FILE__ << ", "              \
       << __func__ << ", " << __LINE__ << ": "                         \
       << MSG << "\n";                                                 \
-    Rprintf(_SCYTHE_WARN_ss.str().c_str());                           \
+    Rprintf("%s", _SCYTHE_WARN_ss.str().c_str());                         \
   }
 
 #define SCYTHE_WARN_STD(MSG)                                          \
@@ -265,6 +266,8 @@ namespace scythe
         << line_ << ": " << message_ << "!";
       char *retval = new char[os.str().length()];
       std::strcpy(retval, os.str().c_str());
+      // strcpy_s(retval, os.str().length(), os.str().c_str());
+      // Jan 12, 2024, replaced std::strcpy(retval, os.str().c_str());
       return retval;
     }
 
@@ -625,7 +628,7 @@ namespace scythe
   inline void scythe_terminate ()
   {
 #ifdef SCYTHE_RPACK
-    Rprintf(serr->what());
+    Rprintf("%s", serr->what());
     error("Aborting Scythe C++ execution");
 #else
     std::cerr << serr->what() << std::endl;
