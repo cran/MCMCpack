@@ -36,6 +36,7 @@
 #include "MCMCrng.h"
 #include "MCMCfcds.h"
 
+#define R_NO_REMAP
 #include <R.h>           // needed to use Rprintf()
 #include <R_ext/Utils.h> // needed to allow user interrupts
 
@@ -50,17 +51,17 @@ using namespace scythe;
 double user_fun_eval(SEXP fun, SEXP theta, SEXP myframe) {
   
   SEXP R_fcall;
-  if(!isFunction(fun)) error("`fun' must be a function");
-  if(!isEnvironment(myframe)) error("myframe must be an environment");
-  PROTECT(R_fcall = lang2(fun, R_NilValue));
+  if(!Rf_isFunction(fun)) Rf_error("`fun' must be a function");
+  if(!Rf_isEnvironment(myframe)) Rf_error("myframe must be an environment");
+  PROTECT(R_fcall = Rf_lang2(fun, R_NilValue));
   SETCADR(R_fcall, theta);
   SEXP funval;
-  PROTECT(funval = eval(R_fcall, myframe));
+  PROTECT(funval = Rf_eval(R_fcall, myframe));
 
-  if (!isReal(funval)) error("`fun' must return a double");
+  if (!Rf_isReal(funval)) Rf_error("`fun' must return a double");
   double fv = REAL(funval)[0];
-  if (fv == R_PosInf) error("`fun' returned +Inf");
-  if (R_IsNaN(fv) || R_IsNA(fv)) error("`fun' returned NaN or NA");
+  if (fv == R_PosInf) Rf_error("`fun' returned +Inf");
+  if (R_IsNaN(fv) || R_IsNA(fv)) Rf_error("`fun' returned NaN or NA");
   UNPROTECT(2);
   return fv;
 }
@@ -74,7 +75,7 @@ void MCMCmetrop1R_impl (rng<RNGTYPE>& stream, SEXP& fun,
                         const Matrix<>& propvar, SEXP& sample_SEXP)
 {
   // define constants
-  const unsigned int npar = length(theta);
+  const unsigned int npar = Rf_length(theta);
   const unsigned int tot_iter = burnin + mcmc;
   const unsigned int nsamp = mcmc / thin;
   const Matrix <> propc  = cholesky(propvar);
@@ -84,7 +85,7 @@ void MCMCmetrop1R_impl (rng<RNGTYPE>& stream, SEXP& fun,
 
   // put theta into a Scythe Matrix 
   double* theta_data = REAL(theta);
-  const int theta_nr = length(theta);
+  const int theta_nr = Rf_length(theta);
   const int theta_nc = 1;
   Matrix <> theta_M (theta_nc, theta_nr, theta_data);
   theta_M = t(theta_M);
@@ -105,7 +106,7 @@ void MCMCmetrop1R_impl (rng<RNGTYPE>& stream, SEXP& fun,
     
     // put theta_can_M into a SEXP
     SEXP theta_can;
-    PROTECT(theta_can = allocVector(REALSXP, npar));
+    PROTECT(theta_can = Rf_allocVector(REALSXP, npar));
     for (unsigned int i = 0; i < npar; ++i) {
       REAL(theta_can)[i] = theta_can_M(i);
     }
@@ -186,15 +187,15 @@ extern "C" {
 
     // put propvar_R into a Matrix
     double* propvar_data = REAL(propvar_R);
-    const int propvar_nr = nrows(propvar_R);
-    const int propvar_nc = ncols(propvar_R);
+    const int propvar_nr = Rf_nrows(propvar_R);
+    const int propvar_nc = Rf_ncols(propvar_R);
     Matrix <> propvar (propvar_nc, propvar_nr, propvar_data);
     propvar = t(propvar);
 
-    const unsigned int npar = length(theta);
+    const unsigned int npar = Rf_length(theta);
     const unsigned int nsamp = INTEGER(mcmc_R)[0] / INTEGER(thin_R)[0];
     SEXP sample_SEXP;
-    PROTECT(sample_SEXP = allocMatrix(REALSXP, nsamp, npar));
+    PROTECT(sample_SEXP = Rf_allocMatrix(REALSXP, nsamp, npar));
     MCMCPACK_PASSRNG2MODEL(MCMCmetrop1R_impl, fun, theta, myframe, 
 			   INTEGER(burnin_R)[0], INTEGER(mcmc_R)[0], 
 			   INTEGER(thin_R)[0],

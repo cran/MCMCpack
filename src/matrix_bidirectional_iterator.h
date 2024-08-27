@@ -216,7 +216,8 @@ namespace scythe {
 	  return *this;
 	}
 
-      inline const reference operator* () const
+      inline reference operator* () const
+      // inline const reference operator* () const
       {
 	SCYTHE_ITER_CHECK_BOUNDS();
         return *pos_;

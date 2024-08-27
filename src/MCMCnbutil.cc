@@ -13,6 +13,9 @@
 #include "MCMCnbutil.h"
 
 #define R_NO_REMAP_MATH
+// #define R_CXX_USE_NO_REMAP
+// #define R_NO_REMAP
+
 #include <R.h>      
 #include <R_ext/Utils.h>
 #include <Rinternals.h>

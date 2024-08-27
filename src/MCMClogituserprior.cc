@@ -38,6 +38,7 @@
 #include "MCMCrng.h"
 #include "MCMCfcds.h"
 
+#define R_NO_REMAP
 #include <R.h>           // needed to use Rprintf()
 #include <R_ext/Utils.h> // needed to allow user interrupts
 
@@ -54,12 +55,12 @@ using namespace scythe;
 static double user_fun_eval(SEXP fun, SEXP theta, SEXP myframe){
     
   SEXP R_fcall;
-  if(!isFunction(fun)) error("`fun' must be a function");
-  if(!isEnvironment(myframe)) error("myframe must be an environment");
-  PROTECT(R_fcall = lang2(fun, R_NilValue));
+  if(!Rf_isFunction(fun)) Rf_error("`fun' must be a function");
+  if(!Rf_isEnvironment(myframe)) Rf_error("myframe must be an environment");
+  PROTECT(R_fcall = Rf_lang2(fun, R_NilValue));
   SETCADR(R_fcall, theta);
-  SEXP funval = eval(R_fcall, myframe);
-  if (!isReal(funval)) error("`fun' must return a double");
+  SEXP funval = Rf_eval(R_fcall, myframe);
+  if (!Rf_isReal(funval)) Rf_error("`fun' must return a double");
   double fv = REAL(funval)[0];
   UNPROTECT(1);
   return fv;
@@ -89,7 +90,7 @@ void MCMClogituserprior_impl(rng<RNGTYPE>& stream, SEXP fun,
 			     const Matrix<>& X_M, SEXP& sample_SEXP){
 
     // define constants
-    const unsigned int npar = length(theta);
+    const unsigned int npar = Rf_length(theta);
     const unsigned int tot_iter = burnin + mcmc;
     const unsigned int nsamp = mcmc/thin;
     const Matrix <> propc  = cholesky(propvar);
@@ -99,7 +100,7 @@ void MCMClogituserprior_impl(rng<RNGTYPE>& stream, SEXP fun,
 
     // put theta into a Scythe Matrix 
     double* theta_data = REAL(theta);
-    const int theta_nr = length(theta);
+    const int theta_nr = Rf_length(theta);
     const int theta_nc = 1;
     Matrix <> theta_M (theta_nc, theta_nr, theta_data);
     theta_M = t(theta_M);
@@ -122,7 +123,7 @@ void MCMClogituserprior_impl(rng<RNGTYPE>& stream, SEXP fun,
       
       // put theta_can_M into a SEXP
       SEXP theta_can;
-      theta_can = PROTECT(allocVector(REALSXP, npar));
+      theta_can = PROTECT(Rf_allocVector(REALSXP, npar));
       for (unsigned int i=0; i<npar; ++i){
 	REAL(theta_can)[i] = theta_can_M(i);
       }
@@ -167,7 +168,7 @@ void MCMClogituserprior_impl(rng<RNGTYPE>& stream, SEXP fun,
     }
 
     // put the sample into a SEXP and return it   
-    sample_SEXP = PROTECT(allocMatrix(REALSXP, nsamp, npar));
+    sample_SEXP = PROTECT(Rf_allocMatrix(REALSXP, nsamp, npar));
     for (unsigned int i=0; i<nsamp; ++i){
       for (unsigned int j=0; j<npar; ++j){
 	REAL(sample_SEXP)[i + nsamp*j] = sample(i,j);
@@ -215,8 +216,8 @@ extern "C" {
        
     // put propvar_R into a Matrix
     double* propvar_data = REAL(propvar_R);
-    const int propvar_nr = nrows(propvar_R);
-    const int propvar_nc = ncols(propvar_R);
+    const int propvar_nr = Rf_nrows(propvar_R);
+    const int propvar_nc = Rf_ncols(propvar_R);
     Matrix <double,Row> propvarpre (propvar_nc, propvar_nr, propvar_data);
     //propvar = Matrix<>(propvar.rows(), propvar.cols(),
     //    propvar.begin_f<Row>());
@@ -224,7 +225,7 @@ extern "C" {
 
     // put Y_R into a Scythe Matrix
     int* Y_data = INTEGER(Y_R);
-    const int Y_nr = length(Y_R);
+    const int Y_nr = Rf_length(Y_R);
     const int Y_nc = 1;
     Matrix <int,Row> Y_Mpre (Y_nc, Y_nr, Y_data);
     //Y_M = Matrix<int>(Y_M.rows(), Y_M.cols(), Y_M.begin_f<Row>());
@@ -232,8 +233,8 @@ extern "C" {
 
     // put X_R into a Scythe Matrix
     double* X_data = REAL(X_R);
-    const int X_nr = nrows(X_R);
-    const int X_nc = ncols(X_R);
+    const int X_nr = Rf_nrows(X_R);
+    const int X_nc = Rf_ncols(X_R);
     Matrix <double,Row> X_Mpre (X_nc, X_nr, X_data);
     //X_M = Matrix<>(X_M.rows(), X_M.cols(), X_M.begin_f<Row>());
     Matrix<> X_M = t(X_Mpre);

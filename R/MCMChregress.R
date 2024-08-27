@@ -193,7 +193,7 @@
 #' 17-26.
 #'
 #' Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
-#' Statistical Library 1.0.} \url{http://scythe.lsa.umich.edu}.
+#' Statistical Library 1.0.} \url{http://scythe.wustl.edu.s3-website-us-east-1.amazonaws.com/}.
 #'
 #' Andrew D. Martin and Kyle L. Saunders. 2002. ``Bayesian Inference for
 #' Political Science Panel Data.'' Paper presented at the 2002 Annual Meeting

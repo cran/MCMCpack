@@ -389,7 +389,7 @@ static void doubling(double (*logfun)(const double&,
     x0 = delta1;
   }
   else {
-    error("ERROR: param not in {0,1,2,3} in doubling().");
+    Rf_error("ERROR: param not in {0,1,2,3} in doubling().");
     //Rprintf("\nERROR: param not in {0,1,2,3} in doubling().\n");
     //exit(1);    
   }
@@ -474,7 +474,7 @@ static void StepOut(double (*logfun)(const double&,
     x0 = delta1;
   }
   else {
-    error("ERROR: param not in {0,1,2,3} in StepOut().");
+    Rf_error("ERROR: param not in {0,1,2,3} in StepOut().");
     //Rprintf("\nERROR: param not in {0,1,2,3} in StepOut().\n");
     //exit(1);    
   }
@@ -634,7 +634,7 @@ static double shrinkageDoubling(double (*logfun)(const double&,
     x0 = delta1;
   }
   else {
-    error("ERROR: param not in {0,1,2,3} in shrinkageDoubling().");
+    Rf_error("ERROR: param not in {0,1,2,3} in shrinkageDoubling().");
     //Rprintf("\nERROR: param not in {0,1,2,3} in shrinkageDoubling().\n");
     //exit(1);    
   }
@@ -721,7 +721,7 @@ static double shrinkageStep(double (*logfun)(const double&,
     x0 = delta1;
   }
   else {
-    error("ERROR: param not in {0,1,2,3} in shrinkageDoubling().");
+    Rf_error("ERROR: param not in {0,1,2,3} in shrinkageDoubling().");
     //Rprintf("\nERROR: param not in {0,1,2,3} in shrinkageDoubling().\n");
     //exit(1);    
   }

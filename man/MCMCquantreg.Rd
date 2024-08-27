@@ -142,7 +142,7 @@ summary(posterior_95)
 }
 \references{
 Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.
-\emph{Scythe Statistical Library 1.2.} \url{http://scythe.lsa.umich.edu}.
+\emph{Scythe Statistical Library 1.2.} \url{http://scythe.wustl.edu.s3-website-us-east-1.amazonaws.com/}.
 
 Craig Reed and Keming Yu. 2009. ``An Efficient Gibbs Sampler for Bayesian
 Quantile Regression.'' Technical Report.

@@ -338,7 +338,7 @@ Markov Chain Monte Carlo in R.'', \emph{Journal of Statistical Software}.
 42(9): 1-21.  \doi{10.18637/jss.v042.i09}.
 
 Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
-Statistical Library 1.0.} \url{http://scythe.lsa.umich.edu}.
+Statistical Library 1.0.} \url{http://scythe.wustl.edu.s3-website-us-east-1.amazonaws.com/}.
 
 Radford Neal. 2003. ``Slice Sampling'' (with discussion). \emph{Annals of
 Statistics}, 31: 705-767.

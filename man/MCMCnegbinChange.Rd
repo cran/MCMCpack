@@ -221,7 +221,7 @@ Andrew D. Martin, Kevin M. Quinn, and Jong Hee Park. 2011.
 Software}. 42(9): 1-21.  \doi{10.18637/jss.v042.i09}.
 
 Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
-Statistical Library 1.0.} \url{http://scythe.lsa.umich.edu}.
+Statistical Library 1.0.} \url{http://scythe.wustl.edu.s3-website-us-east-1.amazonaws.com/}.
 
 Sylvia Fruehwirth-Schnatter, Rudolf Fruehwirth, Leonhard Held, and
     Havard Rue. 2009. ``Improved auxiliary mixture sampling for

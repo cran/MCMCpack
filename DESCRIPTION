@@ -1,9 +1,56 @@
 Package: MCMCpack
-Version: 1.7-0
-Date: 2024-01-18
+Version: 1.7-1
+Date: 2024-08-27
 Title: Markov Chain Monte Carlo (MCMC) Package
-Author: Andrew D. Martin [aut], Kevin M. Quinn [aut], Jong Hee Park [aut,cre], Ghislain Vieilledent [ctb], Michael Malecki[ctb], Matthew Blackwell [ctb], Keith Poole [ctb], Craig Reed [ctb], Ben Goodrich [ctb], Qiushi Yu [ctb], Ross Ihaka [cph], The R Development Core Team [cph], The R Foundation [cph], Pierre L'Ecuyer [cph], Makoto Matsumoto [cph], Takuji Nishimura [cph]
-Maintainer: Jong Hee Park <jongheepark@snu.ac.kr>
+Authors@R: c(person(given = c("Andrew", "D."),
+                      family = "Martin",
+                      role = "aut"),
+               person(given = c("Kevin", "M."),
+                      family = "Quinn",
+                      role = "aut"),
+               person(given = c("Jong", "Hee"),
+                      family = "Park",
+                      role = c("aut", "cre"),
+                      email = "jongheepark@snu.ac.kr"),
+               person(given = "Ghislain",
+                      family = "Vieilledent",
+                      role = "ctb"),
+               person(given = "Michael",
+                      family = "Malecki",
+                      role = "ctb"),
+               person(given = "Matthew",
+                      family = "Blackwell",
+                      role = "ctb"),
+               person(given = "Keith",
+                      family = "Poole",
+                      role = "ctb"),
+               person(given = "Craig",
+                      family = "Reed",
+                      role = "ctb"),
+               person(given = "Ben",
+                      family = "Goodrich",
+                      role = "ctb"),
+               person(given = "Qiushi",
+                      family = "Yu",
+                      role = "ctb"),
+               person(given = "Ross",
+                      family = "Ihaka",
+                      role = "cph"),
+               person(given = c("The", "R", "Development", "Core"),
+                      family = "Team",
+                      role = "cph"),
+               person(given = c("The", "R"),
+                      family = "Foundation",
+                      role = "cph"),
+               person(given = "Pierre",
+                      family = "L'Ecuyer",
+                      role = "cph"),
+               person(given = "Makoto",
+                      family = "Matsumoto",
+                      role = "cph"),
+               person(given = "Takuji",
+                      family = "Nishimura",
+                      role = "cph"))
 Depends: R (>= 3.6), coda (>= 0.11-3), MASS, stats
 Imports: graphics, grDevices, lattice, methods, utils, mcmc, quantreg
 Description: Contains functions to perform Bayesian
@@ -19,9 +66,26 @@ Description: Contains functions to perform Bayesian
 License: GPL-3
 SystemRequirements: gcc (>= 4.0)
 URL: https://CRAN.R-project.org/package=MCMCpack
-Packaged: 2024-01-18 14:23:16 UTC; park
+Packaged: 2024-08-27 05:25:26 UTC; jongheepark
 NeedsCompilation: yes
 Repository: CRAN
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Encoding: UTF-8
-Date/Publication: 2024-01-18 15:20:07 UTC
+Date/Publication: 2024-08-27 06:30:02 UTC
+Author: Andrew D. Martin [aut],
+  Kevin M. Quinn [aut],
+  Jong Hee Park [aut, cre],
+  Ghislain Vieilledent [ctb],
+  Michael Malecki [ctb],
+  Matthew Blackwell [ctb],
+  Keith Poole [ctb],
+  Craig Reed [ctb],
+  Ben Goodrich [ctb],
+  Qiushi Yu [ctb],
+  Ross Ihaka [cph],
+  The R Development Core Team [cph],
+  The R Foundation [cph],
+  Pierre L'Ecuyer [cph],
+  Makoto Matsumoto [cph],
+  Takuji Nishimura [cph]
+Maintainer: Jong Hee Park <jongheepark@snu.ac.kr>

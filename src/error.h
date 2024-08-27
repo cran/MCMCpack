@@ -214,7 +214,7 @@ namespace scythe
       std::set_terminate (scythe_terminate);
       if (halt) {
 #ifdef SCYTHE_RPACK
-        error("Aborting Scythe C++ execution");
+        // error("Aborting Scythe C++ execution");
 #else
         std::terminate ();
 #endif
@@ -629,7 +629,7 @@ namespace scythe
   {
 #ifdef SCYTHE_RPACK
     Rprintf("%s", serr->what());
-    error("Aborting Scythe C++ execution");
+    // error("Aborting Scythe C++ execution");
 #else
     std::cerr << serr->what() << std::endl;
     std::cerr << std::endl;

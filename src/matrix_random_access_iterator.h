@@ -199,8 +199,9 @@ namespace scythe {
 
 	  return *this;
 	}
-
-      inline const reference operator* () const
+      
+      inline reference operator* () const
+      //  inline const reference operator* () const
       {
 	SCYTHE_ITER_CHECK_BOUNDS();
         return *pos_;
@@ -284,8 +285,9 @@ namespace scythe {
       }
 
       /**** RANDOM ACCESS ITERATOR FACILITIES ****/
-
-      inline const reference operator[] (difference_type n) const
+      
+      inline reference operator[] (difference_type n) const
+      // inline const reference operator[] (difference_type n) const
       {
         if (M_STYLE == Concrete && ORDER == M_ORDER) {
 	  SCYTHE_ITER_CHECK_OFFSET_BOUNDS(start_ + n);
