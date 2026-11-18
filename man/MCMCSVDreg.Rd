@@ -151,8 +151,7 @@ Statistical Software}.  42(9): 1-21.
 \doi{10.18637/jss.v042.i09}.
 
 Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.
-\emph{Scythe Statistical Library 1.0.}
-\url{http://scythe.wustl.edu.s3-website-us-east-1.amazonaws.com/}.
+\emph{Scythe Statistical Library 1.0.} \doi{10.18637/jss.v042.i12}.
 
 Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.
 ``Output Analysis and Diagnostics for MCMC (CODA)'', \emph{R

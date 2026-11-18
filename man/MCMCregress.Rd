@@ -161,7 +161,7 @@ Robert E. Kass and Adrian E. Raftery. 1995. ``Bayes Factors.'' \emph{Journal
 of the American Statistical Association}. 90: 773-795.
 
 Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
-Statistical Library 1.0.} \url{http://scythe.wustl.edu.s3-website-us-east-1.amazonaws.com/}.
+Statistical Library 1.0.} \doi{10.18637/jss.v042.i12}.
 
 Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.  ``Output
 Analysis and Diagnostics for MCMC (CODA)'', \emph{R News}. 6(1): 7-11.

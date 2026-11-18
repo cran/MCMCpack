@@ -120,7 +120,7 @@
 #' Variable Selection for Quantile Regression" Technical Report.
 #'
 #' Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
-#' Statistical Library 1.2.} \url{http://scythe.wustl.edu.s3-website-us-east-1.amazonaws.com/}.
+#' Statistical Library 1.2.} \doi{10.18637/jss.v042.i12}.
 #'
 #' Keming Yu and Jin Zhang. 2005. "A Three Parameter Asymmetric Laplace
 #' Distribution and it's extensions." \emph{Communications in Statistics -

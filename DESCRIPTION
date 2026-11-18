@@ -1,6 +1,6 @@
 Package: MCMCpack
-Version: 1.7-1
-Date: 2024-08-27
+Version: 1.7-2
+Date: 2026-11-18
 Title: Markov Chain Monte Carlo (MCMC) Package
 Authors@R: c(person(given = c("Andrew", "D."),
                       family = "Martin",
@@ -66,12 +66,9 @@ Description: Contains functions to perform Bayesian
 License: GPL-3
 SystemRequirements: gcc (>= 4.0)
 URL: https://CRAN.R-project.org/package=MCMCpack
-Packaged: 2024-08-27 05:25:26 UTC; jongheepark
 NeedsCompilation: yes
-Repository: CRAN
 RoxygenNote: 7.3.1
 Encoding: UTF-8
-Date/Publication: 2024-08-27 06:30:02 UTC
 Author: Andrew D. Martin [aut],
   Kevin M. Quinn [aut],
   Jong Hee Park [aut, cre],
@@ -89,3 +86,6 @@ Author: Andrew D. Martin [aut],
   Makoto Matsumoto [cph],
   Takuji Nishimura [cph]
 Maintainer: Jong Hee Park <jongheepark@snu.ac.kr>
+Packaged: 2026-11-18 00:33:57 UTC; jongheepark
+Repository: CRAN
+Date/Publication: 2026-11-18 03:40:08 UTC

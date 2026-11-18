@@ -230,7 +230,7 @@
 #' Springer: New York.
 #'
 #' Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.  \emph{Scythe
-#' Statistical Library 1.0.} \url{http://scythe.wustl.edu.s3-website-us-east-1.amazonaws.com/}.
+#' Statistical Library 1.0.} \doi{10.18637/jss.v042.i12}.
 #'
 #' Martyn Plummer, Nicky Best, Kate Cowles, and Karen Vines. 2006.  ``Output
 #' Analysis and Diagnostics for MCMC (CODA)'', \emph{R News}. 6(1): 7-11.
@@ -328,6 +328,24 @@
 
     N <- nrow(X)	      # number of observations
     K <- ncol(X)              # number of manifest variables
+
+    # standardize X
+    if (std.mean){
+      for (i in 1:K){
+        if (is.numeric(X[,i])){
+          X[,i] <- X[,i]-mean(X[,i], na.rm=TRUE)
+        }
+      }
+    }
+    if (std.var){
+      for (i in 1:K){
+        if (is.numeric(X[,i])){
+          X[,i] <- (X[,i] - mean(X[,i], na.rm=TRUE))/sd(X[,i], na.rm=TRUE) + mean(X[,i], na.rm=TRUE)
+        }
+      }
+    }
+
+      
     ncat <- matrix(NA, K, 1)  # vector of number of categ. in each man. var.
     for (i in 1:K){
       if (is.numeric(X[,i])){
@@ -354,21 +372,6 @@
       xobs <- 1:N
     }
 
-    # standardize X
-    if (std.mean){
-      for (i in 1:K){
-        if (ncat[i] == -999){
-          X[,i] <- X[,i]-mean(X[,i])
-        }
-      }
-    }
-    if (std.var){
-      for (i in 1:K){
-        if (ncat[i] == -999){
-          X[,i] <- (X[,i] - mean(X[,i]))/sd(X[,i]) + mean(X[,i])
-        }
-      }
-    }
 
     n.ord.ge3 <- 0
     for (i in 1:K)
@@ -508,6 +511,10 @@
 
     ## starting values for Psi
     Psi <- factuniqueness.start(psi.start, X)
+    if (any(is.na(psi.start))){
+      ## exclude missing values (coded -999) from the default start values
+      Psi <- 0.5 * diag(apply(X, 2, function(x) var(x[x != -999])), K)
+    }
     for (i in 1:K){
       if (ncat[i] >= 2){
         Psi[i,i] <- 1.0

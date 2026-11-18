@@ -1,6 +1,10 @@
 //
 // Changes and Bug Fixes
 //
+1.7-1 to 1.7-2
+  * fixed issue with standardizing variables with missing values in MCMCmixfactanal
+  * replaced defunct Scythe URL in help pages with JSS doi; updated URL in MCMCquantreg.Rd
+
 1.6.4 to 1.6.5
   * fixed warnings generated during c++ compiling 
   * matrix_random_access_iterator.h:97 matrix_forward_iterator.h:77, matrix_bidirectional_iterator.h:77 (void, void, void) is added 

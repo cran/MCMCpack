@@ -9,7 +9,7 @@
 #'
 #' \code{MCMCquantreg} simulates from the posterior distribution using Gibbs
 #' sampling with data augmentation (see
-#' \url{http://people.brunel.ac.uk/~mastkky/}).  \eqn{\beta} are drawn
+#' \url{https://people.brunel.ac.uk/~mastkky/}).  \eqn{\beta} are drawn
 #' from a multivariate normal distribution. The augmented data are drawn
 #' conditionally from the inverse Gaussian distribution. The simulation is
 #' carried out in compiled C++ code to maximise efficiency.  Please consult the
@@ -108,7 +108,7 @@
 #' \code{\link[quantreg]{rq}}
 #'
 #' @references Daniel Pemstein, Kevin M. Quinn, and Andrew D. Martin.  2007.
-#' \emph{Scythe Statistical Library 1.2.} \url{http://scythe.wustl.edu.s3-website-us-east-1.amazonaws.com/}.
+#' \emph{Scythe Statistical Library 1.2.} \doi{10.18637/jss.v042.i12}.
 #'
 #' Craig Reed and Keming Yu. 2009. ``An Efficient Gibbs Sampler for Bayesian
 #' Quantile Regression.'' Technical Report.
